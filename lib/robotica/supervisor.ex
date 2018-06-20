@@ -1,21 +1,13 @@
 defmodule Robotica.Supervisor do
   use Supervisor
 
-  defmodule Plugin do
-    @type t :: %__MODULE__{
-            module: atom,
-            config: map
-          }
-    @enforce_keys [:module, :config]
-    defstruct module: nil, config: nil
-  end
-
   defmodule State do
     @type t :: %__MODULE__{
-            plugins: list(Plugin.t())
+            plugins: list(Robotica.Plugins.Plugin.t()),
+            location: String.t()
           }
-    @enforce_keys [:plugins]
-    defstruct plugins: []
+    @enforce_keys [:plugins, :location]
+    defstruct plugins: [], location: nil
   end
 
   @spec start_link(opts :: State.t()) :: {:ok, pid} | {:error, String.t()}
@@ -23,17 +15,30 @@ defmodule Robotica.Supervisor do
     {:ok, pid} = Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
 
     Enum.each(opts.plugins, fn plugin ->
-      {:ok, _} = DynamicSupervisor.start_child(:dynamic, {plugin.module, plugin.config})
+      plugin = %Robotica.Plugins.Plugin{
+        plugin
+        | register: fn pid ->
+            Robotica.Executor.add(Robotica.Executor, plugin.location, pid)
+            nil
+          end
+      }
+
+      {:ok, _pid} = DynamicSupervisor.start_child(:dynamic, {plugin.module, plugin})
     end)
 
     {:ok, pid}
   end
 
   @impl true
-  def init(_opts) do
+  def init(opts) do
     children = [
-      {Robotica.Registry, name: Robotica.Registry},
-      {DynamicSupervisor, name: :dynamic, strategy: :one_for_one}
+      {Robotica.Executor, name: Robotica.Executor},
+      {DynamicSupervisor, name: :dynamic, strategy: :one_for_one},
+      {Tortoise.Connection,
+       client_id: Robotica.Client,
+       handler: {Robotica.Client, []},
+       server: {Tortoise.Transport.Tcp, host: 'proxy.pri', port: 1883},
+       subscriptions: [{"/action/#{opts.location}/", 0}]}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

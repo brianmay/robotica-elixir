@@ -2,30 +2,15 @@ defmodule Robotica.Client do
   require Logger
 
   defmodule State do
-    @type t :: %__MODULE__{
-            location: String.t()
-          }
-    @enforce_keys [:location]
-    defstruct location: nil
+    @type t :: %__MODULE__{}
+    defstruct []
   end
 
   @behaviour Tortoise.Handler
 
-  @spec start(opts :: State.t()) :: {:ok, pid}
-  def start(opts) do
-    location = opts.location
-
-    Tortoise.Supervisor.start_child(
-      client_id: Robotica.Client,
-      handler: {Robotica.Client, []},
-      server: {Tortoise.Transport.Tcp, host: 'proxy.pri', port: 1883},
-      subscriptions: [{"/action/#{location}/", 0}]
-    )
-  end
-
-  @spec init(opts :: State.t()) :: {:ok, State.t()}
-  def init(opts) do
-    {:ok, opts}
+  @spec init(opts :: list) :: {:ok, State.t()}
+  def init(_opts) do
+    {:ok, %State{}}
   end
 
   def connection(:up, state) do
@@ -65,19 +50,7 @@ defmodule Robotica.Client do
     locations = [location]
     actions = [message]
 
-    Enum.each(actions, fn action ->
-      Enum.each(locations, fn location ->
-        plugins = Robotica.Registry.lookup(Robotica.Registry, location)
-
-        Enum.each(plugins, fn plugin ->
-          Robotica.Plugins.execute(plugin, action)
-        end)
-
-        Enum.each(plugins, fn plugin ->
-          Robotica.Plugins.wait(plugin)
-        end)
-      end)
-    end)
+    Robotica.Executor.execute(Robotica.Executor, locations, actions)
 
     {:ok, state}
   end

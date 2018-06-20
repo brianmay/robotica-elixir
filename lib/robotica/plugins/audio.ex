@@ -1,34 +1,20 @@
 defmodule Robotica.Plugins.Audio do
   use GenServer
+  use Robotica.Plugins.Plugin
 
   defmodule State do
     @type t :: %__MODULE__{
             commands: %{required(String.t()) => String.t()},
-            sounds: %{required(String.t()) => String.t()},
-            location: String.t()
+            sounds: %{required(String.t()) => String.t()}
           }
-    @enforce_keys [:location]
     defstruct commands: %{},
-              sounds: %{},
-              location: nil
-  end
-
-  ## Client API
-
-  @spec start_link(config: State.t()) :: {:ok, pid} | {:error, String.t()}
-  def start_link(config) do
-    with {:ok, pid} <- GenServer.start_link(__MODULE__, config, []) do
-      Robotica.Registry.add(Robotica.Registry, config.location, pid)
-      {:ok, pid}
-    else
-      err -> err
-    end
+              sounds: %{}
   end
 
   ## Server Callbacks
 
-  def init(opts) do
-    {:ok, opts}
+  def init(config) do
+    {:ok, config}
   end
 
   @spec replace_values(String.t(), %{required(String.t()) => String.t()}) :: String.t()
@@ -98,7 +84,8 @@ defmodule Robotica.Plugins.Audio do
     0 = run(state, "music_stop", [])
   end
 
-  defp do_execute(state, action) do
+  @spec handle_execute(state :: State.t(), action :: Robotica.Executor.Action.t()) :: nil
+  defp handle_execute(state, action) do
     paused =
       if Map.has_key?(action, "music") do
         music_stop(state)
@@ -153,7 +140,7 @@ defmodule Robotica.Plugins.Audio do
   end
 
   def handle_cast({:execute, action}, state) do
-    do_execute(state, action)
+    handle_execute(state, action)
     {:noreply, state}
   end
 end

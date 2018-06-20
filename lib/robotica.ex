@@ -30,25 +30,20 @@ defmodule Robotica do
         "music_resume" => [
           ["mpc", "play"]
         ]
-      },
-      location: "Brian"
+      }
     }
 
     config = %Robotica.Supervisor.State{
       plugins: [
-        %Robotica.Supervisor.Plugin{
+        %Robotica.Plugins.Plugin{
           module: Robotica.Plugins.Audio,
+          location: "Brian",
           config: audio_config
         }
-      ]
-    }
-
-    Robotica.Supervisor.start_link(config)
-
-    config = %Robotica.Client.State{
+      ],
       location: "Brian"
     }
 
-    Robotica.Client.start(config)
+    Robotica.Supervisor.start_link(config)
   end
 end
