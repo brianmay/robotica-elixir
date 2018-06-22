@@ -2,6 +2,8 @@ defmodule Robotica do
   use Application
 
   def start(_type, _args) do
+    :ok = Lifx.Client.start
+
     audio_config = %Robotica.Plugins.Audio.State{
       sounds: %{
         "beep" => "sounds/ding1.wav",
@@ -32,6 +34,9 @@ defmodule Robotica do
         ]
       }
     }
+    lifx_config = %Robotica.Plugins.LIFX.State{
+        lights: ["Brian"]
+    }
 
     config = %Robotica.Supervisor.State{
       plugins: [
@@ -39,6 +44,11 @@ defmodule Robotica do
           module: Robotica.Plugins.Audio,
           location: "Brian",
           config: audio_config
+        },
+        %Robotica.Plugins.Plugin{
+          module: Robotica.Plugins.LIFX,
+          location: "Brian",
+          config: lifx_config
         }
       ],
       location: "Brian"
