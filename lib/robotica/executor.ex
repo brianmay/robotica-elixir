@@ -33,7 +33,7 @@ defmodule Robotica.Executor do
   @spec execute(server :: pid | atom, locations :: list(String.t()), actions :: list(Action.t())) ::
           nil
   def execute(server, locations, actions) do
-    GenServer.call(server, {:execute, locations, actions})
+    GenServer.call(server, {:execute, locations, actions}, :infinity)
     nil
   end
 

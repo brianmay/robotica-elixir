@@ -58,7 +58,7 @@ defmodule Robotica.Plugins.Audio do
 
   defp say(state, text) do
     play_sound(state, "prefix")
-    0 = run(state, "sayabc", text: text)
+    0 = run(state, "say", text: text)
     play_sound(state, "repeat")
     0 = run(state, "say", text: text)
     play_sound(state, "postfix")
@@ -86,13 +86,7 @@ defmodule Robotica.Plugins.Audio do
 
   @spec handle_execute(state :: State.t(), action :: Robotica.Executor.Action.t()) :: nil
   defp handle_execute(state, action) do
-    paused =
-      if Map.has_key?(action, "music") do
-        music_stop(state)
-        false
-      else
-        music_paused?(state)
-      end
+    paused = music_paused?(state)
 
     if Map.has_key?(action, "timer_status") do
       play_sound(state, "beep")
@@ -105,10 +99,8 @@ defmodule Robotica.Plugins.Audio do
 
     if Map.has_key?(action, "timer_status") do
       time_left = get_in(action, ["timer_status", "time_left"])
-      play_sound(state, "beep")
-
       if time_left > 0 and rem(time_left, 5) == 0 do
-        say(state, "{time_left} minutes")
+        say(state, "#{time_left} minutes")
       end
     end
 
