@@ -1,6 +1,7 @@
 defmodule Robotica.Plugins.Audio do
   use GenServer
   use Robotica.Plugins.Plugin
+  require Logger
 
   defmodule State do
     @type t :: %__MODULE__{
@@ -27,15 +28,15 @@ defmodule Robotica.Plugins.Audio do
   defp run_commands(state, [cmd | tail], values) do
     [cmd | args] = cmd
     args = Enum.map(args, &replace_values(&1, values))
-    IO.puts(cmd <> inspect(args))
+    Logger.debug(cmd <> inspect(args))
 
     case System.cmd(cmd, args) do
       {_, 0} ->
-        IO.puts("result no error")
+        Logger.debug("result no error")
         run_commands(state, tail, values)
 
       {_, rc} ->
-        IO.puts("result " <> inspect(rc))
+        Logger.debug("result " <> inspect(rc))
         rc
     end
   end
