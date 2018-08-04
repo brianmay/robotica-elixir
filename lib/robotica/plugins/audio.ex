@@ -75,13 +75,30 @@ defmodule Robotica.Plugins.Audio do
 
   defp music_resume(state, action, paused) do
     cond do
+      # If music given, process action.
       Map.has_key?(action, "music") ->
-        play_list = get_in(action, ["music", "play_list"])
-        music_play(state, play_list)
+        music = action["music"]
 
+        cond do
+          # If play list given, play music.
+          Map.has_key?(music, "play_list") ->
+            play_list = music["play_list"]
+            music_play(state, play_list)
+
+          # If no play_list given already paused, nothing to do.
+          paused ->
+            nil
+
+          # Otherwise pause music now.
+          true ->
+            music_paused?(state)
+        end
+
+      # If music paused, resume.
       paused ->
         0 = run(state, "music_resume", [])
 
+      # Otherwise do nothing.
       true ->
         nil
     end
