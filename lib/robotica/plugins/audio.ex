@@ -20,7 +20,7 @@ defmodule Robotica.Plugins.Audio do
 
   @spec replace_values(String.t(), %{required(String.t()) => String.t()}) :: String.t()
   defp replace_values(string, values) do
-    Regex.replace(~r/{([a-z]+)?}/, string, fn _, match ->
+    Regex.replace(~r/{([a-z_]+)?}/, string, fn _, match ->
       Map.fetch!(values, match)
     end)
   end
