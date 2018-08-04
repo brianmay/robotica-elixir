@@ -73,58 +73,116 @@ defmodule Robotica.Plugins.Audio do
     end
   end
 
-  defp music_resume(state) do
-    0 = run(state, "music_resume", [])
-  end
-
-  defp music_play(state, play_list) do
-    0 = run(state, "music_play", play_list: play_list)
-  end
-
-  defp music_stop(state) do
-    0 = run(state, "music_stop", [])
-  end
-
-  @spec handle_execute(state :: State.t(), action :: Robotica.Executor.Action.t()) :: nil
-  defp handle_execute(state, action) do
-    paused = music_paused?(state)
-
-    if Map.has_key?(action, "timer_status") do
-      play_sound(state, "beep")
-    end
-
-    if Map.has_key?(action, "sound") do
-      sound = get_in(action, ["sound"])
-      play_sound(state, sound)
-    end
-
-    if Map.has_key?(action, "timer_status") do
-      time_left = get_in(action, ["timer_status", "time_left"])
-      if time_left > 0 and rem(time_left, 5) == 0 do
-        say(state, "#{time_left} minutes")
-      end
-    end
-
-    if Map.has_key?(action, "timer_cancel") do
-      play_sound(state, "cancelled")
-      say(state, "timer cancelled")
-    end
-
-    if Map.has_key?(action, "message") do
-      text = get_in(action, ["message", "text"])
-      say(state, text)
-    end
-
+  defp music_resume(state, action, paused) do
     cond do
       Map.has_key?(action, "music") ->
         play_list = get_in(action, ["music", "play_list"])
         music_play(state, play_list)
 
       paused ->
-        music_resume(state)
+        0 = run(state, "music_resume", [])
 
       true ->
         nil
+    end
+
+    nil
+  end
+
+  defp music_play(state, play_list) do
+    0 = run(state, "music_play", play_list: play_list)
+    nil
+  end
+
+  defp music_stop(state) do
+    0 = run(state, "music_stop", [])
+  end
+
+  defp append_timer_beep(sound_list, action) do
+    if Map.has_key?(action, "timer_status") do
+      sound_list ++ [{:sound, "beep"}]
+    else
+      sound_list
+    end
+  end
+
+  defp append_sound(sound_list, action) do
+    if Map.has_key?(action, "sound") do
+      sound = get_in(action, ["sound"])
+      sound_list ++ [{:sound, sound}]
+    else
+      sound_list
+    end
+  end
+
+  defp append_timer_status(sound_list, action) do
+    if Map.has_key?(action, "timer_status") do
+      time_left = get_in(action, ["timer_status", "time_left"])
+
+      if time_left > 0 and rem(time_left, 5) == 0 do
+        sound_list ++ [{:say, "#{time_left} minutes"}]
+      else
+        sound_list
+      end
+    else
+      sound_list
+    end
+  end
+
+  defp append_timer_cancel(sound_list, action) do
+    if Map.has_key?(action, "timer_cancel") do
+      sound_list ++
+        [
+          {:sound, "cancelled"},
+          {:say, "timer cancelled"}
+        ]
+    else
+      sound_list
+    end
+  end
+
+  defp append_message(sound_list, action) do
+    if Map.has_key?(action, "message") do
+      text = get_in(action, ["message", "text"])
+      sound_list ++ [{:say, text}]
+    else
+      sound_list
+    end
+  end
+
+  defp get_sound_list(action) do
+    []
+    |> append_timer_beep(action)
+    |> append_sound(action)
+    |> append_timer_status(action)
+    |> append_timer_cancel(action)
+    |> append_message(action)
+  end
+
+  defp process_sound_list(_state, []), do: nil
+
+  defp process_sound_list(state, [head | tail]) do
+    case head do
+      {:sound, sound} ->
+        play_sound(state, sound)
+
+      {:say, text} ->
+        say(state, text)
+    end
+
+    process_sound_list(state, tail)
+  end
+
+  @spec handle_execute(state :: State.t(), action :: Robotica.Executor.Action.t()) :: nil
+  defp handle_execute(state, action) do
+    sound_list = get_sound_list(action)
+
+    if length(sound_list) > 0 do
+      paused = music_paused?(state)
+      process_sound_list(state, sound_list)
+      music_resume(state, action, paused)
+    else
+      music_resume(state, action, false)
     end
   end
 
