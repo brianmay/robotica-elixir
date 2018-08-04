@@ -4,7 +4,7 @@ defmodule Robotica.Plugins.LIFX do
 
   defmodule State do
     @type t :: %__MODULE__{
-            lights: list(String.t),
+            lights: list(String.t())
           }
     defstruct lights: %{}
   end
@@ -18,67 +18,76 @@ defmodule Robotica.Plugins.LIFX do
   @spec do_command(state :: State.t(), command :: map) :: nil
 
   defp do_command(state, %{"action" => "flash"}) do
-    lights = Enum.filter(Lifx.Client.devices, &(Enum.member?(state.lights, &1.label)))
+    lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
 
-    Enum.each(lights, &(Lifx.Device.on(&1.id)))
+    Enum.each(lights, &Lifx.Device.on(&1.id))
     Process.sleep(200)
-    Enum.each(lights, &(Lifx.Device.off(&1.id)))
+    Enum.each(lights, &Lifx.Device.off(&1.id))
     Process.sleep(200)
-    Enum.each(lights, &(Lifx.Device.on(&1.id)))
+    Enum.each(lights, &Lifx.Device.on(&1.id))
     Process.sleep(200)
-    Enum.each(lights, &(Lifx.Device.off(&1.id)))
+    Enum.each(lights, &Lifx.Device.off(&1.id))
     Process.sleep(200)
-    Enum.each(lights, &(GenServer.cast(&1.id, {:set_power, &1.power})))
+    Enum.each(lights, &GenServer.cast(&1.id, {:set_power, &1.power}))
 
     nil
   end
 
   defp do_command(state, %{"action" => "turn_off"}) do
-    lights = Enum.filter(Lifx.Client.devices, &(Enum.member?(state.lights, &1.label)))
+    lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
 
-    Enum.each(lights, &(Lifx.Device.off(&1.id)))
+    Enum.each(lights, &Lifx.Device.off(&1.id))
 
     nil
   end
 
-  defp do_command(state, %{"action" => "turn_on"}=command) do
-    lights = Enum.filter(Lifx.Client.devices, &(Enum.member?(state.lights, &1.label)))
+  defp do_command(state, %{"action" => "turn_on"} = command) do
+    lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
 
     if Map.has_key?(command, "color") do
-        src_color = Map.fetch!(command, "color")
-        color = %Lifx.Protocol.HSBK{
-            hue: Map.fetch!(src_color, "hue"),
-            saturation: Map.fetch!(src_color, "saturation"),
-            brightness: Map.fetch!(src_color, "brightness"),
-            kelvin: Map.fetch!(src_color, "kelvin")
-        }
+      src_color = Map.fetch!(command, "color")
 
-        Enum.each(lights, &(Lifx.Device.set_color(&1.id, color)))
+      color = %Lifx.Protocol.HSBK{
+        hue: Map.fetch!(src_color, "hue"),
+        saturation: Map.fetch!(src_color, "saturation"),
+        brightness: Map.fetch!(src_color, "brightness"),
+        kelvin: Map.fetch!(src_color, "kelvin")
+      }
+
+      Enum.each(lights, &Lifx.Device.set_color(&1.id, color))
     end
 
-    Enum.each(lights, &(Lifx.Device.on(&1.id)))
+    Enum.each(lights, &Lifx.Device.on(&1.id))
 
     nil
   end
 
   defp do_command(state, %{"action" => "wake_up"}) do
-    lights = Enum.filter(Lifx.Client.devices, &(Enum.member?(state.lights, &1.label)))
+    lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
 
-    Enum.each(lights, fn light -> 
-        power = light.power
-        if power == 0 do
-            color_off = %Lifx.Protocol.HSBK{
-                hue: 0, saturation: 0, brightness: 0, kelvin: 2500
-            }
-            Lifx.Device.set_color(light.id, color_off)
-        end
+    Enum.each(lights, fn light ->
+      power = light.power
 
-        color_on = %Lifx.Protocol.HSBK{
-            hue: 0, saturation: 0, brightness: 100, kelvin: 2500
+      if power == 0 do
+        color_off = %Lifx.Protocol.HSBK{
+          hue: 0,
+          saturation: 0,
+          brightness: 0,
+          kelvin: 2500
         }
 
-        Lifx.Device.on(light.id)
-        Lifx.Device.set_color(light.id, color_on, 60000)
+        Lifx.Device.set_color(light.id, color_off)
+      end
+
+      color_on = %Lifx.Protocol.HSBK{
+        hue: 0,
+        saturation: 0,
+        brightness: 100,
+        kelvin: 2500
+      }
+
+      Lifx.Device.on(light.id)
+      Lifx.Device.set_color(light.id, color_on, 60000)
     end)
 
     nil
@@ -94,6 +103,7 @@ defmodule Robotica.Plugins.LIFX do
       command = get_in(action, ["lights"])
       do_command(state, command)
     end
+
     nil
   end
 
