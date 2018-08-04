@@ -23,9 +23,6 @@ defmodule Robotica do
           ["mpc", "load", "{play_list}"],
           ["mpc", "play"]
         ],
-        "music_stop" => [
-          ["mpc", "stop"]
-        ],
         "music_pause" => [
           ["mpc", "pause-if-playing"]
         ],

@@ -94,10 +94,6 @@ defmodule Robotica.Plugins.Audio do
     nil
   end
 
-  defp music_stop(state) do
-    0 = run(state, "music_stop", [])
-  end
-
   defp append_timer_beep(sound_list, action) do
     if Map.has_key?(action, "timer_status") do
       sound_list ++ [{:sound, "beep"}]
