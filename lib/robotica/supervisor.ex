@@ -31,11 +31,14 @@ defmodule Robotica.Supervisor do
 
   @impl true
   def init(opts) do
+    {:ok, hostname} = :inet.gethostname()
+    hostname = to_string(hostname)
+
     children = [
       {Robotica.Executor, name: Robotica.Executor},
       {DynamicSupervisor, name: :dynamic, strategy: :one_for_one},
       {Tortoise.Connection,
-       client_id: Robotica.Client,
+       client_id: "robotica-#{hostname}",
        handler: {Robotica.Client, []},
        server: {Tortoise.Transport.Tcp, host: 'proxy.pri', port: 1883},
        subscriptions: [{"/action/#{opts.location}/", 0}]}
