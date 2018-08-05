@@ -73,36 +73,8 @@ defmodule Robotica.Plugins.Audio do
     end
   end
 
-  defp music_resume(state, action, paused) do
-    cond do
-      # If music given, process action.
-      Map.has_key?(action, "music") ->
-        music = action["music"]
-
-        cond do
-          # If play list given, play music.
-          Map.has_key?(music, "play_list") ->
-            play_list = music["play_list"]
-            music_play(state, play_list)
-
-          # If no play_list given already paused, nothing to do.
-          paused ->
-            nil
-
-          # Otherwise pause music now.
-          true ->
-            music_paused?(state)
-        end
-
-      # If music paused, resume.
-      paused ->
-        0 = run(state, "music_resume", [])
-
-      # Otherwise do nothing.
-      true ->
-        nil
-    end
-
+  defp music_resume(state) do
+    0 = run(state, "music_resume", [])
     nil
   end
 
@@ -111,57 +83,49 @@ defmodule Robotica.Plugins.Audio do
     nil
   end
 
-  defp append_timer_beep(sound_list, action) do
-    if Map.has_key?(action, "timer_status") do
-      sound_list ++ [{:sound, "beep"}]
+  defp append_timer_beep(sound_list, %{"timer_status" => _}) do
+    sound_list ++ [{:sound, "beep"}]
+  end
+
+  defp append_timer_beep(sound_list, _), do: sound_list
+
+  defp append_sound(sound_list, %{"sound" => sound}) do
+    sound_list ++ [{:sound, sound}]
+  end
+
+  defp append_sound(sound_list, _), do: sound_list
+
+  defp append_timer_status(sound_list, %{"timer_status" => %{"time_left" => time_left}}) do
+    if time_left > 0 and rem(time_left, 5) == 0 do
+      sound_list ++ [{:say, "#{time_left} minutes"}]
     else
       sound_list
     end
   end
 
-  defp append_sound(sound_list, action) do
-    if Map.has_key?(action, "sound") do
-      sound = get_in(action, ["sound"])
-      sound_list ++ [{:sound, sound}]
-    else
-      sound_list
-    end
+  defp append_timer_status(sound_list, _), do: sound_list
+
+  defp append_timer_cancel(sound_list, %{"timer_cancel" => _}) do
+    sound_list ++
+      [
+        {:sound, "cancelled"},
+        {:say, "timer cancelled"}
+      ]
   end
 
-  defp append_timer_status(sound_list, action) do
-    if Map.has_key?(action, "timer_status") do
-      time_left = get_in(action, ["timer_status", "time_left"])
+  defp append_timer_cancel(sound_list, _), do: sound_list
 
-      if time_left > 0 and rem(time_left, 5) == 0 do
-        sound_list ++ [{:say, "#{time_left} minutes"}]
-      else
-        sound_list
-      end
-    else
-      sound_list
-    end
+  defp append_message(sound_list, %{"messsage" => %{"text" => text}}) do
+    sound_list ++ [{:say, text}]
   end
 
-  defp append_timer_cancel(sound_list, action) do
-    if Map.has_key?(action, "timer_cancel") do
-      sound_list ++
-        [
-          {:sound, "cancelled"},
-          {:say, "timer cancelled"}
-        ]
-    else
-      sound_list
-    end
+  defp append_message(sound_list, _), do: sound_list
+
+  defp append_music(sound_list, %{"music" => %{"play_list" => play_list}}) do
+    sound_list ++ [{:music, play_list}]
   end
 
-  defp append_message(sound_list, action) do
-    if Map.has_key?(action, "message") do
-      text = get_in(action, ["message", "text"])
-      sound_list ++ [{:say, text}]
-    else
-      sound_list
-    end
-  end
+  defp append_music(sound_list, _), do: sound_list
 
   defp get_sound_list(action) do
     []
@@ -170,6 +134,7 @@ defmodule Robotica.Plugins.Audio do
     |> append_timer_status(action)
     |> append_timer_cancel(action)
     |> append_message(action)
+    |> append_music(action)
   end
 
   defp process_sound_list(_state, []), do: nil
@@ -181,10 +146,17 @@ defmodule Robotica.Plugins.Audio do
 
       {:say, text} ->
         say(state, text)
+
+      {:music, play_list} ->
+        music_play(state, play_list)
     end
 
     process_sound_list(state, tail)
   end
+
+  defp sound_list_has_music([]), do: False
+  defp sound_list_has_music([{:music, _} | _]), do: True
+  defp sound_list_has_music([_ | tail]), do: sound_list_has_music(tail)
 
   @spec handle_execute(state :: State.t(), action :: Robotica.Executor.Action.t()) :: nil
   defp handle_execute(state, action) do
@@ -193,9 +165,10 @@ defmodule Robotica.Plugins.Audio do
     if length(sound_list) > 0 do
       paused = music_paused?(state)
       process_sound_list(state, sound_list)
-      music_resume(state, action, paused)
-    else
-      music_resume(state, action, false)
+
+      if paused and not sound_list_has_music(sound_list) do
+        music_resume(state)
+      end
     end
   end
 
