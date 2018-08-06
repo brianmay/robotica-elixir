@@ -83,6 +83,10 @@ defmodule Robotica.Plugins.Audio do
     nil
   end
 
+  defp music_stop(state) do
+    0 = run(state, "music_stop", [])
+  end
+
   defp append_timer_beep(sound_list, %{"timer_status" => _}) do
     sound_list ++ [{:sound, "beep"}]
   end
@@ -125,6 +129,10 @@ defmodule Robotica.Plugins.Audio do
     sound_list ++ [{:music, play_list}]
   end
 
+  defp append_music(sound_list, %{"music" => _}) do
+    sound_list ++ [{:music, nil}]
+  end
+
   defp append_music(sound_list, _), do: sound_list
 
   defp get_sound_list(action) do
@@ -147,15 +155,20 @@ defmodule Robotica.Plugins.Audio do
       {:say, text} ->
         say(state, text)
 
+      {:music, nil} ->
+        music_stop(state)
+
       {:music, play_list} ->
         music_play(state, play_list)
     end
 
     process_sound_list(state, tail)
+
+    nil
   end
 
-  defp sound_list_has_music([]), do: False
-  defp sound_list_has_music([{:music, _} | _]), do: True
+  defp sound_list_has_music([]), do: false
+  defp sound_list_has_music([{:music, _} | _]), do: true
   defp sound_list_has_music([_ | tail]), do: sound_list_has_music(tail)
 
   @spec handle_execute(state :: State.t(), action :: Robotica.Executor.Action.t()) :: nil
