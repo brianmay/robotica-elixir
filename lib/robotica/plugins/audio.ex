@@ -115,7 +115,7 @@ defmodule Robotica.Plugins.Audio do
 
   defp append_timer_cancel(sound_list, _), do: sound_list
 
-  defp append_message(sound_list, %{"messsage" => %{"text" => text}}) do
+  defp append_message(sound_list, %{"message" => %{"text" => text}}) do
     sound_list ++ [{:say, text}]
   end
 
