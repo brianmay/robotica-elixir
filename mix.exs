@@ -25,7 +25,8 @@ defmodule Robotica.MixProject do
       {:poison, "~> 3.1"},
       {:tortoise, "~> 0.4.2"},
       {:dialyxir, "~> 1.0.0-rc.2", only: [:dev], runtime: false},
-      {:lifx, "~> 0.1.8"}
+      {:lifx, "~> 0.1.8"},
+      {:yaml_elixir, "~> 2.1.0"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
     ]
