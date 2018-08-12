@@ -25,6 +25,20 @@ defmodule Robotica.Plugins do
     end
   end
 
+  defmodule Task do
+    @enforce_keys [:locations, :actions]
+    defstruct locations: [], actions: []
+  end
+
+  defmodule Action do
+    defstruct message: nil,
+              lights: nil,
+              sound: nil,
+              music: nil,
+              timer_status: nil,
+              timer_cancel: nil
+  end
+
   @spec execute(server :: pid, action :: map) :: nil
   def execute(server, action) do
     GenServer.cast(server, {:execute, action})

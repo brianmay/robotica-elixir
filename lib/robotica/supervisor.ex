@@ -3,11 +3,10 @@ defmodule Robotica.Supervisor do
 
   defmodule State do
     @type t :: %__MODULE__{
-            plugins: list(Robotica.Plugins.Plugin.t()),
-            location: String.t()
+            plugins: list(Robotica.Plugins.Plugin.t())
           }
-    @enforce_keys [:plugins, :location]
-    defstruct plugins: [], location: nil
+    @enforce_keys [:plugins]
+    defstruct plugins: []
   end
 
   @spec start_link(opts :: State.t()) :: {:ok, pid} | {:error, String.t()}
@@ -26,11 +25,13 @@ defmodule Robotica.Supervisor do
       {:ok, _pid} = DynamicSupervisor.start_child(:dynamic, {plugin.module, plugin})
     end)
 
+    Robotica.Scheduler.load_schedule()
+
     {:ok, pid}
   end
 
   @impl true
-  def init(opts) do
+  def init(_opts) do
     {:ok, hostname} = :inet.gethostname()
     hostname = to_string(hostname)
 
@@ -41,7 +42,7 @@ defmodule Robotica.Supervisor do
        client_id: "robotica-#{hostname}",
        handler: {Robotica.Client, []},
        server: {Tortoise.Transport.Tcp, host: 'proxy.pri', port: 1883},
-       subscriptions: [{"/action/#{opts.location}/", 0}]}
+       subscriptions: [{"/execute/", 0}]}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

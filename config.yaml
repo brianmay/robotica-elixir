@@ -8,6 +8,8 @@ plugins:
             repeat: "sounds/cymbal.wav"
             postfix: "sounds/logout.wav"
         commands:
+            init:
+              - ["amixer", "sset", "Master", "100%"]
             play:
               - ["aplay", "{file}"]
             say:
@@ -22,4 +24,3 @@ plugins:
               - ["mpc", "pause-if-playing"]
             music_resume:
               - ["mpc", "play"]
-location: Brian

@@ -3,11 +3,23 @@ defmodule Robotica.Plugins.Audio do
   use Robotica.Plugins.Plugin
   require Logger
 
+  defmodule Commands do
+    @enforce_keys [:init, :play, :say, :music_play, :music_stop, :music_pause, :music_resume]
+    defstruct init: nil,
+              play: nil,
+              say: nil,
+              music_play: nil,
+              music_stop: nil,
+              music_pause: nil,
+              music_resume: nil
+  end
+
   defmodule State do
     @type t :: %__MODULE__{
             commands: %{required(String.t()) => String.t()},
             sounds: %{required(String.t()) => String.t()}
           }
+    @enforce_keys [:commands, :sounds]
     defstruct commands: %{},
               sounds: %{}
   end
@@ -15,6 +27,7 @@ defmodule Robotica.Plugins.Audio do
   ## Server Callbacks
 
   def init(config) do
+    0 = run(config, :init, [])
     {:ok, config}
   end
 
@@ -54,52 +67,52 @@ defmodule Robotica.Plugins.Audio do
 
   defp play_sound(state, sound) do
     sound_file = Map.fetch!(state.sounds, sound)
-    0 = run(state, "play", file: sound_file)
+    0 = run(state, :play, file: sound_file)
   end
 
   defp say(state, text) do
     play_sound(state, "prefix")
-    0 = run(state, "say", text: text)
+    0 = run(state, :say, text: text)
     play_sound(state, "repeat")
-    0 = run(state, "say", text: text)
+    0 = run(state, :say, text: text)
     play_sound(state, "postfix")
     nil
   end
 
   defp music_paused?(state) do
-    case run(state, "music_pause", []) do
+    case run(state, :music_pause, []) do
       0 -> true
       _ -> false
     end
   end
 
   defp music_resume(state) do
-    0 = run(state, "music_resume", [])
+    0 = run(state, :music_resume, [])
     nil
   end
 
   defp music_play(state, play_list) do
-    0 = run(state, "music_play", play_list: play_list)
+    0 = run(state, :music_play, play_list: play_list)
     nil
   end
 
   defp music_stop(state) do
-    0 = run(state, "music_stop", [])
+    0 = run(state, :music_stop, [])
   end
 
-  defp append_timer_beep(sound_list, %{"timer_status" => _}) do
+  defp append_timer_beep(sound_list, %{timer_status: %{}}) do
     sound_list ++ [{:sound, "beep"}]
   end
 
   defp append_timer_beep(sound_list, _), do: sound_list
 
-  defp append_sound(sound_list, %{"sound" => sound}) do
+  defp append_sound(sound_list, %{sound: %{} = sound}) do
     sound_list ++ [{:sound, sound}]
   end
 
   defp append_sound(sound_list, _), do: sound_list
 
-  defp append_timer_status(sound_list, %{"timer_status" => %{"time_left" => time_left}}) do
+  defp append_timer_status(sound_list, %{timer_status: %{"time_left" => time_left}}) do
     if time_left > 0 and rem(time_left, 5) == 0 do
       sound_list ++ [{:say, "#{time_left} minutes"}]
     else
@@ -109,7 +122,7 @@ defmodule Robotica.Plugins.Audio do
 
   defp append_timer_status(sound_list, _), do: sound_list
 
-  defp append_timer_cancel(sound_list, %{"timer_cancel" => _}) do
+  defp append_timer_cancel(sound_list, %{timer_cancel: %{}}) do
     sound_list ++
       [
         {:sound, "cancelled"},
@@ -119,18 +132,18 @@ defmodule Robotica.Plugins.Audio do
 
   defp append_timer_cancel(sound_list, _), do: sound_list
 
-  defp append_message(sound_list, %{"message" => %{"text" => text}}) do
+  defp append_message(sound_list, %{message: %{"text" => text}}) do
     sound_list ++ [{:say, text}]
   end
 
   defp append_message(sound_list, _), do: sound_list
 
-  defp append_music(sound_list, %{"music" => %{"play_list" => play_list}}) do
-    sound_list ++ [{:music, play_list}]
+  defp append_music(sound_list, %{music: %{"stop" => true}}) do
+    sound_list ++ [{:music, nil}]
   end
 
-  defp append_music(sound_list, %{"music" => _}) do
-    sound_list ++ [{:music, nil}]
+  defp append_music(sound_list, %{music: %{"play_list" => play_list}}) do
+    sound_list ++ [{:music, play_list}]
   end
 
   defp append_music(sound_list, _), do: sound_list

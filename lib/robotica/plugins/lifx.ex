@@ -99,9 +99,12 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec handle_execute(state :: State.t(), action :: Robotica.Executor.Action.t()) :: nil
   defp handle_execute(state, action) do
-    if Map.has_key?(action, "lights") do
-      command = get_in(action, ["lights"])
-      do_command(state, command)
+    case action.lights do
+      %{} = lights ->
+        do_command(state, lights)
+
+      _ ->
+        nil
     end
 
     nil

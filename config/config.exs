@@ -3,7 +3,11 @@
 use Mix.Config
 
 config :robotica,
-    config_file: "config.yaml"
+  config_file: "config.yaml",
+  classifications_file: "classifications.yaml",
+  schedule_file: "schedule.yaml",
+  sequences_file: "sequences.yaml",
+  timezone: "Australia/Melbourne"
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
