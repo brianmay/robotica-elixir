@@ -1,4 +1,11 @@
 defmodule Robotica.Config do
+  @spec replace_values(String.t(), %{required(String.t()) => String.t()}) :: String.t()
+  defp replace_values(string, values) do
+    Regex.replace(~r/{([a-z_]+)?}/, string, fn _, match ->
+      Map.fetch!(values, match)
+    end)
+  end
+
   defp map_anything(input, key, required) do
     {value, input} = Map.pop(input, key)
 
@@ -532,46 +539,48 @@ defmodule Robotica.Config do
 
   defp validate_sequences(_), do: {:error, "Sequences didn't get a map."}
 
+  def substitutions do
+    {:ok, hostname} = :inet.gethostname()
+    hostname = to_string(hostname)
+    %{
+        "hostname" => hostname,
+    }
+  end
+
   def configuration do
     filename = Application.get_env(:robotica, :config_file)
+    |> replace_values(substitutions())
+    IO.puts(filename)
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_config(data)
     data
   end
 
-  defp classifications_internal do
+  def classifications do
     filename = Application.get_env(:robotica, :classifications_file)
+    |> replace_values(substitutions())
+    IO.puts(filename)
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_classifications(data)
     data
   end
 
-  def schedule_internal do
+  def schedule do
     filename = Application.get_env(:robotica, :schedule_file)
+    |> replace_values(substitutions())
+    IO.puts(filename)
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_schedule(data)
     data
   end
 
-  def sequences_internal do
+  def sequences do
     filename = Application.get_env(:robotica, :sequences_file)
+    |> replace_values(substitutions())
+    IO.puts(filename)
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_sequences(data)
     data
   end
 
-  defmacro classifications do
-    data = classifications_internal()
-    Macro.escape(data)
-  end
-
-  defmacro schedule do
-    data = schedule_internal()
-    Macro.escape(data)
-  end
-
-  defmacro sequences do
-    data = sequences_internal()
-    Macro.escape(data)
-  end
 end

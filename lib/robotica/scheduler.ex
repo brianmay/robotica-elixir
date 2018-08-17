@@ -1,6 +1,4 @@
 defmodule Robotica.Scheduler do
-  require Robotica.Config
-
   @timezone Application.get_env(:robotica, :timezone)
 
   defmodule Classification do
@@ -21,8 +19,9 @@ defmodule Robotica.Scheduler do
       end
     end
 
-    defp classifications do
-      Robotica.Config.classifications()
+    defmacrop classifications do
+      data = Robotica.Config.classifications()
+      Macro.escape(data)
     end
 
     defp is_date_in_classification?(%Classification{} = classification, date) do
@@ -96,8 +95,9 @@ defmodule Robotica.Scheduler do
   defmodule Schedule do
     @timezone Application.get_env(:robotica, :timezone)
 
-    defp actions do
-      Robotica.Config.schedule()
+    defmacrop schedule do
+      data = Robotica.Config.schedule()
+      Macro.escape(data)
     end
 
     defp convert_time_to_utc(time) do
@@ -121,7 +121,7 @@ defmodule Robotica.Scheduler do
     end
 
     def get_schedule(classifications) do
-      a = actions()
+      a = schedule()
 
       tomorrow = Calendar.Date.today!(@timezone) |> Calendar.Date.next_day!()
 
@@ -221,8 +221,13 @@ defmodule Robotica.Scheduler do
   end
 
   defmodule Sequence do
+    defmacrop sequences do
+      data = Robotica.Config.sequences()
+      Macro.escape(data)
+    end
+
     defp get_sequence(sequence_name) do
-      Robotica.Config.sequences()
+      sequences()
       |> Map.fetch!(sequence_name)
     end
 

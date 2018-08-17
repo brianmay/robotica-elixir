@@ -3,7 +3,7 @@
 use Mix.Config
 
 config :robotica,
-  config_file: "config.yaml",
+  config_file: "config-{hostname}.yaml",
   classifications_file: "classifications.yaml",
   schedule_file: "schedule.yaml",
   sequences_file: "sequences.yaml",
