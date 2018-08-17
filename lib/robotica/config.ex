@@ -449,6 +449,7 @@ defmodule Robotica.Config do
 
     with {:ok, i, locations} <- map_anything(i, "locations", true),
          {:ok, i, actions} <- map_anything(i, "actions", true),
+         {:ok} <- map_used_all_keys(i),
          {:ok, locations} <- validate_locations(locations),
          {:ok, actions} <- validate_actions(actions) do
       result = %Robotica.Plugins.Task{
