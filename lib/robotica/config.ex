@@ -539,29 +539,39 @@ defmodule Robotica.Config do
     data
   end
 
-  def classifications do
+  defp classifications_internal do
     filename = Application.get_env(:robotica, :classifications_file)
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_classifications(data)
     data
   end
 
-  def schedule do
+  def schedule_internal do
     filename = Application.get_env(:robotica, :schedule_file)
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_schedule(data)
     data
   end
 
-  def sequences do
+  def sequences_internal do
     filename = Application.get_env(:robotica, :sequences_file)
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_sequences(data)
     data
   end
 
-  defmacro configuration_old do
-    data = configuration()
+  defmacro classifications do
+    data = classifications_internal()
+    Macro.escape(data)
+  end
+
+  defmacro schedule do
+    data = schedule_internal()
+    Macro.escape(data)
+  end
+
+  defmacro sequences do
+    data = sequences_internal()
     Macro.escape(data)
   end
 end

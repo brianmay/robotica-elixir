@@ -1,4 +1,6 @@
 defmodule Robotica.Scheduler do
+  require Robotica.Config
+
   @timezone Application.get_env(:robotica, :timezone)
 
   defmodule Classification do
