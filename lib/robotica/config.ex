@@ -169,6 +169,7 @@ defmodule Robotica.Config do
   defp validate_plugins(_), do: {:error, "Data is not a list."}
 
   defp validate_module("Audio"), do: {:ok, Robotica.Plugins.Audio}
+  defp validate_module("LIFX"), do: {:ok, Robotica.Plugins.LIFX}
   defp validate_module(module), do: {:error, "Unknown module #{module}"}
 
   defp validate_command_item([]), do: {:ok, []}
@@ -255,6 +256,19 @@ defmodule Robotica.Config do
 
   defp validate_plugin_audio_commands(_), do: {:error, "Commands didn't get a map."}
 
+  defp validate_plugin_lifx_lights([]), do: {:ok, []}
+
+  defp validate_plugin_lifx_lights([head | tail]) do
+    with {:ok, head} <- validate_string(head),
+         {:ok, tail} <- validate_plugin_lifx_lights(tail) do
+      {:ok, [head] ++ tail}
+    else
+      {:error, err} -> {:error, err}
+    end
+  end
+
+  defp validate_plugin_lifx_lights(_), do: {:error, "Data is not a list."}
+
   defp validate_plugin_config(%{} = item, Robotica.Plugins.Audio) do
     i = item
 
@@ -274,7 +288,23 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_plugin_config(%{}, _), do: {:error, "Unknown plugin."}
+  defp validate_plugin_config(%{} = item, Robotica.Plugins.LIFX) do
+    i = item
+
+    with {:ok, i, lights} <- map_anything(i, "lights", true),
+         {:ok} <- map_used_all_keys(i),
+         {:ok, lights} <- validate_plugin_lifx_lights(lights) do
+      result = %Robotica.Plugins.LIFX.State{
+        lights: lights
+      }
+
+      {:ok, result}
+    else
+      {:error, err} -> {:error, err}
+    end
+  end
+
+  defp validate_plugin_config(%{}, plugin), do: {:error, "Unknown plugin #{plugin}."}
   defp validate_plugin_config(_, _), do: {:error, "Plugin didn't get a map."}
 
   defp validate_config(%{} = item) do

@@ -3,6 +3,7 @@ defmodule Robotica do
   require Robotica.Config
 
   def start(_type, _args) do
+    Lifx.Client.start
     config = Robotica.Config.configuration()
     Robotica.Supervisor.start_link(config)
   end

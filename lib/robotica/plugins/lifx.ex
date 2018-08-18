@@ -6,7 +6,7 @@ defmodule Robotica.Plugins.LIFX do
     @type t :: %__MODULE__{
             lights: list(String.t())
           }
-    defstruct lights: %{}
+    defstruct lights: []
   end
 
   ## Server Callbacks
@@ -20,15 +20,15 @@ defmodule Robotica.Plugins.LIFX do
   defp do_command(state, %{"action" => "flash"}) do
     lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
 
-    Enum.each(lights, &Lifx.Device.on(&1.id))
+    Enum.each(lights, &Lifx.Device.on_wait(&1))
     Process.sleep(200)
-    Enum.each(lights, &Lifx.Device.off(&1.id))
+    Enum.each(lights, &Lifx.Device.off_wait(&1))
     Process.sleep(200)
-    Enum.each(lights, &Lifx.Device.on(&1.id))
+    Enum.each(lights, &Lifx.Device.on_wait(&1))
     Process.sleep(200)
-    Enum.each(lights, &Lifx.Device.off(&1.id))
+    Enum.each(lights, &Lifx.Device.off_wait(&1))
     Process.sleep(200)
-    Enum.each(lights, &GenServer.cast(&1.id, {:set_power, &1.power}))
+    Enum.each(lights, &GenServer.cast(&1, {:set_power, &1.power}))
 
     nil
   end
@@ -36,7 +36,7 @@ defmodule Robotica.Plugins.LIFX do
   defp do_command(state, %{"action" => "turn_off"}) do
     lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
 
-    Enum.each(lights, &Lifx.Device.off(&1.id))
+    Enum.each(lights, &Lifx.Device.off_wait(&1))
 
     nil
   end
@@ -54,10 +54,10 @@ defmodule Robotica.Plugins.LIFX do
         kelvin: Map.fetch!(src_color, "kelvin")
       }
 
-      Enum.each(lights, &Lifx.Device.set_color(&1.id, color))
+      Enum.each(lights, &Lifx.Device.set_color_wait(&1, color))
     end
 
-    Enum.each(lights, &Lifx.Device.on(&1.id))
+    Enum.each(lights, &Lifx.Device.on_wait(&1))
 
     nil
   end
@@ -76,7 +76,7 @@ defmodule Robotica.Plugins.LIFX do
           kelvin: 2500
         }
 
-        Lifx.Device.set_color(light.id, color_off)
+        Lifx.Device.set_color_wait(light, color_off)
       end
 
       color_on = %Lifx.Protocol.HSBK{
@@ -86,7 +86,7 @@ defmodule Robotica.Plugins.LIFX do
         kelvin: 2500
       }
 
-      Lifx.Device.on(light.id)
+      Lifx.Device.on_wait(light.id)
       Lifx.Device.set_color(light.id, color_on, 60000)
     end)
 
