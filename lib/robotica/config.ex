@@ -580,7 +580,6 @@ defmodule Robotica.Config do
   def configuration do
     filename = Application.get_env(:robotica, :config_file)
     |> replace_values(substitutions())
-    IO.puts(filename)
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_config(data)
     data
@@ -589,7 +588,6 @@ defmodule Robotica.Config do
   def classifications do
     filename = Application.get_env(:robotica, :classifications_file)
     |> replace_values(substitutions())
-    IO.puts(filename)
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_classifications(data)
     data
@@ -598,7 +596,6 @@ defmodule Robotica.Config do
   def schedule do
     filename = Application.get_env(:robotica, :schedule_file)
     |> replace_values(substitutions())
-    IO.puts(filename)
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_schedule(data)
     data
@@ -607,7 +604,6 @@ defmodule Robotica.Config do
   def sequences do
     filename = Application.get_env(:robotica, :sequences_file)
     |> replace_values(substitutions())
-    IO.puts(filename)
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_sequences(data)
     data

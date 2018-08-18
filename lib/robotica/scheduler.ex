@@ -1,4 +1,6 @@
 defmodule Robotica.Scheduler do
+  require Logger
+
   @timezone Application.get_env(:robotica, :timezone)
 
   defmodule Classification do
@@ -175,23 +177,23 @@ defmodule Robotica.Scheduler do
         Calendar.DateTime.before?(now, required_time) ->
           {:ok, s, ms, :after} = Calendar.DateTime.diff(required_time, now)
           milliseconds = Kernel.trunc(s * 1000 + ms / 1000)
-          IO.puts("Sleeping #{inspect(milliseconds)} until #{inspect(required_time)}.")
+          Logger.debug("Sleeping #{inspect(milliseconds)} until #{inspect(required_time)}.")
           Process.send_after(self(), {:timer, required_time, latest_time}, milliseconds)
           state
 
         Calendar.DateTime.before?(now, latest_time) ->
-          IO.puts("Running late for #{inspect(required_time)}.")
+          Logger.debug("Running late for #{inspect(required_time)}.")
           do_step(required_time, step)
           set_timer({required_time, tail})
 
         true ->
-          IO.puts("Skipping #{inspect(required_time)}.")
+          Logger.debug("Skipping #{inspect(required_time)}.")
           set_timer({required_time, tail})
       end
     end
 
     defp do_step(_required_time, %Step{locations: locations, actions: actions} = step) do
-      IO.puts("Executing #{inspect(actions)} at locations #{inspect(locations)}")
+      Logger.debug("Executing #{inspect(actions)} at locations #{inspect(locations)}")
       Robotica.Executor.execute(Robotica.Executor, locations, actions)
 
       if step.load_schedule do
@@ -203,12 +205,12 @@ defmodule Robotica.Scheduler do
 
     def handle_info({:timer, required_time, latest_time}, {_, [step | tail]}) do
       now = Calendar.DateTime.now_utc()
-      IO.puts("Got timer at time #{inspect(now)}")
+      Logger.debug("Got timer at time #{inspect(now)}")
 
       if Calendar.DateTime.before?(now, latest_time) do
         do_step(required_time, step)
       else
-        IO.puts("Timer received too late for #{inspect(step)} @ #{inspect(required_time)}")
+        Logger.debug("Timer received too late for #{inspect(step)} @ #{inspect(required_time)}")
       end
 
       state = set_timer({required_time, tail})
@@ -249,18 +251,18 @@ defmodule Robotica.Scheduler do
       {required_time, sequence_names} = head
 
       Enum.each(sequence_names, fn sequence_name ->
-        IO.puts("")
-        IO.puts("Loading schedule #{inspect(sequence_name)} for #{inspect(required_time)}.")
+        Logger.debug("")
+        Logger.debug("Loading schedule #{inspect(sequence_name)} for #{inspect(required_time)}.")
         sequence = get_sequence(sequence_name)
         required_time = get_start_time(required_time, sequence)
-        IO.puts("Actual start time for #{inspect(sequence_name)} is #{inspect(required_time)}.")
+        Logger.debug("Actual start time for #{inspect(sequence_name)} is #{inspect(required_time)}.")
         state = {required_time, sequence}
         r = DynamicSupervisor.start_child(:dynamic, {Sequencer, state})
 
         case r do
           {:ok, _pid} -> nil
           {:error, :normal} -> nil
-          r -> IO.puts("Error #{inspect(r)}.")
+          r -> Logger.debug("Error #{inspect(r)}.")
         end
       end)
 

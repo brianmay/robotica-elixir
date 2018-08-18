@@ -11,7 +11,7 @@ plugins:
             init:
               - ["amixer", "sset", "Master", "100%"]
             play:
-              - ["aplay", "{file}"]
+              - ["aplay", "-q", "{file}"]
             say:
               - ["espeak", "-ven+f5", "-k5", "{text}"]
             music_play:
