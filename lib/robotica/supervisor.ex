@@ -13,31 +13,19 @@ defmodule Robotica.Supervisor do
   def start_link(opts) do
     {:ok, pid} = Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
 
-    Enum.each(opts.plugins, fn plugin ->
-      plugin = %Robotica.Plugins.Plugin{
-        plugin
-        | register: fn pid ->
-            Robotica.Executor.add(Robotica.Executor, plugin.location, pid)
-            nil
-          end
-      }
-
-      {:ok, _pid} = DynamicSupervisor.start_child(:dynamic, {plugin.module, plugin})
-    end)
-
     Robotica.Scheduler.load_schedule()
 
     {:ok, pid}
   end
 
   @impl true
-  def init(_opts) do
+  def init(opts) do
     {:ok, hostname} = :inet.gethostname()
     hostname = to_string(hostname)
 
     children = [
-      {Robotica.Executor, name: Robotica.Executor},
       {DynamicSupervisor, name: :dynamic, strategy: :one_for_one},
+      {Robotica.Executor, name: Robotica.Executor},
       {Tortoise.Connection,
        client_id: "robotica-#{hostname}",
        handler: {Robotica.Client, []},
@@ -45,6 +33,18 @@ defmodule Robotica.Supervisor do
        subscriptions: [{"/execute/", 0}]}
     ]
 
-    Supervisor.init(children, strategy: :one_for_one)
+    extra_children = Enum.map(opts.plugins, fn plugin ->
+      plugin = %Robotica.Plugins.Plugin{
+        plugin
+        | register: fn pid ->
+            Robotica.Executor.add(Robotica.Executor, plugin.location, pid)
+            nil
+          end
+      }
+      {plugin.module, plugin}
+    end)
+
+
+    Supervisor.init(children ++ extra_children, strategy: :one_for_one)
   end
 end
