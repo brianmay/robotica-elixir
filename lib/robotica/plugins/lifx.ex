@@ -19,7 +19,9 @@ defmodule Robotica.Plugins.LIFX do
 
   defp do_command(state, %{"action" => "flash"}) do
     lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
+    Enum.each(lights, &Lifx.Device.get_power(&1))
 
+    lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
     Enum.each(lights, &Lifx.Device.on_wait(&1))
     Process.sleep(200)
     Enum.each(lights, &Lifx.Device.off_wait(&1))
