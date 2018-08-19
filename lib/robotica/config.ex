@@ -11,7 +11,7 @@ defmodule Robotica.Config do
 
     cond do
       required and is_nil(value) ->
-        {:error, "Value #{key} is not supplied."}
+        {:error, "Value #{key} is not supplied"}
 
       true ->
         {:ok, input, value}
@@ -30,7 +30,7 @@ defmodule Robotica.Config do
     cond do
       is_nil(value) -> {:ok, value}
       is_binary(value) -> {:ok, value}
-      true -> {:error, "Value #{inspect(value)} is not a string."}
+      true -> {:error, "Value #{inspect(value)} is not a string"}
     end
   end
 
@@ -48,7 +48,7 @@ defmodule Robotica.Config do
       "no" -> {:ok, false}
       "y" -> {:ok, true}
       "n" -> {:ok, false}
-      _ -> {:error, "Invalid boolean #{boolean}."}
+      _ -> {:error, "Invalid boolean #{boolean}"}
     end
   end
 
@@ -68,7 +68,7 @@ defmodule Robotica.Config do
       "fri" -> {:ok, 5}
       "sat" -> {:ok, 6}
       "sun" -> {:ok, 7}
-      _ -> {:error, "Invalid week day #{day_of_week}."}
+      _ -> {:error, "Invalid week day #{day_of_week}"}
     end
   end
 
@@ -83,7 +83,7 @@ defmodule Robotica.Config do
       true ->
         case Date.from_iso8601(value) do
           {:ok, value} -> {:ok, value}
-          {:error, _} -> {:error, "Cannot parse date #{value}."}
+          {:error, _} -> {:error, "Cannot parse date #{value}"}
         end
     end
   end
@@ -96,7 +96,7 @@ defmodule Robotica.Config do
       true ->
         case Time.from_iso8601(value) do
           {:ok, value} -> {:ok, value}
-          {:error, _} -> {:error, "Cannot parse time #{value}."}
+          {:error, _} -> {:error, "Cannot parse time #{value}"}
         end
     end
   end
@@ -105,7 +105,7 @@ defmodule Robotica.Config do
     case String.split(value, ":", parts: 3) do
       [hh, mm] -> {:ok, hh, mm, "0"}
       [hh, mm, ss] -> {:ok, hh, mm, ss}
-      {:error, _} -> {:error, "Cannot split delta #{value}."}
+      {:error, _} -> {:error, "Cannot split delta #{value}"}
     end
   end
 
@@ -125,8 +125,8 @@ defmodule Robotica.Config do
           {:ok, result}
         else
           {:error, err} -> {:error, err}
-          :error -> {:error, "Cannot parse value in #{value}."}
-          {_, _} -> {:error, "Cannot parse value in #{value}."}
+          :error -> {:error, "Cannot parse value in #{value}"}
+          {_, _} -> {:error, "Cannot parse value in #{value}"}
         end
     end
   end
@@ -153,7 +153,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_plugin(_), do: {:error, "We expected a map."}
+  defp validate_plugin(_), do: {:error, "We expected a map"}
 
   defp validate_plugins([]), do: {:ok, []}
 
@@ -166,7 +166,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_plugins(_), do: {:error, "Data is not a list."}
+  defp validate_plugins(_), do: {:error, "Data is not a list"}
 
   defp validate_module("Audio"), do: {:ok, Robotica.Plugins.Audio}
   defp validate_module("LIFX"), do: {:ok, Robotica.Plugins.LIFX}
@@ -219,7 +219,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_plugin_audio_sounds(_), do: {:error, "Sounds didn't get a map."}
+  defp validate_plugin_audio_sounds(_), do: {:error, "Sounds didn't get a map"}
 
   defp validate_plugin_audio_commands(%{} = item) do
     i = item
@@ -254,7 +254,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_plugin_audio_commands(_), do: {:error, "Commands didn't get a map."}
+  defp validate_plugin_audio_commands(_), do: {:error, "Commands didn't get a map"}
 
   defp validate_plugin_lifx_lights([]), do: {:ok, []}
 
@@ -267,7 +267,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_plugin_lifx_lights(_), do: {:error, "Data is not a list."}
+  defp validate_plugin_lifx_lights(_), do: {:error, "Data is not a list"}
 
   defp validate_plugin_config(%{} = item, Robotica.Plugins.Audio) do
     i = item
@@ -304,8 +304,8 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_plugin_config(%{}, plugin), do: {:error, "Unknown plugin #{plugin}."}
-  defp validate_plugin_config(_, _), do: {:error, "Plugin didn't get a map."}
+  defp validate_plugin_config(%{}, plugin), do: {:error, "Unknown plugin #{plugin}"}
+  defp validate_plugin_config(_, _), do: {:error, "Plugin didn't get a map"}
 
   defp validate_config(%{} = item) do
     i = item
@@ -323,7 +323,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_config(_), do: {:error, "We expected a map."}
+  defp validate_config(_), do: {:error, "We expected a map"}
 
   defp validate_classification(%{} = item) do
     i = item
@@ -356,7 +356,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_classification(_), do: {:error, "We expected a map."}
+  defp validate_classification(_), do: {:error, "We expected a map"}
 
   defp validate_classifications([]), do: {:ok, []}
 
@@ -380,7 +380,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_sequence_entry(_), do: {:error, "We expected a list."}
+  defp validate_sequence_entry(_), do: {:error, "We expected a list"}
 
   defp validate_schedule_entry([]), do: {:ok, []}
 
@@ -404,7 +404,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_schedule_entry(_), do: {:error, "Schedule entry didn't get a map."}
+  defp validate_schedule_entry(_), do: {:error, "Schedule entry didn't get a map"}
 
   defp validate_schedule([]), do: {:ok, []}
 
@@ -439,7 +439,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_locations(_), do: {:error, "We expected a list."}
+  defp validate_locations(_), do: {:error, "We expected a list"}
 
   defp validate_action(%{} = item) do
     i = item
@@ -466,7 +466,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_action(_), do: {:error, "We expected a map."}
+  defp validate_action(_), do: {:error, "We expected a map"}
 
   defp validate_actions([]), do: {:ok, []}
 
@@ -479,7 +479,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_actions(_), do: {:error, "We expected a list."}
+  defp validate_actions(_), do: {:error, "We expected a list"}
 
   def validate_task(%{} = item) do
     i = item
@@ -500,7 +500,7 @@ defmodule Robotica.Config do
     end
   end
 
-  def validate_task(_), do: {:error, "We expected a map."}
+  def validate_task(_), do: {:error, "We expected a map"}
 
   defp validate_sequences_item(%{} = item) do
     i = item
@@ -527,7 +527,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_sequences_item(_), do: {:error, "We expected a map."}
+  defp validate_sequences_item(_), do: {:error, "We expected a map"}
 
   defp validate_sequences_entry([]), do: {:ok, []}
 
@@ -540,7 +540,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_sequences_entry(_), do: {:error, "Schedule entry didn't get a list."}
+  defp validate_sequences_entry(_), do: {:error, "Schedule entry didn't get a list"}
 
   defp validate_sequences([]), do: {:ok, []}
 
@@ -564,7 +564,7 @@ defmodule Robotica.Config do
     end
   end
 
-  defp validate_sequences(_), do: {:error, "Sequences didn't get a map."}
+  defp validate_sequences(_), do: {:error, "Sequences didn't get a map"}
 
   def substitutions do
     {:ok, hostname} = :inet.gethostname()
