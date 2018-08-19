@@ -10,6 +10,7 @@ plugins:
         commands:
             init:
               - ["amixer", "sset", "Master", "100%"]
+              - ["mpc", "repeat", "on"]
             play:
               - ["aplay", "-q", "{file}"]
             say:
@@ -24,3 +25,7 @@ plugins:
               - ["mpc", "pause-if-playing"]
             music_resume:
               - ["mpc", "play"]
+  - module: LIFX
+    location: "AnotherBrian"
+    config:
+        lights: ["Brian"]
