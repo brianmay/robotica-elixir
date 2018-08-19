@@ -509,19 +509,16 @@ defmodule Robotica.Config do
          {:ok, i, zero_time} <- map_anything(i, "zero_time", false),
          {:ok, i, locations} <- map_anything(i, "locations", true),
          {:ok, i, actions} <- map_anything(i, "actions", true),
-         {:ok, i, load_schedule} <- map_anything(i, "load_schedule", false),
          {:ok} <- map_used_all_keys(i),
          {:ok, time} <- validate_delta(time),
          {:ok, zero_time} <- validate_boolean(zero_time, false),
          {:ok, locations} <- validate_locations(locations),
-         {:ok, actions} <- validate_actions(actions),
-         {:ok, load_schedule} <- validate_boolean(load_schedule) do
+         {:ok, actions} <- validate_actions(actions) do
       result = %Robotica.Scheduler.Step{
         time: time,
         zero_time: zero_time,
         locations: locations,
-        actions: actions,
-        load_schedule: load_schedule
+        actions: actions
       }
 
       {:ok, result}

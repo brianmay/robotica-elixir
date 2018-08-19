@@ -1,8 +1,6 @@
 defmodule Robotica.Scheduler do
   require Logger
 
-  @timezone Application.get_env(:robotica, :timezone)
-
   defmodule Classification do
     @enforce_keys [:day_type]
     defstruct start: nil, stop: nil, date: nil, week_day: nil, day_of_week: nil, day_type: nil
@@ -10,7 +8,7 @@ defmodule Robotica.Scheduler do
 
   defmodule Step do
     @enforce_keys [:time, :locations, :actions]
-    defstruct time: nil, zero_time: false, locations: nil, actions: nil, load_schedule: false
+    defstruct time: nil, zero_time: false, locations: nil, actions: nil
   end
 
   defmodule ExpandedStep do
@@ -18,8 +16,7 @@ defmodule Robotica.Scheduler do
     defstruct required_time: nil,
               latest_time: nil,
               locations: nil,
-              actions: nil,
-              load_schedule: false
+              actions: nil
   end
 
   defmodule Classifier do
@@ -134,16 +131,7 @@ defmodule Robotica.Scheduler do
     def get_schedule(classifications) do
       a = schedule()
 
-      tomorrow = Calendar.Date.today!(@timezone) |> Calendar.Date.next_day!()
-
-      midnight =
-        tomorrow
-        |> Calendar.DateTime.from_date_and_time_and_zone!(~T[00:00:00], @timezone)
-        |> Calendar.DateTime.shift_zone!("UTC")
-
-      schedule =
-        %{"reschedule" => midnight}
-        |> add_schedule(a, "*")
+      schedule = add_schedule(%{}, a, "*")
 
       schedule =
         Enum.reduce(classifications, schedule, fn v, acc -> add_schedule(acc, a, v) end)
@@ -154,103 +142,6 @@ defmodule Robotica.Scheduler do
         |> Enum.sort(fn x, y -> Calendar.DateTime.before?(elem(x, 0), elem(y, 0)) end)
 
       schedule
-    end
-  end
-
-  defmodule Executor do
-    use GenServer
-
-    def start_link(opts) do
-      GenServer.start_link(__MODULE__, {nil, []}, opts)
-    end
-
-    def init({nil, expanded_steps}) do
-      state = set_timer(expanded_steps)
-      {:ok, state}
-    end
-
-    def add_expanded_steps(expanded_steps, server) do
-      GenServer.call(server, {:add, expanded_steps})
-    end
-
-    def handle_call({:add, add_steps}, _from, {timer, expanded_steps}) do
-      if not is_nil(timer) do
-        Process.cancel_timer(timer)
-      end
-
-      steps =
-        (expanded_steps ++ add_steps)
-        |> Enum.sort(fn x, y -> Calendar.DateTime.before?(x.required_time, y.required_time) end)
-
-      state = set_timer(steps)
-      {:reply, nil, state}
-    end
-
-    defp maximum(v, max) when v > max, do: max
-    defp maximum(v, _max), do: v
-
-    defp set_timer([]), do: {nil, []}
-
-    defp set_timer([step | tail] = list) do
-      required_time = step.required_time
-      latest_time = step.latest_time
-
-      now = Calendar.DateTime.now_utc()
-
-      cond do
-        Calendar.DateTime.before?(now, required_time) ->
-          {:ok, s, ms, :after} = Calendar.DateTime.diff(required_time, now)
-          milliseconds = Kernel.trunc(s * 1000 + ms / 1000)
-          # Ensure we wake up regularly so we can cope with system time changes.
-          milliseconds = maximum(milliseconds, 60 * 1000)
-          Logger.debug("Sleeping #{milliseconds} until #{inspect(required_time)}.")
-          timer = Process.send_after(self(), :timer, milliseconds)
-          {timer, list}
-
-        Calendar.DateTime.before?(now, latest_time) ->
-          Logger.debug("Running late for #{inspect(required_time)}.")
-          do_step(step)
-          set_timer(tail)
-
-        true ->
-          Logger.debug("Skipping #{inspect(required_time)}.")
-          set_timer(tail)
-      end
-    end
-
-    defp do_step(%ExpandedStep{locations: locations, actions: actions} = step) do
-      Logger.debug("Executing #{inspect(actions)} at locations #{inspect(locations)}.")
-      Robotica.Executor.execute(Robotica.Executor, locations, actions)
-
-      if step.load_schedule do
-        Robotica.Scheduler.load_schedule()
-      end
-
-      nil
-    end
-
-    def handle_info(:timer, {_, [step | tail] = list}) do
-      now = Calendar.DateTime.now_utc()
-      Logger.debug("Got timer at time #{inspect(now)}.")
-
-      new_list =
-        cond do
-          Calendar.DateTime.before?(now, step.required_time) ->
-            Logger.debug("Timer received too early for #{inspect(step)}.")
-            list
-
-          Calendar.DateTime.before?(now, step.latest_time) ->
-            Logger.debug("Timer received on time for #{inspect(step)}.")
-            do_step(step)
-            tail
-
-          true ->
-            Logger.debug("Timer received too late for #{inspect(step)}.")
-            tail
-        end
-
-      timer = set_timer(new_list)
-      {:noreply, {timer, new_list}}
     end
   end
 
@@ -295,8 +186,7 @@ defmodule Robotica.Scheduler do
           required_time: required_time,
           latest_time: latest_time,
           locations: step.locations,
-          actions: step.actions,
-          load_schedule: step.load_schedule
+          actions: step.actions
         }
       end)
     end
@@ -316,11 +206,109 @@ defmodule Robotica.Scheduler do
     end
   end
 
-  def load_schedule do
-    Calendar.Date.today!(@timezone)
-    |> Classifier.classify_date()
-    |> Schedule.get_schedule()
-    |> Sequence.expand_schedule()
-    |> Executor.add_expanded_steps(Robotica.Scheduler.Executor)
+  defmodule Executor do
+    use GenServer
+
+    @timezone Application.get_env(:robotica, :timezone)
+
+    def start_link(opts) do
+      today = Calendar.Date.today!(@timezone)
+      GenServer.start_link(__MODULE__, {today, nil, []}, opts)
+    end
+
+    def init({date, timer, expanded_steps}) do
+      steps = expanded_steps ++ get_expanded_steps_for_date(date)
+      state = set_timer({date, timer, steps})
+      {:ok, state}
+    end
+
+    defp maximum(v, max) when v > max, do: max
+    defp maximum(v, _max), do: v
+
+    defp set_timer({_, nil, []} = state), do: state
+
+    defp set_timer({date, nil, [step | tail] = list}) do
+      required_time = step.required_time
+      latest_time = step.latest_time
+
+      now = Calendar.DateTime.now_utc()
+
+      cond do
+        Calendar.DateTime.before?(now, required_time) ->
+          {:ok, s, ms, :after} = Calendar.DateTime.diff(required_time, now)
+          milliseconds = Kernel.trunc(s * 1000 + ms / 1000)
+          # Ensure we wake up regularly so we can cope with system time changes.
+          milliseconds = maximum(milliseconds, 60 * 1000)
+          Logger.debug("Sleeping #{milliseconds} until #{inspect(required_time)}.")
+          timer = Process.send_after(self(), :timer, milliseconds)
+          {date, timer, list}
+
+        Calendar.DateTime.before?(now, latest_time) ->
+          Logger.debug("Running late for #{inspect(required_time)}.")
+          do_step(step)
+          set_timer({date, nil, tail})
+
+        true ->
+          Logger.debug("Skipping #{inspect(required_time)}.")
+          set_timer({date, nil, tail})
+      end
+    end
+
+    defp get_expanded_steps_for_date(date) do
+      date
+      |> Classifier.classify_date()
+      |> Schedule.get_schedule()
+      |> Sequence.expand_schedule()
+    end
+
+    defp do_step(%ExpandedStep{locations: locations, actions: actions}) do
+      Logger.debug("Executing #{inspect(actions)} at locations #{inspect(locations)}.")
+      Robotica.Executor.execute(Robotica.Executor, locations, actions)
+      nil
+    end
+
+    def handle_info(:timer, {date, _, [step | tail] = list}) do
+      now = Calendar.DateTime.now_utc()
+      Logger.debug("Got timer at time #{inspect(now)}.")
+
+      new_list =
+        cond do
+          Calendar.DateTime.before?(now, step.required_time) ->
+            Logger.debug("Timer received too early for #{inspect(step)}.")
+            list
+
+          Calendar.DateTime.before?(now, step.latest_time) ->
+            Logger.debug("Timer received on time for #{inspect(step)}.")
+            do_step(step)
+            tail
+
+          true ->
+            Logger.debug("Timer received too late for #{inspect(step)}.")
+            tail
+        end
+
+      today = Calendar.Date.today!(@timezone)
+
+      new_list =
+        cond do
+          # If we have gone back in time, we should drop the list entirely to
+          # avoid duplicating future events.
+          Calendar.Date.before?(today, date) ->
+            get_expanded_steps_for_date(date)
+
+          # If we have gonei forward in time, any old entries will expire naturally.
+          # avoid duplicating future events.
+          Calendar.Date.after?(today, date) ->
+            new_list ++ get_expanded_steps_for_date(date)
+
+          # No change in date.
+          true ->
+            new_list
+        end
+        |> Enum.sort(fn x, y -> Calendar.DateTime.before?(x.required_time, y.required_time) end)
+
+      state = set_timer({today, nil, new_list})
+      {:noreply, state}
+    end
   end
 end

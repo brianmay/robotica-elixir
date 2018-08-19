@@ -11,11 +11,7 @@ defmodule Robotica.Supervisor do
 
   @spec start_link(opts :: State.t()) :: {:ok, pid} | {:error, String.t()}
   def start_link(opts) do
-    {:ok, pid} = Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
-
-    Robotica.Scheduler.load_schedule()
-
-    {:ok, pid}
+    {:ok, _pid} = Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
   @impl true
