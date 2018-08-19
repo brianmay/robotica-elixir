@@ -572,41 +572,49 @@ defmodule Robotica.Config do
   def substitutions do
     {:ok, hostname} = :inet.gethostname()
     hostname = to_string(hostname)
+
     %{
-        "hostname" => hostname,
+      "hostname" => hostname
     }
   end
 
   def configuration do
-    filename = Application.get_env(:robotica, :config_file)
-    |> replace_values(substitutions())
+    filename =
+      Application.get_env(:robotica, :config_file)
+      |> replace_values(substitutions())
+
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_config(data)
     data
   end
 
   def classifications do
-    filename = Application.get_env(:robotica, :classifications_file)
-    |> replace_values(substitutions())
+    filename =
+      Application.get_env(:robotica, :classifications_file)
+      |> replace_values(substitutions())
+
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_classifications(data)
     data
   end
 
   def schedule do
-    filename = Application.get_env(:robotica, :schedule_file)
-    |> replace_values(substitutions())
+    filename =
+      Application.get_env(:robotica, :schedule_file)
+      |> replace_values(substitutions())
+
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_schedule(data)
     data
   end
 
   def sequences do
-    filename = Application.get_env(:robotica, :sequences_file)
-    |> replace_values(substitutions())
+    filename =
+      Application.get_env(:robotica, :sequences_file)
+      |> replace_values(substitutions())
+
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_sequences(data)
     data
   end
-
 end
