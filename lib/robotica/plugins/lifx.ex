@@ -28,7 +28,7 @@ defmodule Robotica.Plugins.LIFX do
     Process.sleep(200)
     Enum.each(lights, &Lifx.Device.off_wait(&1))
     Process.sleep(200)
-    Enum.each(lights, &GenServer.cast(&1, {:set_power, &1.power}))
+    Enum.each(lights, &Lifx.Device.set_power_wait(&1, &1.power))
 
     nil
   end
