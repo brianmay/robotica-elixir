@@ -24,8 +24,8 @@ defmodule Robotica.Supervisor do
     hostname = to_string(hostname)
 
     children = [
-      {DynamicSupervisor, name: :dynamic, strategy: :one_for_one},
       {Robotica.Executor, name: Robotica.Executor},
+      {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor},
       {Tortoise.Connection,
        client_id: "robotica-#{hostname}",
        handler: {Robotica.Client, []},
@@ -33,17 +33,18 @@ defmodule Robotica.Supervisor do
        subscriptions: [{"/execute/", 0}]}
     ]
 
-    extra_children = Enum.map(opts.plugins, fn plugin ->
-      plugin = %Robotica.Plugins.Plugin{
-        plugin
-        | register: fn pid ->
-            Robotica.Executor.add(Robotica.Executor, plugin.location, pid)
-            nil
-          end
-      }
-      {plugin.module, plugin}
-    end)
+    extra_children =
+      Enum.map(opts.plugins, fn plugin ->
+        plugin = %Robotica.Plugins.Plugin{
+          plugin
+          | register: fn pid ->
+              Robotica.Executor.add(Robotica.Executor, plugin.location, pid)
+              nil
+            end
+        }
 
+        {plugin.module, plugin}
+      end)
 
     Supervisor.init(children ++ extra_children, strategy: :one_for_one)
   end

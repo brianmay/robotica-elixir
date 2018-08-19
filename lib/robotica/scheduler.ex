@@ -10,7 +10,16 @@ defmodule Robotica.Scheduler do
 
   defmodule Step do
     @enforce_keys [:time, :locations, :actions]
-    defstruct time: nil, zero_time: false, locations: nil, actions: nil, load_schedule: nil
+    defstruct time: nil, zero_time: false, locations: nil, actions: nil, load_schedule: false
+  end
+
+  defmodule ExpandedStep do
+    @enforce_keys [:required_time, :latest_time, :locations, :actions]
+    defstruct required_time: nil,
+              latest_time: nil,
+              locations: nil,
+              actions: nil,
+              load_schedule: false
   end
 
   defmodule Classifier do
@@ -148,28 +157,43 @@ defmodule Robotica.Scheduler do
     end
   end
 
-  defmodule Sequencer do
-    use GenServer, restart: :transient
+  defmodule Executor do
+    use GenServer
 
-    def start_link(state) do
-      GenServer.start_link(__MODULE__, state)
+    def start_link(opts) do
+      GenServer.start_link(__MODULE__, {nil, []}, opts)
     end
 
-    def init(state) do
-      state = set_timer(state)
+    def init({nil, expanded_steps}) do
+      state = set_timer(expanded_steps)
+      {:ok, state}
+    end
 
-      case state do
-        {_, []} -> {:stop, :normal}
-        _ -> {:ok, state}
+    def add_expanded_steps(expanded_steps, server) do
+      GenServer.call(server, {:add, expanded_steps})
+    end
+
+    def handle_call({:add, add_steps}, _from, {timer, expanded_steps}) do
+      if not is_nil(timer) do
+        Process.cancel_timer(timer)
       end
+
+      steps =
+        (expanded_steps ++ add_steps)
+        |> Enum.sort(fn x, y -> Calendar.DateTime.before?(x.required_time, y.required_time) end)
+
+      state = set_timer(steps)
+      {:reply, nil, state}
     end
 
-    defp set_timer({_, []} = state), do: state
+    defp maximum(v, max) when v > max, do: max
+    defp maximum(v, _max), do: v
 
-    defp set_timer({start_time, [step | tail]} = state) do
-      seconds = step.time
-      required_time = Calendar.DateTime.add!(start_time, seconds)
-      latest_time = Calendar.DateTime.add!(required_time, 300)
+    defp set_timer([]), do: {nil, []}
+
+    defp set_timer([step | tail] = list) do
+      required_time = step.required_time
+      latest_time = step.latest_time
 
       now = Calendar.DateTime.now_utc()
 
@@ -177,23 +201,25 @@ defmodule Robotica.Scheduler do
         Calendar.DateTime.before?(now, required_time) ->
           {:ok, s, ms, :after} = Calendar.DateTime.diff(required_time, now)
           milliseconds = Kernel.trunc(s * 1000 + ms / 1000)
-          Logger.debug("Sleeping #{inspect(milliseconds)} until #{inspect(required_time)}.")
-          Process.send_after(self(), {:timer, required_time, latest_time}, milliseconds)
-          state
+          # Ensure we wake up regularly so we can cope with system time changes.
+          milliseconds = maximum(milliseconds, 60 * 1000)
+          Logger.debug("Sleeping #{milliseconds} until #{inspect(required_time)}.")
+          timer = Process.send_after(self(), :timer, milliseconds)
+          {timer, list}
 
         Calendar.DateTime.before?(now, latest_time) ->
           Logger.debug("Running late for #{inspect(required_time)}.")
-          do_step(required_time, step)
-          set_timer({required_time, tail})
+          do_step(step)
+          set_timer(tail)
 
         true ->
           Logger.debug("Skipping #{inspect(required_time)}.")
-          set_timer({required_time, tail})
+          set_timer(tail)
       end
     end
 
-    defp do_step(_required_time, %Step{locations: locations, actions: actions} = step) do
-      Logger.debug("Executing #{inspect(actions)} at locations #{inspect(locations)}")
+    defp do_step(%ExpandedStep{locations: locations, actions: actions} = step) do
+      Logger.debug("Executing #{inspect(actions)} at locations #{inspect(locations)}.")
       Robotica.Executor.execute(Robotica.Executor, locations, actions)
 
       if step.load_schedule do
@@ -203,22 +229,28 @@ defmodule Robotica.Scheduler do
       nil
     end
 
-    def handle_info({:timer, required_time, latest_time}, {_, [step | tail]}) do
+    def handle_info(:timer, {_, [step | tail] = list}) do
       now = Calendar.DateTime.now_utc()
-      Logger.debug("Got timer at time #{inspect(now)}")
+      Logger.debug("Got timer at time #{inspect(now)}.")
 
-      if Calendar.DateTime.before?(now, latest_time) do
-        do_step(required_time, step)
-      else
-        Logger.debug("Timer received too late for #{inspect(step)} @ #{inspect(required_time)}")
-      end
+      new_list =
+        cond do
+          Calendar.DateTime.before?(now, step.required_time) ->
+            Logger.debug("Timer received too early for #{inspect(step)}.")
+            list
 
-      state = set_timer({required_time, tail})
+          Calendar.DateTime.before?(now, step.latest_time) ->
+            Logger.debug("Timer received on time for #{inspect(step)}.")
+            do_step(step)
+            tail
 
-      case state do
-        {_, []} -> {:stop, :normal, state}
-        _ -> {:noreply, state}
-      end
+          true ->
+            Logger.debug("Timer received too late for #{inspect(step)}.")
+            tail
+        end
+
+      timer = set_timer(new_list)
+      {:noreply, {timer, new_list}}
     end
   end
 
@@ -233,8 +265,8 @@ defmodule Robotica.Scheduler do
       |> Map.fetch!(sequence_name)
     end
 
-    defp get_start_time(required_time, sequence) do
-      Enum.reduce_while(sequence, required_time, fn step, acc ->
+    defp get_corrected_start_time(start_time, sequence) do
+      Enum.reduce_while(sequence, start_time, fn step, acc ->
         time = Calendar.DateTime.subtract!(acc, step.time)
 
         if step.zero_time do
@@ -245,28 +277,42 @@ defmodule Robotica.Scheduler do
       end)
     end
 
-    def execute_schedule([]), do: nil
+    defp expand_sequence(start_time, sequence_name) do
+      Logger.debug("Loading sequence #{inspect(sequence_name)} for #{inspect(start_time)}.")
+      sequence = get_sequence(sequence_name)
+      start_time = get_corrected_start_time(start_time, sequence)
 
-    def execute_schedule([head | tail]) do
-      {required_time, sequence_names} = head
+      Logger.debug(
+        "Actual start time for sequence #{inspect(sequence_name)} is #{inspect(start_time)}."
+      )
 
-      Enum.each(sequence_names, fn sequence_name ->
-        Logger.debug("")
-        Logger.debug("Loading schedule #{inspect(sequence_name)} for #{inspect(required_time)}.")
-        sequence = get_sequence(sequence_name)
-        required_time = get_start_time(required_time, sequence)
-        Logger.debug("Actual start time for #{inspect(sequence_name)} is #{inspect(required_time)}.")
-        state = {required_time, sequence}
-        r = DynamicSupervisor.start_child(:dynamic, {Sequencer, state})
+      Enum.map(sequence, fn step ->
+        seconds = step.time
+        required_time = Calendar.DateTime.add!(start_time, seconds)
+        latest_time = Calendar.DateTime.add!(required_time, 300)
 
-        case r do
-          {:ok, _pid} -> nil
-          {:error, :normal} -> nil
-          r -> Logger.debug("Error #{inspect(r)}.")
-        end
+        %ExpandedStep{
+          required_time: required_time,
+          latest_time: latest_time,
+          locations: step.locations,
+          actions: step.actions,
+          load_schedule: step.load_schedule
+        }
       end)
+    end
 
-      execute_schedule(tail)
+    defp expand_sequences(start_time, sequence_names) do
+      Enum.map(sequence_names, fn sequence_name ->
+        expand_sequence(start_time, sequence_name)
+      end)
+    end
+
+    def expand_schedule(schedule) do
+      Enum.map(schedule, fn {start_time, sequence_names} ->
+        expand_sequences(start_time, sequence_names)
+      end)
+      |> List.flatten()
+      |> Enum.sort(fn x, y -> Calendar.DateTime.before?(x.required_time, y.required_time) end)
     end
   end
 
@@ -274,6 +320,7 @@ defmodule Robotica.Scheduler do
     Calendar.Date.today!(@timezone)
     |> Classifier.classify_date()
     |> Schedule.get_schedule()
-    |> Sequence.execute_schedule()
+    |> Sequence.expand_schedule()
+    |> Executor.add_expanded_steps(Robotica.Scheduler.Executor)
   end
 end
