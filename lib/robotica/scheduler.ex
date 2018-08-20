@@ -246,6 +246,7 @@ defmodule Robotica.Scheduler do
 
     def init({date, timer, expanded_steps}) do
       steps = expanded_steps ++ get_expanded_steps_for_date(date)
+      |> Sequence.squash_schedule()
       state = set_timer({date, timer, steps})
       {:ok, state}
     end
@@ -254,7 +255,6 @@ defmodule Robotica.Scheduler do
     defp maximum(v, _max), do: v
 
     defp set_timer({date, nil, []}) do
-      Logger.debug("Dummy polling timer.")
       timer = Process.send_after(self(), :timer, 60 * 1000)
       {date, timer, []}
     end
@@ -291,7 +291,6 @@ defmodule Robotica.Scheduler do
       |> Classifier.classify_date()
       |> Schedule.get_schedule()
       |> Sequence.expand_schedule()
-      |> Sequence.squash_schedule()
     end
 
     defp do_step(%ExpandedStep{tasks: tasks}) do
@@ -304,7 +303,9 @@ defmodule Robotica.Scheduler do
     end
 
     def handle_info(:timer, {date, _, [] = list}) do
-      state = set_timer({date, nil, list})
+      Logger.debug("Dummy polling timer.")
+      {date, new_list} = check_time_travel({date, list})
+      state = set_timer({date, nil, new_list})
       {:noreply, state}
     end
 
@@ -328,6 +329,12 @@ defmodule Robotica.Scheduler do
             tail
         end
 
+      {date, new_list} = check_time_travel({date, new_list})
+      state = set_timer({date, nil, new_list})
+      {:noreply, state}
+    end
+
+    def check_time_travel({date, _, list}) do
       today = Calendar.Date.today!(@timezone)
 
       new_list =
@@ -336,19 +343,20 @@ defmodule Robotica.Scheduler do
           # avoid duplicating future events.
           Calendar.Date.before?(today, date) ->
             get_expanded_steps_for_date(date)
+            |> Sequence.squash_schedule()
 
           # If we have gonei forward in time, any old entries will expire naturally.
           # avoid duplicating future events.
           Calendar.Date.after?(today, date) ->
-            new_list ++ get_expanded_steps_for_date(date)
+            list ++ get_expanded_steps_for_date(date)
+            |> Sequence.squash_schedule()
 
           # No change in date.
           true ->
-            new_list
+            list
         end
 
-      state = set_timer({today, nil, new_list})
-      {:noreply, state}
+      {today, new_list}
     end
   end
 end
