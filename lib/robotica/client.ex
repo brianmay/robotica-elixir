@@ -49,9 +49,7 @@ defmodule Robotica.Client do
 
     case Robotica.Config.validate_task(message) do
       {:ok, task} ->
-        locations = task.locations
-        actions = task.actions
-        Robotica.Executor.execute(Robotica.Executor, locations, actions)
+        Robotica.Executor.execute(Robotica.Executor, task)
 
       {:error, error} ->
         Logger.error("Invalid message received: #{error}.")

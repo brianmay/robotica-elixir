@@ -12,6 +12,15 @@ defmodule Robotica.Executor do
     defstruct plugins: %{}
   end
 
+  defmodule Task do
+    @type t :: %__MODULE__{
+            locations: list(String.t()),
+            actions: list(Action.t())
+          }
+    @enforce_keys [:locations, :actions]
+    defstruct locations: [], actions: []
+  end
+
   ## Client API
 
   @spec start_link(opts :: list) :: {:ok, pid} | {:error, String.t()}
@@ -30,9 +39,8 @@ defmodule Robotica.Executor do
     nil
   end
 
-  @spec execute(server :: pid | atom, locations :: list(String.t()), actions :: list(Action.t())) ::
-          nil
-  def execute(server, locations, actions) do
+  @spec execute(server :: pid | atom, task :: Task.t()) :: nil
+  def execute(server, %Task{locations: locations, actions: actions}) do
     GenServer.call(server, {:execute, locations, actions}, :infinity)
     nil
   end

@@ -12,11 +12,10 @@ defmodule Robotica.Scheduler do
   end
 
   defmodule ExpandedStep do
-    @enforce_keys [:required_time, :latest_time, :locations, :actions]
+    @enforce_keys [:required_time, :latest_time, :tasks]
     defstruct required_time: nil,
               latest_time: nil,
-              locations: nil,
-              actions: nil
+              tasks: []
   end
 
   defmodule Classifier do
@@ -168,6 +167,27 @@ defmodule Robotica.Scheduler do
       end)
     end
 
+    defp expand_steps(_, []), do: []
+
+    defp expand_steps(start_time, [step | tail]) do
+      seconds = step.time
+      required_time = Calendar.DateTime.add!(start_time, seconds)
+      latest_time = Calendar.DateTime.add!(required_time, 300)
+
+      expanded_step = %ExpandedStep{
+        required_time: required_time,
+        latest_time: latest_time,
+        tasks: [
+          %Robotica.Executor.Task{
+            locations: step.locations,
+            actions: step.actions
+          }
+        ]
+      }
+
+      [expanded_step] ++ expand_steps(required_time, tail)
+    end
+
     defp expand_sequence(start_time, sequence_name) do
       Logger.debug("Loading sequence #{inspect(sequence_name)} for #{inspect(start_time)}.")
       sequence = get_sequence(sequence_name)
@@ -177,18 +197,7 @@ defmodule Robotica.Scheduler do
         "Actual start time for sequence #{inspect(sequence_name)} is #{inspect(start_time)}."
       )
 
-      Enum.map(sequence, fn step ->
-        seconds = step.time
-        required_time = Calendar.DateTime.add!(start_time, seconds)
-        latest_time = Calendar.DateTime.add!(required_time, 300)
-
-        %ExpandedStep{
-          required_time: required_time,
-          latest_time: latest_time,
-          locations: step.locations,
-          actions: step.actions
-        }
-      end)
+      expand_steps(start_time, sequence)
     end
 
     defp expand_sequences(start_time, sequence_names) do
@@ -202,7 +211,26 @@ defmodule Robotica.Scheduler do
         expand_sequences(start_time, sequence_names)
       end)
       |> List.flatten()
+    end
+
+    def squash_schedule(schedule) do
+      schedule
       |> Enum.sort(fn x, y -> Calendar.DateTime.before?(x.required_time, y.required_time) end)
+      |> Enum.reduce([], fn v, acc ->
+        case acc do
+          [] ->
+            [v]
+
+          [head | tail] = list ->
+            if head.required_time == v.required_time and head.latest_time == v.latest_time do
+              head = Map.update!(head, :tasks, fn w -> w ++ v.tasks end)
+              [head | tail]
+            else
+              [v | list]
+            end
+        end
+      end)
+      |> Enum.reverse()
     end
   end
 
@@ -225,7 +253,11 @@ defmodule Robotica.Scheduler do
     defp maximum(v, max) when v > max, do: max
     defp maximum(v, _max), do: v
 
-    defp set_timer({_, nil, []} = state), do: state
+    defp set_timer({date, nil, []}) do
+      Logger.debug("Dummy polling timer.")
+      timer = Process.send_after(self(), :timer, 60 * 1000)
+      {date, timer, []}
+    end
 
     defp set_timer({date, nil, [step | tail] = list}) do
       required_time = step.required_time
@@ -239,17 +271,17 @@ defmodule Robotica.Scheduler do
           milliseconds = Kernel.trunc(s * 1000 + ms / 1000)
           # Ensure we wake up regularly so we can cope with system time changes.
           milliseconds = maximum(milliseconds, 60 * 1000)
-          Logger.debug("Sleeping #{milliseconds} until #{inspect(required_time)}.")
+          Logger.debug("Sleeping #{milliseconds} for #{inspect(step)}.")
           timer = Process.send_after(self(), :timer, milliseconds)
           {date, timer, list}
 
         Calendar.DateTime.before?(now, latest_time) ->
-          Logger.debug("Running late for #{inspect(required_time)}.")
+          Logger.debug("Running late for #{inspect(step)}.")
           do_step(step)
           set_timer({date, nil, tail})
 
         true ->
-          Logger.debug("Skipping #{inspect(required_time)}.")
+          Logger.debug("Skipping #{inspect(step)}.")
           set_timer({date, nil, tail})
       end
     end
@@ -259,12 +291,21 @@ defmodule Robotica.Scheduler do
       |> Classifier.classify_date()
       |> Schedule.get_schedule()
       |> Sequence.expand_schedule()
+      |> Sequence.squash_schedule()
     end
 
-    defp do_step(%ExpandedStep{locations: locations, actions: actions}) do
-      Logger.debug("Executing #{inspect(actions)} at locations #{inspect(locations)}.")
-      Robotica.Executor.execute(Robotica.Executor, locations, actions)
+    defp do_step(%ExpandedStep{tasks: tasks}) do
+      Enum.each(tasks, fn task ->
+        Logger.debug("Executing #{inspect(task)}.")
+        Robotica.Executor.execute(Robotica.Executor, task)
+      end)
+
       nil
+    end
+
+    def handle_info(:timer, {date, _, [] = list}) do
+      state = set_timer({date, nil, list})
+      {:noreply, state}
     end
 
     def handle_info(:timer, {date, _, [step | tail] = list}) do
@@ -305,7 +346,6 @@ defmodule Robotica.Scheduler do
           true ->
             new_list
         end
-        |> Enum.sort(fn x, y -> Calendar.DateTime.before?(x.required_time, y.required_time) end)
 
       state = set_timer({today, nil, new_list})
       {:noreply, state}

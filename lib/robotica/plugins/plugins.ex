@@ -25,11 +25,6 @@ defmodule Robotica.Plugins do
     end
   end
 
-  defmodule Task do
-    @enforce_keys [:locations, :actions]
-    defstruct locations: [], actions: []
-  end
-
   defmodule Action do
     defstruct message: nil,
               lights: nil,
