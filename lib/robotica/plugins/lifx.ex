@@ -68,28 +68,30 @@ defmodule Robotica.Plugins.LIFX do
     lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
 
     Enum.each(lights, fn light ->
-      power = light.power
+      with {:ok, power} <- Lifx.Device.get_power(light) do
+        if power == 0 do
+          color_off = %Lifx.Protocol.HSBK{
+            hue: 0,
+            saturation: 0,
+            brightness: 0,
+            kelvin: 2500
+          }
 
-      if power == 0 do
-        color_off = %Lifx.Protocol.HSBK{
+          Lifx.Device.set_color(light, color_off)
+        end
+
+        color_on = %Lifx.Protocol.HSBK{
           hue: 0,
           saturation: 0,
-          brightness: 0,
+          brightness: 100,
           kelvin: 2500
         }
 
-        Lifx.Device.set_color_wait(light, color_off)
+        Lifx.Device.on(light)
+        Lifx.Device.set_color(light, color_on, 60000)
+      else
+        _ -> nil
       end
-
-      color_on = %Lifx.Protocol.HSBK{
-        hue: 0,
-        saturation: 0,
-        brightness: 100,
-        kelvin: 2500
-      }
-
-      Lifx.Device.on_wait(light.id)
-      Lifx.Device.set_color(light.id, color_on, 60000)
     end)
 
     nil
