@@ -334,7 +334,7 @@ defmodule Robotica.Scheduler do
       {:noreply, state}
     end
 
-    def check_time_travel({date, _, list}) do
+    def check_time_travel({date, list}) do
       today = Calendar.Date.today!(@timezone)
 
       new_list =
