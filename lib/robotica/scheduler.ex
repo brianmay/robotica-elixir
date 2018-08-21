@@ -303,6 +303,7 @@ defmodule Robotica.Scheduler do
     end
 
     def handle_info(:timer, {date, _, [] = list}) do
+      now = Calendar.DateTime.now_utc()
       Logger.debug("Got dummy timer at time #{inspect(now)}.")
       {date, new_list} = check_time_travel({date, list})
       state = set_timer({date, nil, new_list})
