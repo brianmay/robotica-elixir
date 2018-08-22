@@ -265,7 +265,7 @@ defmodule Robotica.Config do
       end
     else
       {:error,
-       "Map #{inspect(struct_type)} has keys #{inspect(unwanted_keys)} that are not supported."}
+       "Map #{inspect(struct_type)} has keys #{inspect(unwanted_keys)} that are not supported"}
     end
   end
 
