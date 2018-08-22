@@ -7,8 +7,8 @@ defmodule Robotica.Scheduler do
   end
 
   defmodule Step do
-    @enforce_keys [:time, :locations, :actions]
-    defstruct time: nil, zero_time: false, locations: nil, actions: nil
+    @enforce_keys [:time, :task]
+    defstruct time: nil, zero_time: false, task: nil
   end
 
   defmodule ExpandedStep do
@@ -177,12 +177,7 @@ defmodule Robotica.Scheduler do
       expanded_step = %ExpandedStep{
         required_time: required_time,
         latest_time: latest_time,
-        tasks: [
-          %Robotica.Executor.Task{
-            locations: step.locations,
-            actions: step.actions
-          }
-        ]
+        tasks: [step.task]
       }
 
       [expanded_step] ++ expand_steps(required_time, tail)
@@ -245,8 +240,10 @@ defmodule Robotica.Scheduler do
     end
 
     def init({date, timer, expanded_steps}) do
-      steps = expanded_steps ++ get_expanded_steps_for_date(date)
-      |> Sequence.squash_schedule()
+      steps =
+        (expanded_steps ++ get_expanded_steps_for_date(date))
+        |> Sequence.squash_schedule()
+
       state = set_timer({date, timer, steps})
       {:ok, state}
     end
@@ -349,7 +346,7 @@ defmodule Robotica.Scheduler do
           # If we have gonei forward in time, any old entries will expire naturally.
           # avoid duplicating future events.
           Calendar.Date.after?(today, date) ->
-            list ++ get_expanded_steps_for_date(date)
+            (list ++ get_expanded_steps_for_date(date))
             |> Sequence.squash_schedule()
 
           # No change in date.
