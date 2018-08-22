@@ -41,7 +41,7 @@ defmodule Robotica.Executor do
 
   @spec execute(server :: pid | atom, task :: Task.t()) :: nil
   def execute(server, %Task{locations: locations, actions: actions}) do
-    GenServer.call(server, {:execute, locations, actions}, :infinity)
+    GenServer.cast(server, {:execute, locations, actions})
     nil
   end
 
@@ -95,9 +95,9 @@ defmodule Robotica.Executor do
     {:reply, nil, new_state}
   end
 
-  def handle_call({:execute, locations, actions}, _from, state) do
+  def handle_cast({:execute, locations, actions}, state) do
     handle_execute(state, locations, actions)
-    {:reply, nil, state}
+    {:noreply, state}
   end
 
   @spec keyword_list_to_map(values :: list) :: map
