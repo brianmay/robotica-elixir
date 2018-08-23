@@ -45,14 +45,12 @@ defmodule Robotica.Client do
 
   def handle_message(topic, publish, state) do
     Logger.info("#{Enum.join(topic, "/")} #{inspect(publish)}")
-    message = Poison.decode!(publish)
 
-    case Robotica.Config.validate_task(message) do
-      {:ok, task} ->
-        Robotica.Executor.execute(Robotica.Executor, task)
-
-      {:error, error} ->
-        Logger.error("Invalid message received: #{error}.")
+    with {:ok, message} <- Poison.decode(publish),
+         {:ok, task} <- Robotica.Config.validate_task(message) do
+      Robotica.Executor.execute(Robotica.Executor, task)
+    else
+      {:error, error} -> Logger.error("Invalid message received: #{error}.")
     end
 
     {:ok, state}
