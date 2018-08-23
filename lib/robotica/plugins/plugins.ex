@@ -14,7 +14,7 @@ defmodule Robotica.Plugins do
         @spec start_link(plugin :: Robotica.Plugins.Plugin.t()) ::
                 {:ok, pid} | {:error, String.t()}
         def start_link(plugin) do
-          with {:ok, pid} <- GenServer.start_link(__MODULE__, plugin.config, []) do
+          with {:ok, pid} <- GenServer.start_link(__MODULE__, plugin, []) do
             plugin.register.(pid)
             {:ok, pid}
           else

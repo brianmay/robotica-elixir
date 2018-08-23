@@ -1,4 +1,4 @@
-defmodule Robotica.Plugins.Logging do
+defmodule Robotica.Plugins.MQTT do
   use GenServer
   use Robotica.Plugins.Plugin
   require Logger
@@ -11,7 +11,7 @@ defmodule Robotica.Plugins.Logging do
   ## Server Callbacks
 
   def init(plugin) do
-    {:ok, plugin.config}
+    {:ok, plugin}
   end
 
   def handle_call({:wait}, _from, state) do
@@ -20,6 +20,15 @@ defmodule Robotica.Plugins.Logging do
 
   def handle_cast({:execute, action}, state) do
     Logger.info(inspect(action))
+    Logger.info(inspect(state))
+    topic = "execute/#{state.location}"
+
+    with {:ok, action} <- Poison.encode(action) do
+      Tortoise.publish(Tortoise.Connection, topic, action, qos: 0)
+    else
+      {:error, err} -> {:error, err}
+    end
+
     {:noreply, state}
   end
 end

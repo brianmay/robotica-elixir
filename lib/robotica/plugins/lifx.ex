@@ -11,8 +11,8 @@ defmodule Robotica.Plugins.LIFX do
 
   ## Server Callbacks
 
-  def init(config) do
-    {:ok, config}
+  def init(plugin) do
+    {:ok, plugin.config}
   end
 
   @spec do_command(state :: State.t(), command :: map) :: nil

@@ -26,9 +26,9 @@ defmodule Robotica.Plugins.Audio do
 
   ## Server Callbacks
 
-  def init(config) do
-    0 = run(config, :init, [])
-    {:ok, config}
+  def init(plugin) do
+    0 = run(plugin.config, :init, [])
+    {:ok, plugin.config}
   end
 
   @spec replace_values(String.t(), %{required(String.t()) => String.t()}) :: String.t()
