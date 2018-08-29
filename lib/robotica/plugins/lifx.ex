@@ -56,7 +56,7 @@ defmodule Robotica.Plugins.LIFX do
         kelvin: Map.fetch!(src_color, "kelvin")
       }
 
-      Enum.each(lights, &Lifx.Device.set_color_wait(&1, color))
+      Enum.each(lights, &Lifx.Device.set_color_wait(&1, color, 0))
     end
 
     Enum.each(lights, &Lifx.Device.on_wait(&1))
@@ -77,7 +77,7 @@ defmodule Robotica.Plugins.LIFX do
             kelvin: 2500
           }
 
-          Lifx.Device.set_color_wait(light, color_off)
+          Lifx.Device.set_color_wait(light, color_off, 0)
         end
 
         color_on = %Lifx.Protocol.HSBK{
