@@ -19,14 +19,14 @@ defmodule Robotica.Plugins.MQTT do
   end
 
   def handle_cast({:execute, action}, state) do
-    Logger.info(inspect(action))
-    Logger.info(inspect(state))
-    topic = "execute/#{state.location}"
+    topic = "/action/#{state.location}/"
+    client_id = Robotica.Supervisor.get_tortoise_client_id()
 
-    with {:ok, action} <- Poison.encode(action) do
-      Tortoise.publish(Tortoise.Connection, topic, action, qos: 0)
+    with {:ok, action} <- Poison.encode(action),
+         :ok <- Tortoise.publish(client_id, topic, action, qos: 0) do
+      nil
     else
-      {:error, err} -> {:error, err}
+      {:error, _} -> Logger.debug("Cannot send outgoing action #{inspect(action)}")
     end
 
     {:noreply, state}

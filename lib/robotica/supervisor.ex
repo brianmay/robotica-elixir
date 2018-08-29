@@ -14,16 +14,19 @@ defmodule Robotica.Supervisor do
     {:ok, _pid} = Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
-  @impl true
-  def init(opts) do
+  def get_tortoise_client_id do
     {:ok, hostname} = :inet.gethostname()
     hostname = to_string(hostname)
+    "robotica-#{hostname}"
+  end
 
+  @impl true
+  def init(opts) do
     children = [
       {Robotica.Executor, name: Robotica.Executor},
       {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor},
       {Tortoise.Connection,
-       client_id: "robotica-#{hostname}",
+       client_id: get_tortoise_client_id(),
        handler: {Robotica.Client, []},
        server: {Tortoise.Transport.Tcp, host: 'proxy.pri', port: 1883},
        subscriptions: [{"/execute/", 0}]}
