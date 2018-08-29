@@ -98,9 +98,19 @@ defmodule Robotica.Config do
     }
   end
 
+  defp lights_color  do
+    %{
+      brightness: {:integer, true},
+      hue: {:integer, true},
+      saturation: {:integer, true},
+      kelvin: {:integer, true}
+    }
+  end
+
   defp lights_action_schema do
     %{
-      action: {:string, true}
+      action: {:string, true},
+      color: {lights_color(), false}
     }
   end
 

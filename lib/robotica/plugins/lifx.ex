@@ -46,14 +46,14 @@ defmodule Robotica.Plugins.LIFX do
   defp do_command(state, %{action: "turn_on"} = command) do
     lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
 
-    if Map.has_key?(command, "color") do
-      src_color = Map.fetch!(command, "color")
+    if not is_nil(command.color) do
+      src_color = command.color
 
       color = %Lifx.Protocol.HSBK{
-        hue: Map.fetch!(src_color, "hue"),
-        saturation: Map.fetch!(src_color, "saturation"),
-        brightness: Map.fetch!(src_color, "brightness"),
-        kelvin: Map.fetch!(src_color, "kelvin")
+        hue: src_color.hue,
+        saturation: src_color.saturation,
+        brightness: src_color.brightness,
+        kelvin: src_color.kelvin
       }
 
       Enum.each(lights, &Lifx.Device.set_color_wait(&1, color, 0))
