@@ -98,7 +98,7 @@ defmodule Robotica.Config do
     }
   end
 
-  defp lights_color  do
+  defp lights_color do
     %{
       brightness: {:integer, true},
       hue: {:integer, true},
@@ -255,6 +255,8 @@ defmodule Robotica.Config do
     end
   end
 
+  defp validate_schema(value, {:list, _}), do: {:error, "Value #{inspect(value)} is not a list"}
+
   defp validate_schema(nil, %{}), do: {:ok, nil}
 
   defp validate_schema(%{} = data, %{} = schema) do
@@ -288,10 +290,14 @@ defmodule Robotica.Config do
     end
   end
 
+  defp validate_schema(value, %{}), do: {:error, "Value #{inspect(value)} is not a map"}
+
   defp validate_schema(%{} = data, {:map, key_schema, value_schema}) do
     data_keyword_list = Map.to_list(data)
     validate_map(data_keyword_list, key_schema, value_schema)
   end
+
+  defp validate_schema(value, {:map, _, _}), do: {:error, "Value #{inspect(value)} is not a map"}
 
   defp validate_schema(_, :set_nil), do: {:ok, nil}
 
@@ -401,7 +407,12 @@ defmodule Robotica.Config do
   defp validate_schema(nil, {:boolean, default}), do: {:ok, default}
   defp validate_schema(true, {:boolean, _}), do: {:ok, true}
   defp validate_schema(false, {:boolean, _}), do: {:ok, false}
-  defp validate_schema(_, {:boolean, _}), do: {:error, "Non-string boolean detected"}
+
+  defp validate_schema(value, {:boolean, _}),
+    do: {:error, "Non-string boolean detected #{inspect(value)}"}
+
+  defp validate_schema(value, type),
+    do: {:error, "Something went wrong with #{inspect(value)} expected type #{inspect(type)}"}
 
   defp substitutions do
     {:ok, hostname} = :inet.gethostname()
