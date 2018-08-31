@@ -2,6 +2,8 @@ defmodule Robotica.Plugins.LIFX do
   use GenServer
   use Robotica.Plugins.Plugin
 
+  require Logger
+
   defmodule State do
     @type t :: %__MODULE__{
             lights: list(String.t())
@@ -15,82 +17,115 @@ defmodule Robotica.Plugins.LIFX do
     {:ok, plugin.config}
   end
 
+  defp light_to_string(light) do
+      "Light #{light.id}/#{light.label}"
+  end
+
+  defp for_every_light(state, callback) do
+    lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
+    Enum.each(lights, callback)
+  end
+
   @spec do_command(state :: State.t(), command :: map) :: nil
 
   defp do_command(state, %{action: "flash"}) do
-    lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
-    Enum.each(lights, &Lifx.Device.get_power(&1))
-
-    lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
-    Enum.each(lights, &Lifx.Device.on_wait(&1))
-    Process.sleep(200)
-    Enum.each(lights, &Lifx.Device.off_wait(&1))
-    Process.sleep(200)
-    Enum.each(lights, &Lifx.Device.on_wait(&1))
-    Process.sleep(200)
-    Enum.each(lights, &Lifx.Device.off_wait(&1))
-    Process.sleep(200)
-    Enum.each(lights, &Lifx.Device.set_power_wait(&1, &1.power))
+    for_every_light(state, fn light ->
+      Logger.debug("#{light_to_string(light)}: flash")
+      with {:ok, power} <- Lifx.Device.get_power(light),
+           Logger.debug("#{light_to_string(light)}: Start flash power #{power}."),
+           {:ok, _} <- Lifx.Device.on_wait(light),
+           Process.sleep(200),
+           {:ok, _} <- Lifx.Device.off_wait(light),
+           Process.sleep(200),
+           {:ok, _} <- Lifx.Device.on_wait(light),
+           Process.sleep(200),
+           {:ok, _} <- Lifx.Device.off_wait(light),
+           Process.sleep(200),
+           {:ok, _} <- Lifx.Device.set_power_wait(light, power) do
+        nil
+      else
+        {:error, err} -> Logger.info("#{light_to_string(light)}: Got error in lifx flash: #{inspect(err)}")
+      end
+    end)
 
     nil
   end
 
   defp do_command(state, %{action: "turn_off"}) do
-    lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
-
-    Enum.each(lights, &Lifx.Device.off_wait(&1))
+    for_every_light(state, fn light ->
+      Logger.debug("#{light_to_string(light)}: turn_off")
+      with {:ok, _} <- Lifx.Device.off_wait(light) do
+        nil
+      else
+        {:error, err} -> Logger.info("#{light_to_string(light)}: Got error in lifx turn_off: #{inspect(err)}")
+      end
+    end)
 
     nil
   end
 
   defp do_command(state, %{action: "turn_on"} = command) do
-    lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
+    set_color = fn light, color ->
+      if is_nil(color) do
+        {:ok, nil}
+      else
+        hsbk = %Lifx.Protocol.HSBK{
+          hue: color.hue,
+          saturation: color.saturation,
+          brightness: color.brightness,
+          kelvin: color.kelvin
+        }
 
-    if not is_nil(command.color) do
-      src_color = command.color
-
-      color = %Lifx.Protocol.HSBK{
-        hue: src_color.hue,
-        saturation: src_color.saturation,
-        brightness: src_color.brightness,
-        kelvin: src_color.kelvin
-      }
-
-      Enum.each(lights, &Lifx.Device.set_color_wait(&1, color, 0))
+        Lifx.Device.set_color_wait(light, hsbk, 0)
+      end
     end
 
-    Enum.each(lights, &Lifx.Device.on_wait(&1))
+    for_every_light(state, fn light ->
+      Logger.debug("#{light_to_string(light)}: turn_on")
+      with {:ok, _} <- set_color.(light, command.color),
+           {:ok, _} <- Lifx.Device.on_wait(light) do
+        nil
+      else
+        {:error, err} -> Logger.info("#{light_to_string(light)}: Got error in lifx turn_on: #{inspect(err)}")
+      end
+    end)
 
     nil
   end
 
   defp do_command(state, %{action: "wake_up"}) do
-    lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.lights, &1.label))
+    color_off = %Lifx.Protocol.HSBK{
+      hue: 0,
+      saturation: 0,
+      brightness: 0,
+      kelvin: 2500
+    }
 
-    Enum.each(lights, fn light ->
-      with {:ok, power} <- Lifx.Device.get_power(light) do
-        if power == 0 do
-          color_off = %Lifx.Protocol.HSBK{
-            hue: 0,
-            saturation: 0,
-            brightness: 0,
-            kelvin: 2500
-          }
+    color_on = %Lifx.Protocol.HSBK{
+      hue: 0,
+      saturation: 0,
+      brightness: 100,
+      kelvin: 2500
+    }
 
-          Lifx.Device.set_color_wait(light, color_off, 0)
-        end
-
-        color_on = %Lifx.Protocol.HSBK{
-          hue: 0,
-          saturation: 0,
-          brightness: 100,
-          kelvin: 2500
-        }
-
-        Lifx.Device.on_wait(light)
-        Lifx.Device.set_color_wait(light, color_on, 60000)
+    set_color = fn light, power, color ->
+      Logger.debug("#{light_to_string(light)}: wake_up")
+      if power == 0 do
+        Lifx.Device.set_color_wait(light, color, 0)
       else
-        _ -> nil
+        {:ok, nil}
+      end
+    end
+
+    for_every_light(state, fn light ->
+      with {:ok, power} <- Lifx.Device.get_power(light),
+           Logger.debug("#{light_to_string(light)}: Start wake_up power #{power}."),
+           {:ok, _} <- set_color.(light, power, color_off),
+           {:ok, _} <- Lifx.Device.on_wait(light),
+           {:ok, _} <- Lifx.Device.set_color_wait(light, color_on, 60000) do
+        nil
+      else
+        {:error, err} -> Logger.info("#{light_to_string(light)}: Got error in lifx wake_up: #{inspect(err)}")
       end
     end)
 
