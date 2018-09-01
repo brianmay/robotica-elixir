@@ -67,7 +67,7 @@ defmodule Robotica.Config do
       start: {:date, false},
       stop: {:date, false},
       date: {:date, false},
-      week_day: {{:boolean, false}, false},
+      week_day: {{:boolean, nil}, false},
       day_of_week: {:day_of_week, false},
       day_type: {:string, true}
     }
