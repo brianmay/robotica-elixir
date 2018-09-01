@@ -244,6 +244,7 @@ defmodule Robotica.Config do
     end
   end
 
+  defp validate_schema(nil, {:list, _}), do: {:ok, nil}
   defp validate_schema([], {:list, _}), do: {:ok, []}
 
   defp validate_schema([head | tail], {:list, item_schema} = schema) do
