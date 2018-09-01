@@ -340,13 +340,13 @@ defmodule Robotica.Scheduler do
           # If we have gone back in time, we should drop the list entirely to
           # avoid duplicating future events.
           Calendar.Date.before?(today, date) ->
-            get_expanded_steps_for_date(date)
+            get_expanded_steps_for_date(today)
             |> Sequence.squash_schedule()
 
           # If we have gonei forward in time, any old entries will expire naturally.
           # avoid duplicating future events.
           Calendar.Date.after?(today, date) ->
-            (list ++ get_expanded_steps_for_date(date))
+            (list ++ get_expanded_steps_for_date(today))
             |> Sequence.squash_schedule()
 
           # No change in date.
