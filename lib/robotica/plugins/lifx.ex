@@ -18,7 +18,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp light_to_string(light) do
-      "Light #{light.id}/#{light.label}"
+    "Light #{light.id}/#{light.label}"
   end
 
   defp for_every_light(state, callback) do
@@ -31,6 +31,7 @@ defmodule Robotica.Plugins.LIFX do
   defp do_command(state, %{action: "flash"}) do
     for_every_light(state, fn light ->
       Logger.debug("#{light_to_string(light)}: flash")
+
       with {:ok, power} <- Lifx.Device.get_power(light),
            Logger.debug("#{light_to_string(light)}: Start flash power #{power}."),
            {:ok, _} <- Lifx.Device.on_wait(light),
@@ -44,7 +45,8 @@ defmodule Robotica.Plugins.LIFX do
            {:ok, _} <- Lifx.Device.set_power_wait(light, power) do
         nil
       else
-        {:error, err} -> Logger.info("#{light_to_string(light)}: Got error in lifx flash: #{inspect(err)}")
+        {:error, err} ->
+          Logger.info("#{light_to_string(light)}: Got error in lifx flash: #{inspect(err)}")
       end
     end)
 
@@ -54,10 +56,12 @@ defmodule Robotica.Plugins.LIFX do
   defp do_command(state, %{action: "turn_off"}) do
     for_every_light(state, fn light ->
       Logger.debug("#{light_to_string(light)}: turn_off")
+
       with {:ok, _} <- Lifx.Device.off_wait(light) do
         nil
       else
-        {:error, err} -> Logger.info("#{light_to_string(light)}: Got error in lifx turn_off: #{inspect(err)}")
+        {:error, err} ->
+          Logger.info("#{light_to_string(light)}: Got error in lifx turn_off: #{inspect(err)}")
       end
     end)
 
@@ -82,11 +86,13 @@ defmodule Robotica.Plugins.LIFX do
 
     for_every_light(state, fn light ->
       Logger.debug("#{light_to_string(light)}: turn_on")
+
       with {:ok, _} <- set_color.(light, command.color),
            {:ok, _} <- Lifx.Device.on_wait(light) do
         nil
       else
-        {:error, err} -> Logger.info("#{light_to_string(light)}: Got error in lifx turn_on: #{inspect(err)}")
+        {:error, err} ->
+          Logger.info("#{light_to_string(light)}: Got error in lifx turn_on: #{inspect(err)}")
       end
     end)
 
@@ -110,6 +116,7 @@ defmodule Robotica.Plugins.LIFX do
 
     set_color = fn light, power, color ->
       Logger.debug("#{light_to_string(light)}: wake_up")
+
       if power == 0 do
         Lifx.Device.set_color_wait(light, color, 0)
       else
@@ -125,7 +132,8 @@ defmodule Robotica.Plugins.LIFX do
            {:ok, _} <- Lifx.Device.set_color_wait(light, color_on, 60000) do
         nil
       else
-        {:error, err} -> Logger.info("#{light_to_string(light)}: Got error in lifx wake_up: #{inspect(err)}")
+        {:error, err} ->
+          Logger.info("#{light_to_string(light)}: Got error in lifx wake_up: #{inspect(err)}")
       end
     end)
 
