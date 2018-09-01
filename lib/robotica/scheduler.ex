@@ -3,7 +3,13 @@ defmodule Robotica.Scheduler do
 
   defmodule Classification do
     @enforce_keys [:day_type]
-    defstruct start: nil, stop: nil, date: nil, week_day: nil, day_of_week: nil, day_type: nil
+    defstruct start: nil,
+              stop: nil,
+              date: nil,
+              week_day: nil,
+              day_of_week: nil,
+              exclude: nil,
+              day_type: nil
   end
 
   defmodule Step do
@@ -92,9 +98,32 @@ defmodule Robotica.Scheduler do
       end
     end
 
+    defp is_excluded_entry?(classification_names, %Classification{} = classification) do
+      exclude_list =
+        if is_nil(classification.exclude) do
+          []
+        else
+          classification.exclude
+        end
+
+      Enum.any?(exclude_list, fn exclude_name ->
+        Enum.member?(classification_names, exclude_name)
+      end)
+    end
+
+    defp reject_excluded(classifications) do
+      classification_names =
+        Enum.map(classifications, fn classification -> classification.day_type end)
+
+      Enum.reject(classifications, fn classification ->
+        is_excluded_entry?(classification_names, classification)
+      end)
+    end
+
     def classify_date(date) do
       classifications()
       |> Enum.filter(fn classification -> is_in_classification?(classification, date) end)
+      |> reject_excluded()
       |> Enum.map(fn classification -> classification.day_type end)
     end
   end
