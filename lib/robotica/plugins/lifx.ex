@@ -32,17 +32,28 @@ defmodule Robotica.Plugins.LIFX do
     for_every_light(state, fn light ->
       Logger.debug("#{light_to_string(light)}: flash")
 
+      color_flash = %Lifx.Protocol.HSBK{
+        hue: 240,
+        saturation: 50,
+        brightness: 100,
+        kelvin: 2500
+      }
+
       with {:ok, power} <- Lifx.Device.get_power(light),
+           {:ok, color} <- Lifx.Device.get_color(light),
            Logger.debug("#{light_to_string(light)}: Start flash power #{power}."),
+           Logger.debug("#{light_to_string(light)}: Start flash color #{inspect color}."),
+           {:ok, _} <- Lifx.Device.set_color_wait(light, color_flash, 0),
            {:ok, _} <- Lifx.Device.on_wait(light),
+           Process.sleep(400),
+           {:ok, _} <- Lifx.Device.set_color_wait(light, color, 0),
            Process.sleep(200),
-           {:ok, _} <- Lifx.Device.off_wait(light),
+           {:ok, _} <- Lifx.Device.set_color_wait(light, color_flash, 0),
+           Process.sleep(400),
+           {:ok, _} <- Lifx.Device.set_color_wait(light, color, 0),
            Process.sleep(200),
-           {:ok, _} <- Lifx.Device.on_wait(light),
-           Process.sleep(200),
-           {:ok, _} <- Lifx.Device.off_wait(light),
-           Process.sleep(200),
-           {:ok, _} <- Lifx.Device.set_power_wait(light, power) do
+           {:ok, _} <- Lifx.Device.set_power_wait(light, power),
+           {:ok, _} <- Lifx.Device.set_color_wait(light, color, 0) do
         nil
       else
         {:error, err} ->
