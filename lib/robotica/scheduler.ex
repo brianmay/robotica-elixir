@@ -312,7 +312,7 @@ defmodule Robotica.Scheduler do
       end
     end
 
-    defp get_expanded_steps_for_date(date) do
+    def get_expanded_steps_for_date(date) do
       date
       |> Classifier.classify_date()
       |> Schedule.get_schedule()
@@ -361,7 +361,7 @@ defmodule Robotica.Scheduler do
       {:noreply, state}
     end
 
-    def check_time_travel({date, list}) do
+    defp check_time_travel({date, list}) do
       today = Calendar.Date.today!(@timezone)
 
       new_list =
