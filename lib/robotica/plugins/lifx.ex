@@ -42,7 +42,7 @@ defmodule Robotica.Plugins.LIFX do
       with {:ok, power} <- Lifx.Device.get_power(light),
            {:ok, color} <- Lifx.Device.get_color(light),
            Logger.debug("#{light_to_string(light)}: Start flash power #{power}."),
-           Logger.debug("#{light_to_string(light)}: Start flash color #{inspect color}."),
+           Logger.debug("#{light_to_string(light)}: Start flash color #{inspect(color)}."),
            {:ok, _} <- Lifx.Device.set_color_wait(light, color_flash, 0),
            {:ok, _} <- Lifx.Device.on_wait(light),
            Process.sleep(400),
