@@ -184,11 +184,10 @@ defmodule Robotica.Scheduler do
 
     defp get_corrected_start_time(start_time, sequence) do
       Enum.reduce_while(sequence, start_time, fn step, acc ->
-        time = Calendar.DateTime.subtract!(acc, step.time)
-
         if step.zero_time do
-          {:halt, time}
+          {:halt, acc}
         else
+          time = Calendar.DateTime.subtract!(acc, step.time)
           {:cont, time}
         end
       end)
@@ -197,8 +196,7 @@ defmodule Robotica.Scheduler do
     defp expand_steps(_, []), do: []
 
     defp expand_steps(start_time, [step | tail]) do
-      seconds = step.time
-      required_time = Calendar.DateTime.add!(start_time, seconds)
+      required_time = start_time
       latest_time = Calendar.DateTime.add!(required_time, 300)
 
       expanded_step = %ExpandedStep{
@@ -207,7 +205,8 @@ defmodule Robotica.Scheduler do
         tasks: [step.task]
       }
 
-      [expanded_step] ++ expand_steps(required_time, tail)
+      next_start_time = Calendar.DateTime.add!(start_time, step.time)
+      [expanded_step] ++ expand_steps(next_start_time, tail)
     end
 
     defp expand_sequence(start_time, sequence_name) do
