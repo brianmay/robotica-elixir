@@ -281,6 +281,10 @@ defmodule Robotica.Scheduler do
       {:ok, state}
     end
 
+    def get_schedule(server) do
+      GenServer.call(server, {:get_schedule})
+    end
+
     defp maximum(v, max) when v > max, do: max
     defp maximum(v, _max), do: v
 
@@ -334,6 +338,10 @@ defmodule Robotica.Scheduler do
       end)
 
       nil
+    end
+
+    def handle_call({:get_schedule}, _from, {_, _, list} = state) do
+      {:reply, list, state}
     end
 
     def handle_info(:timer, {date, _, [] = list}) do
