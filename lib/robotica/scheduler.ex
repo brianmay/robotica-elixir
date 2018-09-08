@@ -136,19 +136,17 @@ defmodule Robotica.Scheduler do
       Macro.escape(data)
     end
 
-    defp convert_time_to_utc(time) do
-      today = Calendar.Date.today!(@timezone)
-
-      Calendar.DateTime.from_date_and_time_and_zone!(today, time, @timezone)
+    defp convert_time_to_utc(date, time) do
+      Calendar.DateTime.from_date_and_time_and_zone!(date, time, @timezone)
       |> Calendar.DateTime.shift_zone!("UTC")
     end
 
-    defp add_schedule(scheduled, actions, name) do
+    defp add_schedule(date, scheduled, actions, name) do
       action = Map.fetch!(actions, name)
 
       action =
         action
-        |> Enum.map(fn {k, v} -> {convert_time_to_utc(k), v} end)
+        |> Enum.map(fn {k, v} -> {convert_time_to_utc(date, k), v} end)
         |> Enum.reduce(%{}, fn {k, vs}, acc ->
           Enum.reduce(vs, acc, fn v, acc -> Map.put(acc, v, k) end)
         end)
@@ -156,13 +154,13 @@ defmodule Robotica.Scheduler do
       Map.merge(scheduled, action)
     end
 
-    def get_schedule(classifications) do
+    def get_schedule(classifications, date) do
       a = schedule()
 
-      schedule = add_schedule(%{}, a, "*")
+      schedule = add_schedule(date, %{}, a, "*")
 
       schedule =
-        Enum.reduce(classifications, schedule, fn v, acc -> add_schedule(acc, a, v) end)
+        Enum.reduce(classifications, schedule, fn v, acc -> add_schedule(date, acc, a, v) end)
         |> Enum.reduce(%{}, fn {k, v}, acc ->
           Map.update(acc, v, MapSet.new([k]), &MapSet.put(&1, k))
         end)
@@ -264,16 +262,22 @@ defmodule Robotica.Scheduler do
     @timezone Application.get_env(:robotica, :timezone)
 
     def start_link(opts) do
-      today = Calendar.Date.today!(@timezone)
-      GenServer.start_link(__MODULE__, {today, nil, []}, opts)
+      GenServer.start_link(__MODULE__, :ok, opts)
     end
 
-    def init({date, timer, expanded_steps}) do
+    def init(:ok) do
+      today = Calendar.Date.today!(@timezone)
+      yesterday = Calendar.Date.add!(today, -1)
+      tomorrow = Calendar.Date.add!(today, 1)
+
       steps =
-        (expanded_steps ++ get_expanded_steps_for_date(date))
+        []
+        |> add_expanded_steps_for_date(yesterday)
+        |> add_expanded_steps_for_date(today)
+        |> add_expanded_steps_for_date(tomorrow)
         |> Sequence.squash_schedule()
 
-      state = set_timer({date, timer, steps})
+      state = set_timer({today, nil, steps})
       {:ok, state}
     end
 
@@ -315,8 +319,12 @@ defmodule Robotica.Scheduler do
     def get_expanded_steps_for_date(date) do
       date
       |> Classifier.classify_date()
-      |> Schedule.get_schedule()
+      |> Schedule.get_schedule(date)
       |> Sequence.expand_schedule()
+    end
+
+    def add_expanded_steps_for_date(list, date) do
+      list ++ get_expanded_steps_for_date(date)
     end
 
     defp do_step(%ExpandedStep{tasks: tasks}) do
@@ -363,19 +371,34 @@ defmodule Robotica.Scheduler do
 
     defp check_time_travel({date, list}) do
       today = Calendar.Date.today!(@timezone)
+      yesterday = Calendar.Date.add!(today, -1)
+      tomorrow = Calendar.Date.add!(today, 1)
 
       new_list =
         cond do
-          # If we have gone back in time, we should drop the list entirely to
-          # avoid duplicating future events.
+          # If we have travelled back in time, we should drop the list entirely
+          # to avoid duplicating future events.
           Calendar.Date.before?(today, date) ->
-            get_expanded_steps_for_date(today)
+            []
+            |> add_expanded_steps_for_date(yesterday)
+            |> add_expanded_steps_for_date(today)
+            |> add_expanded_steps_for_date(tomorrow)
             |> Sequence.squash_schedule()
 
-          # If we have gonei forward in time, any old entries will expire naturally.
-          # avoid duplicating future events.
+          # If we have travelled forward in time by one day, we only need to
+          # add events for tomorrow.
+          Calendar.Date.same_date?(yesterday, date) ->
+            list
+            |> add_expanded_steps_for_date(tomorrow)
+            |> Sequence.squash_schedule()
+
+          # If we have travelled forward in time more then one day, regenerate
+          # entire events list.
           Calendar.Date.after?(today, date) ->
-            (list ++ get_expanded_steps_for_date(today))
+            []
+            |> add_expanded_steps_for_date(yesterday)
+            |> add_expanded_steps_for_date(today)
+            |> add_expanded_steps_for_date(tomorrow)
             |> Sequence.squash_schedule()
 
           # No change in date.
