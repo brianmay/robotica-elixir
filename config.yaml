@@ -1,3 +1,6 @@
+mqtt:
+  host: proxy.pri
+  port: 1883
 plugins:
   - module: Audio
     location: "Brian"

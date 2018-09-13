@@ -3,10 +3,11 @@ defmodule Robotica.Supervisor do
 
   defmodule State do
     @type t :: %__MODULE__{
-            plugins: list(Robotica.Plugins.Plugin.t())
+            plugins: list(Robotica.Plugins.Plugin.t()),
+            mqtt: map()
           }
-    @enforce_keys [:plugins]
-    defstruct plugins: []
+    @enforce_keys [:plugins, :mqtt]
+    defstruct plugins: [], mqtt: nil
   end
 
   @spec start_link(opts :: State.t()) :: {:ok, pid} | {:error, String.t()}
@@ -28,7 +29,7 @@ defmodule Robotica.Supervisor do
       {Tortoise.Connection,
        client_id: get_tortoise_client_id(),
        handler: {Robotica.Client, []},
-       server: {Tortoise.Transport.Tcp, host: 'proxy.pri', port: 1883},
+       server: {Tortoise.Transport.Tcp, host: opts.mqtt.host, port: opts.mqtt.port},
        subscriptions: [{"/execute/", 0}]}
     ]
 

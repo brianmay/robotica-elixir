@@ -180,10 +180,18 @@ defmodule Robotica.Config do
     }
   end
 
+  defp mqtt_config_schema do
+    %{
+      host: {:string, true},
+      port: {:integer, true}
+    }
+  end
+
   defp config_schema do
     %{
       struct_type: Robotica.Supervisor.State,
-      plugins: {{:list, plugin_schema()}, true}
+      plugins: {{:list, plugin_schema()}, true},
+      mqtt: {mqtt_config_schema(), true}
     }
   end
 
@@ -432,6 +440,7 @@ defmodule Robotica.Config do
 
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_schema(data, config_schema())
+    IO.inspect(data)
     data
   end
 
