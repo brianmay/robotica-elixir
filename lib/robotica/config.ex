@@ -202,11 +202,11 @@ defmodule Robotica.Config do
     sub_data = data[data_key]
     {sub_schema, required} = value
 
-    case {required, data} do
+    case {required, sub_data} do
       {true, nil} ->
         {:error, "Value #{key} is not provided"}
 
-      {_, data} ->
+      {_, sub_data} ->
         with {:ok, new_head} <- validate_schema(sub_data, sub_schema),
              {:ok, new_tail} <- validate_kwlist_any(data, tail) do
           {:ok, Map.put(new_tail, key, new_head)}
