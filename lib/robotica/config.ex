@@ -440,7 +440,6 @@ defmodule Robotica.Config do
 
     {:ok, data} = YamlElixir.read_from_file(filename)
     {:ok, data} = validate_schema(data, config_schema())
-    IO.inspect(data)
     data
   end
 
