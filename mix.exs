@@ -22,7 +22,7 @@ defmodule Robotica.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:poison, "~> 3.1"},
+      {:poison, "~> 4.0.1"},
       {:tortoise, "~> 0.9.2"},
       {:dialyxir, "~> 1.0.0-rc.2", only: [:dev], runtime: false},
       {:lifx, path: "../lifx"},
