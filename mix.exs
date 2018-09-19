@@ -23,7 +23,7 @@ defmodule Robotica.MixProject do
   defp deps do
     [
       {:poison, "~> 3.1"},
-      {:tortoise, "~> 0.8.3"},
+      {:tortoise, "~> 0.9.2"},
       {:dialyxir, "~> 1.0.0-rc.2", only: [:dev], runtime: false},
       {:lifx, path: "../lifx"},
       {:yaml_elixir, "~> 2.1.0"},
