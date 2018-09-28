@@ -142,7 +142,7 @@ defmodule Robotica.Scheduler do
     end
 
     defp add_schedule(date, scheduled, actions, name) do
-      action = Map.fetch!(actions, name)
+      action = Map.get(actions, name, %{})
 
       action =
         action
