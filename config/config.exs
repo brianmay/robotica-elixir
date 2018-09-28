@@ -21,6 +21,12 @@ config :lifx,
   max_retries: 3,
   wait_between_retry: 500
 
+config :logger,
+  backends: [:console],
+  compile_time_purge_matching: [
+    [level_lower_than: :info]
+  ]
+
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
 # file won't be loaded nor affect the parent project. For this reason,

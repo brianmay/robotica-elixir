@@ -27,7 +27,7 @@ defmodule Robotica.Plugins.Audio do
   ## Server Callbacks
 
   def init(plugin) do
-    0 = run(plugin.config, :init, [])
+    run(plugin.config, :init, [])
     {:ok, plugin.config}
   end
 
@@ -38,66 +38,73 @@ defmodule Robotica.Plugins.Audio do
     end)
   end
 
-  defp run_commands(state, [cmd | tail], values) do
+  defp run_commands(state, [cmd | tail], values, on_nonzero) do
     [cmd | args] = cmd
     args = Enum.map(args, &replace_values(&1, values))
-    Logger.debug(cmd <> inspect(args))
 
-    case System.cmd(cmd, args) do
-      {_, 0} ->
-        Logger.debug("result no error")
-        run_commands(state, tail, values)
+    string = "#{cmd} #{Enum.join(args, " ")}"
+    Logger.debug("Running '#{string}'.")
 
-      {_, rc} ->
-        Logger.debug("result " <> inspect(rc))
+    {_output, rc} = System.cmd(cmd, args)
+    case {rc, on_nonzero} do
+      {0, _} ->
+        Logger.info("result 0 from '#{string}'.")
+        run_commands(state, tail, values, on_nonzero)
+
+      {rc, :error} ->
+        Logger.error("result #{rc} from '#{string}'.")
+        rc
+
+      {rc, :info} ->
+        Logger.info("result #{rc} from '#{string}'.")
         rc
     end
   end
 
-  defp run_commands(_state, [], _values) do
+  defp run_commands(_state, [], _values, _on_nonzero) do
     0
   end
 
-  defp run(state, cmd, values) do
+  defp run(state, cmd, values, on_nonzero \\ :error) do
     values = for {key, val} <- values, into: %{}, do: {Atom.to_string(key), val}
 
     cmds = Map.fetch!(state.commands, cmd)
-    run_commands(state, cmds, values)
+    run_commands(state, cmds, values, on_nonzero)
   end
 
   defp play_sound(state, sound) do
     sound_file = Map.fetch!(state.sounds, sound)
-    0 = run(state, :play, file: sound_file)
+    run(state, :play, file: sound_file)
   end
 
   defp say(state, text) do
     play_sound(state, "prefix")
-    0 = run(state, :say, text: text)
+    run(state, :say, text: text)
     play_sound(state, "repeat")
-    0 = run(state, :say, text: text)
+    run(state, :say, text: text)
     play_sound(state, "postfix")
     nil
   end
 
   defp music_paused?(state) do
-    case run(state, :music_pause, []) do
+    case run(state, :music_pause, [], :info) do
       0 -> true
       _ -> false
     end
   end
 
   defp music_resume(state) do
-    0 = run(state, :music_resume, [])
+    run(state, :music_resume, [])
     nil
   end
 
   defp music_play(state, play_list) do
-    0 = run(state, :music_play, play_list: play_list)
+    run(state, :music_play, play_list: play_list)
     nil
   end
 
   defp music_stop(state) do
-    0 = run(state, :music_stop, [])
+    run(state, :music_stop, [])
   end
 
   defp append_timer_beep(sound_list, %{timer_status: %{}}) do
