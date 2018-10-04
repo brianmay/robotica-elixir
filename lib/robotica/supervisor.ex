@@ -37,10 +37,7 @@ defmodule Robotica.Supervisor do
       Enum.map(opts.plugins, fn plugin ->
         plugin = %Robotica.Plugins.Plugin{
           plugin
-          | register: fn pid ->
-              Robotica.Executor.add(Robotica.Executor, plugin.location, pid)
-              nil
-            end
+          | executor: Robotica.Executor
         }
 
         {plugin.module, plugin}

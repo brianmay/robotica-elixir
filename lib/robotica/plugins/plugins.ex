@@ -4,10 +4,10 @@ defmodule Robotica.Plugins do
             module: atom,
             location: String.t(),
             config: map,
-            register: (pid :: pid) :: nil
+            executor: pid | nil
           }
     @enforce_keys [:module, :location, :config]
-    defstruct module: nil, location: nil, config: nil, register: nil
+    defstruct module: nil, location: nil, config: nil, executor: nil
 
     defmacro __using__(_opts) do
       quote do
@@ -15,7 +15,7 @@ defmodule Robotica.Plugins do
                 {:ok, pid} | {:error, String.t()}
         def start_link(plugin) do
           with {:ok, pid} <- GenServer.start_link(__MODULE__, plugin, []) do
-            plugin.register.(pid)
+            Robotica.Executor.add(plugin.executor, plugin.location, pid)
             {:ok, pid}
           else
             err -> err
