@@ -10,7 +10,7 @@ defmodule Robotica.Config do
     case String.split(value, ":", parts: 3) do
       [hh, mm] -> {:ok, hh, mm, "0"}
       [hh, mm, ss] -> {:ok, hh, mm, ss}
-      {:error, _} -> {:error, "Cannot split delta #{value}"}
+      _ -> {:error, "Cannot split delta #{value}"}
     end
   end
 
