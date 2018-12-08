@@ -46,6 +46,7 @@ defmodule Robotica.Plugins.Audio do
     Logger.debug("Running '#{string}'.")
 
     {_output, rc} = System.cmd(cmd, args)
+
     case {rc, on_nonzero} do
       {0, _} ->
         Logger.info("result 0 from '#{string}'.")

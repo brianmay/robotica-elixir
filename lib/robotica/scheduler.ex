@@ -141,8 +141,8 @@ defmodule Robotica.Scheduler do
       |> Calendar.DateTime.shift_zone!("UTC")
     end
 
-    defp add_schedule(date, scheduled, actions, name) do
-      action = Map.get(actions, name, %{})
+    defp add_schedule(date, scheduled, action, name) do
+      action = Map.get(action, name, %{})
 
       action =
         action

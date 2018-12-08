@@ -148,7 +148,7 @@ defmodule Robotica.Config do
   defp task_schema do
     %{
       struct_type: Robotica.Executor.Task,
-      actions: {{:list, action_schema()}, true},
+      action: {action_schema(), true},
       locations: {{:list, :string}, true}
     }
   end

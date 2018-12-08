@@ -15,10 +15,10 @@ defmodule Robotica.Executor do
   defmodule Task do
     @type t :: %__MODULE__{
             locations: list(String.t()),
-            actions: list(Action.t())
+            action: Action.t()
           }
-    @enforce_keys [:locations, :actions]
-    defstruct locations: [], actions: []
+    @enforce_keys [:locations, :action]
+    defstruct locations: [], action: nil
   end
 
   ## Client API
@@ -40,8 +40,8 @@ defmodule Robotica.Executor do
   end
 
   @spec execute(server :: pid | atom, task :: Task.t()) :: nil
-  def execute(server, %Task{locations: locations, actions: actions}) do
-    GenServer.cast(server, {:execute, locations, actions})
+  def execute(server, %Task{locations: locations, action: action}) do
+    GenServer.cast(server, {:execute, locations, action})
     nil
   end
 
@@ -66,20 +66,18 @@ defmodule Robotica.Executor do
   @spec handle_execute(
           state :: State.t(),
           locations :: list(String.t()),
-          actions :: list(Action.t())
+          action :: Action.t()
         ) :: nil
-  defp handle_execute(state, locations, actions) do
-    Enum.each(actions, fn action ->
-      Enum.each(locations, fn location ->
-        plugins = Map.get(state.plugins, location, [])
+  defp handle_execute(state, locations, action) do
+    Enum.each(locations, fn location ->
+      plugins = Map.get(state.plugins, location, [])
 
-        Enum.each(plugins, fn pid ->
-          Robotica.Plugins.execute(pid, action)
-        end)
+      Enum.each(plugins, fn pid ->
+        Robotica.Plugins.execute(pid, action)
+      end)
 
-        Enum.each(plugins, fn pid ->
-          Robotica.Plugins.wait(pid)
-        end)
+      Enum.each(plugins, fn pid ->
+        Robotica.Plugins.wait(pid)
       end)
     end)
 
@@ -95,8 +93,8 @@ defmodule Robotica.Executor do
     {:reply, nil, new_state}
   end
 
-  def handle_cast({:execute, locations, actions}, state) do
-    handle_execute(state, locations, actions)
+  def handle_cast({:execute, locations, action}, state) do
+    handle_execute(state, locations, action)
     {:noreply, state}
   end
 
