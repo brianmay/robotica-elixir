@@ -35,6 +35,7 @@ defmodule Robotica.Supervisor do
        server: {Tortoise.Transport.Tcp, host: opts.mqtt.host, port: opts.mqtt.port},
        subscriptions: [
          {"execute", 0},
+         {"request/all/#", 0},
          {"request/#{client_id}/#", 0}
        ]}
     ]
