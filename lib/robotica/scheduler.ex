@@ -187,9 +187,18 @@ defmodule Robotica.Scheduler do
       Macro.escape(data)
     end
 
+    defp add_id_to_tasks([], _, _), do: []
+
+    defp add_id_to_tasks([step | tail], sequence_name, n) do
+        id = "#{sequence_name}_#{n}"
+        step = %{step | task: %{step.task | id: id}}
+        [step | add_id_to_tasks(tail, sequence_name, n+1)]
+    end
+
     defp get_sequence(sequence_name) do
       sequences()
       |> Map.fetch!(sequence_name)
+      |> add_id_to_tasks(sequence_name, 0)
     end
 
     defp get_corrected_start_time(start_time, sequence) do

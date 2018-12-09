@@ -11,10 +11,11 @@ defmodule Robotica.Executor do
   defmodule Task do
     @type t :: %__MODULE__{
             locations: list(String.t()),
-            action: Robotica.Plugins.Action.t()
+            action: Robotica.Plugins.Action.t(),
+            id: string
           }
     @enforce_keys [:locations, :action]
-    defstruct locations: [], action: nil
+    defstruct locations: [], action: nil, id: nil
   end
 
   ## Client API
