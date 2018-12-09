@@ -157,7 +157,8 @@ defmodule Robotica.Config do
     %{
       struct_type: Robotica.Scheduler.Step,
       zero_time: {{:boolean, false}, false},
-      time: {:delta, true},
+      required_time: {:delta, true},
+      latest_time: {:delta, false},
       task: {task_schema(), true}
     }
   end

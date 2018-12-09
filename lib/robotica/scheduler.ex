@@ -14,12 +14,13 @@ defmodule Robotica.Scheduler do
 
   defmodule Step do
     @type t :: %__MODULE__{
-            time: %DateTime{},
+            required_time: integer,
+            latest_time: integer | nil,
             zero_time: boolean(),
             task: Robotica.Executor.Task.t()
           }
-    @enforce_keys [:time, :task]
-    defstruct time: nil, zero_time: false, task: nil
+    @enforce_keys [:required_time, :latest_time, :task]
+    defstruct required_time: nil, latest_time: nil, zero_time: false, task: nil
   end
 
   defmodule ExpandedStep do
@@ -206,7 +207,7 @@ defmodule Robotica.Scheduler do
         if step.zero_time do
           {:halt, acc}
         else
-          time = Calendar.DateTime.subtract!(acc, step.time)
+          time = Calendar.DateTime.subtract!(acc, step.required_time)
           {:cont, time}
         end
       end)
@@ -216,7 +217,13 @@ defmodule Robotica.Scheduler do
 
     defp expand_steps(start_time, [step | tail]) do
       required_time = start_time
-      latest_time = Calendar.DateTime.add!(required_time, 300)
+
+      latest_time = case step.latest_time do
+        nil -> 300
+        latest_time -> latest_time
+      end
+
+      latest_time = Calendar.DateTime.add!(required_time, latest_time)
 
       expanded_step = %ExpandedStep{
         required_time: required_time,
@@ -224,7 +231,7 @@ defmodule Robotica.Scheduler do
         tasks: [step.task]
       }
 
-      next_start_time = Calendar.DateTime.add!(start_time, step.time)
+      next_start_time = Calendar.DateTime.add!(start_time, step.required_time)
       [expanded_step] ++ expand_steps(next_start_time, tail)
     end
 
