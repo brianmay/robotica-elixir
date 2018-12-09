@@ -24,8 +24,10 @@ defmodule Robotica.Supervisor do
   @impl true
   def init(opts) do
     client_id = get_tortoise_client_id()
+
     children = [
       {Robotica.Executor, name: Robotica.Executor},
+      {Robotica.Scheduler.Marks, name: Robotica.Scheduler.Marks},
       {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor},
       {Tortoise.Connection,
        client_id: client_id,

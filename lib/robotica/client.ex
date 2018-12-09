@@ -44,7 +44,7 @@ defmodule Robotica.Client do
     {:ok, state}
   end
 
-  def handle_message(["execute"]=topic, publish, state) do
+  def handle_message(["execute"] = topic, publish, state) do
     Logger.info("#{Enum.join(topic, "/")} #{inspect(publish)}")
 
     with {:ok, message} <- Poison.decode(publish),
@@ -57,7 +57,7 @@ defmodule Robotica.Client do
     {:ok, state}
   end
 
-  def handle_message(["request", _, "schedule"]=topic, publish, state) do
+  def handle_message(["request", _, "schedule"] = topic, publish, state) do
     Logger.info("#{Enum.join(topic, "/")} #{inspect(publish)}")
     Robotica.Scheduler.Executor.publish_schedule(Robotica.Scheduler.Executor)
     {:ok, state}

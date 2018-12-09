@@ -8,14 +8,27 @@ defmodule Robotica.Executor do
     defstruct plugins: %{}
   end
 
+  defmodule Mark do
+    @type t :: %__MODULE__{
+            id: String.t(),
+            status: :done | :cancelled,
+            expires_time: %DateTime{}
+          }
+    @enforce_keys [:id, :status, :expires_time]
+    defstruct id: nil,
+              status: nil,
+              expires_time: nil
+  end
+
   defmodule Task do
     @type t :: %__MODULE__{
             locations: list(String.t()),
             action: Robotica.Plugins.Action.t(),
-            id: string
+            id: String.t() | nil,
+            mark: Mark.t() | nil
           }
-    @enforce_keys [:locations, :action]
-    defstruct locations: [], action: nil, id: nil
+    @enforce_keys [:locations, :action, :mark]
+    defstruct locations: [], action: nil, id: nil, mark: nil
   end
 
   ## Client API

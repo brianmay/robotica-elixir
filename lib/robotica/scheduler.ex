@@ -190,9 +190,9 @@ defmodule Robotica.Scheduler do
     defp add_id_to_tasks([], _, _), do: []
 
     defp add_id_to_tasks([step | tail], sequence_name, n) do
-        id = "#{sequence_name}_#{n}"
-        step = %{step | task: %{step.task | id: id}}
-        [step | add_id_to_tasks(tail, sequence_name, n+1)]
+      id = "#{sequence_name}_#{n}"
+      step = %{step | task: %{step.task | id: id}}
+      [step | add_id_to_tasks(tail, sequence_name, n + 1)]
     end
 
     defp get_sequence(sequence_name) do
@@ -274,6 +274,49 @@ defmodule Robotica.Scheduler do
     end
   end
 
+  defmodule Marks do
+    use GenServer
+
+    def start_link(opts) do
+      GenServer.start_link(__MODULE__, :ok, opts)
+    end
+
+    def put_mark(server, mark) do
+      GenServer.call(server, {:put_mark, mark})
+    end
+
+    def get_mark(server, id) do
+      GenServer.call(server, {:get_mark, id})
+    end
+
+    def filter_expired(state) do
+      # Add several minutes margin before deleting due to late tasks.
+      now =
+        DateTime.utc_now()
+        |> Calendar.DateTime.subtract!(600)
+
+      state
+      |> Enum.filter(fn {_id, m} -> DateTime.compare(m.expires_time, now) in [:eq, :gt] end)
+      |> Enum.into(%{})
+    end
+
+    def init(:ok) do
+      {:ok, %{}}
+    end
+
+    def handle_call({:put_mark, mark}, _from, state) do
+      state = filter_expired(state)
+      id = mark.id
+      {:reply, nil, Map.put(state, id, mark)}
+    end
+
+    def handle_call({:get_mark, id}, _from, state) do
+      state = filter_expired(state)
+      mark = Map.get(state, id, nil)
+      {:reply, mark, state}
+    end
+  end
+
   defmodule Executor do
     use GenServer
 
@@ -315,6 +358,10 @@ defmodule Robotica.Scheduler do
 
     def get_schedule(server) do
       GenServer.call(server, {:get_schedule})
+    end
+
+    def reload_marks(server) do
+      GenServer.call(server, {:reload_marks})
     end
 
     def publish_schedule(server) do
@@ -367,10 +414,40 @@ defmodule Robotica.Scheduler do
       list ++ get_expanded_steps_for_date(date)
     end
 
+    defp add_mark_to_task(required_time, task) do
+      mark = Marks.get_mark(Robotica.Scheduler.Marks, task.id)
+
+      mark =
+        cond do
+          is_nil(mark) -> nil
+          DateTime.compare(required_time, mark.expires_time) in [:gt, :eq] -> nil
+          true -> mark
+        end
+
+      %{task | mark: mark}
+    end
+
+    def add_marks_to_schedule(list) do
+      Enum.map(list, fn step ->
+        tasks =
+          Enum.map(step.tasks, fn task ->
+            add_mark_to_task(step.required_time, task)
+          end)
+
+        %{step | tasks: tasks}
+      end)
+    end
+
     defp do_step(%ExpandedStep{tasks: tasks}) do
       Enum.each(tasks, fn task ->
-        Logger.info("Executing #{inspect(task)}.")
-        Robotica.Executor.execute(Robotica.Executor, task)
+        cond do
+          not is_nil(task.mark) ->
+            Logger.debug("Skipping task #{inspect(task)}.")
+
+          true ->
+            Logger.info("Executing #{inspect(task)}.")
+            Robotica.Executor.execute(Robotica.Executor, task)
+        end
       end)
 
       nil
@@ -378,6 +455,14 @@ defmodule Robotica.Scheduler do
 
     def handle_call({:get_schedule}, _from, {_, _, list} = state) do
       {:reply, list, state}
+    end
+
+    def handle_call({:reload_marks}, _from, {date, timer, list}) do
+      list = add_marks_to_schedule(list)
+
+      new_state = {date, timer, list}
+
+      {:reply, nil, new_state}
     end
 
     def handle_cast({:publish_schedule}, {_, _, list} = state) do
@@ -440,6 +525,7 @@ defmodule Robotica.Scheduler do
             |> add_expanded_steps_for_date(yesterday)
             |> add_expanded_steps_for_date(today)
             |> add_expanded_steps_for_date(tomorrow)
+            |> add_marks_to_schedule()
             |> Sequence.squash_schedule()
 
           # If we have travelled forward in time by one day, we only need to
@@ -447,6 +533,7 @@ defmodule Robotica.Scheduler do
           Calendar.Date.same_date?(yesterday, date) ->
             list
             |> add_expanded_steps_for_date(tomorrow)
+            |> add_marks_to_schedule()
             |> Sequence.squash_schedule()
 
           # If we have travelled forward in time more then one day, regenerate
@@ -456,6 +543,7 @@ defmodule Robotica.Scheduler do
             |> add_expanded_steps_for_date(yesterday)
             |> add_expanded_steps_for_date(today)
             |> add_expanded_steps_for_date(tomorrow)
+            |> add_marks_to_schedule()
             |> Sequence.squash_schedule()
 
           # No change in date.
