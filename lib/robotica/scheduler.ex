@@ -333,6 +333,18 @@ defmodule Robotica.Scheduler do
       GenServer.start_link(__MODULE__, :ok, opts)
     end
 
+    def get_schedule(server) do
+      GenServer.call(server, {:get_schedule})
+    end
+
+    def reload_marks(server) do
+      GenServer.call(server, {:reload_marks})
+    end
+
+    def publish_schedule(server) do
+      GenServer.cast(server, {:publish_schedule})
+    end
+
     @spec publish_steps(
             list(Robotica.Scheduler.ExpandedStep.t()),
             list(Robotica.Scheduler.ExpandedStep.t())
@@ -361,18 +373,6 @@ defmodule Robotica.Scheduler do
 
       state = set_timer({today, nil, steps})
       {:ok, state}
-    end
-
-    def get_schedule(server) do
-      GenServer.call(server, {:get_schedule})
-    end
-
-    def reload_marks(server) do
-      GenServer.call(server, {:reload_marks})
-    end
-
-    def publish_schedule(server) do
-      GenServer.cast(server, {:publish_schedule})
     end
 
     defp maximum(v, max) when v > max, do: max
