@@ -192,7 +192,7 @@ defmodule Robotica.Plugins.Audio do
   defp sound_list_has_music([{:music, _} | _]), do: true
   defp sound_list_has_music([_ | tail]), do: sound_list_has_music(tail)
 
-  @spec handle_execute(state :: State.t(), action :: Robotica.Executor.Action.t()) :: nil
+  @spec handle_execute(state :: State.t(), action :: Robotica.Plugins.Action.t()) :: nil
   defp handle_execute(state, action) do
     sound_list = get_sound_list(action)
 

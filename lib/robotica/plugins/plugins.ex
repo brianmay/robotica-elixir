@@ -26,6 +26,13 @@ defmodule Robotica.Plugins do
   end
 
   defmodule Action do
+    @type t :: %__MODULE__{
+            lights: map() | nil,
+            sound: map() | nil,
+            music: map() | nil,
+            timer_status: map() | nil,
+            timer_cancel: map() | nil
+          }
     defstruct message: nil,
               lights: nil,
               sound: nil,
@@ -34,7 +41,7 @@ defmodule Robotica.Plugins do
               timer_cancel: nil
   end
 
-  @spec execute(server :: pid, action :: map) :: nil
+  @spec execute(server :: pid, action :: Action.t()) :: nil
   def execute(server, action) do
     GenServer.cast(server, {:execute, action})
     nil

@@ -155,7 +155,7 @@ defmodule Robotica.Plugins.LIFX do
     nil
   end
 
-  @spec handle_execute(state :: State.t(), action :: Robotica.Executor.Action.t()) :: nil
+  @spec handle_execute(state :: State.t(), action :: Robotica.Plugins.Action.t()) :: nil
   defp handle_execute(state, action) do
     case action.lights do
       %{} = lights ->

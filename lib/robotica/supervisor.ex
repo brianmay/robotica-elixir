@@ -23,14 +23,18 @@ defmodule Robotica.Supervisor do
 
   @impl true
   def init(opts) do
+    client_id = get_tortoise_client_id()
     children = [
       {Robotica.Executor, name: Robotica.Executor},
       {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor},
       {Tortoise.Connection,
-       client_id: get_tortoise_client_id(),
+       client_id: client_id,
        handler: {Robotica.Client, []},
        server: {Tortoise.Transport.Tcp, host: opts.mqtt.host, port: opts.mqtt.port},
-       subscriptions: [{"/execute/", 0}]}
+       subscriptions: [
+         {"execute", 0},
+         {"request/#{client_id}/#", 0}
+       ]}
     ]
 
     extra_children =

@@ -15,6 +15,7 @@ defmodule Robotica.Client do
 
   def connection(:up, state) do
     Logger.info("Connection has been established")
+    Robotica.Scheduler.Executor.publish_schedule(Robotica.Scheduler.Executor)
     {:ok, state}
   end
 
@@ -43,7 +44,7 @@ defmodule Robotica.Client do
     {:ok, state}
   end
 
-  def handle_message(topic, publish, state) do
+  def handle_message(["execute"]=topic, publish, state) do
     Logger.info("#{Enum.join(topic, "/")} #{inspect(publish)}")
 
     with {:ok, message} <- Poison.decode(publish),
@@ -53,6 +54,18 @@ defmodule Robotica.Client do
       {:error, error} -> Logger.error("Invalid message received: #{error}.")
     end
 
+    {:ok, state}
+  end
+
+  def handle_message(["request", _, "schedule"]=topic, publish, state) do
+    Logger.info("#{Enum.join(topic, "/")} #{inspect(publish)}")
+    Robotica.Scheduler.Executor.publish_schedule(Robotica.Scheduler.Executor)
+    {:ok, state}
+  end
+
+  def handle_message(topic, publish, state) do
+    IO.inspect(topic)
+    Logger.info("Received unknown topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
     {:ok, state}
   end
 

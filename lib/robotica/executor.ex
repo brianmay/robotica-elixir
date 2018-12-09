@@ -1,10 +1,6 @@
 defmodule Robotica.Executor do
   use GenServer
 
-  defmodule Action do
-    @type t :: map
-  end
-
   defmodule State do
     @type t :: %__MODULE__{
             plugins: %{required(String.t()) => list(pid)}
@@ -15,7 +11,7 @@ defmodule Robotica.Executor do
   defmodule Task do
     @type t :: %__MODULE__{
             locations: list(String.t()),
-            action: Action.t()
+            action: Robotica.Plugins.Action.t()
           }
     @enforce_keys [:locations, :action]
     defstruct locations: [], action: nil
@@ -66,7 +62,7 @@ defmodule Robotica.Executor do
   @spec handle_execute(
           state :: State.t(),
           locations :: list(String.t()),
-          action :: Action.t()
+          action :: Robotica.Plugins.Action.t()
         ) :: nil
   defp handle_execute(state, locations, action) do
     Enum.each(locations, fn location ->

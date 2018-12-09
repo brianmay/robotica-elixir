@@ -13,11 +13,21 @@ defmodule Robotica.Scheduler do
   end
 
   defmodule Step do
+    @type t :: %__MODULE__{
+            time: %DateTime{},
+            zero_time: boolean(),
+            task: Robotica.Executor.Task.t()
+          }
     @enforce_keys [:time, :task]
     defstruct time: nil, zero_time: false, task: nil
   end
 
   defmodule ExpandedStep do
+    @type t :: %__MODULE__{
+            required_time: %DateTime{},
+            latest_time: %DateTime{},
+            tasks: list(Robotica.Executor.Task.t())
+          }
     @enforce_keys [:required_time, :latest_time, :tasks]
     defstruct required_time: nil,
               latest_time: nil,
@@ -264,6 +274,20 @@ defmodule Robotica.Scheduler do
       GenServer.start_link(__MODULE__, :ok, opts)
     end
 
+    @spec publish_steps(
+            list(Robotica.Scheduler.ExpandedStep.t()),
+            list(Robotica.Scheduler.ExpandedStep.t())
+          ) :: nil
+
+    defp publish_steps(steps, steps), do: nil
+
+    defp publish_steps(_old_steps, steps) do
+      case Robotica.Mqtt.publish_schedule(steps) do
+        :ok -> nil
+        {:error, _} -> Logger.debug("Cannot send current steps.")
+      end
+    end
+
     def init(:ok) do
       today = Calendar.Date.today!(@timezone)
       yesterday = Calendar.Date.add!(today, -1)
@@ -282,6 +306,10 @@ defmodule Robotica.Scheduler do
 
     def get_schedule(server) do
       GenServer.call(server, {:get_schedule})
+    end
+
+    def publish_schedule(server) do
+      GenServer.cast(server, {:publish_schedule})
     end
 
     defp maximum(v, max) when v > max, do: max
@@ -343,11 +371,20 @@ defmodule Robotica.Scheduler do
       {:reply, list, state}
     end
 
+    def handle_cast({:publish_schedule}, {_, _, list} = state) do
+      publish_steps([], list)
+      {:noreply, state}
+    end
+
     def handle_info(:timer, {date, _, [] = list}) do
       now = Calendar.DateTime.now_utc()
       Logger.debug("Got dummy timer at time #{inspect(now)}.")
       {date, new_list} = check_time_travel({date, list})
       state = set_timer({date, nil, new_list})
+
+      {_, _, new_list} = state
+      publish_steps(list, new_list)
+
       {:noreply, state}
     end
 
@@ -373,6 +410,10 @@ defmodule Robotica.Scheduler do
 
       {date, new_list} = check_time_travel({date, new_list})
       state = set_timer({date, nil, new_list})
+
+      {_, _, new_list} = state
+      publish_steps(list, new_list)
+
       {:noreply, state}
     end
 
