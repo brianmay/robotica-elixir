@@ -448,11 +448,18 @@ defmodule Robotica.Scheduler do
     defp do_step(%ExpandedStep{tasks: tasks}) do
       Enum.each(tasks, fn task ->
         cond do
-          not is_nil(task.mark) ->
-            Logger.debug("Skipping task #{inspect(task)}.")
+          is_nil(task.mark) ->
+            Logger.info("Executing #{inspect(task)}.")
+            Robotica.Executor.execute(Robotica.Executor, task)
+
+          task.mark.status == :done ->
+            Logger.debug("Skipping done task #{inspect(task)}.")
+
+          task.mark.status == :cancelled ->
+            Logger.debug("Skipping cancelled task #{inspect(task)}.")
 
           true ->
-            Logger.info("Executing #{inspect(task)}.")
+            Logger.info("Executing marked task #{inspect(task)}.")
             Robotica.Executor.execute(Robotica.Executor, task)
         end
       end)
@@ -466,9 +473,9 @@ defmodule Robotica.Scheduler do
 
     def handle_call({:reload_marks}, _from, {date, timer, list}) do
       list = add_marks_to_schedule(list)
+      publish_steps([], list)
 
       new_state = {date, timer, list}
-
       {:reply, nil, new_state}
     end
 

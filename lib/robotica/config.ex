@@ -153,6 +153,15 @@ defmodule Robotica.Config do
     }
   end
 
+  defp mark_schema do
+    %{
+      struct_type: Robotica.Executor.Mark,
+      id: {:string, true},
+      status: {:mark_status, true},
+      expires_time: {:date_time, true},
+    }
+  end
+
   defp step_schema do
     %{
       struct_type: Robotica.Scheduler.Step,
@@ -333,6 +342,24 @@ defmodule Robotica.Config do
   defp validate_schema("MQTT", :module), do: {:ok, Robotica.Plugins.MQTT}
   defp validate_schema(module, :module), do: {:error, "Unknown module #{module}"}
 
+  defp validate_schema("done", :mark_status), do: {:ok, :done}
+  defp validate_schema("cancelled", :mark_status), do: {:ok, :cancelled}
+  defp validate_schema(status, :mark_status), do: {:error, "Unknown mark status #{status}"}
+
+  defp validate_schema(value, :date_time) do
+    cond do
+      is_nil(value) ->
+        {:ok, value}
+
+      true ->
+        case DateTime.from_iso8601(value) do
+          {:ok, value, 0} -> {:ok, value}
+          {:ok, _, _} -> {:error, "Need to have a UTC datetime." }
+          {:error, _} -> {:error, "Cannot parse date time #{value}"}
+        end
+    end
+  end
+
   defp validate_schema(value, :date) do
     cond do
       is_nil(value) ->
@@ -476,5 +503,9 @@ defmodule Robotica.Config do
 
   def validate_task(%{} = data) do
     validate_schema(data, task_schema())
+  end
+
+  def validate_mark(%{} = data) do
+    validate_schema(data, mark_schema())
   end
 end
