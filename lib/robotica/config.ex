@@ -338,11 +338,13 @@ defmodule Robotica.Config do
     end
   end
 
+  defp validate_schema(nil, :module), do: {:ok, nil}
   defp validate_schema("Audio", :module), do: {:ok, Robotica.Plugins.Audio}
   defp validate_schema("LIFX", :module), do: {:ok, Robotica.Plugins.LIFX}
   defp validate_schema("MQTT", :module), do: {:ok, Robotica.Plugins.MQTT}
   defp validate_schema(module, :module), do: {:error, "Unknown module #{module}"}
 
+  defp validate_schema(nil, :mark_status), do: {:ok, nil}
   defp validate_schema("done", :mark_status), do: {:ok, :done}
   defp validate_schema("cancelled", :mark_status), do: {:ok, :cancelled}
   defp validate_schema(status, :mark_status), do: {:error, "Unknown mark status #{status}"}
