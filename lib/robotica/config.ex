@@ -148,6 +148,7 @@ defmodule Robotica.Config do
   defp task_schema do
     %{
       struct_type: Robotica.Executor.Task,
+      frequency: {:task_frequency, false},
       action: {action_schema(), true},
       locations: {{:list, :string}, true}
     }
@@ -345,6 +346,11 @@ defmodule Robotica.Config do
   defp validate_schema("done", :mark_status), do: {:ok, :done}
   defp validate_schema("cancelled", :mark_status), do: {:ok, :cancelled}
   defp validate_schema(status, :mark_status), do: {:error, "Unknown mark status #{status}"}
+
+  defp validate_schema(nil, :task_frequency), do: {:ok, nil}
+  defp validate_schema("daily", :task_frequency), do: {:ok, :daily}
+  defp validate_schema("weekly", :task_frequency), do: {:ok, :weekly}
+  defp validate_schema(tf, :task_frequency), do: {:error, "Unknown task frequency #{tf}"}
 
   defp validate_schema(value, :date_time) do
     cond do

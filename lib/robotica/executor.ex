@@ -24,11 +24,12 @@ defmodule Robotica.Executor do
     @type t :: %__MODULE__{
             locations: list(String.t()),
             action: Robotica.Plugins.Action.t(),
+            frequency: :daily | :weekly | nil,
             id: String.t() | nil,
             mark: Mark.t() | nil
           }
-    @enforce_keys [:locations, :action, :mark]
-    defstruct locations: [], action: nil, id: nil, mark: nil
+    @enforce_keys [:locations, :action, :frequency, :mark]
+    defstruct locations: [], action: nil, frequency: nil, id: nil, mark: nil
   end
 
   ## Client API
