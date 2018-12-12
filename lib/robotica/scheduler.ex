@@ -428,7 +428,7 @@ defmodule Robotica.Scheduler do
         cond do
           is_nil(mark) -> nil
           DateTime.compare(required_time, mark.expires_time) in [:gt, :eq] -> nil
-          true -> mark
+          true -> mark.status
         end
 
       %{task | mark: mark}
