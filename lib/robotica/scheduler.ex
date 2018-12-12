@@ -452,10 +452,10 @@ defmodule Robotica.Scheduler do
             Logger.info("Executing #{inspect(task)}.")
             Robotica.Executor.execute(Robotica.Executor, task)
 
-          task.mark.status == :done ->
+          task.mark == :done ->
             Logger.info("Skipping done task #{inspect(task)}.")
 
-          task.mark.status == :cancelled ->
+          task.mark == :cancelled ->
             Logger.info("Skipping cancelled task #{inspect(task)}.")
 
           true ->
