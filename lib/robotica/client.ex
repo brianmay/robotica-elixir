@@ -1,12 +1,12 @@
 defmodule Robotica.Client do
+  use Tortoise.Handler
+
   require Logger
 
   defmodule State do
     @type t :: %__MODULE__{}
     defstruct []
   end
-
-  @behaviour Tortoise.Handler
 
   @spec init(opts :: list) :: {:ok, State.t()}
   def init(_opts) do
