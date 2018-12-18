@@ -61,11 +61,27 @@ defmodule Robotica.Scheduler do
       end
     end
 
-    defp is_date_range_in_classification?(%Classification{} = classification, date) do
+    defp is_date_start_ok?(%Classification{} = classification, date) do
       cond do
-        not is_nil(classification.start) and not is_nil(classification.stop) ->
-          case {Date.compare(date, classification.start), Date.compare(date, classification.stop)} do
-            {a, b} when a in [:gt, :eq] and b in [:lt, :eq] ->
+        not is_nil(classification.start) ->
+          case Date.compare(date, classification.start) do
+            a when a in [:gt, :eq] ->
+              true
+
+            _ ->
+              false
+          end
+
+        true ->
+          true
+      end
+    end
+
+    defp is_date_stop_ok?(%Classification{} = classification, date) do
+      cond do
+        not is_nil(classification.stop) ->
+          case Date.compare(date, classification.stop) do
+            b when b in [:lt, :eq] ->
               true
 
             _ ->
@@ -100,7 +116,8 @@ defmodule Robotica.Scheduler do
 
     defp is_in_classification?(%Classification{} = classification, date) do
       with true <- is_date_in_classification?(classification, date),
-           true <- is_date_range_in_classification?(classification, date),
+           true <- is_date_start_ok?(classification, date),
+           true <- is_date_stop_ok?(classification, date),
            true <- is_week_day_in_classification?(classification, date),
            true <- is_day_of_week_in_classification?(classification, date) do
         true
