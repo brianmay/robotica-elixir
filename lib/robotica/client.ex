@@ -24,6 +24,16 @@ defmodule Robotica.Client do
     {:ok, state}
   end
 
+  def connection(:terminating, state) do
+    Logger.warn("Connection is terminating")
+    {:ok, state}
+  end
+
+  def connection(:terminated, state) do
+    Logger.warn("Connection has been terminated")
+    {:ok, state}
+  end
+
   def subscription(:up, topic, state) do
     Logger.info("Subscribed to #{topic}")
     {:ok, state}
