@@ -17,13 +17,11 @@ defmodule Robotica.Executor.Test do
       module: Robotica.Plugins.Logging,
       location: "SouthPole",
       config: config,
-      register: fn pid ->
-        Robotica.Executor.add(executor, "NorthPole", pid)
-      end
+      executor: executor,
     }
 
-    {:ok, pid} = DynamicSupervisor.start_child(:dynamic, {plugin.module, plugin})
-    assert [^pid] = Robotica.Executor.lookup(executor, "NorthPole")
+    {:ok, pid} = start_supervised({plugin.module, plugin})
+    assert [^pid] = Robotica.Executor.lookup(executor, "SouthPole")
   end
 
   test "stops plugin on exit", %{executor: executor} do
@@ -33,15 +31,13 @@ defmodule Robotica.Executor.Test do
       module: Robotica.Plugins.Logging,
       location: "SouthPole",
       config: config,
-      register: fn pid ->
-        Robotica.Executor.add(executor, "NorthPole", pid)
-      end
+      executor: executor,
     }
 
-    {:ok, pid} = DynamicSupervisor.start_child(:dynamic, {plugin.module, plugin})
-    assert [^pid] = Robotica.Executor.lookup(executor, "NorthPole")
+    {:ok, pid} = start_supervised({plugin.module, plugin})
+    assert [^pid] = Robotica.Executor.lookup(executor, "SouthPole")
 
-    Supervisor.stop(pid)
-    assert [] = Robotica.Executor.lookup(executor, "NorthPole")
+    stop_supervised(plugin.module)
+    assert [] = Robotica.Executor.lookup(executor, "SouthPole")
   end
 end
