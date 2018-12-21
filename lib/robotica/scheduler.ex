@@ -235,10 +235,11 @@ defmodule Robotica.Scheduler do
     defp expand_steps(start_time, [step | tail]) do
       required_time = start_time
 
-      latest_time = case step.latest_time do
-        nil -> 300
-        latest_time -> latest_time
-      end
+      latest_time =
+        case step.latest_time do
+          nil -> 300
+          latest_time -> latest_time
+        end
 
       latest_time = Calendar.DateTime.add!(required_time, latest_time)
 

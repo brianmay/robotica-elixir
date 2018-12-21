@@ -61,7 +61,7 @@ defmodule Robotica.Client do
          {:ok, task} <- Robotica.Config.validate_task(message) do
       Robotica.Executor.execute(Robotica.Executor, task)
     else
-      {:error, error} -> Logger.error("Invalid execute message received: #{inspect error}.")
+      {:error, error} -> Logger.error("Invalid execute message received: #{inspect(error)}.")
     end
 
     {:ok, state}
@@ -75,7 +75,7 @@ defmodule Robotica.Client do
       Robotica.Scheduler.Marks.put_mark(Robotica.Scheduler.Marks, mark)
       Robotica.Scheduler.Executor.reload_marks(Robotica.Scheduler.Executor)
     else
-      {:error, error} -> Logger.error("Invalid mark message received: #{inspect error}.")
+      {:error, error} -> Logger.error("Invalid mark message received: #{inspect(error)}.")
     end
 
     {:ok, state}

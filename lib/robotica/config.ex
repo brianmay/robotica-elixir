@@ -159,7 +159,7 @@ defmodule Robotica.Config do
       struct_type: Robotica.Executor.Mark,
       id: {:string, true},
       status: {:mark_status, true},
-      expires_time: {:date_time, true},
+      expires_time: {:date_time, true}
     }
   end
 
@@ -362,7 +362,7 @@ defmodule Robotica.Config do
       true ->
         case DateTime.from_iso8601(value) do
           {:ok, value, 0} -> {:ok, value}
-          {:ok, _, _} -> {:error, "Need to have a UTC datetime." }
+          {:ok, _, _} -> {:error, "Need to have a UTC datetime."}
           {:error, _} -> {:error, "Cannot parse date time #{value}"}
         end
     end
