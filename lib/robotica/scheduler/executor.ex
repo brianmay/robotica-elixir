@@ -28,8 +28,8 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   @spec publish_steps(
-          list(Types.ExpandedStep.t()),
-          list(Types.ExpandedStep.t())
+          list(Types.MultiStep.t()),
+          list(Types.MultiStep.t())
         ) :: nil
 
   defp publish_steps(steps, steps), do: nil
@@ -127,7 +127,7 @@ defmodule Robotica.Scheduler.Executor do
     end)
   end
 
-  defp do_step(%Types.ExpandedStep{tasks: tasks}) do
+  defp do_step(%Types.MultiStep{tasks: tasks}) do
     Enum.each(tasks, fn task ->
       cond do
         is_nil(task.mark) ->

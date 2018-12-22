@@ -46,7 +46,7 @@ defmodule Robotica.Scheduler.Sequence do
 
     latest_time = Calendar.DateTime.add!(required_time, latest_time)
 
-    expanded_step = %Types.ExpandedStep{
+    expanded_step = %Types.MultiStep{
       required_time: required_time,
       latest_time: latest_time,
       tasks: [step.task]

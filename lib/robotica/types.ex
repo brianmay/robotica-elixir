@@ -21,7 +21,7 @@ defmodule Robotica.Types do
     defstruct required_time: nil, latest_time: nil, zero_time: false, task: nil
   end
 
-  defmodule ExpandedStep do
+  defmodule MultiStep do
     @type t :: %__MODULE__{
             required_time: %DateTime{},
             latest_time: %DateTime{},
