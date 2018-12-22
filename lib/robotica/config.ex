@@ -63,7 +63,7 @@ defmodule Robotica.Config do
 
   defp classification_schema do
     %{
-      struct_type: Robotica.Scheduler.Classification,
+      struct_type: Robotica.Types.Classification,
       start: {:date, false},
       stop: {:date, false},
       date: {:date, false},
@@ -165,7 +165,7 @@ defmodule Robotica.Config do
 
   defp step_schema do
     %{
-      struct_type: Robotica.Scheduler.Step,
+      struct_type: Robotica.Types.Step,
       zero_time: {{:boolean, false}, false},
       required_time: {:delta, true},
       latest_time: {:delta, false},
