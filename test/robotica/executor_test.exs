@@ -17,7 +17,7 @@ defmodule Robotica.Executor.Test do
       module: Robotica.Plugins.Logging,
       location: "SouthPole",
       config: config,
-      executor: executor,
+      executor: executor
     }
 
     {:ok, pid} = start_supervised({plugin.module, plugin})
@@ -31,7 +31,7 @@ defmodule Robotica.Executor.Test do
       module: Robotica.Plugins.Logging,
       location: "SouthPole",
       config: config,
-      executor: executor,
+      executor: executor
     }
 
     {:ok, pid} = start_supervised({plugin.module, plugin})

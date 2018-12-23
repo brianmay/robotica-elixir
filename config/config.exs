@@ -3,7 +3,7 @@
 use Mix.Config
 
 config :robotica,
-  config_file: "config-{hostname}.yaml",
+  config_file: "config.yaml",
   classifications_file: "classifications.yaml",
   schedule_file: "schedule.yaml",
   sequences_file: "sequences.yaml",
@@ -51,5 +51,5 @@ config :logger,
 # by uncommenting the line below and defining dev.exs, test.exs and such.
 # Configuration from the imported file will override the ones defined
 # here (which is why it is important to import them last).
-#
-#     import_config "#{Mix.env}.exs"
+
+import_config "#{Mix.env()}.exs"
