@@ -8,6 +8,7 @@
   "dialyxir": {:hex, :dialyxir, "1.0.0-rc.3", "774306f84973fc3f1e2e8743eeaa5f5d29b117f3916e5de74c075c02f1b8ef55", [:mix], [], "hexpm"},
   "emqttc": {:git, "https://github.com/emqtt/emqttc.git", "cffa0aa356ec9dcabfc66ab6515fe5873f6a0bd3", []},
   "eqc_ex": {:hex, :eqc_ex, "1.4.2", "c89322cf8fbd4f9ddcb18141fb162a871afd357c55c8c0198441ce95ffe2e105", [:mix], [], "hexpm"},
+  "event_bus": {:hex, :event_bus, "1.6.0", "00a26d524f061dd142c170afd2084698fcf2c57c434da180ba0b507728d83dd9", [:mix], [], "hexpm"},
   "exmqttc": {:hex, :exmqttc, "0.5.0", "db6093ec4e583a87bfb48af788fb8205c278c91a287e65d249faeb6712da4cbe", [:mix], [{:credo, "~> 0.8.0", [hex: :credo, repo: "hexpm", optional: false]}, {:uuid, "~> 1.1", [hex: :uuid, repo: "hexpm", optional: false]}], "hexpm"},
   "gen_logger": {:git, "https://github.com/emqtt/gen_logger.git", "e3c9c60b153642193319c793501b10c263d76477", [branch: "master"]},
   "gen_state_machine": {:hex, :gen_state_machine, "2.0.3", "477ea51b466a749ab23a0d6090e9e84073f41f9aa28c7efc40eac18f3d4a9f77", [:mix], [], "hexpm"},
