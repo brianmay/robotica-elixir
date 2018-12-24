@@ -26,6 +26,7 @@ defmodule Robotica.Supervisor do
     client_id = get_tortoise_client_id()
 
     EventBus.register_topic(:execute)
+    EventBus.register_topic(:done)
 
     children = [
       {Robotica.Executor, name: Robotica.Executor},
