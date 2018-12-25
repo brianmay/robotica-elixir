@@ -82,7 +82,8 @@ defmodule Robotica.Executor do
         ) :: nil
   defp handle_execute(state, locations, action) do
     event_params = %{topic: :execute}
-    EventSource.notify(event_params) do
+
+    EventSource.notify event_params do
       action
     end
 
@@ -99,7 +100,8 @@ defmodule Robotica.Executor do
     end)
 
     event_params = %{topic: :done}
-    EventSource.notify(event_params) do
+
+    EventSource.notify event_params do
       action
     end
 

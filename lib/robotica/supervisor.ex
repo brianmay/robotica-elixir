@@ -27,6 +27,9 @@ defmodule Robotica.Supervisor do
 
     EventBus.register_topic(:execute)
     EventBus.register_topic(:done)
+    EventBus.register_topic(:schedule)
+    EventBus.register_topic(:request_schedule)
+    EventBus.subscribe({Robotica.RoboticaService, ["^request_schedule"]})
 
     children = [
       {Robotica.Executor, name: Robotica.Executor},

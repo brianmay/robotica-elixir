@@ -1,5 +1,6 @@
 defmodule Robotica.Scheduler.Executor do
   use GenServer
+  use EventBus.EventSource
 
   require Logger
 
@@ -27,6 +28,10 @@ defmodule Robotica.Scheduler.Executor do
     GenServer.cast(server, {:publish_schedule})
   end
 
+  def request_schedule(server) do
+    GenServer.cast(server, {:request_schedule})
+  end
+
   @spec publish_steps(
           list(Types.MultiStep.t()),
           list(Types.MultiStep.t())
@@ -38,6 +43,21 @@ defmodule Robotica.Scheduler.Executor do
     case Robotica.Mqtt.publish_schedule(steps) do
       :ok -> nil
       {:error, _} -> Logger.debug("Cannot send current steps.")
+    end
+  end
+
+  @spec notify_steps(
+          list(Types.MultiStep.t()),
+          list(Types.MultiStep.t())
+        ) :: nil
+
+  defp notify_steps(steps, steps), do: nil
+
+  defp notify_steps(_old_steps, steps) do
+    event_params = %{topic: :schedule}
+
+    EventSource.notify event_params do
+      steps
     end
   end
 
@@ -155,6 +175,7 @@ defmodule Robotica.Scheduler.Executor do
 
   def handle_call({:reload_marks}, _from, {date, timer, list}) do
     list = add_marks_to_schedule(list)
+    notify_steps([], list)
     publish_steps([], list)
 
     new_state = {date, timer, list}
@@ -162,7 +183,13 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   def handle_cast({:publish_schedule}, {_, _, list} = state) do
+    notify_steps([], list)
     publish_steps([], list)
+    {:noreply, state}
+  end
+
+  def handle_cast({:request_schedule}, {_, _, list} = state) do
+    notify_steps([], list)
     {:noreply, state}
   end
 
@@ -173,6 +200,7 @@ defmodule Robotica.Scheduler.Executor do
     state = set_timer({date, nil, new_list})
 
     {_, _, new_list} = state
+    notify_steps(list, new_list)
     publish_steps(list, new_list)
 
     {:noreply, state}
@@ -202,6 +230,7 @@ defmodule Robotica.Scheduler.Executor do
     state = set_timer({date, nil, new_list})
 
     {_, _, new_list} = state
+    notify_steps(list, new_list)
     publish_steps(list, new_list)
 
     {:noreply, state}
