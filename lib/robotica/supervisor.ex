@@ -25,8 +25,6 @@ defmodule Robotica.Supervisor do
   def init(opts) do
     client_id = get_tortoise_client_id()
 
-    EventBus.register_topic(:execute)
-    EventBus.register_topic(:done)
     EventBus.register_topic(:schedule)
     EventBus.register_topic(:request_schedule)
     EventBus.subscribe({Robotica.RoboticaService, ["^request_schedule"]})

@@ -12,6 +12,8 @@ defmodule Robotica.Plugins.EventBus do
   ## Server Callbacks
 
   def init(plugin) do
+    EventBus.register_topic(:execute)
+    EventBus.register_topic(:done)
     {:ok, plugin}
   end
 
