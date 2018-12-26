@@ -61,6 +61,12 @@ defmodule Robotica.Config do
     }
   end
 
+  defp plugin_event_bus_schema do
+    %{
+      struct_type: Robotica.Plugins.EventBus.State
+    }
+  end
+
   defp classification_schema do
     %{
       struct_type: Robotica.Types.Classification,
@@ -180,6 +186,7 @@ defmodule Robotica.Config do
   defp module_to_schema(Robotica.Plugins.Audio), do: {:ok, plugin_audio_schema()}
   defp module_to_schema(Robotica.Plugins.LIFX), do: {:ok, plugin_lifx_schema()}
   defp module_to_schema(Robotica.Plugins.MQTT), do: {:ok, plugin_mqtt_schema()}
+  defp module_to_schema(Robotica.Plugins.EventBus), do: {:ok, plugin_event_bus_schema()}
   defp module_to_schema(module), do: {:error, "Unknown module #{inspect(module)}"}
 
   defp plugin_schema do
@@ -342,6 +349,7 @@ defmodule Robotica.Config do
   defp validate_schema("Audio", :module), do: {:ok, Robotica.Plugins.Audio}
   defp validate_schema("LIFX", :module), do: {:ok, Robotica.Plugins.LIFX}
   defp validate_schema("MQTT", :module), do: {:ok, Robotica.Plugins.MQTT}
+  defp validate_schema("event_bus", :module), do: {:ok, Robotica.Plugins.EventBus}
   defp validate_schema(module, :module), do: {:error, "Unknown module #{module}"}
 
   defp validate_schema(nil, :mark_status), do: {:ok, nil}

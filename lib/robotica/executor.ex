@@ -1,6 +1,5 @@
 defmodule Robotica.Executor do
   use GenServer
-  use EventBus.EventSource
 
   defmodule State do
     @type t :: %__MODULE__{
@@ -81,11 +80,6 @@ defmodule Robotica.Executor do
           action :: Robotica.Plugins.Action.t()
         ) :: nil
   defp handle_execute(state, locations, action) do
-    event_params = %{topic: :execute}
-
-    EventSource.notify event_params do
-      action
-    end
 
     Enum.each(locations, fn location ->
       plugins = Map.get(state.plugins, location, [])
@@ -98,12 +92,6 @@ defmodule Robotica.Executor do
         Robotica.Plugins.wait(pid)
       end)
     end)
-
-    event_params = %{topic: :done}
-
-    EventSource.notify event_params do
-      action
-    end
 
     nil
   end
