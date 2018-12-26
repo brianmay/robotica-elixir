@@ -124,7 +124,7 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   defp add_mark_to_task(required_time, task) do
-    mark = Marks.get_mark(Types.Marks, task.id)
+    mark = Marks.get_mark(Robotica.Scheduler.Marks, task.id)
 
     mark =
       cond do
