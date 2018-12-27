@@ -27,7 +27,7 @@ defmodule Robotica.Plugins.EventBus do
       action
     end
 
-    Process.sleep(5000)
+    Process.sleep(10000)
 
     event_params = %{topic: :done}
     EventSource.notify event_params do
