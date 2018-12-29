@@ -4,7 +4,7 @@ defmodule Robotica.Plugins.EventBus do
   use EventBus.EventSource
   require Logger
 
-  defmodule State do
+  defmodule Config do
     @type t :: %__MODULE__{}
     defstruct []
   end
@@ -13,7 +13,7 @@ defmodule Robotica.Plugins.EventBus do
 
   def init(plugin) do
     EventBus.register_topic(:execute)
-    {:ok, plugin}
+    {:ok, plugin.config}
   end
 
   def handle_call({:wait}, _from, state) do

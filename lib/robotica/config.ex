@@ -42,7 +42,7 @@ defmodule Robotica.Config do
 
   defp plugin_audio_schema do
     %{
-      struct_type: Robotica.Plugins.Audio.State,
+      struct_type: Robotica.Plugins.Audio.Config,
       commands: {commands(), true},
       sounds: {sounds(), true}
     }
@@ -50,20 +50,20 @@ defmodule Robotica.Config do
 
   defp plugin_lifx_schema do
     %{
-      struct_type: Robotica.Plugins.LIFX.State,
+      struct_type: Robotica.Plugins.LIFX.Config,
       lights: {{:list, :string}, true}
     }
   end
 
   defp plugin_mqtt_schema do
     %{
-      struct_type: Robotica.Plugins.MQTT.State
+      struct_type: Robotica.Plugins.MQTT.Config
     }
   end
 
   defp plugin_event_bus_schema do
     %{
-      struct_type: Robotica.Plugins.EventBus.State
+      struct_type: Robotica.Plugins.EventBus.Config
     }
   end
 

@@ -4,7 +4,7 @@ defmodule Robotica.Plugins.LIFX do
 
   require Logger
 
-  defmodule State do
+  defmodule Config do
     @type t :: %__MODULE__{
             lights: list(String.t())
           }
@@ -26,7 +26,7 @@ defmodule Robotica.Plugins.LIFX do
     Enum.each(lights, callback)
   end
 
-  @spec do_command(state :: State.t(), command :: map) :: nil
+  @spec do_command(state :: Config.t(), command :: map) :: nil
 
   defp do_command(state, %{action: "flash"}) do
     for_every_light(state, fn light ->
@@ -155,7 +155,7 @@ defmodule Robotica.Plugins.LIFX do
     nil
   end
 
-  @spec handle_execute(state :: State.t(), action :: Robotica.Plugins.Action.t()) :: nil
+  @spec handle_execute(state :: Config.t(), action :: Robotica.Plugins.Action.t()) :: nil
   defp handle_execute(state, action) do
     case action.lights do
       %{} = lights ->

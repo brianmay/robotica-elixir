@@ -3,7 +3,7 @@ defmodule Robotica.Plugins.MQTT do
   use Robotica.Plugins.Plugin
   require Logger
 
-  defmodule State do
+  defmodule Config do
     @type t :: %__MODULE__{}
     defstruct []
   end

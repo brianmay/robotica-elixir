@@ -14,7 +14,7 @@ defmodule Robotica.Plugins.Audio do
               music_resume: nil
   end
 
-  defmodule State do
+  defmodule Config do
     @type t :: %__MODULE__{
             commands: %{required(String.t()) => String.t()},
             sounds: %{required(String.t()) => String.t()}
@@ -192,7 +192,7 @@ defmodule Robotica.Plugins.Audio do
   defp sound_list_has_music([{:music, _} | _]), do: true
   defp sound_list_has_music([_ | tail]), do: sound_list_has_music(tail)
 
-  @spec handle_execute(state :: State.t(), action :: Robotica.Plugins.Action.t()) :: nil
+  @spec handle_execute(state :: Config.t(), action :: Robotica.Plugins.Action.t()) :: nil
   defp handle_execute(state, action) do
     sound_list = get_sound_list(action)
 

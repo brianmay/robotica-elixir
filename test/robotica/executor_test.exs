@@ -11,7 +11,7 @@ defmodule Robotica.Executor.Test do
   end
 
   test "add plugin to location", %{executor: executor} do
-    config = %Robotica.Plugins.Logging.State{}
+    config = %Robotica.Plugins.Logging.Config{}
 
     plugin = %Robotica.Plugins.Plugin{
       module: Robotica.Plugins.Logging,
@@ -25,7 +25,7 @@ defmodule Robotica.Executor.Test do
   end
 
   test "stops plugin on exit", %{executor: executor} do
-    config = %Robotica.Plugins.Logging.State{}
+    config = %Robotica.Plugins.Logging.Config{}
 
     plugin = %Robotica.Plugins.Plugin{
       module: Robotica.Plugins.Logging,
