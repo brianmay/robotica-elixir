@@ -80,7 +80,6 @@ defmodule Robotica.Executor do
           action :: Robotica.Plugins.Action.t()
         ) :: nil
   defp handle_execute(state, locations, action) do
-
     Enum.each(locations, fn location ->
       plugins = Map.get(state.plugins, location, [])
 
