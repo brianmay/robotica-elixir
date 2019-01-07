@@ -31,6 +31,40 @@ defmodule Robotica.Plugins.Audio do
     {:ok, plugin.config}
   end
 
+  defp command_list do
+    {:list, {:list, :string}}
+  end
+
+  defp commands do
+    %{
+      struct_type: Commands,
+      init: {command_list(), true},
+      music_pause: {command_list(), true},
+      music_play: {command_list(), true},
+      music_resume: {command_list(), true},
+      music_stop: {command_list(), true},
+      play: {command_list(), true},
+      say: {command_list(), true}
+    }
+  end
+
+  defp sounds do
+    %{
+      "beep" => {:string, true},
+      "postfix" => {:string, true},
+      "prefix" => {:string, true},
+      "repeat" => {:string, true}
+    }
+  end
+
+  def config_schema do
+    %{
+      struct_type: Robotica.Plugins.Audio.Config,
+      commands: {commands(), true},
+      sounds: {sounds(), true}
+    }
+  end
+
   @spec replace_values(String.t(), %{required(String.t()) => String.t()}) :: String.t()
   defp replace_values(string, values) do
     Regex.replace(~r/{([a-z_]+)?}/, string, fn _, match ->
@@ -204,10 +238,6 @@ defmodule Robotica.Plugins.Audio do
         music_resume(state)
       end
     end
-  end
-
-  def handle_call({:wait}, _from, state) do
-    {:reply, nil, state}
   end
 
   def handle_cast({:execute, action}, state) do

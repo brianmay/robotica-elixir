@@ -16,8 +16,10 @@ defmodule Robotica.Plugins.EventBus do
     {:ok, plugin.config}
   end
 
-  def handle_call({:wait}, _from, state) do
-    {:reply, nil, state}
+  def config_schema do
+    %{
+      struct_type: Config
+    }
   end
 
   def handle_cast({:execute, action}, state) do

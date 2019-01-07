@@ -14,57 +14,11 @@ defmodule Robotica.Config do
     end
   end
 
-  defp command_list do
-    {:list, {:list, :string}}
-  end
-
-  defp commands do
-    %{
-      struct_type: Robotica.Plugins.Audio.Commands,
-      init: {command_list(), true},
-      music_pause: {command_list(), true},
-      music_play: {command_list(), true},
-      music_resume: {command_list(), true},
-      music_stop: {command_list(), true},
-      play: {command_list(), true},
-      say: {command_list(), true}
-    }
-  end
-
-  defp sounds do
-    %{
-      "beep" => {:string, true},
-      "postfix" => {:string, true},
-      "prefix" => {:string, true},
-      "repeat" => {:string, true}
-    }
-  end
-
-  defp plugin_audio_schema do
-    %{
-      struct_type: Robotica.Plugins.Audio.Config,
-      commands: {commands(), true},
-      sounds: {sounds(), true}
-    }
-  end
-
-  defp plugin_lifx_schema do
-    %{
-      struct_type: Robotica.Plugins.LIFX.Config,
-      lights: {{:list, :string}, true}
-    }
-  end
-
-  defp plugin_mqtt_schema do
-    %{
-      struct_type: Robotica.Plugins.MQTT.Config
-    }
-  end
-
-  defp plugin_event_bus_schema do
-    %{
-      struct_type: Robotica.Plugins.EventBus.Config
-    }
+  defp plugin_available?(module) do
+    case Code.ensure_compiled?(module) do
+      true -> function_exported?(module, :config_schema, 0)
+      false -> false
+    end
   end
 
   defp classification_schema do
@@ -183,11 +137,7 @@ defmodule Robotica.Config do
     {:map, :string, {:list, step_schema()}}
   end
 
-  defp module_to_schema(Robotica.Plugins.Audio), do: {:ok, plugin_audio_schema()}
-  defp module_to_schema(Robotica.Plugins.LIFX), do: {:ok, plugin_lifx_schema()}
-  defp module_to_schema(Robotica.Plugins.MQTT), do: {:ok, plugin_mqtt_schema()}
-  defp module_to_schema(Robotica.Plugins.EventBus), do: {:ok, plugin_event_bus_schema()}
-  defp module_to_schema(module), do: {:error, "Unknown module #{inspect(module)}"}
+  defp module_to_schema(module), do: {:ok, apply(module, :config_schema, [])}
 
   defp plugin_schema do
     %{
@@ -346,11 +296,13 @@ defmodule Robotica.Config do
   end
 
   defp validate_schema(nil, :module), do: {:ok, nil}
-  defp validate_schema("Audio", :module), do: {:ok, Robotica.Plugins.Audio}
-  defp validate_schema("LIFX", :module), do: {:ok, Robotica.Plugins.LIFX}
-  defp validate_schema("MQTT", :module), do: {:ok, Robotica.Plugins.MQTT}
-  defp validate_schema("event_bus", :module), do: {:ok, Robotica.Plugins.EventBus}
-  defp validate_schema(module, :module), do: {:error, "Unknown module #{module}"}
+  defp validate_schema(module, :module) do
+    module = String.to_atom("Elixir.#{module}")
+    case plugin_available?(module) do
+      true -> {:ok, module}
+      false -> {:error, "Unknown module #{module}"}
+    end
+  end
 
   defp validate_schema(nil, :mark_status), do: {:ok, nil}
   defp validate_schema("done", :mark_status), do: {:ok, :done}

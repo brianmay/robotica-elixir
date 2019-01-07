@@ -17,6 +17,13 @@ defmodule Robotica.Plugins.LIFX do
     {:ok, plugin.config}
   end
 
+  def config_schema do
+    %{
+      struct_type: Config,
+      lights: {{:list, :string}, true}
+    }
+  end
+
   defp light_to_string(light) do
     "Light #{light.id}/#{light.label}"
   end
@@ -166,10 +173,6 @@ defmodule Robotica.Plugins.LIFX do
     end
 
     nil
-  end
-
-  def handle_call({:wait}, _from, state) do
-    {:reply, nil, state}
   end
 
   def handle_cast({:execute, action}, state) do

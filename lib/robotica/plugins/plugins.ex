@@ -9,8 +9,12 @@ defmodule Robotica.Plugins do
     @enforce_keys [:module, :location, :config]
     defstruct module: nil, location: nil, config: nil, executor: nil
 
+    @callback config_schema :: map()
+
     defmacro __using__(_opts) do
       quote do
+        @behaviour Plugin
+
         @spec start_link(plugin :: Robotica.Plugins.Plugin.t()) ::
                 {:ok, pid} | {:error, String.t()}
         def start_link(plugin) do
@@ -21,6 +25,11 @@ defmodule Robotica.Plugins do
             err -> err
           end
         end
+
+        def handle_call({:wait}, _from, state) do
+          {:reply, nil, state}
+        end
+
       end
     end
   end
