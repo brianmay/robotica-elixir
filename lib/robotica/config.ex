@@ -60,33 +60,13 @@ defmodule Robotica.Config do
     }
   end
 
-  defp timer_status_action_schema do
-    %{
-      name: {:string, true},
-      time_left: {:integer, true},
-      time_total: {:integer, true},
-      epoch_minute: {:integer, true},
-      epoch_finish: {:integer, true}
-    }
-  end
-
-  defp timer_cancel_action_schema do
-    %{
-      name: {:string, true},
-      message: {:string, true}
-    }
-  end
-
   defp action_schema do
     %{
       struct_type: Robotica.Plugins.Action,
       sound: {sound_action_schema(), false},
       music: {music_action_schema(), false},
       message: {message_action_schema(), false},
-      lights: {lights_action_schema(), false},
-      timer_warn: {timer_status_action_schema(), false},
-      timer_status: {timer_status_action_schema(), false},
-      timer_cancel: {timer_cancel_action_schema(), false}
+      lights: {lights_action_schema(), false}
     }
   end
 
