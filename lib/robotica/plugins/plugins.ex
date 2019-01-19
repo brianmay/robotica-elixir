@@ -29,7 +29,6 @@ defmodule Robotica.Plugins do
         def handle_call({:wait}, _from, state) do
           {:reply, nil, state}
         end
-
       end
     end
   end
