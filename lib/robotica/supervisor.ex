@@ -37,7 +37,11 @@ defmodule Robotica.Supervisor do
       {Tortoise.Connection,
        client_id: client_id,
        handler: {Robotica.Client, []},
-       server: {Tortoise.Transport.Tcp, host: opts.mqtt.host, port: opts.mqtt.port},
+       user_name: opts.mqtt.user_name,
+       password: opts.mqtt.password,
+       server:
+         {Tortoise.Transport.SSL,
+          host: opts.mqtt.host, port: opts.mqtt.port, cacertfile: opts.mqtt.ca_cert_file},
        subscriptions: [
          {"execute", 0},
          {"mark", 0},

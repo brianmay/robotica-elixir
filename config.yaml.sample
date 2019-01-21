@@ -1,6 +1,9 @@
 mqtt:
-  host: proxy.pri
-  port: 1883
+  host: mqtt.example.org
+  port: 8883
+  user_name: username
+  password: password
+  ca_cert_file: "cafile.pem"
 plugins:
   - module: Robotica.Plugins.Audio
     location: "Brian"

@@ -114,7 +114,10 @@ defmodule Robotica.Config do
   defp mqtt_config_schema do
     %{
       host: {:string, true},
-      port: {:integer, true}
+      port: {:integer, true},
+      user_name: {:string, false},
+      password: {:string, false},
+      ca_cert_file: {:string, true}
     }
   end
 
