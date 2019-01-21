@@ -13,7 +13,7 @@ defmodule Robotica.RoboticaService do
   def process({:execute = topic, id}) do
     Logger.info("got execute")
     task = EventBus.fetch_event_data({topic, id})
-#    Robotica.Executor.execute(Robotica.Executor, task)
+    #    Robotica.Executor.execute(Robotica.Executor, task)
     Robotica.Mqtt.publish_execute(task)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end

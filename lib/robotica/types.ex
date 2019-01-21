@@ -12,11 +12,11 @@ defmodule Robotica.Types do
 
   defmodule Action do
     @type t :: %__MODULE__{
-                 message: map() | nil,
-                 lights: map() | nil,
-                 sound: map() | nil,
-                 music: map() | nil
-               }
+            message: map() | nil,
+            lights: map() | nil,
+            sound: map() | nil,
+            music: map() | nil
+          }
     defstruct message: nil,
               lights: nil,
               sound: nil,
@@ -25,21 +25,21 @@ defmodule Robotica.Types do
 
   defmodule Task do
     @type t :: %__MODULE__{
-                 locations: list(String.t()),
-                 action: Robotica.Plugins.Action.t()
-               }
+            locations: list(String.t()),
+            action: Robotica.Plugins.Action.t()
+          }
     @enforce_keys [:locations, :action]
     defstruct locations: [], action: nil
   end
 
   defmodule ScheduledTask do
     @type t :: %__MODULE__{
-                 locations: list(String.t()),
-                 action: Robotica.Plugins.Action.t(),
-                 frequency: :daily | :weekly | nil,
-                 id: String.t() | nil,
-                 mark: Mark.t() | nil
-               }
+            locations: list(String.t()),
+            action: Robotica.Plugins.Action.t(),
+            frequency: :daily | :weekly | nil,
+            id: String.t() | nil,
+            mark: Mark.t() | nil
+          }
     @enforce_keys [:locations, :action, :frequency, :mark]
     defstruct locations: [], action: nil, frequency: nil, id: nil, mark: nil
   end
@@ -69,14 +69,13 @@ defmodule Robotica.Types do
 
   defmodule Mark do
     @type t :: %__MODULE__{
-                 id: String.t(),
-                 status: :done | :cancelled,
-                 expires_time: %DateTime{}
-               }
+            id: String.t(),
+            status: :done | :cancelled,
+            expires_time: %DateTime{}
+          }
     @enforce_keys [:id, :status, :expires_time]
     defstruct id: nil,
               status: nil,
               expires_time: nil
   end
-
 end
