@@ -1,4 +1,6 @@
 defmodule Robotica.Plugins do
+  import Robotica.Types
+
   defmodule Plugin do
     @type t :: %__MODULE__{
             module: atom,
@@ -31,22 +33,6 @@ defmodule Robotica.Plugins do
         end
       end
     end
-  end
-
-  defmodule Action do
-    @type t :: %__MODULE__{
-            lights: map() | nil,
-            sound: map() | nil,
-            music: map() | nil,
-            timer_status: map() | nil,
-            timer_cancel: map() | nil
-          }
-    defstruct message: nil,
-              lights: nil,
-              sound: nil,
-              music: nil,
-              timer_status: nil,
-              timer_cancel: nil
   end
 
   @spec execute(server :: pid, action :: Action.t()) :: nil

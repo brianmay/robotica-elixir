@@ -4,6 +4,8 @@ defmodule Robotica.Plugins.LIFX do
 
   require Logger
 
+  import Robotica.Types
+
   defmodule Config do
     @type t :: %__MODULE__{
             lights: list(String.t())
@@ -162,7 +164,7 @@ defmodule Robotica.Plugins.LIFX do
     nil
   end
 
-  @spec handle_execute(state :: Config.t(), action :: Robotica.Plugins.Action.t()) :: nil
+  @spec handle_execute(state :: Config.t(), action :: Action.t()) :: nil
   defp handle_execute(state, action) do
     case action.lights do
       %{} = lights ->

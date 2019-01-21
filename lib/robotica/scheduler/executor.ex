@@ -162,7 +162,8 @@ defmodule Robotica.Scheduler.Executor do
 
         true ->
           Logger.info("Executing marked task #{inspect(task)}.")
-          Robotica.Executor.execute(Robotica.Executor, task)
+          executable_task = %Types.Task{locations: task.locations, action: task.action}
+          Robotica.Executor.execute(Robotica.Executor, executable_task)
       end
     end)
 

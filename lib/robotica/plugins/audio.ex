@@ -3,6 +3,8 @@ defmodule Robotica.Plugins.Audio do
   use Robotica.Plugins.Plugin
   require Logger
 
+  import Robotica.Types
+
   defmodule Commands do
     @enforce_keys [:init, :play, :say, :music_play, :music_stop, :music_pause, :music_resume]
     defstruct init: nil,
@@ -226,7 +228,7 @@ defmodule Robotica.Plugins.Audio do
   defp sound_list_has_music([{:music, _} | _]), do: true
   defp sound_list_has_music([_ | tail]), do: sound_list_has_music(tail)
 
-  @spec handle_execute(state :: Config.t(), action :: Robotica.Plugins.Action.t()) :: nil
+  @spec handle_execute(state :: Config.t(), action :: Action.t()) :: nil
   defp handle_execute(state, action) do
     sound_list = get_sound_list(action)
 

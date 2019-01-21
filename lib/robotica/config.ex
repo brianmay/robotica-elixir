@@ -62,7 +62,7 @@ defmodule Robotica.Config do
 
   defp action_schema do
     %{
-      struct_type: Robotica.Plugins.Action,
+      struct_type: Robotica.Types.Action,
       sound: {sound_action_schema(), false},
       music: {music_action_schema(), false},
       message: {message_action_schema(), false},
@@ -70,10 +70,18 @@ defmodule Robotica.Config do
     }
   end
 
+  defp scheduled_task_schema do
+    %{
+      struct_type: Robotica.Types.ScheduledTask,
+      frequency: {:task_frequency, false},
+      action: {action_schema(), true},
+      locations: {{:list, :string}, true}
+    }
+  end
+
   defp task_schema do
     %{
-      struct_type: Robotica.Executor.Task,
-      frequency: {:task_frequency, false},
+      struct_type: Robotica.Types.Task,
       action: {action_schema(), true},
       locations: {{:list, :string}, true}
     }
@@ -81,7 +89,7 @@ defmodule Robotica.Config do
 
   defp mark_schema do
     %{
-      struct_type: Robotica.Executor.Mark,
+      struct_type: Robotica.Types.Mark,
       id: {:string, true},
       status: {:mark_status, true},
       expires_time: {:date_time, true}
@@ -94,7 +102,7 @@ defmodule Robotica.Config do
       zero_time: {{:boolean, false}, false},
       required_time: {:delta, true},
       latest_time: {:delta, false},
-      task: {task_schema(), true}
+      task: {scheduled_task_schema(), true}
     }
   end
 

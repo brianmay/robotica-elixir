@@ -8,30 +8,6 @@ defmodule Robotica.Executor do
     defstruct plugins: %{}
   end
 
-  defmodule Mark do
-    @type t :: %__MODULE__{
-            id: String.t(),
-            status: :done | :cancelled,
-            expires_time: %DateTime{}
-          }
-    @enforce_keys [:id, :status, :expires_time]
-    defstruct id: nil,
-              status: nil,
-              expires_time: nil
-  end
-
-  defmodule Task do
-    @type t :: %__MODULE__{
-            locations: list(String.t()),
-            action: Robotica.Plugins.Action.t(),
-            frequency: :daily | :weekly | nil,
-            id: String.t() | nil,
-            mark: Mark.t() | nil
-          }
-    @enforce_keys [:locations, :action, :frequency, :mark]
-    defstruct locations: [], action: nil, frequency: nil, id: nil, mark: nil
-  end
-
   ## Client API
 
   @spec start_link(opts :: list) :: {:ok, pid} | {:error, String.t()}
@@ -51,7 +27,7 @@ defmodule Robotica.Executor do
   end
 
   @spec execute(server :: pid | atom, task :: Task.t()) :: nil
-  def execute(server, %Task{locations: locations, action: action}) do
+  def execute(server, %Robotica.Types.Task{locations: locations, action: action}) do
     GenServer.cast(server, {:execute, locations, action})
     nil
   end
