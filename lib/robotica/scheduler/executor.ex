@@ -149,10 +149,11 @@ defmodule Robotica.Scheduler.Executor do
 
   defp do_step(%Types.MultiStep{tasks: tasks}) do
     Enum.each(tasks, fn task ->
+      executable_task = %Types.Task{locations: task.locations, action: task.action}
       cond do
         is_nil(task.mark) ->
           Logger.info("Executing #{inspect(task)}.")
-          Robotica.Executor.execute(Robotica.Executor, task)
+          Robotica.Executor.execute(Robotica.Executor, executable_task)
 
         task.mark == :done ->
           Logger.info("Skipping done task #{inspect(task)}.")
@@ -162,7 +163,6 @@ defmodule Robotica.Scheduler.Executor do
 
         true ->
           Logger.info("Executing marked task #{inspect(task)}.")
-          executable_task = %Types.Task{locations: task.locations, action: task.action}
           Robotica.Executor.execute(Robotica.Executor, executable_task)
       end
     end)

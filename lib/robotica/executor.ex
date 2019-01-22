@@ -1,6 +1,8 @@
 defmodule Robotica.Executor do
   use GenServer
 
+  alias Robotica.Types
+
   defmodule State do
     @type t :: %__MODULE__{
             plugins: %{required(String.t()) => list(pid)}
@@ -26,7 +28,7 @@ defmodule Robotica.Executor do
     nil
   end
 
-  @spec execute(server :: pid | atom, task :: Task.t()) :: nil
+  @spec execute(server :: pid | atom, task :: Types.Task.t()) :: nil
   def execute(server, %Robotica.Types.Task{locations: locations, action: action}) do
     GenServer.cast(server, {:execute, locations, action})
     nil
