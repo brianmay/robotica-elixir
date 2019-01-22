@@ -20,8 +20,10 @@ defmodule Robotica.RoboticaService do
 
   def process({:mark = topic, id}) do
     Logger.info("got mark")
-    action = EventBus.fetch_event_data({topic, id})
-    Robotica.Mqtt.publish_mark(action)
+    mark = EventBus.fetch_event_data({topic, id})
+    #    Robotica.Scheduler.Marks.put_mark(Robotica.Scheduler.Marks, mark)
+    #    Robotica.Scheduler.Executor.reload_marks(Robotica.Scheduler.Executor)
+    Robotica.Mqtt.publish_mark(mark)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 end

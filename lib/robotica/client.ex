@@ -88,7 +88,6 @@ defmodule Robotica.Client do
   end
 
   def handle_message(topic, publish, state) do
-    IO.inspect(topic)
     Logger.info("Received unknown topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
     {:ok, state}
   end

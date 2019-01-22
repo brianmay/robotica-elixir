@@ -70,9 +70,9 @@ defmodule Robotica.Scheduler.Sequence.Test do
         required_time: local_datetime(~N[2018-12-25 04:35:00]),
         latest_time: local_datetime(~N[2018-12-25 04:40:00]),
         tasks: [
-          %Robotica.Executor.Task{
+          %Robotica.Types.ScheduledTask{
             locations: ["here"],
-            action: %Robotica.Plugins.Action{},
+            action: %Robotica.Types.Action{},
             frequency: :daily,
             mark: nil
           }
@@ -82,9 +82,9 @@ defmodule Robotica.Scheduler.Sequence.Test do
         required_time: local_datetime(~N[2018-12-25 04:35:00]),
         latest_time: local_datetime(~N[2018-12-25 04:40:00]),
         tasks: [
-          %Robotica.Executor.Task{
+          %Robotica.Types.ScheduledTask{
             locations: ["here"],
-            action: %Robotica.Plugins.Action{},
+            action: %Robotica.Types.Action{},
             frequency: :daily,
             mark: nil
           }
@@ -94,9 +94,9 @@ defmodule Robotica.Scheduler.Sequence.Test do
         required_time: local_datetime(~N[2018-12-25 05:35:00]),
         latest_time: local_datetime(~N[2018-12-25 04:40:00]),
         tasks: [
-          %Robotica.Executor.Task{
+          %Robotica.Types.ScheduledTask{
             locations: ["here"],
-            action: %Robotica.Plugins.Action{},
+            action: %Robotica.Types.Action{},
             frequency: :daily,
             mark: nil
           }

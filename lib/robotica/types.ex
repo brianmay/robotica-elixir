@@ -26,7 +26,7 @@ defmodule Robotica.Types do
   defmodule Task do
     @type t :: %__MODULE__{
             locations: list(String.t()),
-            action: Robotica.Plugins.Action.t()
+            action: Robotica.Types.Action.t()
           }
     @enforce_keys [:locations, :action]
     defstruct locations: [], action: nil
@@ -35,7 +35,7 @@ defmodule Robotica.Types do
   defmodule ScheduledTask do
     @type t :: %__MODULE__{
             locations: list(String.t()),
-            action: Robotica.Plugins.Action.t(),
+            action: Robotica.Types.Action.t(),
             frequency: :daily | :weekly | nil,
             id: String.t() | nil,
             mark: Mark.t() | nil

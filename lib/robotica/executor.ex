@@ -53,7 +53,7 @@ defmodule Robotica.Executor do
   @spec handle_execute(
           state :: State.t(),
           locations :: list(String.t()),
-          action :: Robotica.Plugins.Action.t()
+          action :: Robotica.Types.Action.t()
         ) :: nil
   defp handle_execute(state, locations, action) do
     Enum.each(locations, fn location ->

@@ -144,37 +144,11 @@ defmodule Robotica.Plugins.Audio do
     run(state, :music_stop, [])
   end
 
-  defp append_timer_beep(sound_list, %{timer_status: %{}}) do
-    sound_list ++ [{:sound, "beep"}]
-  end
-
-  defp append_timer_beep(sound_list, _), do: sound_list
-
   defp append_sound(sound_list, %{sound: %{} = sound}) do
     sound_list ++ [{:sound, sound}]
   end
 
   defp append_sound(sound_list, _), do: sound_list
-
-  defp append_timer_status(sound_list, %{timer_status: %{time_left: time_left}}) do
-    if time_left > 0 and rem(time_left, 5) == 0 do
-      sound_list ++ [{:say, "#{time_left} minutes"}]
-    else
-      sound_list
-    end
-  end
-
-  defp append_timer_status(sound_list, _), do: sound_list
-
-  defp append_timer_cancel(sound_list, %{timer_cancel: %{}}) do
-    sound_list ++
-      [
-        {:sound, "cancelled"},
-        {:say, "timer cancelled"}
-      ]
-  end
-
-  defp append_timer_cancel(sound_list, _), do: sound_list
 
   defp append_message(sound_list, %{message: %{text: text}}) do
     sound_list ++ [{:say, text}]
@@ -194,10 +168,7 @@ defmodule Robotica.Plugins.Audio do
 
   defp get_sound_list(action) do
     []
-    |> append_timer_beep(action)
     |> append_sound(action)
-    |> append_timer_status(action)
-    |> append_timer_cancel(action)
     |> append_message(action)
     |> append_music(action)
   end
