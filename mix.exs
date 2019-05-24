@@ -27,7 +27,7 @@ defmodule Robotica.MixProject do
       {:tortoise, "~> 0.9.2"},
       {:dialyxir, "~> 1.0.0-rc.2", only: [:dev], runtime: false},
       {:lifx, git: "https://github.com/brianmay/lifx.git"},
-      {:yaml_elixir, "~> 2.1.0"},
+      {:yaml_elixir, "~> 2.4.0"},
       {:calendar, "~> 0.17.2"},
       {:event_bus, "~> 1.6.0"}
       # {:dep_from_hexpm, "~> 0.3.0"},
