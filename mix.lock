@@ -17,7 +17,7 @@
   "hulaaki": {:hex, :hulaaki, "0.1.2", "bb6a7540596d3a12eb2e4624dd8daf5b00c5723826563f7cd47fadbec9f8ed0d", [:mix], [], "hexpm"},
   "idna": {:hex, :idna, "5.1.2", "e21cb58a09f0228a9e0b95eaa1217f1bcfc31a1aaa6e1fdf2f53a33f7dbd9494", [:rebar3], [{:unicode_util_compat, "0.3.1", [hex: :unicode_util_compat, repo: "hexpm", optional: false]}], "hexpm"},
   "lager": {:git, "https://github.com/basho/lager.git", "81eaef0ce98fdbf64ab95665e3bc2ec4b24c7dac", [branch: "master"]},
-  "lifx": {:git, "https://github.com/brianmay/lifx.git", "0f95d53487698422522597d26dd1d199ed411f9f", []},
+  "lifx": {:git, "https://github.com/brianmay/lifx.git", "38e3f2fbe4be651bf198799ff3439bdf691c8fec", []},
   "metrics": {:hex, :metrics, "1.0.1", "25f094dea2cda98213cecc3aeff09e940299d950904393b2a29d191c346a8486", [:rebar3], [], "hexpm"},
   "mimerl": {:hex, :mimerl, "1.0.2", "993f9b0e084083405ed8252b99460c4f0563e41729ab42d9074fd5e52439be88", [:rebar3], [], "hexpm"},
   "parse_trans": {:hex, :parse_trans, "3.2.0", "2adfa4daf80c14dc36f522cf190eb5c4ee3e28008fc6394397c16f62a26258c2", [:rebar3], [], "hexpm"},
