@@ -59,7 +59,7 @@ defmodule Robotica.Client do
 
     with {:ok, message} <- Poison.decode(publish),
          {:ok, task} <- Robotica.Config.validate_task(message) do
-      Robotica.Executor.execute(Robotica.Executor, task)
+      RoboticaPlugins.Executor.execute(Robotica.Executor, task)
     else
       {:error, error} -> Logger.error("Invalid execute message received: #{inspect(error)}.")
     end

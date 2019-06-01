@@ -3,7 +3,7 @@ defmodule Robotica.Supervisor do
 
   defmodule State do
     @type t :: %__MODULE__{
-            plugins: list(Robotica.Plugins.Plugin.t()),
+            plugins: list(RoboticaPlugins.Plugin.t()),
             mqtt: map()
           }
     @enforce_keys [:plugins, :mqtt]
@@ -32,7 +32,7 @@ defmodule Robotica.Supervisor do
     EventBus.subscribe({Robotica.RoboticaService, ["^request_schedule$", "^execute$", "^mark$"]})
 
     children = [
-      {Robotica.Executor, name: Robotica.Executor},
+      {RoboticaPlugins.Executor, name: Robotica.Executor},
       {Robotica.Scheduler.Marks, name: Robotica.Scheduler.Marks},
       {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor},
       {Tortoise.Connection,
@@ -53,7 +53,7 @@ defmodule Robotica.Supervisor do
 
     extra_children =
       Enum.map(opts.plugins, fn plugin ->
-        plugin = %Robotica.Plugins.Plugin{
+        plugin = %RoboticaPlugins.Plugin{
           plugin
           | executor: Robotica.Executor
         }

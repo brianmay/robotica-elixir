@@ -1,6 +1,6 @@
 defmodule Robotica.Plugins.Logging do
   use GenServer
-  use Robotica.Plugins.Plugin
+  use RoboticaPlugins.Plugin
   require Logger
 
   defmodule Config do

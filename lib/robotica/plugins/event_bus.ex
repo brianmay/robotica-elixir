@@ -1,6 +1,6 @@
 defmodule Robotica.Plugins.EventBus do
   use GenServer
-  use Robotica.Plugins.Plugin
+  use RoboticaPlugins.Plugin
   use EventBus.EventSource
   require Logger
 

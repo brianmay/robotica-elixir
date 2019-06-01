@@ -29,9 +29,8 @@ defmodule Robotica.MixProject do
       {:lifx, git: "https://github.com/brianmay/lifx.git"},
       {:yaml_elixir, "~> 2.4.0"},
       {:calendar, "~> 0.17.2"},
-      {:event_bus, "~> 1.6.0"}
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
+      {:event_bus, "~> 1.6.0"},
+      {:robotica_plugins, path: "../robotica_plugins"},
     ]
   end
 

@@ -1,6 +1,6 @@
 defmodule Robotica.Plugins.Audio do
   use GenServer
-  use Robotica.Plugins.Plugin
+  use RoboticaPlugins.Plugin
   require Logger
 
   import Robotica.Types

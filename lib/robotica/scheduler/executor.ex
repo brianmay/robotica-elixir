@@ -4,6 +4,7 @@ defmodule Robotica.Scheduler.Executor do
 
   require Logger
 
+  alias RoboticaPlugins.Task
   alias Robotica.Types
   alias Robotica.Scheduler.Sequence
   alias Robotica.Scheduler.Classifier
@@ -149,11 +150,11 @@ defmodule Robotica.Scheduler.Executor do
 
   defp do_step(%Types.MultiStep{tasks: tasks}) do
     Enum.each(tasks, fn task ->
-      executable_task = %Types.Task{locations: task.locations, action: task.action}
+      executable_task = %Task{locations: task.locations, action: task.action}
       cond do
         is_nil(task.mark) ->
           Logger.info("Executing #{inspect(task)}.")
-          Robotica.Executor.execute(Robotica.Executor, executable_task)
+          RoboticaPlugins.Executor.execute(Robotica.Executor, executable_task)
 
         task.mark == :done ->
           Logger.info("Skipping done task #{inspect(task)}.")
@@ -163,7 +164,7 @@ defmodule Robotica.Scheduler.Executor do
 
         true ->
           Logger.info("Executing marked task #{inspect(task)}.")
-          Robotica.Executor.execute(Robotica.Executor, executable_task)
+          RoboticaPlugins.Executor.execute(Robotica.Executor, executable_task)
       end
     end)
 

@@ -1,4 +1,6 @@
 defmodule Robotica.Config do
+  alias RoboticaPlugins.Validation
+
   @spec replace_values(String.t(), %{required(String.t()) => String.t()}) :: String.t()
   defp replace_values(string, values) do
     Regex.replace(~r/{([a-z_]+)?}/, string, fn _, match ->
@@ -62,7 +64,7 @@ defmodule Robotica.Config do
 
   defp action_schema do
     %{
-      struct_type: Robotica.Types.Action,
+      struct_type: RoboticaPlugins.Action,
       sound: {sound_action_schema(), false},
       music: {music_action_schema(), false},
       message: {message_action_schema(), false},
@@ -81,7 +83,7 @@ defmodule Robotica.Config do
 
   defp task_schema do
     %{
-      struct_type: Robotica.Types.Task,
+      struct_type: RoboticaPlugins.Task,
       action: {action_schema(), true},
       locations: {{:list, :string}, true}
     }
@@ -89,7 +91,7 @@ defmodule Robotica.Config do
 
   defp mark_schema do
     %{
-      struct_type: Robotica.Types.Mark,
+      struct_type: RoboticaPlugins.Mark,
       id: {:string, true},
       status: {:mark_status, true},
       expires_time: {:date_time, true}
@@ -112,7 +114,7 @@ defmodule Robotica.Config do
 
   defp plugin_schema do
     %{
-      struct_type: Robotica.Plugins.Plugin,
+      struct_type: RoboticaPlugins.Plugin,
       config: {:set_nil, true},
       location: {:string, true},
       module: {:module, true}
@@ -152,7 +154,7 @@ defmodule Robotica.Config do
       |> replace_values(substitutions())
 
     {:ok, data} = YamlElixir.read_from_file(filename)
-    {:ok, data} = Robotica.Validation.validate_schema(data, config_schema())
+    {:ok, data} = Validation.validate_schema(data, config_schema())
     data
   end
 
@@ -162,7 +164,7 @@ defmodule Robotica.Config do
       |> replace_values(substitutions())
 
     {:ok, data} = YamlElixir.read_from_file(filename)
-    {:ok, data} = Robotica.Validation.validate_schema(data, classifications_schema())
+    {:ok, data} = Validation.validate_schema(data, classifications_schema())
     data
   end
 
@@ -172,7 +174,7 @@ defmodule Robotica.Config do
       |> replace_values(substitutions())
 
     {:ok, data} = YamlElixir.read_from_file(filename)
-    {:ok, data} = Robotica.Validation.validate_schema(data, schedule_schema())
+    {:ok, data} = Validation.validate_schema(data, schedule_schema())
     data
   end
 
@@ -182,15 +184,15 @@ defmodule Robotica.Config do
       |> replace_values(substitutions())
 
     {:ok, data} = YamlElixir.read_from_file(filename)
-    {:ok, data} = Robotica.Validation.validate_schema(data, sequences_schema())
+    {:ok, data} = Validation.validate_schema(data, sequences_schema())
     data
   end
 
   def validate_task(%{} = data) do
-    Robotica.Validation.validate_schema(data, task_schema())
+    Validation.validate_schema(data, task_schema())
   end
 
   def validate_mark(%{} = data) do
-    Robotica.Validation.validate_schema(data, mark_schema())
+    Validation.validate_schema(data, mark_schema())
   end
 end
