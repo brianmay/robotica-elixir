@@ -151,6 +151,7 @@ defmodule Robotica.Scheduler.Executor do
   defp do_step(%Types.MultiStep{tasks: tasks}) do
     Enum.each(tasks, fn task ->
       executable_task = %Task{locations: task.locations, action: task.action}
+
       cond do
         is_nil(task.mark) ->
           Logger.info("Executing #{inspect(task)}.")

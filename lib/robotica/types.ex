@@ -44,5 +44,4 @@ defmodule Robotica.Types do
               latest_time: nil,
               tasks: []
   end
-
 end
