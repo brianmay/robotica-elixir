@@ -1,5 +1,6 @@
 defmodule Robotica.Config do
   alias RoboticaPlugins.Validation
+  alias RoboticaPlugins.Schema
 
   @spec replace_values(String.t(), %{required(String.t()) => String.t()}) :: String.t()
   defp replace_values(string, values) do
@@ -29,54 +30,11 @@ defmodule Robotica.Config do
     {:map, :string, {:map, :time, {:list, :string}}}
   end
 
-  defp sound_action_schema do
-    :string
-  end
-
-  defp music_action_schema do
-    %{
-      play_list: {:string, false},
-      stop: {{:boolean, false}, false}
-    }
-  end
-
-  defp message_action_schema do
-    %{
-      text: {:string, true}
-    }
-  end
-
-  defp lights_color do
-    %{
-      brightness: {:integer, true},
-      hue: {:integer, true},
-      saturation: {:integer, true},
-      kelvin: {:integer, true}
-    }
-  end
-
-  defp lights_action_schema do
-    %{
-      action: {:string, true},
-      color: {lights_color(), false}
-    }
-  end
-
-  defp action_schema do
-    %{
-      struct_type: RoboticaPlugins.Action,
-      sound: {sound_action_schema(), false},
-      music: {music_action_schema(), false},
-      message: {message_action_schema(), false},
-      lights: {lights_action_schema(), false}
-    }
-  end
-
   defp scheduled_task_schema do
     %{
       struct_type: Robotica.Types.ScheduledTask,
       frequency: {:task_frequency, false},
-      action: {action_schema(), true},
+      action: {Schema.action_schema(), true},
       locations: {{:list, :string}, true}
     }
   end
@@ -84,7 +42,7 @@ defmodule Robotica.Config do
   defp task_schema do
     %{
       struct_type: RoboticaPlugins.Task,
-      action: {action_schema(), true},
+      action: {Schema.action_schema(), true},
       locations: {{:list, :string}, true}
     }
   end
