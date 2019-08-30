@@ -119,7 +119,7 @@ defmodule Robotica.Plugins.LIFX do
     nil
   end
 
-  defp do_command(state, %{action: "wake_up"}) do
+  defp do_command(state, %{action: "wake_up"} = command) do
     color_off = %Lifx.Protocol.HSBK{
       hue: 0,
       saturation: 0,
@@ -127,12 +127,30 @@ defmodule Robotica.Plugins.LIFX do
       kelvin: 2500
     }
 
-    color_on = %Lifx.Protocol.HSBK{
-      hue: 0,
-      saturation: 0,
-      brightness: 100,
-      kelvin: 2500
-    }
+    color_on =
+      case command.color do
+        nil ->
+          %Lifx.Protocol.HSBK{
+            hue: 0,
+            saturation: 0,
+            brightness: 100,
+            kelvin: 2500
+          }
+
+        color ->
+          %Lifx.Protocol.HSBK{
+            hue: color.hue,
+            saturation: color.saturation,
+            brightness: color.brightness,
+            kelvin: color.kelvin
+          }
+      end
+
+    duration =
+      case command.duration do
+        nil -> 60000
+        duration -> duration
+      end
 
     set_color = fn light, power, color ->
       Logger.debug("#{light_to_string(light)}: wake_up")
@@ -149,7 +167,7 @@ defmodule Robotica.Plugins.LIFX do
            Logger.debug("#{light_to_string(light)}: Start wake_up power #{power}."),
            {:ok, _} <- set_color.(light, power, color_off),
            {:ok, _} <- Lifx.Device.on_wait(light),
-           {:ok, _} <- Lifx.Device.set_color_wait(light, color_on, 60000) do
+           {:ok, _} <- Lifx.Device.set_color_wait(light, color_on, duration) do
         nil
       else
         {:error, err} ->
