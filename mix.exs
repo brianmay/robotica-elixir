@@ -30,7 +30,7 @@ defmodule Robotica.MixProject do
       {:yaml_elixir, "~> 2.4.0"},
       {:calendar, "~> 1.0.0"},
       {:event_bus, "~> 1.6.0"},
-      {:robotica_plugins, path: "../robotica_plugins"}
+      {:robotica_plugins, git: "https://github.com/brianmay/robotica-plugins.git"},
     ]
   end
 
