@@ -35,6 +35,33 @@ defmodule Robotica.Plugins.LIFX do
     Enum.each(lights, callback)
   end
 
+  defp get_color(command) do
+    case command.color do
+      nil ->
+        %Lifx.Protocol.HSBK{
+          hue: 0,
+          saturation: 0,
+          brightness: 100,
+          kelvin: 2500
+        }
+
+      color ->
+        %Lifx.Protocol.HSBK{
+          hue: color.hue,
+          saturation: color.saturation,
+          brightness: color.brightness,
+          kelvin: color.kelvin
+        }
+    end
+  end
+
+  defp get_duration(command) do
+    case command.duration do
+      nil -> 0
+      duration -> duration * 1000
+    end
+  end
+
   @spec do_command(state :: Config.t(), command :: map) :: nil
 
   defp do_command(state, %{action: "flash"}) do
@@ -89,37 +116,6 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp do_command(state, %{action: "turn_on"} = command) do
-    set_color = fn light, color ->
-      if is_nil(color) do
-        {:ok, nil}
-      else
-        hsbk = %Lifx.Protocol.HSBK{
-          hue: color.hue,
-          saturation: color.saturation,
-          brightness: color.brightness,
-          kelvin: color.kelvin
-        }
-
-        Lifx.Device.set_color_wait(light, hsbk, 0)
-      end
-    end
-
-    for_every_light(state, fn light ->
-      Logger.debug("#{light_to_string(light)}: turn_on")
-
-      with {:ok, _} <- set_color.(light, command.color),
-           {:ok, _} <- Lifx.Device.on_wait(light) do
-        nil
-      else
-        {:error, err} ->
-          Logger.info("#{light_to_string(light)}: Got error in lifx turn_on: #{inspect(err)}")
-      end
-    end)
-
-    nil
-  end
-
-  defp do_command(state, %{action: "wake_up"} = command) do
     color_off = %Lifx.Protocol.HSBK{
       hue: 0,
       saturation: 0,
@@ -127,33 +123,11 @@ defmodule Robotica.Plugins.LIFX do
       kelvin: 2500
     }
 
-    color_on =
-      case command.color do
-        nil ->
-          %Lifx.Protocol.HSBK{
-            hue: 0,
-            saturation: 0,
-            brightness: 100,
-            kelvin: 2500
-          }
+    color_on = get_color(command)
+    duration = get_duration(command)
 
-        color ->
-          %Lifx.Protocol.HSBK{
-            hue: color.hue,
-            saturation: color.saturation,
-            brightness: color.brightness,
-            kelvin: color.kelvin
-          }
-      end
-
-    duration =
-      case command.duration do
-        nil -> 60000
-        duration -> duration
-      end
-
-    set_color = fn light, power, color ->
-      Logger.debug("#{light_to_string(light)}: wake_up")
+    set_off_color = fn light, power, color ->
+      Logger.debug("#{light_to_string(light)}: turn_on")
 
       if power == 0 do
         Lifx.Device.set_color_wait(light, color, 0)
@@ -165,7 +139,7 @@ defmodule Robotica.Plugins.LIFX do
     for_every_light(state, fn light ->
       with {:ok, power} <- Lifx.Device.get_power(light),
            Logger.debug("#{light_to_string(light)}: Start wake_up power #{power}."),
-           {:ok, _} <- set_color.(light, power, color_off),
+           {:ok, _} <- set_off_color.(light, power, color_off),
            {:ok, _} <- Lifx.Device.on_wait(light),
            {:ok, _} <- Lifx.Device.set_color_wait(light, color_on, duration) do
         nil
