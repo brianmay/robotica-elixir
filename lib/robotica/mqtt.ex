@@ -11,7 +11,7 @@ defmodule Robotica.Mqtt do
     end
   end
 
-  @spec publish_action(String.t(), Robotica.Plugins.Action.t()) :: :ok | {:error, String.t()}
+  @spec publish_action(String.t(), RoboticaPlugins.Action.t()) :: :ok | {:error, String.t()}
   def publish_action(location, action) do
     topic = "action/#{location}"
     publish(topic, action)

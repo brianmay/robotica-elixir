@@ -72,7 +72,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
         tasks: [
           %Robotica.Types.ScheduledTask{
             locations: ["here"],
-            action: %Robotica.Types.Action{},
+            action: %RoboticaPlugins.Action{},
             frequency: :daily,
             mark: nil
           }
@@ -84,7 +84,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
         tasks: [
           %Robotica.Types.ScheduledTask{
             locations: ["here"],
-            action: %Robotica.Types.Action{},
+            action: %RoboticaPlugins.Action{},
             frequency: :daily,
             mark: nil
           }
@@ -96,7 +96,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
         tasks: [
           %Robotica.Types.ScheduledTask{
             locations: ["here"],
-            action: %Robotica.Types.Action{},
+            action: %RoboticaPlugins.Action{},
             frequency: :daily,
             mark: nil
           }
