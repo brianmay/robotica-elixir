@@ -64,16 +64,11 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec do_command(state :: Config.t(), command :: map) :: nil
 
-  defp do_command(state, %{action: "flash"}) do
+  defp do_command(state, %{action: "flash"} = command) do
     for_every_light(state, fn light ->
       Logger.debug("#{light_to_string(light)}: flash")
 
-      color_flash = %Lifx.Protocol.HSBK{
-        hue: 240,
-        saturation: 50,
-        brightness: 100,
-        kelvin: 2500
-      }
+      color_flash = get_color(command)
 
       with {:ok, power} <- Lifx.Device.get_power(light),
            {:ok, color} <- Lifx.Device.get_color(light),
@@ -100,11 +95,32 @@ defmodule Robotica.Plugins.LIFX do
     nil
   end
 
-  defp do_command(state, %{action: "turn_off"}) do
+  defp do_command(state, %{action: "turn_off"} = command) do
     for_every_light(state, fn light ->
       Logger.debug("#{light_to_string(light)}: turn_off")
 
-      with {:ok, _} <- Lifx.Device.off_wait(light) do
+      duration = get_duration(command)
+      IO.puts(duration)
+
+      set_off =
+        if duration == 0 do
+          fn light ->
+            Lifx.Device.off_wait(light)
+          end
+        else
+          color_off = %Lifx.Protocol.HSBK{
+            hue: 0,
+            saturation: 0,
+            brightness: 0,
+            kelvin: 2500
+          }
+
+          fn light ->
+            Lifx.Device.set_color_wait(light, color_off, duration)
+          end
+        end
+
+      with {:ok, _} <- set_off.(light) do
         nil
       else
         {:error, err} ->
