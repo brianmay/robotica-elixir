@@ -13,7 +13,7 @@ defmodule Robotica.RoboticaService do
   def process({:local_execute = topic, id}) do
     Logger.info("got local execute")
     task = EventBus.fetch_event_data({topic, id})
-    RoboticaPlugins.Executor.execute(Robotica.Executor, task)
+    Robotica.Executor.execute(Robotica.Executor, task)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 

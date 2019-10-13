@@ -1,6 +1,6 @@
 defmodule Robotica.Plugins.LIFX do
   use GenServer
-  use RoboticaPlugins.Plugin
+  use Robotica.Plugin
 
   require Logger
 

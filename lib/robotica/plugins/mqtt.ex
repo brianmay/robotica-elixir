@@ -1,6 +1,6 @@
 defmodule Robotica.Plugins.MQTT do
   use GenServer
-  use RoboticaPlugins.Plugin
+  use Robotica.Plugin
   require Logger
 
   defmodule Config do

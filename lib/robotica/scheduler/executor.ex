@@ -155,7 +155,7 @@ defmodule Robotica.Scheduler.Executor do
       cond do
         is_nil(task.mark) ->
           Logger.info("Executing #{inspect(task)}.")
-          RoboticaPlugins.Executor.execute(Robotica.Executor, executable_task)
+          Robotica.Executor.execute(Robotica.Executor, executable_task)
 
         task.mark == :done ->
           Logger.info("Skipping done task #{inspect(task)}.")
@@ -165,7 +165,7 @@ defmodule Robotica.Scheduler.Executor do
 
         true ->
           Logger.info("Executing marked task #{inspect(task)}.")
-          RoboticaPlugins.Executor.execute(Robotica.Executor, executable_task)
+          Robotica.Executor.execute(Robotica.Executor, executable_task)
       end
     end)
 

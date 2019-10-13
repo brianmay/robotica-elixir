@@ -1,6 +1,6 @@
 defmodule Robotica.Plugins.EventBus do
   use GenServer
-  use RoboticaPlugins.Plugin
+  use Robotica.Plugin
   use EventBus.EventSource
   require Logger
 
@@ -23,9 +23,7 @@ defmodule Robotica.Plugins.EventBus do
   end
 
   def handle_cast({:execute, action}, state) do
-    event_params = %{topic: :execute}
-
-    EventSource.notify event_params do
+    EventSource.notify %{topic: :execute} do
       action
     end
 

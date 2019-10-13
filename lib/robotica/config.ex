@@ -72,7 +72,7 @@ defmodule Robotica.Config do
 
   defp plugin_schema do
     %{
-      struct_type: RoboticaPlugins.Plugin,
+      struct_type: Robotica.Plugin,
       config: {:set_nil, true},
       location: {:string, true},
       module: {:module, true}

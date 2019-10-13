@@ -37,7 +37,7 @@ defmodule Robotica.Supervisor do
     )
 
     children = [
-      {RoboticaPlugins.Executor, name: Robotica.Executor},
+      {Robotica.Executor, name: Robotica.Executor},
       {Robotica.Scheduler.Marks, name: Robotica.Scheduler.Marks},
       {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor},
       {Tortoise.Connection,
@@ -58,7 +58,7 @@ defmodule Robotica.Supervisor do
 
     extra_children =
       Enum.map(opts.plugins, fn plugin ->
-        plugin = %RoboticaPlugins.Plugin{
+        plugin = %Robotica.Plugin{
           plugin
           | executor: Robotica.Executor
         }
