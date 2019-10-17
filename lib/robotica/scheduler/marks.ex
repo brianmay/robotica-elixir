@@ -1,6 +1,13 @@
 defmodule Robotica.Scheduler.Marks do
   use GenServer
 
+  defmodule State do
+    @type t :: %__MODULE__{
+            marks: %{required(String.t()) => list(RoboticaPlugins.Mark)}
+          }
+    defstruct marks: %{}
+  end
+
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
@@ -19,24 +26,26 @@ defmodule Robotica.Scheduler.Marks do
       DateTime.utc_now()
       |> Calendar.DateTime.subtract!(600)
 
-    state
-    |> Enum.filter(fn {_id, m} -> DateTime.compare(m.expires_time, now) in [:eq, :gt] end)
+    marks = state.marks
+    |> Enum.filter(fn {_id, m} -> DateTime.compare(m.stop_time, now) in [:eq, :gt] end)
     |> Enum.into(%{})
+
+    %State{state | marks: marks}
   end
 
   def init(:ok) do
-    {:ok, %{}}
+    {:ok, %State{}}
   end
 
-  def handle_call({:put_mark, mark}, _from, state) do
+  def handle_call({:put_mark, mark}, _from, %State{} = state) do
     state = filter_expired(state)
     id = mark.id
-    {:reply, nil, Map.put(state, id, mark)}
+    {:reply, nil, put_in(state.marks[id], mark)}
   end
 
-  def handle_call({:get_mark, id}, _from, state) do
+  def handle_call({:get_mark, id}, _from, %State{} = state) do
     state = filter_expired(state)
-    mark = Map.get(state, id, nil)
+    mark = Map.get(state.marks, id, nil)
     {:reply, mark, state}
   end
 end

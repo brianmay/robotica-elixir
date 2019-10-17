@@ -33,7 +33,6 @@ defmodule Robotica.Config do
   defp scheduled_task_schema do
     %{
       struct_type: Robotica.Types.ScheduledTask,
-      frequency: {:task_frequency, false},
       action: {Schema.action_schema(), true},
       locations: {{:list, :string}, true}
     }
@@ -52,13 +51,14 @@ defmodule Robotica.Config do
       struct_type: RoboticaPlugins.Mark,
       id: {:string, true},
       status: {:mark_status, true},
-      expires_time: {:date_time, true}
+      start_time: {:date_time, true},
+      stop_time: {:date_time, true}
     }
   end
 
   defp step_schema do
     %{
-      struct_type: Robotica.Types.Step,
+      struct_type: RoboticaPlugins.Step,
       zero_time: {{:boolean, false}, false},
       required_time: {:delta, true},
       latest_time: {:delta, false},

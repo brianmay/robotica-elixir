@@ -5,7 +5,6 @@ defmodule Robotica.Scheduler.Executor do
   require Logger
 
   alias RoboticaPlugins.Task
-  alias Robotica.Types
   alias Robotica.Scheduler.Sequence
   alias Robotica.Scheduler.Classifier
   alias Robotica.Scheduler.Marks
@@ -34,8 +33,8 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   @spec publish_steps(
-          list(Types.MultiStep.t()),
-          list(Types.MultiStep.t())
+          list(RoboticaPlugins.MultiStep.t()),
+          list(RoboticaPlugins.MultiStep.t())
         ) :: nil
 
   defp publish_steps(steps, steps), do: nil
@@ -48,8 +47,8 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   @spec notify_steps(
-          list(Types.MultiStep.t()),
-          list(Types.MultiStep.t())
+          list(RoboticaPlugins.MultiStep.t()),
+          list(RoboticaPlugins.MultiStep.t())
         ) :: nil
 
   defp notify_steps(steps, steps), do: nil
@@ -130,7 +129,8 @@ defmodule Robotica.Scheduler.Executor do
     mark =
       cond do
         is_nil(mark) -> nil
-        DateTime.compare(required_time, mark.expires_time) in [:gt, :eq] -> nil
+        DateTime.compare(required_time, mark.start_time) == :lt -> nil
+        DateTime.compare(required_time, mark.stop_time) in [:eq, :gt] -> nil
         true -> mark.status
       end
 
@@ -148,7 +148,7 @@ defmodule Robotica.Scheduler.Executor do
     end)
   end
 
-  defp do_step(%Types.MultiStep{tasks: tasks}) do
+  defp do_step(%RoboticaPlugins.MultiStep{tasks: tasks}) do
     Enum.each(tasks, fn task ->
       executable_task = %Task{locations: task.locations, action: task.action}
 

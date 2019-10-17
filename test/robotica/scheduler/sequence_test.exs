@@ -66,7 +66,18 @@ defmodule Robotica.Scheduler.Sequence.Test do
 
   test "squash_schedule" do
     schedule = [
-      %Robotica.Types.MultiStep{
+      %RoboticaPlugins.MultiStep{
+        required_time: local_datetime(~N[2018-12-25 04:35:00]),
+        latest_time: local_datetime(~N[2018-12-25 04:40:00]),
+        tasks: [
+          %Robotica.Types.ScheduledTask{
+            locations: ["here"],
+            action: %RoboticaPlugins.Action{},
+            mark: nil
+          }
+        ]
+      },
+      %RoboticaPlugins.MultiStep{
         required_time: local_datetime(~N[2018-12-25 04:35:00]),
         latest_time: local_datetime(~N[2018-12-25 04:40:00]),
         tasks: [
@@ -78,19 +89,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
           }
         ]
       },
-      %Robotica.Types.MultiStep{
-        required_time: local_datetime(~N[2018-12-25 04:35:00]),
-        latest_time: local_datetime(~N[2018-12-25 04:40:00]),
-        tasks: [
-          %Robotica.Types.ScheduledTask{
-            locations: ["here"],
-            action: %RoboticaPlugins.Action{},
-            frequency: :daily,
-            mark: nil
-          }
-        ]
-      },
-      %Robotica.Types.MultiStep{
+      %RoboticaPlugins.MultiStep{
         required_time: local_datetime(~N[2018-12-25 05:35:00]),
         latest_time: local_datetime(~N[2018-12-25 04:40:00]),
         tasks: [

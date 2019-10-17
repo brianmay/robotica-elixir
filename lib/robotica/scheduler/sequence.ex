@@ -1,8 +1,6 @@
 defmodule Robotica.Scheduler.Sequence do
   require Logger
 
-  alias Robotica.Types
-
   defmacrop sequences do
     data = Robotica.Config.sequences()
     Macro.escape(data)
@@ -46,7 +44,7 @@ defmodule Robotica.Scheduler.Sequence do
 
     latest_time = Calendar.DateTime.add!(required_time, latest_time)
 
-    expanded_step = %Types.MultiStep{
+    expanded_step = %RoboticaPlugins.MultiStep{
       required_time: required_time,
       latest_time: latest_time,
       tasks: [step.task]

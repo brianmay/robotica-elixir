@@ -17,7 +17,7 @@ defmodule Robotica.Mqtt do
     publish(topic, action)
   end
 
-  @spec publish_schedule(list(Robotica.Scheduler.MultiStep.t())) :: :ok | {:error, String.t()}
+  @spec publish_schedule(list(RoboticaPlugins.MultiStep.t())) :: :ok | {:error, String.t()}
   def publish_schedule(steps) do
     client_id = Robotica.Supervisor.get_tortoise_client_id()
     topic = "schedule/#{client_id}"
@@ -27,6 +27,13 @@ defmodule Robotica.Mqtt do
   @spec publish_mark(map()) :: :ok | {:error, String.t()}
   def publish_mark(action) do
     topic = "mark"
+
+    action = %{
+      action
+      | start_time: Calendar.DateTime.Format.iso8601(action.start_time),
+        stop_time: Calendar.DateTime.Format.iso8601(action.stop_time)
+    }
+
     publish(topic, action)
   end
 
