@@ -93,7 +93,6 @@ defmodule Robotica.Scheduler.Executor do
       Calendar.DateTime.before?(now, required_time) ->
         updated_now = Calendar.DateTime.now_utc()
         milliseconds = DateTime.diff(required_time, updated_now, :millisecond)
-        IO.puts("#{required_time} #{updated_now} #{milliseconds}")
         # Ensure we wake up regularly so we can cope with system time changes.
         milliseconds = maximum(milliseconds, 60 * 1000)
         # Ensure we don't require time travel when sleeping negative times.

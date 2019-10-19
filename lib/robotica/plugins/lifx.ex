@@ -100,7 +100,6 @@ defmodule Robotica.Plugins.LIFX do
       Logger.debug("#{light_to_string(light)}: turn_off")
 
       duration = get_duration(command)
-      IO.puts(duration)
 
       set_off =
         if duration == 0 do
