@@ -26,9 +26,10 @@ defmodule Robotica.Scheduler.Marks do
       DateTime.utc_now()
       |> Calendar.DateTime.subtract!(600)
 
-    marks = state.marks
-    |> Enum.filter(fn {_id, m} -> DateTime.compare(m.stop_time, now) in [:eq, :gt] end)
-    |> Enum.into(%{})
+    marks =
+      state.marks
+      |> Enum.filter(fn {_id, m} -> DateTime.compare(m.stop_time, now) in [:eq, :gt] end)
+      |> Enum.into(%{})
 
     %State{state | marks: marks}
   end
