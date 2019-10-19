@@ -54,9 +54,7 @@ defmodule Robotica.Scheduler.Executor do
   defp notify_steps(steps, steps), do: nil
 
   defp notify_steps(_old_steps, steps) do
-    event_params = %{topic: :schedule}
-
-    EventSource.notify event_params do
+    EventSource.notify %{topic: :schedule} do
       steps
     end
   end
@@ -73,42 +71,40 @@ defmodule Robotica.Scheduler.Executor do
       |> add_expanded_steps_for_date(tomorrow)
       |> Sequence.squash_schedule()
 
-    state = set_timer({today, nil, steps})
+    now = Calendar.DateTime.now_utc()
+    state = set_timer(now, {today, nil, steps})
     {:ok, state}
   end
 
   defp maximum(v, max) when v > max, do: max
   defp maximum(v, _max), do: v
+  defp minimum(v, min) when v < min, do: min
+  defp minimum(v, _min), do: v
 
-  defp set_timer({date, nil, []}) do
+  defp set_timer(_now, {date, nil, []}) do
     timer = Process.send_after(self(), :timer, 60 * 1000)
     {date, timer, []}
   end
 
-  defp set_timer({date, nil, [step | tail] = list}) do
+  defp set_timer(now, {date, nil, [step | tail] = list}) do
     required_time = step.required_time
-    latest_time = step.latest_time
-
-    now = Calendar.DateTime.now_utc()
 
     cond do
       Calendar.DateTime.before?(now, required_time) ->
-        {:ok, s, ms, :after} = Calendar.DateTime.diff(required_time, now)
-        milliseconds = Kernel.trunc(s * 1000 + ms / 1000)
+        updated_now = Calendar.DateTime.now_utc()
+        milliseconds = DateTime.diff(required_time, updated_now, :millisecond)
+        IO.puts("#{required_time} #{updated_now} #{milliseconds}")
         # Ensure we wake up regularly so we can cope with system time changes.
         milliseconds = maximum(milliseconds, 60 * 1000)
+        # Ensure we don't require time travel when sleeping negative times.
+        milliseconds = minimum(milliseconds, 0)
         Logger.debug("Sleeping #{milliseconds} for #{inspect(step)}.")
         timer = Process.send_after(self(), :timer, milliseconds)
         {date, timer, list}
 
-      Calendar.DateTime.before?(now, latest_time) ->
-        Logger.debug("Running late for #{inspect(step)}.")
-        do_step(step)
-        set_timer({date, nil, tail})
-
       true ->
         Logger.debug("Skipping #{inspect(step)}.")
-        set_timer({date, nil, tail})
+        set_timer(now, {date, nil, tail})
     end
   end
 
@@ -148,28 +144,51 @@ defmodule Robotica.Scheduler.Executor do
     end)
   end
 
-  defp do_step(%RoboticaPlugins.MultiStep{tasks: tasks}) do
-    Enum.each(tasks, fn task ->
-      executable_task = %Task{locations: task.locations, action: task.action}
+  defp do_step(%RoboticaPlugins.MultiStep{tasks: tasks} = step) do
+    new_steps =
+      Enum.map(tasks, fn task ->
+        executable_task = %Task{locations: task.locations, action: task.action}
 
-      cond do
-        is_nil(task.mark) ->
-          Logger.info("Executing #{inspect(task)}.")
-          Robotica.Executor.execute(Robotica.Executor, executable_task)
+        cond do
+          is_nil(task.mark) ->
+            Logger.info("Executing #{inspect(task)}.")
+            Robotica.Executor.execute(Robotica.Executor, executable_task)
+            repeat_task(step, task)
 
-        task.mark == :done ->
-          Logger.info("Skipping done task #{inspect(task)}.")
+          task.mark == :done ->
+            Logger.info("Skipping done task #{inspect(task)}.")
+            nil
 
-        task.mark == :cancelled ->
-          Logger.info("Skipping cancelled task #{inspect(task)}.")
+          task.mark == :cancelled ->
+            Logger.info("Skipping cancelled task #{inspect(task)}.")
+            nil
 
-        true ->
-          Logger.info("Executing marked task #{inspect(task)}.")
-          Robotica.Executor.execute(Robotica.Executor, executable_task)
-      end
-    end)
+          true ->
+            Logger.info("Executing marked task #{inspect(task)}.")
+            Robotica.Executor.execute(Robotica.Executor, executable_task)
+            repeat_task(step, task)
+        end
+      end)
 
-    nil
+    Enum.filter(new_steps, fn step -> not is_nil(step) end)
+  end
+
+  defp repeat_task(%RoboticaPlugins.MultiStep{} = step, %RoboticaPlugins.ScheduledTask{} = task) do
+    cond do
+      task.repeat_count <= 0 ->
+        nil
+
+      is_nil(task.repeat_time) ->
+        nil
+
+      true ->
+        %RoboticaPlugins.MultiStep{
+          step
+          | required_time: Calendar.DateTime.add!(step.required_time, task.repeat_time),
+            latest_time: Calendar.DateTime.add!(step.latest_time, task.repeat_time),
+            tasks: [%RoboticaPlugins.ScheduledTask{task | repeat_count: task.repeat_count - 1}]
+        }
+    end
   end
 
   def handle_call({:get_schedule}, _from, {_, _, list} = state) do
@@ -196,47 +215,59 @@ defmodule Robotica.Scheduler.Executor do
     {:noreply, state}
   end
 
-  def handle_info(:timer, {date, _, [] = list}) do
-    now = Calendar.DateTime.now_utc()
-    Logger.debug("Got dummy timer at time #{inspect(now)}.")
-    {date, new_list} = check_time_travel({date, list})
-    state = set_timer({date, nil, new_list})
-
-    {_, _, new_list} = state
-    notify_steps(list, new_list)
-    publish_steps(list, new_list)
-
+  def handle_info(:timer, {_, _, list} = state) do
+    state = timer(list, state)
     {:noreply, state}
   end
 
-  def handle_info(:timer, {date, _, [step | tail] = list}) do
+  def timer(old_list, {date, _, [] = new_list}) do
+    now = Calendar.DateTime.now_utc()
+    Logger.debug("Got timer at time #{inspect(now)} and no schedule.")
+    finalize(now, date, old_list, new_list)
+  end
+
+  def timer(old_list, {date, timer, [step | tail] = new_list}) do
     now = Calendar.DateTime.now_utc()
     Logger.debug("Got timer at time #{inspect(now)}.")
 
-    new_list =
+    {new_list, too_early} =
       cond do
         Calendar.DateTime.before?(now, step.required_time) ->
           Logger.debug("Timer received too early for #{inspect(step)}.")
-          list
+          {new_list, true}
 
         Calendar.DateTime.before?(now, step.latest_time) ->
-          Logger.debug("Timer received on time for #{inspect(step)}.")
-          do_step(step)
-          tail
+          Logger.debug("Timer received for #{inspect(step)}.")
+
+          new_list =
+            case do_step(step) do
+              [] -> tail
+              extra_steps -> Sequence.squash_schedule(tail ++ extra_steps)
+            end
+
+          {new_list, false}
 
         true ->
           Logger.debug("Timer received too late for #{inspect(step)}.")
-          tail
+          {tail, false}
       end
 
+    # Keep processing list until we find a step that is still too early to run.
+    case too_early do
+      false -> timer(old_list, {date, timer, new_list})
+      true -> finalize(now, date, old_list, new_list)
+    end
+  end
+
+  defp finalize(now, date, old_list, new_list) do
     {date, new_list} = check_time_travel({date, new_list})
-    state = set_timer({date, nil, new_list})
+    state = set_timer(now, {date, nil, new_list})
 
     {_, _, new_list} = state
-    notify_steps(list, new_list)
-    publish_steps(list, new_list)
+    notify_steps(old_list, new_list)
+    publish_steps(old_list, new_list)
 
-    {:noreply, state}
+    state
   end
 
   defp check_time_travel({date, list}) do

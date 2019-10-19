@@ -9,16 +9,4 @@ defmodule Robotica.Types do
               exclude: nil,
               day_type: nil
   end
-
-  defmodule ScheduledTask do
-    @type t :: %__MODULE__{
-            locations: list(String.t()),
-            action: RoboticaPlugins.Action.t(),
-            id: String.t() | nil,
-            mark: Mark.t() | nil
-          }
-    @enforce_keys [:locations, :action, :mark]
-    defstruct locations: [], action: nil, id: nil, mark: nil
-  end
-
 end

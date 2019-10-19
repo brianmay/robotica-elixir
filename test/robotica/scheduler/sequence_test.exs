@@ -70,10 +70,12 @@ defmodule Robotica.Scheduler.Sequence.Test do
         required_time: local_datetime(~N[2018-12-25 04:35:00]),
         latest_time: local_datetime(~N[2018-12-25 04:40:00]),
         tasks: [
-          %Robotica.Types.ScheduledTask{
+          %RoboticaPlugins.ScheduledTask{
             locations: ["here"],
             action: %RoboticaPlugins.Action{},
-            mark: nil
+            mark: nil,
+            repeat_count: 0,
+            repeat_time: nil
           }
         ]
       },
@@ -81,11 +83,12 @@ defmodule Robotica.Scheduler.Sequence.Test do
         required_time: local_datetime(~N[2018-12-25 04:35:00]),
         latest_time: local_datetime(~N[2018-12-25 04:40:00]),
         tasks: [
-          %Robotica.Types.ScheduledTask{
+          %RoboticaPlugins.ScheduledTask{
             locations: ["here"],
             action: %RoboticaPlugins.Action{},
-            frequency: :daily,
-            mark: nil
+            mark: nil,
+            repeat_count: 0,
+            repeat_time: nil
           }
         ]
       },
@@ -93,11 +96,12 @@ defmodule Robotica.Scheduler.Sequence.Test do
         required_time: local_datetime(~N[2018-12-25 05:35:00]),
         latest_time: local_datetime(~N[2018-12-25 04:40:00]),
         tasks: [
-          %Robotica.Types.ScheduledTask{
+          %RoboticaPlugins.ScheduledTask{
             locations: ["here"],
             action: %RoboticaPlugins.Action{},
-            frequency: :daily,
-            mark: nil
+            mark: nil,
+            repeat_count: 0,
+            repeat_time: nil
           }
         ]
       }
