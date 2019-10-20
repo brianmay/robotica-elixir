@@ -1,0 +1,23 @@
+/* This file is for your main application css. */
+
+@import "./phoenix.css";
+@import "../../deps/phoenix_live_view/assets/css/live_view.css";
+
+.overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    color: #000000;
+    background: #ffffff;
+    z-index: 10;
+}
+
+.overlay p {
+    text-align: center;
+/*    vertical-align: middle; */
+position: relative;
+top: 50%;
+transform: translateY(-50%);
+}
