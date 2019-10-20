@@ -1,0 +1,40 @@
+mqtt:
+  host: mqtt.example.org
+  port: 8883
+  user_name: username
+  password: password
+  ca_cert_file: "cafile.pem"
+plugins:
+  - module: Robotica.Plugins.Audio
+    location: "Brian"
+    config:
+        sounds:
+            beep: "sounds/ding1.wav"
+            prefix: "sounds/login.wav"
+            repeat: "sounds/cymbal.wav"
+            postfix: "sounds/logout.wav"
+        commands:
+            init:
+              - ["amixer", "sset", "Master", "100%"]
+              - ["mpc", "repeat", "on"]
+            play:
+              - ["aplay", "-q", "{file}"]
+            say:
+              - ["espeak", "-ven+f5", "-k5", "{text}"]
+            music_play:
+              - ["mpc", "clear"]
+              - ["mpc", "load", "{play_list}"]
+              - ["mpc", "play"]
+            music_stop:
+              - ["mpc", "stop"]
+            music_pause:
+              - ["mpc", "pause-if-playing"]
+            music_resume:
+              - ["mpc", "play"]
+  - module: Robotica.Plugins.LIFX
+    location: "Brian"
+    config:
+        lights: ["Brian"]
+  - module: Robotica.Plugins.MQTT
+    location: "Brian"
+    config: {}
