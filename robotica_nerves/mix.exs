@@ -53,7 +53,7 @@ defmodule RoboticaNerves.MixProject do
       {:nerves, "~> 1.5", runtime: false},
       {:shoehorn, "~> 0.6"},
       {:robotica, path: "../robotica"},
-      {:robotica_plugins, git: "https://github.com/brianmay/robotica-plugins.git"},
+      {:robotica_plugins, path: "../robotica_plugins"},
       {:robotica_ui, path: "../robotica_ui"},
       {:robotica_face, path: "../robotica_face"},
       {:ring_logger, "~> 0.6"},
