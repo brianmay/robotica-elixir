@@ -23,3 +23,10 @@ erl_crash.dump
 robotica-*.tar
 
 /.tool-versions/
+
+/classifications.yaml
+/config.yaml
+/schedule.yaml
+/sequences.yaml
+
+/sounds/

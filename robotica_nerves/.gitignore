@@ -15,3 +15,12 @@
 
 # If the VM crashes, it generates a dump, let's ignore it too.
 erl_crash.dump
+
+/.envrc
+/upload_all
+/config.yaml
+/cafile.pem
+
+/rootfs_overlay/etc/cacert.pem
+/rootfs_overlay/etc/robotica/
+/sounds/
