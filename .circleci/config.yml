@@ -178,10 +178,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - build-ui:
-          filters:
-            tags:
-              only: /.*/
       - build-face:
           filters:
             tags:
