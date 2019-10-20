@@ -1,0 +1,38 @@
+defmodule RoboticaUi.Scene.Home do
+  use Scenic.Scene
+
+  alias Scenic.Graph
+
+  import Scenic.Primitives
+  import Scenic.Components
+
+  @graph Graph.build(font: :roboto, font_size: 24)
+  |> button("C", id: :btn_clear, translate: {20, 200})
+  |> button("0", id: 0, translate: {120, 200})
+  |> button("E", id: :btn_enter, translate: {220, 200})
+  |> button("1", id: :btn_1, translate: {20, 150})
+  |> button("2", id: :btn_2, translate: {120, 150})
+  |> button("3", id: :btn_3, translate: {220, 150})
+  |> button("4", id: :btn_4, translate: {20, 100})
+  |> button("5", id: :btn_5, translate: {120, 100})
+  |> button("6", id: :btn_6, translate: {220, 100})
+  |> button("7", id: :btn_7, translate: {20, 50})
+  |> button("8", id: :btn_8, translate: {120, 50})
+  |> button("9", id: :btn_9, translate: {220, 50})
+  |> text("Hello World", text_align: :center, translate: {300, 300})
+  |> circle(100, stroke: {2, :green}, translate: {300, 300})
+
+  # ============================================================================
+  # setup
+
+  # --------------------------------------------------------
+  def init(_, _) do
+    push_graph( @graph )
+    {:ok, @graph}
+  end
+
+  def filter_event(event, _, graph) do
+    IO.inspect(event)
+    {:continue, event, graph}
+  end
+end
