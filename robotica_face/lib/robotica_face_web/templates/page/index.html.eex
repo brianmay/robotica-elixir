@@ -15,9 +15,10 @@
   <article class="column">
     <h2>Help</h2>
     <ul>
-      <li>Pretend this this information is helpful.</li>
+        <li>Pretend this this information is helpful.</li>
     </ul>
   </article>
 </section>
 
+<%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Local) %>
 <%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
