@@ -25,7 +25,7 @@ defmodule RoboticaPlugins do
 
       cond do
         v(message_text) -> message_text
-        v(lights_action) -> "Lights #{lights_action}"
+        v(lights_action) -> "Lights #{lights_action}."
         v(music_stop) and music_stop -> "Music stop."
         v(music_playlist) -> "Music #{music_playlist}."
         true -> "N/A"
