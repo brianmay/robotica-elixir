@@ -42,7 +42,7 @@ defmodule RoboticaFace.Config do
 
   def configuration do
     filename =
-      Application.get_env(:robotica_ui, :config_file)
+      Application.get_env(:robotica_face, :config_file)
       |> replace_values(substitutions())
 
     {:ok, data} = YamlElixir.read_from_file(filename)

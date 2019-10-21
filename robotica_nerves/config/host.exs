@@ -18,3 +18,6 @@ config :robotica,
 
 config :robotica_ui,
   config_file: "ui.yaml"
+
+config :robotica_face,
+  config_file: "ui.yaml"
