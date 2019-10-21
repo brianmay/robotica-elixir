@@ -10,7 +10,7 @@ defmodule RoboticaFaceWeb.Live.Local do
     <tr>
     <td><%= row.name %></td>
     <%= for button <- row.buttons do %>
-    <td><button phx-click="<%= button.name %>"><%= button.name %></button></td>
+    <td><button phx-click="activate" phx-value-row="<%= row.name %>" phx-value-button="<%= button.name %>"><%= button.name %></button></td>
     <% end %>
     </tr>
     <% end %>
@@ -30,16 +30,15 @@ defmodule RoboticaFaceWeb.Live.Local do
     {:ok, socket}
   end
 
-  def handle_event(button_name, _value, socket) do
+  def handle_event("activate", %{"row" => row_name, "button" => button_name}, socket) do
     buttons = socket.assigns.buttons
     locations = socket.assigns.locations
 
     button =
       buttons
-      |> Enum.map(fn row ->
-        Enum.find(row.buttons, nil, fn button -> button.name == button_name end)
-      end)
-      |> Enum.find(fn button -> not is_nil(button) end)
+      |> Enum.find(%{}, fn row -> row.name == row_name end)
+      |> Map.get(:buttons, [])
+      |> Enum.find(nil, fn button -> button.name == button_name end)
 
     case button do
       nil ->
