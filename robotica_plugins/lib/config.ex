@@ -1,4 +1,4 @@
-defmodule RoboticaUi.Config do
+defmodule RoboticaPlugins.Config do
   alias RoboticaPlugins.Schema
 
   @spec replace_values(String.t(), %{required(String.t()) => String.t()}) :: String.t()
@@ -40,9 +40,9 @@ defmodule RoboticaUi.Config do
     }
   end
 
-  def configuration do
+  def ui_configuration do
     filename =
-      Application.get_env(:robotica_ui, :config_file)
+      Application.get_env(:robotica_plugins, :config_file)
       |> replace_values(substitutions())
 
     {:ok, data} = YamlElixir.read_from_file(filename)

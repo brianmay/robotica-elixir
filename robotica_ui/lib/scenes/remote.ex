@@ -20,7 +20,7 @@ defmodule RoboticaUi.Scene.Remote do
     viewport = opts[:viewport]
     {:ok, %ViewPort.Status{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
 
-    configuration = RoboticaUi.Config.configuration()
+    configuration = RoboticaPlugins.Config.ui_configuration()
     remote_locations = configuration.remote_locations
     rows = configuration.remote_buttons
 

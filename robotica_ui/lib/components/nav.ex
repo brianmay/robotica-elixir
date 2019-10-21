@@ -12,7 +12,7 @@ defmodule RoboticaUi.Components.Nav do
   def verify(_), do: :invalid_data
 
   # build the path to the static asset file (compile time)
-  @timezone Application.get_env(:robotica_ui, :timezone)
+  @timezone Application.get_env(:robotica_plugins, :timezone)
   @schedule_path :code.priv_dir(:robotica_ui) |> Path.join("/static/images/schedule.png")
   @local_path :code.priv_dir(:robotica_ui) |> Path.join("/static/images/local.png")
   @remote_path :code.priv_dir(:robotica_ui) |> Path.join("/static/images/remote.png")

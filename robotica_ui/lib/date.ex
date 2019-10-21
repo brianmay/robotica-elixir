@@ -1,7 +1,7 @@
 defmodule RoboticaUi.Date do
   @moduledoc false
 
-  @timezone Application.get_env(:robotica_ui, :timezone)
+  @timezone Application.get_env(:robotica_plugins, :timezone)
 
   def tomorrow(date_time) do
     Calendar.DateTime.shift_zone!(date_time, @timezone)

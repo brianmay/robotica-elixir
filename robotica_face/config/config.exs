@@ -8,10 +8,6 @@
 use Mix.Config
 
 config :robotica_face,
-  config_file: "ui.yaml",
-  timezone: "Australia/Melbourne"
-
-config :robotica_face,
   api_username: System.get_env("GOOGLE_USERNAME"),
   api_password: System.get_env("GOOGLE_PASSWORD"),
   mqtt_host: System.get_env("MQTT_HOST"),
@@ -32,6 +28,8 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
   ]
 
 config :robotica_plugins,
+  config_file: "ui.yaml",
+  timezone: "Australia/Melbourne",
   map_types: []
 
 config :joken,

@@ -8,7 +8,7 @@ defmodule RoboticaUi.Components.Task do
 
   def verify(step), do: {:ok, step}
 
-  @timezone Application.get_env(:robotica_ui, :timezone)
+  @timezone Application.get_env(:robotica_plugins, :timezone)
   @graph Graph.build(styles: %{}, font_size: 20)
 
   defp date_time_to_local(dt) do

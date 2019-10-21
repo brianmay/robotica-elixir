@@ -12,15 +12,9 @@ config :robotica,
   sequences_file: "sequences.yaml",
   timezone: "Australia/Melbourne"
 
-config :robotica_ui,
-  config_file: "/etc/robotica/ui-{hostname}.yaml",
-  timezone: "Australia/Melbourne"
-
-config :robotica_face,
-  config_file: "/etc/robotica/ui-{hostname}.yaml",
-  timezone: "Australia/Melbourne"
-
 config :robotica_plugins,
+  config_file: "/etc/robotica/ui-{hostname}.yaml",
+  timezone: "Australia/Melbourne",
   map_types: [
     {Robotica.Plugin, {Robotica.Validation, :validate_plugin_config}}
   ]

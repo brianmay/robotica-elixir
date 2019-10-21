@@ -27,7 +27,6 @@ defmodule RoboticaUi.MixProject do
       {:event_bus, "~> 1.6.1"},
       {:timex, "~> 3.6.0"},
       {:calendar, "~> 1.0.0"},
-      {:yaml_elixir, "~> 2.4.0"},
       {:robotica_plugins, path: "../robotica_plugins"}
     ]
   end

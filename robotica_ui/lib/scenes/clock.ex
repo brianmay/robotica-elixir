@@ -8,7 +8,7 @@ defmodule RoboticaUi.Scene.Clock do
   alias RoboticaUi.Layout
   alias RoboticaUi.Components.Nav
 
-  @timezone Application.get_env(:robotica_ui, :timezone)
+  @timezone Application.get_env(:robotica_plugins, :timezone)
 
   @graph Graph.build(font: :roboto, font_size: 24)
 

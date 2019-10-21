@@ -22,7 +22,7 @@ defmodule RoboticaUi.Scene.Local do
     {:ok, %ViewPort.Status{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
 
     graph = @graph
-    configuration = RoboticaUi.Config.configuration()
+    configuration = RoboticaPlugins.Config.ui_configuration()
     local_locations = configuration.local_locations
     rows = configuration.local_buttons
 
