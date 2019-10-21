@@ -3,9 +3,9 @@ defmodule RoboticaFaceWeb.Live.Messages do
 
   def render(assigns) do
     ~L"""
-    <%= if not is_nil(@action) do %>
+    <%= if not is_nil(@text) do %>
     <div class="overlay">
-    <p>Last message: <%= inspect @action %></p>
+    <p><%= inspect @text %></p>
     </div>
     <% end %>
     """
@@ -13,14 +13,20 @@ defmodule RoboticaFaceWeb.Live.Messages do
 
   def mount(_, socket) do
     RoboticaFace.Execute.register(self())
-    {:ok, assign(socket, :action, nil)}
+    {:ok, assign(socket, :text, nil)}
   end
 
   def handle_cast({:execute, action}, socket) do
-    {:noreply, assign(socket, :action, action)}
+    text =
+      case action.message do
+        nil -> nil
+        message -> Map.get(message, :text)
+      end
+
+    {:noreply, assign(socket, :text, text)}
   end
 
   def handle_cast(:clear, socket) do
-    {:noreply, assign(socket, :action, nil)}
+    {:noreply, assign(socket, :text, nil)}
   end
 end
