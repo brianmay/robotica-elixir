@@ -45,7 +45,7 @@ defmodule RoboticaUi.Scene.Local do
       end)
 
     graph = Nav.add_to_graph(graph, :local)
-    {:ok, %{locations: MapSet.new(local_locations), graph: graph}, push: graph}
+    {:ok, %{locations: local_locations, graph: graph}, push: graph}
   end
 
   def handle_input(_event, _context, state) do
@@ -73,7 +73,7 @@ defmodule RoboticaUi.Scene.Local do
 
     EventSource.notify event_params do
       %RoboticaPlugins.Task{
-        locations: MapSet.to_list(state.locations),
+        locations: state.locations,
         action: action
       }
     end
