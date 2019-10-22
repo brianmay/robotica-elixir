@@ -5,7 +5,7 @@ defmodule RoboticaFaceWeb.Live.Messages do
     ~L"""
     <%= if not is_nil(@text) do %>
     <div class="overlay">
-    <p><%= inspect @text %></p>
+    <p><%= @text %></p>
     </div>
     <% end %>
     """
