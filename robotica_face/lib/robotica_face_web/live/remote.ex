@@ -12,7 +12,7 @@ defmodule RoboticaFaceWeb.Live.Remote do
     <%= if MapSet.member?(@locations, location) do %>
     <td><button phx-click="location" phx-value-location="<%= location %>" phx-value-set="off"><%= location %></button></td>
     <% else %>
-    <td><button class="button-clear" phx-click="location" phx-value-location="<%= location %>" phx-value-set="on"><%= location %></button></td>
+    <td><button class="button-outline" phx-click="location" phx-value-location="<%= location %>" phx-value-set="on"><%= location %></button></td>
     <% end %>
     <% end %>
     </tr>
