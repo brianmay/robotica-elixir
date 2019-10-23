@@ -21,4 +21,5 @@
 </section>
 
 <%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Local) %>
+<%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Remote) %>
 <%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
