@@ -4,3 +4,9 @@
 </section>
 
 <%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
+
+<ul>
+    <li><%= link("Local", to: Helpers.page_path(@conn, :local)) %></li>
+    <li><%= link("Remote", to: Helpers.page_path(@conn, :remote)) %></li>
+    <li><%= link("Schedule", to: Helpers.page_path(@conn, :schedule)) %></li>
+</ul>
