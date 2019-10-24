@@ -3,23 +3,4 @@
   <p>A system for controlling IOT schedules<br/>that does not compromise speed and maintainability.</p>
 </section>
 
-<section class="row">
-  <article class="column">
-    <h2>Resources</h2>
-    <ul>
-      <li>Resource 1.</li>
-      <li>Resource 2.</li>
-      <li>Resource 2.</li>
-    </ul>
-  </article>
-  <article class="column">
-    <h2>Help</h2>
-    <ul>
-        <li>Pretend this this information is helpful.</li>
-    </ul>
-  </article>
-</section>
-
-<%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Local) %>
-<%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Remote) %>
 <%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
