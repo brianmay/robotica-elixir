@@ -41,9 +41,9 @@ defmodule RoboticaFaceWeb.Router do
     pipe_through :auth
     pipe_through :ensure_auth
 
-    scope "/schedule" do
-      get "/", ScheduleController, :upcoming_list
-    end
+    get "/local", PageController, :local
+    get "/remote", PageController, :remote
+    get "/schedule", PageController, :schedule
   end
 
   scope "/api", RoboticaFaceWeb do
