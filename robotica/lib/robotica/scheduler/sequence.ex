@@ -54,6 +54,29 @@ defmodule Robotica.Scheduler.Sequence do
     [expanded_step] ++ expand_steps(next_start_time, tail)
   end
 
+  defp repeat_task([step | _] = step_list, %RoboticaPlugins.ScheduledTask{} = task) do
+    cond do
+      task.repeat_count <= 0 ->
+        step_list
+
+      is_nil(task.repeat_time) ->
+        step_list
+
+      true ->
+        new_task = %RoboticaPlugins.ScheduledTask{task | repeat_count: task.repeat_count - 1}
+
+        new_step = %RoboticaPlugins.MultiStep{
+          step
+          | required_time: Calendar.DateTime.add!(step.required_time, task.repeat_time),
+            latest_time: Calendar.DateTime.add!(step.latest_time, task.repeat_time),
+            tasks: [new_task]
+        }
+
+        new_step_list = [new_step | step_list]
+        repeat_task(new_step_list, new_task)
+    end
+  end
+
   defp expand_sequence(start_time, sequence_name) do
     Logger.debug("Loading sequence #{inspect(sequence_name)} for #{inspect(start_time)}.")
     sequence = get_sequence(sequence_name)
@@ -64,6 +87,8 @@ defmodule Robotica.Scheduler.Sequence do
     )
 
     expand_steps(start_time, sequence)
+    |> Enum.map(fn step -> repeat_task([step], hd(step.tasks)) end)
+    |> List.flatten()
   end
 
   defp expand_sequences(start_time, sequence_names) do

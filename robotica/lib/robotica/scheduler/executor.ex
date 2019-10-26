@@ -143,51 +143,26 @@ defmodule Robotica.Scheduler.Executor do
     end)
   end
 
-  defp do_step(%RoboticaPlugins.MultiStep{tasks: tasks} = step) do
-    new_steps =
-      Enum.map(tasks, fn task ->
-        executable_task = %Task{locations: task.locations, action: task.action}
+  defp do_step(%RoboticaPlugins.MultiStep{tasks: tasks}) do
+    Enum.each(tasks, fn task ->
+      executable_task = %Task{locations: task.locations, action: task.action}
 
-        cond do
-          is_nil(task.mark) ->
-            Logger.info("Executing #{inspect(task)}.")
-            Robotica.Executor.execute(Robotica.Executor, executable_task)
-            repeat_task(step, task)
+      cond do
+        is_nil(task.mark) ->
+          Logger.info("Executing #{inspect(task)}.")
+          Robotica.Executor.execute(Robotica.Executor, executable_task)
 
-          task.mark == :done ->
-            Logger.info("Skipping done task #{inspect(task)}.")
-            nil
+        task.mark == :done ->
+          Logger.info("Skipping done task #{inspect(task)}.")
 
-          task.mark == :cancelled ->
-            Logger.info("Skipping cancelled task #{inspect(task)}.")
-            nil
+        task.mark == :cancelled ->
+          Logger.info("Skipping cancelled task #{inspect(task)}.")
 
-          true ->
-            Logger.info("Executing marked task #{inspect(task)}.")
-            Robotica.Executor.execute(Robotica.Executor, executable_task)
-            repeat_task(step, task)
-        end
-      end)
-
-    Enum.filter(new_steps, fn step -> not is_nil(step) end)
-  end
-
-  defp repeat_task(%RoboticaPlugins.MultiStep{} = step, %RoboticaPlugins.ScheduledTask{} = task) do
-    cond do
-      task.repeat_count <= 0 ->
-        nil
-
-      is_nil(task.repeat_time) ->
-        nil
-
-      true ->
-        %RoboticaPlugins.MultiStep{
-          step
-          | required_time: Calendar.DateTime.add!(step.required_time, task.repeat_time),
-            latest_time: Calendar.DateTime.add!(step.latest_time, task.repeat_time),
-            tasks: [%RoboticaPlugins.ScheduledTask{task | repeat_count: task.repeat_count - 1}]
-        }
-    end
+        true ->
+          Logger.info("Executing marked task #{inspect(task)}.")
+          Robotica.Executor.execute(Robotica.Executor, executable_task)
+      end
+    end)
   end
 
   def handle_call({:get_schedule}, _from, {_, _, list} = state) do
@@ -237,14 +212,8 @@ defmodule Robotica.Scheduler.Executor do
 
         Calendar.DateTime.before?(now, step.latest_time) ->
           Logger.debug("Timer received for #{inspect(step)}.")
-
-          new_list =
-            case do_step(step) do
-              [] -> tail
-              extra_steps -> Sequence.squash_schedule(tail ++ extra_steps)
-            end
-
-          {new_list, false}
+          do_step(step)
+          {tail, false}
 
         true ->
           Logger.debug("Timer received too late for #{inspect(step)}.")
