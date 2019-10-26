@@ -50,7 +50,12 @@ defmodule RoboticaUi.Schedule do
 
   def handle_call({:set_schedule, schedule}, _, state) do
     Enum.each(state.scenes, fn pid ->
-      Scenic.Scene.send_event(pid, {:schedule, schedule})
+
+      try do
+        Scenic.Scene.send_event(pid, {:schedule, schedule})
+      catch
+        :exit, {:noproc, _} -> nil
+      end
     end)
 
     {:reply, nil, Map.put(state, :schedule, schedule)}
