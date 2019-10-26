@@ -12,10 +12,11 @@ defmodule RoboticaFace.Application do
       RoboticaFaceWeb.Endpoint,
       RoboticaFaceWeb.Strategy,
       {RoboticaFace.Schedule, name: :face_schedule},
-      {RoboticaFace.Execute, name: :face_execute}
+      {RoboticaFace.Execute, name: :face_execute},
+      {RoboticaFace.Tesla, name: :tesla}
     ]
 
-    EventBus.subscribe({RoboticaFace.RoboticaService, ["^schedule", "^execute"]})
+    EventBus.subscribe({RoboticaFace.RoboticaService, ["^schedule", "^execute", "^tesla"]})
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

@@ -25,6 +25,7 @@ defmodule Robotica.Supervisor do
   def init(opts) do
     client_id = get_tortoise_client_id()
 
+    EventBus.register_topic(:tesla)
     EventBus.register_topic(:schedule)
     EventBus.register_topic(:request_schedule)
     EventBus.register_topic(:local_execute)
@@ -52,7 +53,8 @@ defmodule Robotica.Supervisor do
          {"execute", 0},
          {"mark", 0},
          {"request/all/#", 0},
-         {"request/#{client_id}/#", 0}
+         {"request/#{client_id}/#", 0},
+         {"tesla", 0}
        ]}
     ]
 

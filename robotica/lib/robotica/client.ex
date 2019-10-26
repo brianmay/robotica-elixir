@@ -87,6 +87,17 @@ defmodule Robotica.Client do
     {:ok, state}
   end
 
+  def handle_message(["tesla"] = topic, publish, state) do
+    Logger.info("#{Enum.join(topic, "/")}")
+
+    case Poison.decode(publish) do
+      {:ok, message} -> Robotica.Tesla.publish_state(message)
+      {:error, error} -> Logger.error("Invalid tesla message received: #{inspect(error)}.")
+    end
+
+    {:ok, state}
+  end
+
   def handle_message(topic, publish, state) do
     Logger.info("Received unknown topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
     {:ok, state}

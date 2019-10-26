@@ -9,4 +9,5 @@
     <li><%= link("Local", to: Helpers.page_path(@conn, :local)) %></li>
     <li><%= link("Remote", to: Helpers.page_path(@conn, :remote)) %></li>
     <li><%= link("Schedule", to: Helpers.page_path(@conn, :schedule)) %></li>
+    <li><%= link("Tesla", to: Helpers.page_path(@conn, :tesla)) %></li>
 </ul>

@@ -14,4 +14,11 @@ defmodule RoboticaFace.RoboticaService do
     RoboticaFace.Execute.execute(action)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
+
+  def process({:tesla = topic, id}) do
+    tesla_state = EventBus.fetch_event_data({topic, id})
+    RoboticaFace.Tesla.update_tesla_state(tesla_state)
+    EventBus.mark_as_completed({__MODULE__, topic, id})
+  end
+
 end
