@@ -11,9 +11,9 @@ defmodule RoboticaFace.Application do
       # Start the endpoint when the application starts
       RoboticaFaceWeb.Endpoint,
       RoboticaFaceWeb.Strategy,
-      {RoboticaFace.Schedule, name: :face_schedule},
-      {RoboticaFace.Execute, name: :face_execute},
-      {RoboticaFace.Tesla, name: :tesla}
+      RoboticaFace.Schedule,
+      RoboticaFace.Execute,
+      RoboticaFace.Tesla,
     ]
 
     EventBus.subscribe({RoboticaFace.RoboticaService, ["^schedule", "^execute", "^tesla"]})

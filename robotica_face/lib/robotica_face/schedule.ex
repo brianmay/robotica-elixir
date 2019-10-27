@@ -10,9 +10,8 @@ defmodule RoboticaFace.Schedule do
     defstruct scenes: [], schedule: []
   end
 
-  def start_link(default) do
-    name = default[:name]
-    GenServer.start_link(__MODULE__, nil, name: name)
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   def init(_) do
@@ -27,19 +26,19 @@ defmodule RoboticaFace.Schedule do
 
   @spec register(GenServer.server()) :: nil
   def register(pid) do
-    GenServer.call(:face_schedule, {:register, pid})
+    GenServer.call(__MODULE__, {:register, pid})
   end
 
   def set_schedule(schedule) do
-    GenServer.call(:face_schedule, {:set_schedule, schedule})
+    GenServer.call(__MODULE__, {:set_schedule, schedule})
   end
 
   def get_schedule() do
-    GenServer.call(:face_schedule, {:get_schedule})
+    GenServer.call(__MODULE__, {:get_schedule})
   end
 
   def get_tasks_by_id(id) do
-    GenServer.call(:face_schedule, {:get_tasks_by_id, id})
+    GenServer.call(__MODULE__, {:get_tasks_by_id, id})
   end
 
   def handle_call({:register, pid}, _from, state) do

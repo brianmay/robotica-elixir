@@ -12,9 +12,8 @@ defmodule RoboticaFace.Tesla do
     defstruct tesla_state: %{}, scenes: []
   end
 
-  def start_link(default) do
-    name = default[:name]
-    GenServer.start_link(__MODULE__, nil, name: name)
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   def init(_opts) do
@@ -27,15 +26,15 @@ defmodule RoboticaFace.Tesla do
 
   @spec register(GenServer.server()) :: nil
   def register(pid) do
-    GenServer.cast(:tesla, {:register, pid})
+    GenServer.cast(__MODULE__, {:register, pid})
   end
 
   def update_tesla_state(tesla_state) do
-    GenServer.cast(:tesla, {:update_tesla_state, tesla_state})
+    GenServer.cast(__MODULE__, {:update_tesla_state, tesla_state})
   end
 
   def get_tesla_state() do
-    GenServer.call(:tesla, :get_tesla_state)
+    GenServer.call(__MODULE__, :get_tesla_state)
   end
 
   def handle_cast({:update_tesla_state, tesla_state}, state) do

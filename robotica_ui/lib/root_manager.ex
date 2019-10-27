@@ -55,23 +55,23 @@ defmodule RoboticaUi.RootManager do
 
   @spec set_scene(:message, atom() | {atom(), any()} | nil) :: nil
   def set_scene(id, scene) do
-    GenServer.call(RoboticaUi.RootManager, {:set_scene, id, scene})
+    GenServer.call(__MODULE__, {:set_scene, id, scene})
   end
 
   @spec set_tab_scene(:clock | :schedule | :local | :remote, atom() | {atom(), any()} | nil) ::
           nil
   def set_tab_scene(id, scene) do
-    GenServer.call(RoboticaUi.RootManager, {:set_tab_scene, id, scene})
+    GenServer.call(__MODULE__, {:set_tab_scene, id, scene})
   end
 
   @spec set_tab(:clock | :schedule | :local | :remote) :: nil
   def set_tab(id) do
-    GenServer.call(RoboticaUi.RootManager, {:set_tab, id})
+    GenServer.call(__MODULE__, {:set_tab, id})
   end
 
   @spec reset_screensaver :: nil
   def reset_screensaver() do
-    GenServer.call(RoboticaUi.RootManager, {:reset_screensaver})
+    GenServer.call(__MODULE__, {:reset_screensaver})
   end
 
   @spec set_root(State.t(), boolean()) :: {:changed | :not_changed, State.t()}

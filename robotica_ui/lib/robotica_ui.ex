@@ -18,9 +18,9 @@ defmodule RoboticaUi do
     # start the application with the viewport
     children = [
       supervisor(Scenic, viewports: [main_viewport_config]),
-      {RoboticaUi.Schedule, name: :ui_schedule},
-      {RoboticaUi.Execute, name: :ui_execute},
-      {RoboticaUi.RootManager, []}
+      RoboticaUi.Schedule,
+      RoboticaUi.Execute,
+      RoboticaUi.RootManager,
     ]
 
     EventBus.subscribe({RoboticaUi.RoboticaService, ["^schedule", "^execute"]})

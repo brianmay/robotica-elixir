@@ -9,9 +9,8 @@ defmodule RoboticaUi.Execute do
     defstruct []
   end
 
-  def start_link(default) do
-    name = default[:name]
-    GenServer.start_link(__MODULE__, nil, name: name)
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   def init(_opts) do
@@ -23,7 +22,7 @@ defmodule RoboticaUi.Execute do
   end
 
   def execute(action) do
-    GenServer.cast(:ui_execute, {:execute, action})
+    GenServer.cast(__MODULE__, {:execute, action})
   end
 
   def handle_cast({:execute, action}, state) do

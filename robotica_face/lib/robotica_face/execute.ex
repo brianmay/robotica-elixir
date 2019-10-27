@@ -11,9 +11,8 @@ defmodule RoboticaFace.Execute do
     defstruct scenes: []
   end
 
-  def start_link(default) do
-    name = default[:name]
-    GenServer.start_link(__MODULE__, nil, name: name)
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   def init(_opts) do
@@ -26,11 +25,11 @@ defmodule RoboticaFace.Execute do
 
   @spec register(GenServer.server()) :: nil
   def register(pid) do
-    GenServer.cast(:face_execute, {:register, pid})
+    GenServer.cast(__MODULE__, {:register, pid})
   end
 
   def execute(action) do
-    GenServer.cast(:face_execute, {:execute, action})
+    GenServer.cast(__MODULE__, {:execute, action})
   end
 
   def handle_cast({:execute, action}, state) do
