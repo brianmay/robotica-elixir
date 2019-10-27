@@ -1,6 +1,8 @@
 defmodule RoboticaFaceWeb.Live.Tesla do
   use Phoenix.LiveView
 
+  @timezone Application.get_env(:robotica_plugins, :timezone)
+
   def render(assigns) do
     ~L"""
     <%= if @tesla_state != %{} do %>
@@ -8,59 +10,49 @@ defmodule RoboticaFaceWeb.Live.Tesla do
     <tbody>
 
     <tr>
-    <th>
-    <td>Battery Charge</td>
-    <td><%= @tesla_state["state"]["battery_level"] %></td>
-    </th>
+    <th>Last Update time</th>
+    <td><%= @tesla_state["history"]["date_time"] |> date_time_to_local %></td>
     </tr>
 
     <tr>
-    <th>
-    <td>Charger Plugged In</td>
+    <th>Battery Charge</th>
+    <td><%= @tesla_state["state"]["battery_level"] %></td>
+    </tr>
+
+    <tr>
+    <th>Charger Plugged In</th>
     <td><%= @tesla_state["state"]["charger_plugged_in"] %></td>
     </th>
     </tr>
 
     <tr>
-    <th>
-    <td>Is Home</td>
+    <th>Is Home</th>
     <td><%= @tesla_state["state"]["is_home"] %></td>
-    </th>
     </tr>
 
     <tr>
-    <th>
-    <td>Unlocked time</td>
-    <td><%= @tesla_state["state"]["unlocked_time"] %></td>
-    </th>
+    <th>Unlocked time</th>
+    <td><%= @tesla_state["state"]["unlocked_time"] |> date_time_to_local %></td>
     </tr>
 
     <tr>
-    <th>
-    <td>Unlocked Delta</td>
+    <th>Unlocked Delta</th>
     <td><%= @tesla_state["state"]["unlocked_delta"] %></td>
-    </th>
     </tr>
 
     <tr>
-    <th>
-    <td>Battery Charge Time</td>
+    <th>Battery Charge Time</th>
     <td><%= @tesla_state["history"]["battery_charge_time"] * 60 %></td>
-    </th>
     </tr>
 
     <tr>
-    <th>
-    <td>Outside Temperature</td>
+    <th>Outside Temperature</th>
     <td><%= @tesla_state["history"]["outside_temp"] %></td>
-    </th>
     </tr>
 
     <tr>
-    <th>
-    <td>Inside Temperature</td>
+    <th>Inside Temperature</th>
     <td><%= @tesla_state["history"]["inside_temp"] %></td>
-    </th>
     </tr>
 
     </tbody>
@@ -84,4 +76,14 @@ defmodule RoboticaFaceWeb.Live.Tesla do
   def handle_cast(:clear, socket) do
     {:noreply, assign(socket, :text, nil)}
   end
+
+  defp date_time_to_local(nil), do: nil
+
+  defp date_time_to_local(dt) do
+    dt
+    |> Timex.parse!("{ISO:Extended}")
+    |> Timex.Timezone.convert(@timezone)
+    |> Timex.format!("%F %T", :strftime)
+  end
+
 end
