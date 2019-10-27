@@ -32,8 +32,9 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
 config :joken,
   login_secret: System.get_env("LOGIN_SECRET")
 
-# Use Jason for JSON parsing in Phoenix
-config :phoenix, :json_library, Jason
+config :phoenix,
+  json_library: Jason,
+  template_engines: [leex: Phoenix.LiveView.Engine]
 
 if System.get_env("IPV6") != nil do
   config :robotica_face, RoboticaFace.Repo, socket_options: [:inet6]

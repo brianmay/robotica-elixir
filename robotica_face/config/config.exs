@@ -40,8 +40,9 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-# Use Jason for JSON parsing in Phoenix
-config :phoenix, :json_library, Jason
+config :phoenix,
+  json_library: Jason,
+  template_engines: [leex: Phoenix.LiveView.Engine]
 
 if System.get_env("IPV6") != nil do
   config :robotica_face, RoboticaFace.Repo, socket_options: [:inet6]
