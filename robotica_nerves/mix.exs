@@ -9,6 +9,7 @@ defmodule RoboticaNerves.MixProject do
       app: @app,
       version: "0.1.0",
       elixir: "~> 1.4",
+      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       target: @target,
       archives: [nerves_bootstrap: "~> 1.6"],
       deps_path: "deps/#{@target}",
@@ -64,7 +65,8 @@ defmodule RoboticaNerves.MixProject do
   # Specify target specific dependencies
   defp deps("host") do
     [
-      {:scenic_driver_glfw, "~> 0.10"}
+      {:scenic_driver_glfw, "~> 0.10"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev}
     ]
   end
 
