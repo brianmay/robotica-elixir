@@ -18,7 +18,7 @@ config :robotica_face,
 
 # Configures the endpoint
 config :robotica_face, RoboticaFaceWeb.Endpoint,
-  http: [port: 4000, ip: {0, 0, 0, 0, 0, 0, 0, 0}],
+  http: [port: 80, ip: {0, 0, 0, 0, 0, 0, 0, 0}],
   url: [host: {:system, "HOST"}],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: RoboticaFaceWeb.ErrorView, accepts: ~w(html json)],
@@ -28,6 +28,11 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
   ],
   code_reloader: false,
   server: true
+
+if Mix.Project.config()[:target] == "host" do
+  config :robotica_face, RoboticaFaceWeb.Endpoint,
+    http: [port: 4000, ip: {0, 0, 0, 0, 0, 0, 0, 0}]
+end
 
 config :joken,
   login_secret: System.get_env("LOGIN_SECRET")
