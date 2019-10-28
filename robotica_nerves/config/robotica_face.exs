@@ -42,31 +42,33 @@ end
 
 case Mix.env() do
   :dev ->
-    config :robotica_face, RoboticaFaceWeb.Endpoint,
-      debug_errors: true,
-      code_reloader: true,
-      check_origin: false,
-      watchers: [
-        node: [
-          "node_modules/webpack/bin/webpack.js",
-          "--mode",
-          "development",
-          "--watch-stdin",
-          cd: Path.expand("../../robotica_face/assets", __DIR__)
+    if Mix.Project.config()[:target] == "host" do
+      config :robotica_face, RoboticaFaceWeb.Endpoint,
+        debug_errors: true,
+        code_reloader: true,
+        check_origin: false,
+        watchers: [
+          node: [
+            "node_modules/webpack/bin/webpack.js",
+            "--mode",
+            "development",
+            "--watch-stdin",
+            cd: Path.expand("../../robotica_face/assets", __DIR__)
+          ]
+        ],
+        live_reload: [
+          patterns: [
+            ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
+            ~r{priv/gettext/.*(po)$},
+            ~r{lib/robotica_face_web/views/[a-z].*(ex)$},
+            ~r{lib/robotica_face_web/templates/[a-z].*(eex)$},
+            ~r{lib/robotica_face_web/live/[a-z].*(ex)$}
+          ]
         ]
-      ],
-      live_reload: [
-        patterns: [
-          ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
-          ~r{priv/gettext/.*(po)$},
-          ~r{lib/robotica_face_web/views/[a-z].*(ex)$},
-          ~r{lib/robotica_face_web/templates/[a-z].*(eex)$},
-          ~r{lib/robotica_face_web/live/[a-z].*(ex)$},
-        ]
-      ]
 
-    config :phoenix_live_reload,
-      dirs:  ["../robotica_face" ]
+      config :phoenix_live_reload,
+        dirs: ["../robotica_face"]
+    end
 
   :test ->
     config :robotica_face, RoboticaFaceWeb.Endpoint,
