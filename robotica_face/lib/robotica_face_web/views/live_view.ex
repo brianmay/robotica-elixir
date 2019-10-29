@@ -11,4 +11,11 @@ defmodule RoboticaFaceWeb.LiveView do
     |> Timex.Timezone.convert(@timezone)
     |> Timex.format!("%F %T", :strftime)
   end
+
+  defp door_state(value) do
+    case value do
+      0 -> "Closed"
+      1 -> "Open"
+    end
+  end
 end

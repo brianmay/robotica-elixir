@@ -18,8 +18,8 @@
     </tr>
 
     <tr>
-      <th>Is Home</th>
-      <td><%= @tesla_state["state"]["is_home"] %></td>
+      <th>Distance From Home</th>
+      <td><%= @tesla_state["state"]["distance_from_home"] %></td>
     </tr>
 
     <tr>
@@ -45,6 +45,36 @@
     <tr>
       <th>Inside Temperature</th>
       <td><%= @tesla_state["history"]["inside_temp"] %></td>
+    </tr>
+
+    <tr>
+      <th>Driver's Front Door</th>
+      <td><%= door_state(@tesla_state["vehicle"]["vehicle_state"]["df"]) %></td>
+    </tr>
+
+    <tr>
+      <th>Driver's Rear Door</th>
+      <td><%= door_state(@tesla_state["vehicle"]["vehicle_state"]["dr"]) %></td>
+    </tr>
+
+    <tr>
+      <th>Passenger's Front Door</th>
+      <td><%= door_state(@tesla_state["vehicle"]["vehicle_state"]["pf"]) %></td>
+    </tr>
+
+    <tr>
+      <th>Passenger's Rear Door</th>
+      <td><%= door_state(@tesla_state["vehicle"]["vehicle_state"]["pr"]) %></td>
+    </tr>
+
+    <tr>
+      <th>Front Trunk</th>
+      <td><%= door_state(@tesla_state["vehicle"]["vehicle_state"]["ft"]) %></td>
+    </tr>
+
+    <tr>
+      <th>Rear Trunk</th>
+      <td><%= door_state(@tesla_state["vehicle"]["vehicle_state"]["rt"]) %></td>
     </tr>
 
   </tbody>
