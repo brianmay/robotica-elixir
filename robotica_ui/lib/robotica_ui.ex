@@ -20,7 +20,7 @@ defmodule RoboticaUi do
       supervisor(Scenic, viewports: [main_viewport_config]),
       RoboticaUi.Schedule,
       RoboticaUi.Execute,
-      RoboticaUi.RootManager,
+      RoboticaUi.RootManager
     ]
 
     EventBus.subscribe({RoboticaUi.RoboticaService, ["^schedule", "^execute"]})
