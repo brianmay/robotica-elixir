@@ -13,20 +13,43 @@ defmodule RoboticaFaceWeb.Live.Messages do
 
   def mount(_, socket) do
     RoboticaFace.Execute.register(self())
-    {:ok, assign(socket, :text, nil)}
+
+    socket =
+      socket
+      |> assign(:text, nil)
+      |> assign(:timer, nil)
+
+    {:ok, socket}
   end
 
   def handle_cast({:execute, action}, socket) do
-    text =
-      case action.message do
+    text = RoboticaPlugins.Action.action_to_message(action)
+
+    case socket.assigns.timer do
+      nil -> nil
+      timer -> Process.cancel_timer(timer)
+    end
+
+    timer =
+      case text do
         nil -> nil
-        message -> Map.get(message, :text)
+        _ -> Process.send_after(self(), :timer, 10_000)
       end
 
-    {:noreply, assign(socket, :text, text)}
+    socket =
+      socket
+      |> assign(:text, text)
+      |> assign(:timer, timer)
+
+    {:noreply, socket}
   end
 
-  def handle_cast(:clear, socket) do
-    {:noreply, assign(socket, :text, nil)}
+  def handle_info(:timer, socket) do
+    socket =
+      socket
+      |> assign(:text, nil)
+      |> assign(:timer, nil)
+
+    {:noreply, socket}
   end
 end

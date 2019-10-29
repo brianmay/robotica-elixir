@@ -31,6 +31,11 @@ defmodule RoboticaPlugins do
         true -> "N/A"
       end
     end
+
+
+    def action_to_message(%Action{} = action) do
+      Map.get(action.message, :text)
+    end
   end
 
   defmodule Task do

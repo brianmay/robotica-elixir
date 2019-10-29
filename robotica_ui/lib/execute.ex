@@ -5,8 +5,10 @@ defmodule RoboticaUi.Execute do
   require Logger
 
   defmodule State do
-    @type t :: %__MODULE__{}
-    defstruct []
+    @type t :: %__MODULE__{
+            timer: pid()
+          }
+    defstruct [:timer]
   end
 
   def start_link(_) do
@@ -17,33 +19,39 @@ defmodule RoboticaUi.Execute do
     {:ok, %State{}}
   end
 
-  def config_schema do
-    %{}
-  end
-
   def execute(action) do
     GenServer.cast(__MODULE__, {:execute, action})
   end
 
   def handle_cast({:execute, action}, state) do
-    text =
-      case action.message do
-        nil -> nil
-        msg -> msg.text
-      end
+    text = RoboticaPlugins.Action.action_to_message(action)
 
-    case text do
+    case state.timer do
       nil ->
         nil
 
-      text ->
-        RoboticaUi.RootManager.set_scene(:message, {RoboticaUi.Scene.Message, text: text})
-
-        Process.sleep(10000)
-
+      timer ->
+        Process.cancel_timer(timer)
         RoboticaUi.RootManager.set_scene(:message, nil)
     end
 
+    timer =
+      case text do
+        nil ->
+          nil
+
+        text ->
+          RoboticaUi.RootManager.set_scene(:message, {RoboticaUi.Scene.Message, text: text})
+          Process.send_after(self(), :timer, 10_000)
+      end
+
+    state = %{state | timer: timer}
+    {:noreply, state}
+  end
+
+  def handle_info(:timer, state) do
+    RoboticaUi.RootManager.set_scene(:message, nil)
+    state = %{state | timer: nil}
     {:noreply, state}
   end
 end
