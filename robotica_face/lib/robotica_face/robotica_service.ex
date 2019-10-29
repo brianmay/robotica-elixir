@@ -20,5 +20,4 @@ defmodule RoboticaFace.RoboticaService do
     RoboticaFace.Tesla.update_tesla_state(tesla_state)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
-
 end

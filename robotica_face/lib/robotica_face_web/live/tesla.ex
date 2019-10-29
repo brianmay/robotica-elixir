@@ -18,5 +18,4 @@ defmodule RoboticaFaceWeb.Live.Tesla do
   def handle_cast(:clear, socket) do
     {:noreply, assign(socket, :text, nil)}
   end
-
 end
