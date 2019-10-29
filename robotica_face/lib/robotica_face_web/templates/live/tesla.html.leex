@@ -19,7 +19,7 @@
 
     <tr>
       <th>Distance From Home</th>
-      <td><%= @tesla_state["state"]["distance_from_home"] %></td>
+      <td><%= format_distance(@tesla_state["state"]["distance_from_home"]) %></td>
     </tr>
 
     <tr>
@@ -29,12 +29,12 @@
 
     <tr>
       <th>Unlocked Delta</th>
-      <td><%= @tesla_state["state"]["unlocked_delta"] %></td>
+      <td><%= format_time_minutes(@tesla_state["state"]["unlocked_delta"]) %></td>
     </tr>
 
     <tr>
       <th>Battery Charge Time</th>
-      <td><%= @tesla_state["history"]["battery_charge_time"] * 60 %></td>
+      <td><%= format_time_hours(@tesla_state["history"]["battery_charge_time"]) %></td>
     </tr>
 
     <tr>

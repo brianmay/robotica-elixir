@@ -18,4 +18,34 @@ defmodule RoboticaFaceWeb.LiveView do
       1 -> "Open"
     end
   end
+
+  defp div_rem(value, divider) do
+    {div(value, divider), rem(value, divider)}
+  end
+
+  defp pad(number, digits) do
+    number
+    |> Integer.to_string()
+    |> String.pad_leading(digits, "0")
+  end
+
+  defp format_distance(value) do
+    value = round(value)
+    {km, m} = div_rem(value, 1000)
+    "#{km}_#{pad(m, 3)}m"
+  end
+
+  defp format_time_minutes(nil), do: nil
+
+  defp format_time_minutes(value) do
+    value = round(value)
+    {hours, minutes} = div_rem(value, 60)
+    "#{pad(hours, 2)}:#{pad(minutes, 2)}"
+  end
+
+  defp format_time_hours(nil), do: nil
+
+  defp format_time_hours(value) do
+    format_time_minutes(value * 60)
+  end
 end
