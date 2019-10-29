@@ -91,7 +91,7 @@ defmodule RoboticaFaceWeb.ApiController do
 
         msgs =
           Enum.map(step["tasks"], fn task ->
-            RoboticaPlugins.ScheduledTask.task_to_msg(task)
+            RoboticaPlugins.ScheduledTask.task_to_text(task)
           end)
           |> Enum.filter(fn msg -> not is_nil(msg) end)
 

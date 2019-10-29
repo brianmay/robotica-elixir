@@ -59,7 +59,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
   end
 
   defp get_task_message(task) do
-    RoboticaPlugins.ScheduledTask.task_to_msg(task)
+    RoboticaPlugins.ScheduledTask.task_to_text(task)
   end
 
   defp head_or_nil([]), do: nil

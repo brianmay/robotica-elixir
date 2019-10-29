@@ -21,7 +21,7 @@ defmodule RoboticaUi.Components.Task do
     width = opts[:styles][:width]
     task = step.task
 
-    text = RoboticaPlugins.ScheduledTask.task_to_msg(task)
+    text = RoboticaPlugins.ScheduledTask.task_to_text(task)
 
     color =
       case task.mark do

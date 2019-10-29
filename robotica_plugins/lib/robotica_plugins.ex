@@ -13,7 +13,7 @@ defmodule RoboticaPlugins do
 
     def v(value), do: not is_nil(value)
 
-    def action_to_msg(%Action{} = action) do
+    def action_to_text(%Action{} = action) do
       message = action.message
       lights = action.lights
       music = action.music
@@ -85,8 +85,8 @@ defmodule RoboticaPlugins do
       "#{pad(hours)}:#{pad(minutes)}:#{pad(seconds)}"
     end
 
-    def task_to_msg(%ScheduledTask{} = task) do
-      action_str = Action.action_to_msg(task.action)
+    def task_to_text(%ScheduledTask{} = task) do
+      action_str = Action.action_to_text(task.action)
 
       if task.repeat_count > 0 do
         "#{action_str} (#{task.repeat_count}/#{duration_to_string(task.repeat_time)})"
