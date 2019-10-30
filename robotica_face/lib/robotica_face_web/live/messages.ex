@@ -22,9 +22,7 @@ defmodule RoboticaFaceWeb.Live.Messages do
     {:ok, socket}
   end
 
-  def handle_cast({:execute, action}, socket) do
-    text = RoboticaPlugins.Action.action_to_message(action)
-
+  def update_message(socket, text) do
     case socket.assigns.timer do
       nil -> nil
       timer -> Process.cancel_timer(timer)
@@ -36,10 +34,17 @@ defmodule RoboticaFaceWeb.Live.Messages do
         _ -> Process.send_after(self(), :timer, 10_000)
       end
 
+    socket
+    |> assign(:text, text)
+    |> assign(:timer, timer)
+  end
+
+  def handle_cast({:execute, action}, socket) do
     socket =
-      socket
-      |> assign(:text, text)
-      |> assign(:timer, timer)
+      case RoboticaPlugins.Action.action_to_message(action) do
+        nil -> socket
+        text -> update_message(socket, text)
+      end
 
     {:noreply, socket}
   end

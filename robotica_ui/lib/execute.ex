@@ -23,9 +23,7 @@ defmodule RoboticaUi.Execute do
     GenServer.cast(__MODULE__, {:execute, action})
   end
 
-  def handle_cast({:execute, action}, state) do
-    text = RoboticaPlugins.Action.action_to_message(action)
-
+  def update_message(state, text) do
     case state.timer do
       nil ->
         nil
