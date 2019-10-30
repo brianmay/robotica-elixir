@@ -34,7 +34,7 @@ defmodule RoboticaPlugins do
 
 
     def action_to_message(%Action{} = action) do
-      Map.get(action.message, :text)
+      get_in(action.message, [:text])
     end
   end
 
