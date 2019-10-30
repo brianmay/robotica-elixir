@@ -38,9 +38,15 @@ defmodule RoboticaFaceWeb.LiveView do
   defp format_time_minutes(nil), do: nil
 
   defp format_time_minutes(value) do
+    {negative_sign, value} = if value < 0 do
+      {"-", -value}
+    else
+      {"", value}
+    end
+
     value = round(value)
     {hours, minutes} = div_rem(value, 60)
-    "#{pad(hours, 2)}:#{pad(minutes, 2)}"
+    "#{negative_sign}#{pad(hours, 2)}:#{pad(minutes, 2)}"
   end
 
   defp format_time_hours(nil), do: nil
