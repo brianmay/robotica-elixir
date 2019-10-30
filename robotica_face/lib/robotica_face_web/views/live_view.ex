@@ -32,7 +32,7 @@ defmodule RoboticaFaceWeb.LiveView do
   defp format_distance(value) do
     value = round(value)
     {km, m} = div_rem(value, 1000)
-    "#{km}, g#{pad(m, 3)}m"
+    "#{km},#{pad(m, 3)}m"
   end
 
   defp format_time_minutes(nil), do: nil
