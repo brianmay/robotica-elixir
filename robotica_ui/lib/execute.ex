@@ -43,7 +43,16 @@ defmodule RoboticaUi.Execute do
           Process.send_after(self(), :timer, 10_000)
       end
 
-    state = %{state | timer: timer}
+    %{state | timer: timer}
+  end
+
+  def handle_cast({:execute, action}, state) do
+    state =
+      case RoboticaPlugins.Action.action_to_message(action) do
+        nil -> state
+        text -> update_message(state, text)
+      end
+
     {:noreply, state}
   end
 
