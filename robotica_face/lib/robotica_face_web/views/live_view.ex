@@ -38,11 +38,12 @@ defmodule RoboticaFaceWeb.LiveView do
   defp format_time_minutes(nil), do: nil
 
   defp format_time_minutes(value) do
-    {negative_sign, value} = if value < 0 do
-      {"-", -value}
-    else
-      {"", value}
-    end
+    {negative_sign, value} =
+      if value < 0 do
+        {"-", -value}
+      else
+        {"", value}
+      end
 
     value = round(value)
     {hours, minutes} = div_rem(value, 60)
@@ -60,6 +61,7 @@ defmodule RoboticaFaceWeb.LiveView do
 
   defp location_link(latitude, longitude) do
     text = "#{latitude},#{longitude}"
+
     Phoenix.HTML.Link.link(text, to: "https://www.google.com/maps/search/#{latitude},#{longitude}")
   end
 end

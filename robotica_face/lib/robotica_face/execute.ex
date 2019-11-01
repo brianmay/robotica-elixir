@@ -33,7 +33,6 @@ defmodule RoboticaFace.Execute do
   end
 
   def handle_cast({:execute, action}, state) do
-
     Enum.each(state.scenes, fn pid ->
       GenServer.cast(pid, {:execute, action})
     end)
