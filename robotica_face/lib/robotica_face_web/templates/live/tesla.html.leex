@@ -1,3 +1,13 @@
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+      integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+      crossorigin=""/>
+
+ <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+         integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+         crossorigin="">
+ </script>
+
 <%= if @tesla_state != %{} do %>
 <table>
   <tbody>
@@ -5,6 +15,33 @@
     <tr>
       <th>Last Update time</th>
       <td><%= date_time_to_local(@tesla_state["history"]["date_time"])  %></td>
+    </tr>
+
+    <tr>
+      <th>Location</th>
+      <td>
+        <%= location_link(@tesla_state["history"]["latitude"], @tesla_state["history"]["longitude"]) %>
+      </td>
+    </tr>
+
+    <tr>
+      <th>Speed / heading</th>
+      <td><%= format_speed(@tesla_state["history"]["speed"]) %> / <%= @tesla_state["history"]["heading"] %></td>
+    </tr>
+
+    <tr>
+      <th>Battery Charge Time</th>
+      <td><%= format_time_hours(@tesla_state["history"]["battery_charge_time"]) %></td>
+    </tr>
+
+    <tr>
+      <th>Outside Temperature</th>
+      <td><%= @tesla_state["history"]["outside_temp"] %></td>
+    </tr>
+
+    <tr>
+      <th>Inside Temperature</th>
+      <td><%= @tesla_state["history"]["inside_temp"] %></td>
     </tr>
 
     <tr>
@@ -33,18 +70,8 @@
     </tr>
 
     <tr>
-      <th>Battery Charge Time</th>
-      <td><%= format_time_hours(@tesla_state["history"]["battery_charge_time"]) %></td>
-    </tr>
-
-    <tr>
-      <th>Outside Temperature</th>
-      <td><%= @tesla_state["history"]["outside_temp"] %></td>
-    </tr>
-
-    <tr>
-      <th>Inside Temperature</th>
-      <td><%= @tesla_state["history"]["inside_temp"] %></td>
+      <th>Warning</th>
+      <td><%= date_time_to_local(@tesla_state["state"]["next_warning_time"]) %> <%= inspect @tesla_state["state"]["warning_ok"] %></td>
     </tr>
 
     <tr>
@@ -79,6 +106,11 @@
 
   </tbody>
 </table>
+
+<div phx-hook="Map" data-latitude=<%= @tesla_state["history"]["latitude"] %> data-longitude=<%= @tesla_state["history"]["longitude"] %>></div>
+
+<div id="mapid" phx-update="ignore"></div>
+
 <% else %>
 No state date found.
 <% end %>

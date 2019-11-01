@@ -15,7 +15,7 @@ defmodule RoboticaFaceWeb.LiveView do
   defp door_state(value) do
     case value do
       0 -> "Closed"
-      1 -> "Open"
+      x -> "Open #{x}"
     end
   end
 
@@ -32,7 +32,7 @@ defmodule RoboticaFaceWeb.LiveView do
   defp format_distance(value) do
     value = round(value)
     {km, m} = div_rem(value, 1000)
-    "#{km},#{pad(m, 3)}m"
+    "#{km}.#{pad(m, 3)}km"
   end
 
   defp format_time_minutes(nil), do: nil
@@ -53,5 +53,13 @@ defmodule RoboticaFaceWeb.LiveView do
 
   defp format_time_hours(value) do
     format_time_minutes(value * 60)
+  end
+
+  defp format_speed(nil), do: "nil"
+  defp format_speed(value), do: "#{value}km/h"
+
+  defp location_link(latitude, longitude) do
+    text = "#{latitude},#{longitude}"
+    Phoenix.HTML.Link.link(text, to: "https://www.google.com/maps/search/#{latitude},#{longitude}")
   end
 end
