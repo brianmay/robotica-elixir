@@ -107,7 +107,11 @@
   </tbody>
 </table>
 
-<div phx-hook="Map" data-latitude=<%= @tesla_state["history"]["latitude"] %> data-longitude=<%= @tesla_state["history"]["longitude"] %>></div>
+<div phx-hook="Map"
+     data-latitude=<%= @tesla_state["history"]["latitude"] %>
+     data-longitude=<%= @tesla_state["history"]["longitude"] %>
+     data-heading=<%= @tesla_state["history"]["heading"] %>
+></div>
 
 <div id="mapid" phx-update="ignore"></div>
 
