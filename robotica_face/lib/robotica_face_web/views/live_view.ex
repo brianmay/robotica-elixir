@@ -57,7 +57,7 @@ defmodule RoboticaFaceWeb.LiveView do
   end
 
   defp format_speed(nil), do: "nil"
-  defp format_speed(value), do: "#{value}km/h"
+  defp format_speed(value), do: "#{round(value)}km/h"
 
   defp location_link(latitude, longitude) do
     text = "#{latitude},#{longitude}"
