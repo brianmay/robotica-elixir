@@ -55,7 +55,7 @@ defmodule Robotica.Client do
   end
 
   def handle_message(["execute"] = topic, publish, state) do
-    Logger.info("#{Enum.join(topic, "/")} #{inspect(publish)}")
+    Logger.info("Received mqtt topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
 
     with {:ok, message} <- Poison.decode(publish),
          {:ok, task} <- Robotica.Config.validate_task(message) do
@@ -68,7 +68,7 @@ defmodule Robotica.Client do
   end
 
   def handle_message(["mark"] = topic, publish, state) do
-    Logger.info("#{Enum.join(topic, "/")} #{inspect(publish)}")
+    Logger.info("Received mqtt topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
 
     with {:ok, message} <- Poison.decode(publish),
          {:ok, mark} <- Robotica.Config.validate_mark(message) do
@@ -82,13 +82,13 @@ defmodule Robotica.Client do
   end
 
   def handle_message(["request", _, "schedule"] = topic, publish, state) do
-    Logger.info("#{Enum.join(topic, "/")} #{inspect(publish)}")
+    Logger.info("Received mqtt topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
     Robotica.Scheduler.Executor.publish_schedule(Robotica.Scheduler.Executor)
     {:ok, state}
   end
 
   def handle_message(["tesla"] = topic, publish, state) do
-    Logger.info("#{Enum.join(topic, "/")}")
+    Logger.info("Received mqtt topic: #{Enum.join(topic, "/")}")
 
     case Poison.decode(publish) do
       {:ok, message} -> Robotica.Tesla.publish_state(message)
