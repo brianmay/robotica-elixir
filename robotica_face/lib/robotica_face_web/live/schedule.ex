@@ -3,35 +3,37 @@ defmodule RoboticaFaceWeb.Live.Schedule do
 
   def render(assigns) do
     ~L"""
-    <table>
+    <div class="table-responsive">
+    <table class="table schedule">
       <thead>
         <tr>
-          <th>Time</th>
-          <th>Locations</th>
-          <th>Message</th>
-          <th>Marks</th>
-          <th>Actions</th>
+          <th scope="col">Time</th>
+          <th scope="col">Locations</th>
+          <th scope="col">Message</th>
+          <th scope="col">Marks</th>
+          <th scope="col">Actions</th>
         </th>
       </thead>
       <tbody>
         <%= for step <- @schedule do %>
           <% iso_time = Calendar.DateTime.Format.iso8601(step.required_time) %>
           <%= for task <- step.tasks do %>
-            <tr>
+          <tr class="<%= task.mark %>">
               <td><%= date_time_to_local(step.required_time) %></td>
               <td><%= Enum.join(task.locations, ", ") %></td>
               <td><%= get_task_message(task) %></td>
               <td><%= task.mark %></td>
               <td>
-                <button phx-click="mark" phx-value-mark="done" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Done</button>
-                <button phx-click="mark" phx-value-mark="postponed" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Postpone</button>
-                <button phx-click="mark" phx-value-mark="clear" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Clear</button>
+                <button class="btn btn-warning" phx-click="mark" phx-value-mark="done" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Done</button>
+                <button class="btn btn-warning" phx-click="mark" phx-value-mark="postponed" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Postpone</button>
+                <button class="btn btn-warning" phx-click="mark" phx-value-mark="clear" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Clear</button>
               </td>
             </tr>
           <% end %>
         <% end %>
        </tbody>
     </table>
+    </div>
     """
   end
 

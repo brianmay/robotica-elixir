@@ -1,13 +1,17 @@
-<section class="phx-hero">
-  <h1><%= gettext "Welcome to %{name}!", name: "Robotica" %></h1>
-  <p>A system for controlling IOT schedules<br/>that does not compromise speed and maintainability.</p>
-</section>
+<h1><%= gettext "Welcome to %{name}!", name: "Robotica" %></h1>
 
-<%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
+<p>A system for controlling IOT schedules that does not compromise speed and maintainability.</p>
 
-<ul>
-    <li><%= link("Local", to: Helpers.page_path(@conn, :local)) %></li>
-    <li><%= link("Remote", to: Helpers.page_path(@conn, :remote)) %></li>
-    <li><%= link("Schedule", to: Helpers.page_path(@conn, :schedule)) %></li>
-    <li><%= link("Tesla", to: Helpers.page_path(@conn, :tesla)) %></li>
-</ul>
+
+<%= if RoboticaFace.Auth.user_signed_in?(@conn) do %>
+    <%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
+
+    <ul>
+        <li><%= link("Local", to: Routes.page_path(@conn, :local)) %></li>
+        <li><%= link("Remote", to: Routes.page_path(@conn, :remote)) %></li>
+        <li><%= link("Schedule", to: Routes.page_path(@conn, :schedule)) %></li>
+        <li><%= link("Tesla", to: Routes.page_path(@conn, :tesla)) %></li>
+    </ul>
+<% else %>
+    Please <%= link("Login", to: Routes.session_path(@conn, :index)) %>.
+<% end %>

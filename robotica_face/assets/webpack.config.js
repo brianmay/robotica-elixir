@@ -5,6 +5,17 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
+const postcss_loader = {
+    loader: 'postcss-loader',
+    options: {
+      plugins: function () {
+        return [
+          require('autoprefixer')
+        ];
+      }
+    }
+};
+
 module.exports = (env, options) => ({
   optimization: {
     minimizer: [
@@ -31,6 +42,10 @@ module.exports = (env, options) => ({
       {
         test: /\.css$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader']
+      },
+      {
+        test: /\.scss$/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader', postcss_loader, 'sass-loader']
       }
     ]
   },

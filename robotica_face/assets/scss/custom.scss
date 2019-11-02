@@ -1,0 +1,49 @@
+h1 {
+    color: green;
+}
+
+.btn-robotica {
+    width: 5em;
+    height: 4em;
+    margin-bottom: 10px;
+}
+
+.overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    color: #000000;
+    background: #ffffff;
+    z-index: 2000;
+}
+
+.overlay p {
+    text-align: center;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#mapid { height: 480px; }
+
+@media only screen and (max-width: 640px) {
+    .schedule th:nth-child(2),
+    .schedule th:nth-child(4) { display: none; }
+    .schedule td:nth-child(2),
+    .schedule td:nth-child(4) { display: none; }
+}
+
+.schedule .btn {
+    width: 6em;
+    height: 4em;
+    margin-bottom: 10px;
+}
+.schedule .done {
+    color: green;
+}
+
+.schedule .cancelled {
+    color: red;
+}

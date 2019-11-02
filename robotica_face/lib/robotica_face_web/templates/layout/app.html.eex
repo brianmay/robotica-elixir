@@ -8,28 +8,57 @@
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
   </head>
   <body>
-    <header>
-      <section class="container">
-        <nav role="navigation">
-          <ul>
-          <%= if RoboticaFace.Auth.user_signed_in?(@conn) do %>
-            <li><strong><%= RoboticaFace.Auth.current_user(@conn)["name"] %></strong></li>
-            <li><%= link "Logout", to: Routes.session_path(@conn, :logout), method: :post%></li>
-          <% else %>
-            <li><a href="<%= Routes.session_path(@conn, :index) %>">Login</a></li>
-          <% end %>
-          </ul>
-        </nav>
-        <a href="/" class="logo">
-          Robotica
-        </a>
-      </section>
-    </header>
-    <main role="main" class="container">
-      <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-      <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
-      <%= render @view_module, @view_template, assigns %>
-    </main>
-    <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+          <%= link("Robotica", to: Routes.page_path(@conn, :index), class: "navbar-brand") %>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+              <ul class="navbar-nav mr-auto">
+                  <%= if RoboticaFace.Auth.user_signed_in?(@conn) do %>
+                      <li class="nav-item <%= active_class(@active, "local") %>" >
+                          <%= link("Local", to: Routes.page_path(@conn, :local), class: "nav-link") %>
+                      </li>
+                      <li class="nav-item <%= active_class(@active, "remote") %>">
+                          <%= link("Remote", to: Routes.page_path(@conn, :remote), class: "nav-link") %>
+                      </li>
+                      <li class="nav-item <%= active_class(@active, "schedule") %>">
+                          <%= link("Schedule", to: Routes.page_path(@conn, :schedule), class: "nav-link") %>
+                      </li>
+                      <li class="nav-item <%= active_class(@active, "tesla") %>">
+                          <%= link("Tesla", to: Routes.page_path(@conn, :tesla), class: "nav-link") %>
+                      </li>
+
+                      <li class="nav-item dropdown">
+                          <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                              <%= RoboticaFace.Auth.current_user(@conn)["name"] %>
+                          </a>
+                          <div class="dropdown-menu">
+                              <%= link "Logout", to: Routes.session_path(@conn, :logout), method: :post, class: "dropdown-item"%>
+                          </div>
+                      </li>
+                  <% else %>
+                      <li class="nav-item <%= active_class(@active, "login") %>">
+                          <%= link("Login", to: Routes.session_path(@conn, :index), class: "nav-link") %>
+                      </li>
+                  <% end %>
+
+              </ul>
+
+              <form class="form-inline my-2 my-lg-0">
+                  <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                  <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+              </form>
+          </div>
+      </nav>
+
+      <main role="main" class="container">
+          <%= Enum.map(get_flash(@conn), fn {flash_key, flash_message} -> %>
+              <p class="alert alert-<%= flash_key %>"><%= flash_message %></p>
+          <% end) %>
+          <%= render @view_module, @view_template, assigns %>
+      </main>
+      <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>

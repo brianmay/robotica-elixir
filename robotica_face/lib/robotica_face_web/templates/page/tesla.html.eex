@@ -1,2 +1,3 @@
+<h1>Tesla</h1>
 <%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Tesla) %>
 <%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Messages) %>

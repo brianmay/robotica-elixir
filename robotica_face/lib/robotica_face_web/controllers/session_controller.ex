@@ -18,7 +18,8 @@ defmodule RoboticaFaceWeb.SessionController do
     |> put_flash(:info, message)
     |> render("index.html",
       action: Routes.session_path(conn, :login),
-      maybe_user: maybe_user
+      maybe_user: maybe_user,
+      active: "login"
     )
   end
 
@@ -29,7 +30,7 @@ defmodule RoboticaFaceWeb.SessionController do
 
   defp login_reply({:error, error}, conn) do
     conn
-    |> put_flash(:error, error)
+    |> put_flash(:danger, error)
     |> redirect(to: Routes.session_path(conn, :index))
   end
 

@@ -4,28 +4,25 @@ defmodule RoboticaFaceWeb.Live.Remote do
 
   def render(assigns) do
     ~L"""
-    <table>
-    <body>
-    <tr>
-    <td>Locations</td>
+    <div>
+    <div>Locations</div>
     <%= for location <- @all_locations do %>
     <%= if MapSet.member?(@locations, location) do %>
-    <td><button phx-click="location" phx-value-location="<%= location %>" phx-value-set="off"><%= location %></button></td>
+    <button class="btn btn-primary btn-robotica" phx-click="location" phx-value-location="<%= location %>" phx-value-set="off"><%= location %></button>
     <% else %>
-    <td><button class="button-outline" phx-click="location" phx-value-location="<%= location %>" phx-value-set="on"><%= location %></button></td>
+    <button class="btn btn-secondary btn-robotica" phx-click="location" phx-value-location="<%= location %>" phx-value-set="on"><%= location %></button>
     <% end %>
     <% end %>
-    </tr>
+    </div>
+
     <%= for row <- @buttons do %>
-    <tr>
-    <td><%= row.name %></td>
+    <div>
+    <div><%= row.name %></div>
     <%= for button <- row.buttons do %>
-    <td><button phx-click="activate" phx-value-row="<%= row.name %>" phx-value-button="<%= button.name %>"><%= button.name %></button></td>
+    <button class="btn-primary btn-robotica" phx-click="activate" phx-value-row="<%= row.name %>" phx-value-button="<%= button.name %>"><%= button.name %></button>
     <% end %>
-    </tr>
+    </div>
     <% end %>
-    </body>
-    </table>
     """
   end
 

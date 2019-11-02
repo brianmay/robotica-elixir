@@ -4,18 +4,14 @@ defmodule RoboticaFaceWeb.Live.Local do
 
   def render(assigns) do
     ~L"""
-    <table>
-    <body>
     <%= for row <- @buttons do %>
-    <tr>
-    <td><%= row.name %></td>
+    <div>
+    <div><%= row.name %></div>
     <%= for button <- row.buttons do %>
-    <td><button phx-click="activate" phx-value-row="<%= row.name %>" phx-value-button="<%= button.name %>"><%= button.name %></button></td>
+    <button class="btn btn-primary btn-robotica" phx-click="activate" phx-value-row="<%= row.name %>" phx-value-button="<%= button.name %>"><%= button.name %></button>
     <% end %>
-    </tr>
+    </div>
     <% end %>
-    </body>
-    </table>
     """
   end
 
