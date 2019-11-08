@@ -47,20 +47,6 @@ defmodule RoboticaPlugins do
     defstruct locations: [], action: nil
   end
 
-  defmodule Mark do
-    @type t :: %__MODULE__{
-            id: String.t(),
-            status: :done | :cancelled,
-            start_time: %DateTime{},
-            stop_time: %DateTime{}
-          }
-    @enforce_keys [:id, :status, :start_time, :stop_time]
-    defstruct id: nil,
-              status: nil,
-              start_time: nil,
-              stop_time: nil
-  end
-
   defmodule ScheduledTask do
     @type t :: %__MODULE__{
             locations: list(String.t()),

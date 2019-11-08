@@ -1,4 +1,4 @@
-defmodule RoboticaUi.Date do
+defmodule RoboticaPlugins.Date do
   @moduledoc false
 
   @timezone Application.get_env(:robotica_plugins, :timezone)

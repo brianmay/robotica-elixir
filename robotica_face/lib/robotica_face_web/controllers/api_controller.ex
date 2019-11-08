@@ -148,8 +148,8 @@ defmodule RoboticaFaceWeb.ApiController do
     {:ok, steps} = RoboticaFace.Schedule.get_schedule()
 
     midnight =
-      RoboticaFace.Date.tomorrow(now)
-      |> RoboticaFace.Date.midnight_utc()
+      RoboticaPlugins.Date.tomorrow(now)
+      |> RoboticaPlugins.Date.midnight_utc()
 
     steps
     |> parse_steps()
@@ -235,7 +235,7 @@ defmodule RoboticaFaceWeb.ApiController do
 
         count =
           reduce_task(steps, 0, fn _time, task, acc ->
-            result = RoboticaFace.Mark.mark_task(task, status)
+            result = RoboticaPlugins.Mark.mark_task(task, status)
 
             case result do
               :error -> acc

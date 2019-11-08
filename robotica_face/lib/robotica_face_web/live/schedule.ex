@@ -98,7 +98,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
   end
 
   defp do_mark(task, status) do
-    RoboticaFace.Mark.mark_task(task, status)
+    RoboticaPlugins.Mark.mark_task(task, status)
   end
 
   def handle_event("mark", %{"mark" => status, "step_time" => step_time, "task_id" => id}, socket) do

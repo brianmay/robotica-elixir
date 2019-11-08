@@ -8,7 +8,7 @@ defmodule RoboticaUi.Components.Marks do
   import Scenic.Components
   import Scenic.Primitives
 
-  alias RoboticaUi.Mark
+  alias RoboticaPlugins.Mark
 
   def verify(step), do: {:ok, step}
 
