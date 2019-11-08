@@ -25,7 +25,7 @@ defmodule RoboticaFace.Mark do
             stop_time: next_midnight
           }
 
-        :postponed ->
+        :cancelled ->
           %RoboticaPlugins.Mark{
             id: id,
             status: :cancelled,

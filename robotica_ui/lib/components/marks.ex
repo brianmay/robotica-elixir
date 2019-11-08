@@ -47,11 +47,11 @@ defmodule RoboticaUi.Components.Marks do
         translate: {10, height - 180},
         id: :btn_done
       )
-      |> button("Postpone",
+      |> button("Cancel",
         width: width / 2 - 15,
         height: 80,
         translate: {width / 2 + 5, height - 180},
-        id: :btn_postpone
+        id: :btn_cancel
       )
       |> button("Clear",
         width: width / 2 - 15,
@@ -59,11 +59,11 @@ defmodule RoboticaUi.Components.Marks do
         translate: {10, height - 90},
         id: :btn_clear
       )
-      |> button("Cancel",
+      |> button("Close",
         width: width / 2 - 15,
         height: 80,
         translate: {width / 2 + 5, height - 90},
-        id: :btn_cancel
+        id: :btn_close
       )
 
     {:ok, %{graph: graph, viewport: opts[:viewport], step: step}, push: graph}
@@ -74,9 +74,9 @@ defmodule RoboticaUi.Components.Marks do
 
     case id do
       :btn_done -> Mark.mark_task(state.step, :done)
-      :btn_postpone -> Mark.mark_task(state.step, :postponed)
+      :btn_cancel -> Mark.mark_task(state.step, :cancelled)
       :btn_clear -> Mark.mark_task(state.step, :clear)
-      :btn_cancel -> nil
+      :btn_close -> nil
     end
 
     send_event({:done, state.step})

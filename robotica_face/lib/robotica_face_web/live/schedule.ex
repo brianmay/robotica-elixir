@@ -25,7 +25,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
               <td><%= task.mark %></td>
               <td>
                 <button class="btn btn-warning" phx-click="mark" phx-value-mark="done" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Done</button>
-                <button class="btn btn-warning" phx-click="mark" phx-value-mark="postponed" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Postpone</button>
+                <button class="btn btn-warning" phx-click="mark" phx-value-mark="cancel" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Cancel</button>
                 <button class="btn btn-warning" phx-click="mark" phx-value-mark="clear" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Clear</button>
               </td>
             </tr>
@@ -107,7 +107,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
     status =
       case status do
         "done" -> :done
-        "postpone" -> :cancelled
+        "cancel" -> :cancelled
         "clear" -> :clear
       end
 
