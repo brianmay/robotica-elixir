@@ -41,6 +41,7 @@ defmodule RoboticaFaceWeb.Endpoint do
   # Set :encryption_salt if you would also like to encrypt it.
   plug Plug.Session,
     store: :cookie,
+    max_age: 60 * 60 * 24 * 365,
     key: "_robotica_face_key",
     signing_salt: "/P1irGF1"
 
