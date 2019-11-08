@@ -29,7 +29,6 @@ defmodule Robotica.MixProject do
       {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:lifx, git: "https://github.com/brianmay/lifx.git"},
       {:yaml_elixir, "~> 2.4.0"},
-      {:calendar, "~> 1.0.0"},
       {:event_bus, "~> 1.6.0"},
       {:robotica_plugins, path: "../robotica_plugins"}
     ]

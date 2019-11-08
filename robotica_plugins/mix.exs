@@ -21,6 +21,7 @@ defmodule RoboticaPlugins.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:calendar, "~> 1.0.0"},
       {:yaml_elixir, "~> 2.4.0"}
     ]
   end
