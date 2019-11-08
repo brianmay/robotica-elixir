@@ -72,11 +72,15 @@ defmodule RoboticaUi.Components.Marks do
   def filter_event({:click, id}, _, state) do
     RoboticaUi.RootManager.reset_screensaver()
 
-    case id do
-      :btn_done -> Mark.mark_task(state.step, :done)
-      :btn_cancel -> Mark.mark_task(state.step, :cancelled)
-      :btn_clear -> Mark.mark_task(state.step, :clear)
+    new_mark = case id do
+      :btn_done -> :done
+      :btn_cancel -> :cancelled
+      :btn_clear ->  :clear
       :btn_close -> nil
+    end
+
+    if not is_nil(new_mark) do
+      Mark.mark_task(state.step, new_mark)
     end
 
     send_event({:done, state.step})
