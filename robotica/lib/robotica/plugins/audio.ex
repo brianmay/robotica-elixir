@@ -110,8 +110,10 @@ defmodule Robotica.Plugins.Audio do
   end
 
   defp play_sound(state, sound) do
-    sound_file = Map.fetch!(state.sounds, sound)
-    run(state, :play, file: sound_file)
+    case Map.get(state.sounds, sound) do
+      nil -> nil
+      sound_file -> run(state, :play, file: sound_file)
+    end
   end
 
   defp say(state, text) do
@@ -144,7 +146,7 @@ defmodule Robotica.Plugins.Audio do
     run(state, :music_stop, [])
   end
 
-  defp append_sound(sound_list, %{sound: %{} = sound}) do
+  defp append_sound(sound_list, %{sound: sound}) do
     sound_list ++ [{:sound, sound}]
   end
 
