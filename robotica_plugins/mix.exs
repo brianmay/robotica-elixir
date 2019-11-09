@@ -22,6 +22,7 @@ defmodule RoboticaPlugins.MixProject do
   defp deps do
     [
       {:calendar, "~> 1.0.0"},
+      {:event_bus, "~> 1.6.0"},
       {:yaml_elixir, "~> 2.4.0"}
     ]
   end
