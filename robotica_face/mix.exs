@@ -43,6 +43,7 @@ defmodule RoboticaFace.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:joken, "~> 2.1.0"},
       {:joken_jwks, "~> 1.0"},
+      {:calendar, "~> 1.0.0"},
       {:timex, "~> 3.5"},
       {:event_bus, "~> 1.6.1"},
       {:robotica_plugins, path: "../robotica_plugins"}
