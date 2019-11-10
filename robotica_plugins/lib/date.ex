@@ -20,8 +20,8 @@ defmodule RoboticaPlugins.Date do
   """
   @spec tomorrow(DateTime.t()) :: Date.t()
   def tomorrow(date_time) do
-    Calendar.DateTime.shift_zone!(date_time, @timezone)
-    |> Calendar.Date.next_day!()
+    {:ok, local_date_time} = DateTime.shift_zone(date_time, @timezone)
+    Date.add(local_date_time, 1)
   end
 
   @doc """
@@ -47,24 +47,24 @@ defmodule RoboticaPlugins.Date do
     # S 6 --> +2
     # S 7 --> +1
 
-    date_time = Calendar.DateTime.shift_zone!(date_time, @timezone)
+    {:ok, date_time} = DateTime.shift_zone(date_time, @timezone)
     day_of_week = Date.day_of_week(date_time)
     add_days = 7 - day_of_week + 1
-    Calendar.Date.add!(date_time, add_days)
+    Date.add(date_time, add_days)
   end
 
   @doc """
   Find the UTC date time at midnight for the specified local date.
 
   iex> import RoboticaPlugins.Date
-  iex> result = midnight_utc(~D[2019-11-10])
-  iex> %{time_zone: "UTC"} = result
-  iex> %{result| time_zone: "Etc/UTC"}
+  iex> midnight_utc(~D[2019-11-10])
   ~U[2019-11-09 13:00:00+00:00]
   """
   @spec midnight_utc(Date.t()) :: DateTime.t()
   def midnight_utc(date) do
-    Calendar.DateTime.from_date_and_time_and_zone!(date, ~T[00:00:00], @timezone)
-    |> Calendar.DateTime.shift_zone!("UTC")
+    {:ok, naive_date_time} = NaiveDateTime.new(date, ~T[00:00:00])
+    {:ok, local_date_time} = DateTime.from_naive(naive_date_time, @timezone)
+    {:ok, utc_date_time} = DateTime.shift_zone(local_date_time, "Etc/UTC")
+    utc_date_time
   end
 end

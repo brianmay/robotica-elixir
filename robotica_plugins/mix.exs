@@ -21,7 +21,7 @@ defmodule RoboticaPlugins.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:calendar, "~> 1.0.0"},
+      {:tzdata, "~> 1.0.2"},
       {:event_bus, "~> 1.6.0"},
       {:yaml_elixir, "~> 2.4.0"},
       {:dialyxir, "~> 1.0.0-rc.2", only: [:dev], runtime: false},
