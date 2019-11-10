@@ -23,7 +23,8 @@ defmodule RoboticaPlugins.MixProject do
     [
       {:calendar, "~> 1.0.0"},
       {:event_bus, "~> 1.6.0"},
-      {:yaml_elixir, "~> 2.4.0"}
+      {:yaml_elixir, "~> 2.4.0"},
+      {:dialyxir, "~> 1.0.0-rc.2", only: [:dev], runtime: false},
     ]
   end
 end

@@ -1,4 +1,6 @@
 defmodule RoboticaPlugins do
+  alias RoboticaPlugins.Mark
+
   defmodule Action do
     @type t :: %__MODULE__{
             message: map() | nil,
@@ -41,7 +43,7 @@ defmodule RoboticaPlugins do
   defmodule Task do
     @type t :: %__MODULE__{
             locations: list(String.t()),
-            action: Robotica.Types.Action.t()
+            action: Action.t()
           }
     @enforce_keys [:locations, :action]
     defstruct locations: [], action: nil
