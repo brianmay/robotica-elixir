@@ -2,6 +2,8 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 # Configure the main viewport for the Scenic application
 config :robotica_ui, :viewport, %{
   name: :main_viewport,

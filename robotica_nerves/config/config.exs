@@ -5,6 +5,8 @@
 # is restricted to this project.
 use Mix.Config
 
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 config :robotica,
   config_file: "/etc/robotica/config-{hostname}.yaml",
   classifications_file: "classifications.yaml",

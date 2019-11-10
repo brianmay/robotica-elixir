@@ -7,6 +7,8 @@
 # General application configuration
 use Mix.Config
 
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 config :robotica_face,
   api_username: System.get_env("GOOGLE_USERNAME"),
   api_password: System.get_env("GOOGLE_PASSWORD"),

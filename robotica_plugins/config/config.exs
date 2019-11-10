@@ -20,6 +20,7 @@ use Mix.Config
 #
 #     config :logger, level: :info
 #
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :robotica_plugins,
   timezone: "Australia/Melbourne",
