@@ -8,10 +8,9 @@ defmodule Robotica.Scheduler.Classifier do
     end
   end
 
-  defmacrop classifications do
-    data = Robotica.Config.classifications()
-    Macro.escape(data)
-  end
+  @filename Application.get_env(:robotica, :classifications_file)
+  @external_resource @filename
+  @data Robotica.Config.classifications(@filename)
 
   defp is_date_in_classification?(%Types.Classification{} = classification, date) do
     cond do
@@ -114,7 +113,7 @@ defmodule Robotica.Scheduler.Classifier do
   end
 
   def classify_date(date) do
-    classifications()
+    @data
     |> Enum.filter(fn classification -> is_in_classification?(classification, date) end)
     |> reject_excluded()
     |> Enum.map(fn classification -> classification.day_type end)

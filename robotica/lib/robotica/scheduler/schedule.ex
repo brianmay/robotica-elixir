@@ -1,10 +1,9 @@
 defmodule Robotica.Scheduler.Schedule do
   @timezone Application.get_env(:robotica, :timezone)
 
-  defmacrop schedule do
-    data = Robotica.Config.schedule()
-    Macro.escape(data)
-  end
+  @filename Application.get_env(:robotica, :schedule_file)
+  @external_resource @filename
+  @data Robotica.Config.schedule(@filename)
 
   defp convert_time_to_utc(date, time) do
     Calendar.DateTime.from_date_and_time_and_zone!(date, time, @timezone)
@@ -25,7 +24,7 @@ defmodule Robotica.Scheduler.Schedule do
   end
 
   def get_schedule(classifications, date) do
-    a = schedule()
+    a = @data
 
     schedule = add_schedule(date, %{}, a, "*")
 

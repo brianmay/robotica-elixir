@@ -1,10 +1,9 @@
 defmodule Robotica.Scheduler.Sequence do
   require Logger
 
-  defmacrop sequences do
-    data = Robotica.Config.sequences()
-    Macro.escape(data)
-  end
+  @filename Application.get_env(:robotica, :sequences_file)
+  @external_resource @filename
+  @data Robotica.Config.sequences(@filename)
 
   defp add_id_to_tasks([], _, _), do: []
 
@@ -15,7 +14,7 @@ defmodule Robotica.Scheduler.Sequence do
   end
 
   defp get_sequence(sequence_name) do
-    sequences()
+    @data
     |> Map.fetch!(sequence_name)
     |> add_id_to_tasks(sequence_name, 0)
   end
