@@ -1,13 +1,5 @@
 use Mix.Config
 
-# Configure your database
-config :robotica_hello, RoboticaHello.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "robotica_hello_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
-
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :robotica_hello, RoboticaHelloWeb.Endpoint,
@@ -16,3 +8,14 @@ config :robotica_hello, RoboticaHelloWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :robotica_hello, RoboticaHello.Repo,
+  pool: Ecto.Adapters.SQL.Sandbox,
+  url: System.get_env("DATABASE_URL_TEST")
+
+config :robotica_hello, RoboticaHello.Users.Guardian,
+  issuer: "robotica_hello",
+  secret_key: "/q7S9SP028A/BbWqkiisc5qZXbBWQFg8+GSTkflTAfRw/K9jCzJKWpSWvWUEoUU4"
+
+config :robotica_hello, RoboticaHello.Repo,
+  secret_key_base: "oOWDT+7p6JENufDeyMQFLqDMsj1bkVfQT4Navmr5qYem9crHED4jAMr0Stf4aRNt"
