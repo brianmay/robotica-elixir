@@ -12,7 +12,20 @@
       <section class="container">
         <nav role="navigation">
           <ul>
-            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
+            <% user = Guardian.Plug.current_resource(@conn) %>
+            <%= if is_nil(user) do %>
+              <li>Not logged in</li>
+              <li>
+                <%= link "Login", to: Routes.session_path(@conn, :login) %>
+              </li>
+            <% else %>
+              <li>
+                <%= user.name %>
+              </li>
+              <li>
+                <%= link "Logout", to: Routes.session_path(@conn, :logout), method: :post %>
+              </li>
+            <% end %>
           </ul>
         </nav>
         <a href="http://phoenixframework.org/" class="phx-logo">

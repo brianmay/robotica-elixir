@@ -30,7 +30,7 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :robotica_hello, RoboticaHello.Users.Guardian,
+config :robotica_hello, RoboticaHello.Accounts.Guardian,
   issuer: "robotica_hello",
   secret_key: System.get_env("GUARDIAN_SECRET")
 

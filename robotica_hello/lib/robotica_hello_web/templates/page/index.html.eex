@@ -7,15 +7,16 @@
   <article class="column">
     <h2>Resources</h2>
     <ul>
-      <li>
-        <a href="https://hexdocs.pm/phoenix/overview.html">Guides &amp; Docs</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix">Source</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix/blob/v1.4/CHANGELOG.md">v1.4 Changelog</a>
-      </li>
+      <% user = Guardian.Plug.current_resource(@conn) %>
+      <%= if not is_nil(user) do %>
+        <li>
+          <%= link "Logout", to: Routes.session_path(@conn, :logout), method: :post %>
+        </li>
+      <% else %>
+        <li>
+          <%= link "Login", to: Routes.session_path(@conn, :login) %>
+        </li>
+      <% end %>
     </ul>
   </article>
   <article class="column">
