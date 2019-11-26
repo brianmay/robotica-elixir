@@ -120,7 +120,7 @@ defmodule RoboticaHello.Accounts do
     User.update_changeset(user, %{})
   end
 
- @doc """
+  @doc """
   Returns an `%Ecto.Changeset{}` for tracking user changes.
 
   ## Examples

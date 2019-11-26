@@ -6,8 +6,20 @@ defmodule RoboticaHello.AccountsTest do
   describe "users" do
     alias RoboticaHello.Accounts.User
 
-    @valid_attrs %{email: "some email", location: "some location", is_admin: true, name: "some name", password: "some password", password_confirmation: "some password"}
-    @update_attrs %{email: "some updated email", location: "some updated location", is_admin: false, name: "some updated name"}
+    @valid_attrs %{
+      email: "some email",
+      location: "some location",
+      is_admin: true,
+      name: "some name",
+      password: "some password",
+      password_confirmation: "some password"
+    }
+    @update_attrs %{
+      email: "some updated email",
+      location: "some updated location",
+      is_admin: false,
+      name: "some updated name"
+    }
     @invalid_attrs %{email: nil, location: nil, is_admin: nil, name: nil, password: nil}
     @password_attrs %{
       password: "some other password",
