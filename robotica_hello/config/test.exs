@@ -17,5 +17,5 @@ config :robotica_hello, RoboticaHello.Users.Guardian,
   issuer: "robotica_hello",
   secret_key: "/q7S9SP028A/BbWqkiisc5qZXbBWQFg8+GSTkflTAfRw/K9jCzJKWpSWvWUEoUU4"
 
-config :robotica_hello, RoboticaHello.Repo,
+config :robotica_hello, RoboticaHelloWeb.Endpoint,
   secret_key_base: "oOWDT+7p6JENufDeyMQFLqDMsj1bkVfQT4Navmr5qYem9crHED4jAMr0Stf4aRNt"

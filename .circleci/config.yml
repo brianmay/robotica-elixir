@@ -153,18 +153,60 @@ jobs:
             cd robotica_face
             export MIX_ENV=test
             mix compile
+            cd assets
+            npm build
 
       - run:
           name: Run tests
           command: |
             cd robotica_face
-            export SECRET_KEY_BASE="A+1sbKi4zpi1o5Aac2fY6dkinjhNC6+OO6o0DQC6x/mHUfyVK5jZLbH6oQiRFJN0"
-            export GUARDIAN_SECRET="Pbs+1dq8+DH3QMqKX5KgtTVoPgYp+5AQQ8mY56ThEe4fbVblZkWah4gW2NiCTP84"
-            export SIGNING_SALT="lFJrL13YHIH/wScmyEG7U2hXsoNqxSJB"
             mix test
 
       - store_test_results:
           path: robotica_face/_build/test/lib/robotica_face
+
+  build-hello:
+    docker:
+      # specify the version you desire here
+      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
+      - image: circleci/elixir:1.9
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install hex and rebar
+          command: |
+            cd robotica_face
+            mix local.hex --force
+            mix local.rebar --force
+
+      - run:
+          name: Install dependencies
+          command: |
+            cd robotica_hello
+            export MIX_ENV=test
+            mix deps.get
+            cd assets
+            npm install
+
+      - run:
+          name: Compile
+          command: |
+            cd robotica_hello
+            export MIX_ENV=test
+            mix compile
+            cd assets
+            npm build
+
+      - run:
+          name: Run tests
+          command: |
+            cd robotica_hello
+            mix test
+
+      - store_test_results:
+          path: robotica_hello/_build/test/lib/robotica_hello
 
 workflows:
   version: 2
@@ -179,6 +221,10 @@ workflows:
             tags:
               only: /.*/
       - build-face:
+          filters:
+            tags:
+              only: /.*/
+      - build-hello:
           filters:
             tags:
               only: /.*/
