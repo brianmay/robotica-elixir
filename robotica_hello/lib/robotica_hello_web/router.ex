@@ -17,6 +17,9 @@ defmodule RoboticaHelloWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    resources "/users", UserController
+    get "/users/:id/password", UserController, :password_edit
+    put "/users/:id/password", UserController, :password_update
   end
 
   # Other scopes may use custom stacks.
