@@ -8,3 +8,9 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :robotica_face, RoboticaFaceWeb.Endpoint,
+  secret_key_base: "oOWDT+7p6JENufDeyMQFLqDMsj1bkVfQT4Navmr5qYem9crHED4jAMr0Stf4aRNt",
+  live_view: [
+    signing_salt: "lFJrL13YHIH/wScmyEG7U2hXsoNqxSJB"
+  ]

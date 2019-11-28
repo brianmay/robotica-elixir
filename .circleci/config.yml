@@ -77,9 +77,6 @@ jobs:
           name: Run tests
           command: |
             cd robotica
-            export SECRET_KEY_BASE="A+1sbKi4zpi1o5Aac2fY6dkinjhNC6+OO6o0DQC6x/mHUfyVK5jZLbH6oQiRFJN0"
-            export GUARDIAN_SECRET="Pbs+1dq8+DH3QMqKX5KgtTVoPgYp+5AQQ8mY56ThEe4fbVblZkWah4gW2NiCTP84"
-            export SIGNING_SALT="lFJrL13YHIH/wScmyEG7U2hXsoNqxSJB"
             mix test
 
       - store_test_results:
@@ -141,11 +138,19 @@ jobs:
             mix local.rebar --force
 
       - run:
+          name: Install system dependencies
+          command: |
+            curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+
+      - run:
           name: Install dependencies
           command: |
             cd robotica_face
             export MIX_ENV=test
             mix deps.get
+            cd assets
+            npm install
 
       - run:
           name: Compile
@@ -170,6 +175,13 @@ jobs:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
       - image: circleci/elixir:1.9
+        environment:
+          DATABASE_URL_TEST: postgresql://root@localhost/circle_test?sslmode=disable
+
+      - image: circleci/postgres:9.6.2
+        environment:
+          POSTGRES_USER: root
+          POSTGRES_DB: circle_test
 
     steps:
       - checkout
@@ -180,6 +192,12 @@ jobs:
             cd robotica_face
             mix local.hex --force
             mix local.rebar --force
+
+      - run:
+          name: Install system dependencies
+          command: |
+            curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+            sudo apt-get install -y nodejs
 
       - run:
           name: Install dependencies
@@ -198,6 +216,10 @@ jobs:
             mix compile
             cd assets
             npm build
+
+      - run:  # special utility that stalls main process until DB is ready
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
 
       - run:
           name: Run tests
