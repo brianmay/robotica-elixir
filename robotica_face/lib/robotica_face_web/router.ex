@@ -9,8 +9,11 @@ defmodule RoboticaFaceWeb.Router do
     plug :fetch_session
     plug :fetch_flash
     plug Phoenix.LiveView.Flash
-    plug :protect_from_forgery
     plug :put_secure_browser_headers
+  end
+
+  pipeline :csrf do
+    plug :protect_from_forgery
   end
 
   pipeline :auth do
@@ -30,14 +33,22 @@ defmodule RoboticaFaceWeb.Router do
     pipe_through :browser
     pipe_through :auth
 
+    post "/login", SessionController, :login
+  end
+
+  scope "/", RoboticaFaceWeb do 
+    pipe_through :browser
+    pipe_through :csrf
+    pipe_through :auth
+
     get "/", PageController, :index
     get "/login", SessionController, :index
-    post "/login", SessionController, :login
     post "/logout", SessionController, :logout
   end
 
   scope "/", RoboticaFaceWeb do
     pipe_through :browser
+    pipe_through :csrf
     pipe_through :auth
     pipe_through :ensure_auth
 
