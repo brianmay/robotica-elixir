@@ -3,17 +3,17 @@ defmodule RoboticaPlugins.Mark do
   use EventBus.EventSource
 
   @type t :: %__MODULE__{
-    id: String.t(),
-    status: :done | :cancelled,
-    start_time: %DateTime{},
-    stop_time: %DateTime{}
-  }
+          id: String.t(),
+          status: :done | :cancelled,
+          start_time: %DateTime{},
+          stop_time: %DateTime{}
+        }
   @enforce_keys [:id, :status, :start_time, :stop_time]
   defstruct id: nil,
-    status: nil,
-    start_time: nil,
-    stop_time: nil
- 
+            status: nil,
+            start_time: nil,
+            stop_time: nil
+
   @spec publish_mark(t()) :: :ok | {:error, String.t()}
   def publish_mark(mark) do
     EventSource.notify %{topic: :mark} do
