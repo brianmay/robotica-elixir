@@ -45,7 +45,8 @@ defmodule RoboticaHello.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:guardian, "~> 2.0"},
       {:bcrypt_elixir, "~> 2.0"},
-      {:joken, "~> 2.2.0"}
+      {:joken, "~> 2.2.0"},
+      {:robotica_plugins, path: "../robotica_plugins"}
     ]
   end
 

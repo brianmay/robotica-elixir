@@ -283,4 +283,13 @@ defmodule RoboticaPlugins.Validation do
 
   def validate_schema(value, type),
     do: {:error, "Something went wrong with #{inspect(value)} expected type #{inspect(type)}"}
+
+  def load_and_validate(filename, config_schema) do
+    with {:ok, data} <- YamlElixir.read_from_file(filename),
+         {:ok, data} <- validate_schema(data, config_schema) do
+      {:ok, data}
+    else
+      {:error, msg} -> {:error, msg}
+    end
+  end
 end

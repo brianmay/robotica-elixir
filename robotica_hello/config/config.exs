@@ -8,7 +8,8 @@
 use Mix.Config
 
 config :robotica_hello,
-  ecto_repos: [RoboticaHello.Repo]
+  ecto_repos: [RoboticaHello.Repo],
+  config_file: System.get_env("ROBOTICA_HELLO_CONFIG")
 
 config :robotica_hello, RoboticaHello.Repo,
   url: System.get_env("DATABASE_URL"),
@@ -21,6 +22,11 @@ config :robotica_hello, RoboticaHelloWeb.Endpoint,
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: RoboticaHelloWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: RoboticaHello.PubSub, adapter: Phoenix.PubSub.PG2]
+
+config :robotica_plugins,
+  config_file: "ui.yaml",
+  timezone: "Australia/Melbourne",
+  map_types: []
 
 # Configures Elixir's Logger
 config :logger, :console,
