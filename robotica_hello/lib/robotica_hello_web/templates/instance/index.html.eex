@@ -6,7 +6,7 @@
 
             <%= for instance <- @instances do %>
                 <% token = create_token(user) %>
-                <form method="post" action="<%= instance.urls %>/login">
+                <form method="post" action="<%= instance.url %>/login">
                     <input type="hidden" name="token" value="<%= token %>">
                     <input type="submit" value="<%= instance.name %>">
                 </form>
