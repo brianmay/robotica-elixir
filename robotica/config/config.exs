@@ -5,10 +5,10 @@ use Mix.Config
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :robotica,
-  config_file: "config.yaml",
-  classifications_file: "classifications.yaml",
-  schedule_file: "schedule.yaml",
-  sequences_file: "sequences.yaml",
+  config_file: "../config/config.yaml",
+  classifications_file: "../config/classifications.yaml",
+  schedule_file: "../config/schedule.yaml",
+  sequences_file: "../config/sequences.yaml",
   timezone: "Australia/Melbourne"
 
 config :robotica_plugins,

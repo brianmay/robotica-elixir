@@ -14,7 +14,7 @@ config :robotica_ui, :viewport, %{
 }
 
 config :robotica,
-  config_file: "config.yaml"
+  config_file: "../config/config.yaml"
 
 config :robotica_plugins,
-  config_file: "ui.yaml"
+  config_file: "../config/ui.yaml"

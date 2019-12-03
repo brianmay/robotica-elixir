@@ -18,8 +18,6 @@ erl_crash.dump
 
 /.envrc
 /upload_all
-/ui.yaml
-/config.yaml
 /cafile.pem
 
 /rootfs_overlay/etc/cacert.pem
