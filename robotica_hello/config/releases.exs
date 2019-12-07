@@ -11,7 +11,7 @@ config :robotica_hello, RoboticaHelloWeb.Endpoint,
   url: [host: System.get_env("HOST"), port: port],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
-config :robotica_hello, RoboticaHello.Users.Guardian,
+config :robotica_hello, RoboticaHello.Accounts.Guardian,
   issuer: "robotica_hello",
   secret_key: System.get_env("GUARDIAN_SECRET")
 
