@@ -230,6 +230,22 @@ jobs:
       - store_test_results:
           path: robotica_hello/_build/test/lib/robotica_hello
 
+  deploy-hello-beta:
+    docker:
+      - image: circleci/elixir:1.9
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: |
+          docker build \
+            --file "robotica_hello/Dockerfile" \
+            --tag "brianmay/robotica_hello:latest" \
+            --build-arg "BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`" \
+            --build-arg "VCS_REF=$CIRCLE_SHA1" \
+            .
+          docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
+          docker push "brianmay/robotica_hello:latest"
+
 workflows:
   version: 2
   build-deploy:
@@ -250,3 +266,10 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - deploy-hello-beta:
+          context: Docker
+          requires:
+            - build-hello
+          filters:
+            branches:
+              only: master

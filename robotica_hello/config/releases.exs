@@ -1,12 +1,13 @@
 import Config
 
-config :phone_Hello, RoboticaHello.Repo,
+port = String.to_integer(System.get_env("PORT") || "4000")
+
+config :robotica_hello, RoboticaHello.Repo,
   url: System.get_env("DATABASE_URL"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
-# Configures the endpoint
 config :robotica_hello, RoboticaHelloWeb.Endpoint,
-  http: [:inet6, port: String.to_integer(System.get_env("PORT") || "4000")],
+  http: [:inet6, port: port],
   url: [host: System.get_env("HOST"), port: port],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
