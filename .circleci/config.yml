@@ -236,15 +236,17 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: |
-          docker build \
-            --file "robotica_hello/Dockerfile" \
-            --tag "brianmay/robotica_hello:latest" \
-            --build-arg "BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`" \
-            --build-arg "VCS_REF=$CIRCLE_SHA1" \
-            .
-          docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
-          docker push "brianmay/robotica_hello:latest"
+      - run:
+          name: Build and upload docker image
+          command: |
+            docker build \
+              --file "robotica_hello/Dockerfile" \
+              --tag "brianmay/robotica_hello:latest" \
+              --build-arg "BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`" \
+              --build-arg "VCS_REF=$CIRCLE_SHA1" \
+              .
+            docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
+            docker push "brianmay/robotica_hello:latest"
 
 workflows:
   version: 2
