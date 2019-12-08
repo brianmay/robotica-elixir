@@ -16,9 +16,8 @@ defmodule RoboticaUi.Components.Marks do
   @timezone Application.get_env(:robotica_plugins, :timezone)
 
   defp date_time_to_local(dt) do
-    dt
-    |> Calendar.DateTime.shift_zone!(@timezone)
-    |> Timex.format!("%F %T", :strftime)
+    {:ok, local_dt} = DateTime.shift_zone(dt, @timezone)
+    Timex.format!(local_dt, "%F %T", :strftime)
   end
 
   def init(step, opts) do
