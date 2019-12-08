@@ -2,6 +2,9 @@ import Config
 
 port = String.to_integer(System.get_env("PORT") || "4000")
 
+config :robotica_hello,
+  config_file: System.get_env("ROBOTICA_HELLO_CONFIG")
+
 config :robotica_hello, RoboticaHello.Repo,
   url: System.get_env("DATABASE_URL"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
