@@ -34,6 +34,8 @@ defmodule RoboticaHelloWeb.Router do
     get "/login", SessionController, :new
     post "/login", SessionController, :login
     post "/logout", SessionController, :logout
+
+    get "/instances", InstanceController, :index
   end
 
   scope "/", RoboticaHelloWeb do
@@ -42,8 +44,6 @@ defmodule RoboticaHelloWeb.Router do
     resources "/users", UserController
     get "/users/:id/password", UserController, :password_edit
     put "/users/:id/password", UserController, :password_update
-
-    get "/instances", InstanceController, :index
   end
 
   # Other scopes may use custom stacks.
