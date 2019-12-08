@@ -52,6 +52,9 @@ defmodule RoboticaUi.Scene.Schedule do
   end
 
   defp update_schedule(graph, steps, width) do
+    configuration = RoboticaPlugins.Config.ui_configuration()
+    local_locations = configuration.local_locations
+
     steps =
       Enum.reduce(steps, [], fn step, steps ->
         Enum.reduce(step.tasks, steps, fn task, steps ->
@@ -65,6 +68,7 @@ defmodule RoboticaUi.Scene.Schedule do
         end)
       end)
       |> Enum.reverse()
+      |> Enum.filter(fn step -> Enum.any?(step.task.locations, &(&1 in local_locations)) end)
       |> Enum.take(20)
 
     graph
