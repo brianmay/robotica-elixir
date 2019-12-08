@@ -10,6 +10,9 @@
       <% user = Guardian.Plug.current_resource(@conn) %>
       <%= if not is_nil(user) do %>
         <li>
+          <%= link "Instances", to: Routes.instance_path(@conn, :index) %>
+        </li>
+        <li>
           <%= link "Logout", to: Routes.session_path(@conn, :logout), method: :post %>
         </li>
       <% else %>
