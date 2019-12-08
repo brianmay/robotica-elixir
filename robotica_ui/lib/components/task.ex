@@ -12,9 +12,16 @@ defmodule RoboticaUi.Components.Task do
   @graph Graph.build(styles: %{}, font_size: 20)
 
   defp date_time_to_local(dt) do
-    dt
-    |> Calendar.DateTime.shift_zone!(@timezone)
-    |> Timex.format!("%T", :strftime)
+    {:ok, local_dt} = DateTime.shift_zone(dt, @timezone)
+    {:ok, local_now} = DateTime.shift_zone(DateTime.utc_now(), @timezone)
+
+    date_offset =
+      case Date.diff(local_dt, local_now) do
+        0 -> ""
+        x when x > 0 -> "+#{x}"
+      end
+
+    Timex.format!(local_dt, "%T#{date_offset}", :strftime)
   end
 
   def init(step, opts) do
