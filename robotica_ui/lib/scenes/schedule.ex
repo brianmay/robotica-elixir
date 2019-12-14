@@ -34,8 +34,7 @@ defmodule RoboticaUi.Scene.Schedule do
       @graph
       |> Layout.add_background(vp_width, vp_height)
       |> text("Time", text_align: :left, translate: {110, 30})
-      |> text("Locations", text_align: :left, translate: {210, 30})
-      |> text("Message", text_align: :left, translate: {410, 30})
+      |> text("Message", text_align: :left, translate: {210, 30})
       |> Nav.add_to_graph(:schedule)
 
     graph =
