@@ -1,0 +1,226 @@
+"adults:wake_up":
+    - required_time: "00:10:00"
+      task:
+          locations: ["Adult"]
+          action:
+            lights:
+              action: turn_on
+              color: { hue: 0, saturation: 0, brightness: 1, kelvin: 3500 }
+
+    - required_time: "00:05:00"
+      task:
+          locations: ["Adult"]
+          action:
+            message:
+              text: Adult 5 minutes.
+            lights:
+              action: turn_on
+              color: { hue: 0, saturation: 0, brightness: 10, kelvin: 3500 }
+              duration: 30
+
+    - required_time: "00:10:00"
+      zero_time: true
+      task:
+          locations: ["Adult"]
+          action:
+            lights:
+              action: turn_on
+              color: { hue: 0, saturation: 0, brightness: 100, kelvin: 3500 }
+              duration: 30
+            message:
+              text: Adult wake up.
+            music:
+              play_list: wake_up
+
+    - required_time: "00:10:00"
+      task:
+          locations: ["Adult"]
+          action:
+            message:
+              text: Adult breakfast.
+            music:
+              stop: true
+
+    - required_time: "00:10:00"
+      task:
+          locations: ["Adult"]
+          action:
+            message:
+              text: Adult teeth.
+
+    - required_time: "00:05:00"
+      task:
+          locations: ["Adult"]
+          action:
+            message:
+              text: Adult lunch and unplug car.
+
+"kids:wake_up":
+    - required_time: "00:25:00"
+      zero_time: true
+      task:
+          locations: ["Kids"]
+          action:
+            lights:
+              action: turn_on
+              color: { hue: 0, saturation: 0, brightness: 100, kelvin: 3500 }
+              duration: 10
+            message:
+              text: Kids wake up.
+            music:
+              play_list: wake_up
+
+    - required_time: "00:05:00"
+      task:
+          locations: ["Kids", "Dining"]
+          action:
+            message:
+              text: Kids eat breakfast.
+
+    - required_time: "00:10:00"
+      task:
+          locations: ["Kids"]
+          action:
+            music:
+              stop: true
+
+    - required_time: "00:05:00"
+      task:
+          locations: ["Kids", "Dining"]
+          action:
+            message:
+              text: Kids clean teeth.
+
+    - required_time: "00:03:00"
+      task:
+          locations: ["Kids", "Dining"]
+          action:
+            message:
+              text: Kids put shoes on.
+
+    - required_time: "00:02:00"
+      task:
+          locations: ["Kids", "Dining"]
+          action:
+            lights:
+              action: flash
+              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+            message:
+              text: Kids time to go.
+
+"lunch_time":
+    - required_time: "00:30:00"
+      zero_time: true
+      task:
+          locations:
+          - Dining
+          action:
+            lights:
+              action: flash
+              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+            message:
+              text: Time for lunch
+
+"tea_time":
+    - required_time: "00:30:00"
+      task:
+          locations:
+          - Dining
+          action:
+            lights:
+              action: flash
+              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+            message:
+              text: Adult make tea.
+    - required_time: "00:30:00"
+      zero_time: true
+      task:
+          locations:
+          - Dining
+          action:
+            lights:
+              action: flash
+              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+            message:
+              text: Time for tea.
+
+"adults:sleep":
+    - required_time: "01:00:00"
+      task:
+          locations:
+          - Adult
+          action:
+            lights:
+              action: flash
+              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+            message:
+              text: Adult get ready for bed.
+    - required_time: "03:00:00"
+      zero_time: true
+      task:
+          locations:
+          - Adult
+          action:
+            lights:
+              action: flash
+              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+            message:
+              text: Adult get into bed.
+            music:
+              play_list: red
+    - required_time: "00:00:00"
+      task:
+          locations:
+          - Adult
+          action:
+            music:
+              stop: true
+
+"kids:sleep":
+    - required_time: "00:15:00"
+      task:
+          locations:
+          - Kids
+          - Dining
+          action:
+            lights:
+              action: flash
+              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+            message:
+              text: Kids clean your teeth.
+
+    - required_time: "00:15:00"
+      task:
+          locations:
+          - Kids
+          - Dining
+          action:
+            lights:
+              action: flash
+              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+            message:
+              text: Kids book time. 30 minutes to bed time.
+
+    - required_time: "00:15:00"
+      task:
+          locations:
+          - Kids
+          - Dining
+          action:
+            lights:
+              action: flash
+            message:
+              text: Kids talk time. 15 minutes to bed time.
+
+    - required_time: "00:05:00"
+      zero_time: true
+      task:
+          locations:
+          - Kids
+          - Dining
+          action:
+            lights:
+              action: flash
+              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+            message:
+              text: Kids get into bed and sleep and stop talking.

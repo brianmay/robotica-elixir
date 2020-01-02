@@ -1,0 +1,56 @@
+- date: "2019-01-01"
+  day_type: "public_holiday"
+- date: "2019-01-28"
+  day_type: "public_holiday"
+- date: "2019-03-11"
+  day_type: "public_holiday"
+- date: "2019-04-19"
+  day_type: "public_holiday"
+- date: "2019-04-20"
+  day_type: "public_holiday"
+- date: "2019-04-21"
+  day_type: "public_holiday"
+- date: "2019-04-22"
+  day_type: "public_holiday"
+- date: "2019-04-25"
+  day_type: "public_holiday"
+- date: "2019-06-10"
+  day_type: "public_holiday"
+- date: "2019-09-27"
+  day_type: "public_holiday"
+- date: "2019-11-05"
+  day_type: "public_holiday"
+- date: "2019-12-25"
+  day_type: "public_holiday"
+- date: "2019-12-26"
+  day_type: "public_holiday"
+
+- start: "2019-01-30"
+  stop: "2019-04-05"
+  week_day: true
+  day_type: "school_day"
+  exclude:
+  - "public_holiday"
+- start: "2019-04-23"
+  stop: "2019-06-28"
+  week_day: true
+  day_type: "school_day"
+  exclude:
+  - "public_holiday"
+- start: "2019-07-15"
+  stop: "2019-09-20"
+  week_day: true
+  day_type: "school_day"
+  exclude:
+  - "public_holiday"
+- start: "2019-10-07"
+  stop: "2019-12-20"
+  week_day: true
+  day_type: "school_day"
+  exclude:
+  - "public_holiday"
+
+- week_day: true
+  day_type: "work_day"
+  exclude:
+  - "public_holiday"
