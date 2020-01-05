@@ -6,12 +6,14 @@ defmodule RoboticaPlugins do
             message: map() | nil,
             lights: map() | nil,
             sound: map() | nil,
-            music: map() | nil
+            music: map() | nil,
+            hdmi: map() | nil,
           }
     defstruct message: nil,
               lights: nil,
               sound: nil,
-              music: nil
+              music: nil,
+              hdmi: nil
 
     def v(value), do: not is_nil(value)
 

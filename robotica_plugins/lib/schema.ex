@@ -33,13 +33,20 @@ defmodule RoboticaPlugins.Schema do
     }
   end
 
+  def hdmi_action_schema do
+    %{
+      source: {:integer, true}
+    }
+  end
+
   def action_schema do
     %{
       struct_type: RoboticaPlugins.Action,
       sound: {sound_action_schema(), false},
       music: {music_action_schema(), false},
       message: {message_action_schema(), false},
-      lights: {lights_action_schema(), false}
+      lights: {lights_action_schema(), false},
+      hdmi: {hdmi_action_schema(), false}
     }
   end
 end

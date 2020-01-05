@@ -38,3 +38,8 @@ plugins:
   - module: Robotica.Plugins.MQTT
     location: "AnotherBrian"
     config: {}
+  - module: Robotica.Plugins.HDMI
+    location: "AnotherBrian"
+    config:
+        host: hdmi.pri
+        destination: 1

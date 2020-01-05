@@ -50,6 +50,24 @@ local_buttons:
     action:
       music:
         stop: true
+- name: "TV"
+  buttons:
+  - name: "Wii"
+    action:
+      hdmi:
+        source: 1
+  - name: "Google"
+    action:
+      hdmi:
+        source: 2
+  - name: "XBox"
+    action:
+      hdmi:
+        source: 3
+  - name: "MythTV"
+    action:
+      hdmi:
+        source: 4
 remote_buttons:
 - name: "Lights"
   buttons:
