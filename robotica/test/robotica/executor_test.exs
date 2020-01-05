@@ -2,7 +2,7 @@ defmodule Robotica.Executor.Test do
   use ExUnit.Case, async: true
 
   setup do
-    executor = start_supervised!(Robotica.Executor)
+    executor = start_supervised!({Robotica.Executor, name: Robotica.Executor})
     %{executor: executor}
   end
 
@@ -17,7 +17,6 @@ defmodule Robotica.Executor.Test do
       module: Robotica.Plugins.Logging,
       location: "SouthPole",
       config: config,
-      executor: executor
     }
 
     {:ok, pid} = start_supervised({plugin.module, plugin})
@@ -31,7 +30,6 @@ defmodule Robotica.Executor.Test do
       module: Robotica.Plugins.Logging,
       location: "SouthPole",
       config: config,
-      executor: executor
     }
 
     {:ok, pid} = start_supervised({plugin.module, plugin})

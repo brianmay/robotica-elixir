@@ -60,11 +60,6 @@ defmodule Robotica.Supervisor do
 
     extra_children =
       Enum.map(opts.plugins, fn plugin ->
-        plugin = %Robotica.Plugin{
-          plugin
-          | executor: Robotica.Executor
-        }
-
         {plugin.module, plugin}
       end)
 

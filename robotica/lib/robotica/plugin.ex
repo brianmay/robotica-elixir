@@ -3,10 +3,9 @@ defmodule Robotica.Plugin do
           module: atom,
           location: String.t(),
           config: map,
-          executor: pid | nil
         }
   @enforce_keys [:module, :location, :config]
-  defstruct module: nil, location: nil, config: nil, executor: nil
+  defstruct module: nil, location: nil, config: nil
 
   @callback config_schema :: map()
 
@@ -18,7 +17,7 @@ defmodule Robotica.Plugin do
               {:ok, pid} | {:error, String.t()}
       def start_link(plugin) do
         with {:ok, pid} <- GenServer.start_link(__MODULE__, plugin, []) do
-          Robotica.Executor.add(plugin.executor, plugin.location, pid)
+          Robotica.Executor.add(Robotica.Executor, plugin.location, pid)
           {:ok, pid}
         else
           err -> err
