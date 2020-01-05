@@ -1,6 +1,7 @@
 local_locations:
-- "Brian"
+- "AnotherBrian"
 remote_locations:
+- "AnotherBrian"
 - "Brian"
 - "Dining"
 - "Twins"
@@ -13,20 +14,24 @@ local_buttons:
       lights:
         action: turn_on
         color: {hue: 0, saturation: 0, brightness: 100, kelvin: 5000}
+      sound: "beep"
   - name: "Dim"
     action:
       lights:
         action: turn_on
         color: {hue: 0, saturation: 0, brightness: 20, kelvin: 5000}
+      sound: "beep"
   - name: "Sleep"
     action:
       lights:
         action: turn_off
         duration: 30
+      sound: "beep"
   - name: "Off"
     action:
       lights:
         action: turn_off
+      sound: "beep"
 - name: "Music"
   buttons:
   - name: "Red"

@@ -6,7 +6,7 @@ mqtt:
   ca_cert_file: "cafile.pem"
 plugins:
   - module: Robotica.Plugins.Audio
-    location: "Brian"
+    location: "AnotherBrian"
     config:
         sounds:
             beep: "sounds/ding1.wav"
@@ -36,5 +36,5 @@ plugins:
     config:
         lights: ["Brian"]
   - module: Robotica.Plugins.MQTT
-    location: "Brian"
+    location: "AnotherBrian"
     config: {}
