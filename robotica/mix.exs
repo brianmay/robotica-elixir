@@ -31,7 +31,7 @@ defmodule Robotica.MixProject do
       {:calendar, "~> 1.0.0"},
       {:yaml_elixir, "~> 2.4.0"},
       {:event_bus, "~> 1.6.0"},
-      {:mojito, "~> 0.2.2"},
+      {:mojito, "~> 0.6.1"},
       {:robotica_plugins, path: "../robotica_plugins"}
     ]
   end
