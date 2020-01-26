@@ -59,8 +59,10 @@ defmodule Robotica.Supervisor do
     ]
 
     extra_children =
-      Enum.map(opts.plugins, fn plugin ->
-        {plugin.module, plugin}
+      opts.plugins
+      |> Enum.with_index()
+      |> Enum.map(fn {plugin, index} ->
+        Supervisor.child_spec({plugin.module, plugin}, id: "plugin#{index}")
       end)
 
     Supervisor.init(children ++ extra_children, strategy: :one_for_one)
