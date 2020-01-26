@@ -57,6 +57,7 @@ defmodule RoboticaNerves.MixProject do
       {:robotica_plugins, path: "../robotica_plugins"},
       {:robotica_ui, path: "../robotica_ui"},
       {:robotica_face, path: "../robotica_face"},
+      {:mint, "~> 1.0", override: true},
       {:ring_logger, "~> 0.6"},
       {:toolshed, "~> 0.2"}
     ] ++ deps(@target)
