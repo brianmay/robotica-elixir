@@ -5,7 +5,7 @@ defmodule Robotica.Plugins.HDMI do
 
   defmodule Config do
     @type t :: %__MODULE__{}
-    defstruct [ :host, :destination ]
+    defstruct [:host, :destination]
   end
 
   ## Server Callbacks
@@ -18,7 +18,7 @@ defmodule Robotica.Plugins.HDMI do
     %{
       struct_type: Config,
       host: {:string, true},
-      destination: {:integer, true},
+      destination: {:integer, true}
     }
   end
 
@@ -31,5 +31,4 @@ defmodule Robotica.Plugins.HDMI do
     Robotica.Devices.HDMI.switch(state.config.host, hdmi.source, state.config.destination)
     {:noreply, state}
   end
-
 end

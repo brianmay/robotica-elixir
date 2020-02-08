@@ -17,8 +17,9 @@ defmodule Robotica.Devices.HDMI do
   end
 
   def switch(host, input, output) do
-    cmd = [0xa5, 0x5b, 0x02, 0x03, input, 0x00, output, 0x00, 0x00, 0x00, 0x00, 0x00]
+    cmd = [0xA5, 0x5B, 0x02, 0x03, input, 0x00, output, 0x00, 0x00, 0x00, 0x00, 0x00]
     url = cmd_to_url(host, cmd)
+
     case Mojito.request(:get, url) do
       {:ok, %{status_code: 200}} -> :ok
       {:ok, %{status_code: code}} -> {:error, "Got HTTP response #{code}"}
