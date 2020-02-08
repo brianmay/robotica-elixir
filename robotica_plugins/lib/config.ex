@@ -20,6 +20,7 @@ defmodule RoboticaPlugins.Config do
   defp button do
     %{
       name: {:string, true},
+      devices: {{:list, :string}, false},
       action: {Schema.action_schema(), true}
     }
   end

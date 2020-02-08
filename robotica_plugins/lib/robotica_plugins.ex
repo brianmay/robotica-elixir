@@ -7,7 +7,7 @@ defmodule RoboticaPlugins do
             lights: map() | nil,
             sound: map() | nil,
             music: map() | nil,
-            hdmi: map() | nil,
+            hdmi: map() | nil
           }
     defstruct message: nil,
               lights: nil,
@@ -44,23 +44,31 @@ defmodule RoboticaPlugins do
   defmodule Task do
     @type t :: %__MODULE__{
             locations: list(String.t()),
+            devices: list(String.t()),
             action: Action.t()
           }
-    @enforce_keys [:locations, :action]
-    defstruct locations: [], action: nil
+    @enforce_keys [:locations, :devices, :action]
+    defstruct locations: [], devices: [], action: nil
   end
 
   defmodule ScheduledTask do
     @type t :: %__MODULE__{
             locations: list(String.t()),
+            devices: list(String.t()),
             action: Action.t(),
             id: String.t() | nil,
             mark: Mark.t() | nil,
             repeat_time: integer | nil,
             repeat_count: integer
           }
-    @enforce_keys [:locations, :action, :mark, :repeat_time, :repeat_count]
-    defstruct locations: [], action: nil, id: nil, mark: nil, repeat_time: nil, repeat_count: 0
+    @enforce_keys [:locations, :devices, :action, :mark, :repeat_time, :repeat_count]
+    defstruct locations: [],
+              devices: [],
+              action: nil,
+              id: nil,
+              mark: nil,
+              repeat_time: nil,
+              repeat_count: 0
 
     defp div_rem(value, divider) do
       {div(value, divider), rem(value, divider)}
@@ -80,13 +88,23 @@ defmodule RoboticaPlugins do
     end
 
     def task_to_text(%ScheduledTask{} = task) do
-      action_str = Action.action_to_text(task.action)
+      list = []
 
-      if task.repeat_count > 0 do
-        "#{action_str} (#{task.repeat_count}/#{duration_to_string(task.repeat_time)})"
-      else
-        action_str
-      end
+      list =
+        if task.repeat_count > 0 do
+          ["(#{task.repeat_count}/#{duration_to_string(task.repeat_time)})" | list]
+        else
+          list
+        end
+
+      action_str = Action.action_to_text(task.action)
+      list = [action_str | list]
+
+      Enum.join(list, " ")
+    end
+
+    def to_task(%ScheduledTask{} = task) do
+      %Task{locations: task.locations, devices: task.devices, action: task.action}
     end
   end
 

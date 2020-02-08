@@ -48,7 +48,7 @@ defmodule RoboticaUi.Scene.Remote do
 
         {graph, _} =
           Enum.reduce(row.buttons, {graph, 1}, fn button, {graph, x} ->
-            id = {:action, button.action}
+            id = {:action, button.devices, button.action}
 
             graph = add_button(graph, button.name, id, x, y, theme: :primary)
 
@@ -77,8 +77,8 @@ defmodule RoboticaUi.Scene.Remote do
         {:location, location, value} ->
           handle_location_press(location, state, value)
 
-        {:action, action} ->
-          handle_action_press(action, state)
+        {:action, devices, action} ->
+          handle_action_press(action, devices, state)
 
         _ ->
           state
@@ -112,12 +112,13 @@ defmodule RoboticaUi.Scene.Remote do
     %{state | locations: locations, graph: graph}
   end
 
-  def handle_action_press(action, state) do
+  def handle_action_press(action, devices, state) do
     event_params = %{topic: :remote_execute}
 
     EventSource.notify event_params do
       %RoboticaPlugins.Task{
         locations: MapSet.to_list(state.locations),
+        devices: devices,
         action: action
       }
     end

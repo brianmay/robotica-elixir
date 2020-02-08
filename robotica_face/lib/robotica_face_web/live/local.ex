@@ -44,6 +44,7 @@ defmodule RoboticaFaceWeb.Live.Local do
         EventSource.notify %{topic: :local_execute} do
           %RoboticaPlugins.Task{
             locations: locations,
+            devices: button.devices,
             action: button.action
           }
         end

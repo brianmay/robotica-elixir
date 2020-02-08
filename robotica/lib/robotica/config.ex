@@ -35,6 +35,7 @@ defmodule Robotica.Config do
       struct_type: RoboticaPlugins.ScheduledTask,
       action: {Schema.action_schema(), true},
       locations: {{:list, :string}, true},
+      devices: {{:list, :string}, false},
       repeat_time: {:delta, false},
       repeat_count: {{:integer, 0}, false}
     }
@@ -44,7 +45,8 @@ defmodule Robotica.Config do
     %{
       struct_type: RoboticaPlugins.Task,
       action: {Schema.action_schema(), true},
-      locations: {{:list, :string}, true}
+      locations: {{:list, :string}, true},
+      devices: {{:list, :string}, false}
     }
   end
 
@@ -77,6 +79,7 @@ defmodule Robotica.Config do
       struct_type: Robotica.Plugin,
       config: {:set_nil, true},
       location: {:string, true},
+      device: {:string, true},
       module: {:module, true}
     }
   end

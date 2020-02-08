@@ -72,6 +72,7 @@ defmodule RoboticaFaceWeb.Live.Remote do
         EventSource.notify %{topic: :remote_execute} do
           %RoboticaPlugins.Task{
             locations: MapSet.to_list(locations),
+            devices: button.devices,
             action: button.action
           }
         end

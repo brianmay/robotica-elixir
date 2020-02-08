@@ -72,6 +72,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
         tasks: [
           %RoboticaPlugins.ScheduledTask{
             locations: ["here"],
+            devices: ["here"],
             action: %RoboticaPlugins.Action{},
             mark: nil,
             repeat_count: 0,
@@ -85,6 +86,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
         tasks: [
           %RoboticaPlugins.ScheduledTask{
             locations: ["here"],
+            devices: ["here"],
             action: %RoboticaPlugins.Action{},
             mark: nil,
             repeat_count: 0,
@@ -98,6 +100,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
         tasks: [
           %RoboticaPlugins.ScheduledTask{
             locations: ["here"],
+            devices: ["here"],
             action: %RoboticaPlugins.Action{},
             mark: nil,
             repeat_count: 0,

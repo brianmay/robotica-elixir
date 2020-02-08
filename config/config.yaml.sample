@@ -7,6 +7,7 @@ mqtt:
 plugins:
   - module: Robotica.Plugins.Audio
     location: "AnotherBrian"
+    device: "Robotica"
     config:
         sounds:
             beep: "sounds/ding1.wav"
@@ -33,13 +34,16 @@ plugins:
               - ["mpc", "play"]
   - module: Robotica.Plugins.LIFX
     location: "AnotherBrian"
+    device: "Light"
     config:
         lights: ["Brian"]
   - module: Robotica.Plugins.MQTT
     location: "AnotherBrian"
+    device: "Mobile"
     config: {}
   - module: Robotica.Plugins.HDMI
     location: "AnotherBrian"
+    device: "TV"
     config:
         host: hdmi.pri
         destination: 1

@@ -34,7 +34,7 @@ defmodule RoboticaUi.Scene.Local do
 
         {graph, _} =
           Enum.reduce(row.buttons, {graph, 1}, fn button, {graph, x} ->
-            id = {:action, button.action}
+            id = {:action, button.devices, button.action}
 
             graph = add_button(graph, button.name, id, x, y, theme: :primary)
 
@@ -58,8 +58,8 @@ defmodule RoboticaUi.Scene.Local do
 
     state =
       case button do
-        {:action, action} ->
-          handle_action_press(action, state)
+        {:action, devices, action} ->
+          handle_action_press(action, devices, state)
 
         _ ->
           state
@@ -68,12 +68,13 @@ defmodule RoboticaUi.Scene.Local do
     {:halt, state, push: state.graph}
   end
 
-  def handle_action_press(action, state) do
+  def handle_action_press(action, devices, state) do
     event_params = %{topic: :local_execute}
 
     EventSource.notify event_params do
       %RoboticaPlugins.Task{
         locations: state.locations,
+        devices: devices,
         action: action
       }
     end
