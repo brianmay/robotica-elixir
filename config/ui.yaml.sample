@@ -52,7 +52,7 @@ local_buttons:
         stop: true
 - name: "TV"
   buttons:
-  - name: "Wii"
+  - name: "WiiU"
     action:
       hdmi:
         source: 1
@@ -60,7 +60,7 @@ local_buttons:
     action:
       hdmi:
         source: 2
-  - name: "XBox"
+  - name: "XBox1"
     action:
       hdmi:
         source: 3
