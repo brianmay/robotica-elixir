@@ -132,8 +132,8 @@ defmodule Robotica.Scheduler.Executor do
     %{step | mark: mark}
   end
 
-  def add_marks_to_schedule(schedule) do
-    Enum.map(schedule, fn step ->
+  def add_marks_to_schedule(steps) do
+    Enum.map(steps, fn step ->
       add_mark_to_step(step)
     end)
   end

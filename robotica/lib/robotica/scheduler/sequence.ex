@@ -120,8 +120,8 @@ defmodule Robotica.Scheduler.Sequence do
     |> List.flatten()
   end
 
-  def sort_schedule(schedule) do
-    schedule
+  def sort_schedule(scheduled_steps) do
+    scheduled_steps
     |> Enum.sort(fn x, y -> Calendar.DateTime.before?(x.required_time, y.required_time) end)
   end
 end
