@@ -15,7 +15,7 @@ defmodule RoboticaPlugins do
               music: nil,
               hdmi: nil
 
-    def v(value), do: not is_nil(value)
+    defp v(value), do: not is_nil(value)
 
     def action_to_text(%Action{} = action) do
       message = action.message
