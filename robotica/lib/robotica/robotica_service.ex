@@ -12,14 +12,14 @@ defmodule Robotica.RoboticaService do
 
   def process({:local_execute = topic, id}) do
     task = EventBus.fetch_event_data({topic, id})
-    Logger.info("got local execute #{inspect task}")
+    Logger.info("got local execute #{inspect(task)}")
     Robotica.Executor.execute(Robotica.Executor, task)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 
   def process({:remote_execute = topic, id}) do
     task = EventBus.fetch_event_data({topic, id})
-    Logger.info("got remote execute #{inspect task}")
+    Logger.info("got remote execute #{inspect(task)}")
     Robotica.Mqtt.publish_execute(task)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end

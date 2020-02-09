@@ -5,7 +5,7 @@ defmodule RoboticaFace.Schedule do
   defmodule State do
     @type t :: %__MODULE__{
             scenes: list(GenServer.server()),
-            schedule: list(Robotica.Types.MultiStep.t())
+            schedule: list(Robotica.Types.ScheduledStep.t())
           }
     defstruct scenes: [], schedule: []
   end

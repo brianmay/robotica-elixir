@@ -6,6 +6,25 @@ defmodule RoboticaPlugins.Date do
   @timezone Application.get_env(:robotica_plugins, :timezone)
 
   @doc """
+  Converts an UTC date time to a local Date for today.
+
+  Note: 13:00 UTC is midnight in Australia/Melbourne timezone at this date.
+
+  iex> import RoboticaPlugins.Date
+  iex> today(~U[2019-11-09 12:00:00Z])
+  ~D[2019-11-09]
+
+  iex> import RoboticaPlugins.Date
+  iex> tomorrow(~U[2019-11-09 13:00:00Z])
+  ~D[2019-11-10]
+  """
+  @spec today(DateTime.t()) :: Date.t()
+  def today(date_time) do
+    {:ok, local_date_time} = DateTime.shift_zone(date_time, @timezone)
+    Date.add(local_date_time, 0)
+  end
+
+  @doc """
   Converts an UTC date time to a local Date for tomorrow.
 
   Note: 13:00 UTC is midnight in Australia/Melbourne timezone at this date.

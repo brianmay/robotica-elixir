@@ -36,7 +36,7 @@ defmodule RoboticaFaceWeb.Router do
     post "/login", SessionController, :login
   end
 
-  scope "/", RoboticaFaceWeb do 
+  scope "/", RoboticaFaceWeb do
     pipe_through :browser
     pipe_through :csrf
     pipe_through :auth

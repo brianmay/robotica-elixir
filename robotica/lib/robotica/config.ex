@@ -30,17 +30,6 @@ defmodule Robotica.Config do
     {:map, :string, {:map, :time, {:list, :string}}}
   end
 
-  defp scheduled_task_schema do
-    %{
-      struct_type: RoboticaPlugins.ScheduledTask,
-      action: {Schema.action_schema(), true},
-      locations: {{:list, :string}, true},
-      devices: {{:list, :string}, false},
-      repeat_time: {:delta, false},
-      repeat_count: {{:integer, 0}, false}
-    }
-  end
-
   defp task_schema do
     %{
       struct_type: RoboticaPlugins.Task,
@@ -62,11 +51,13 @@ defmodule Robotica.Config do
 
   defp step_schema do
     %{
-      struct_type: RoboticaPlugins.ScheduledStep,
+      struct_type: RoboticaPlugins.SourceStep,
       zero_time: {{:boolean, false}, false},
       required_time: {:delta, true},
       latest_time: {:delta, false},
-      task: {scheduled_task_schema(), true}
+      tasks: {{:list, task_schema()}, true},
+      repeat_time: {:delta, false},
+      repeat_count: {{:integer, 0}, false}
     }
   end
 

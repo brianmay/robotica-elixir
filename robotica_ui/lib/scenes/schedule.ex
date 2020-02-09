@@ -9,7 +9,7 @@ defmodule RoboticaUi.Scene.Schedule do
 
   alias RoboticaUi.Layout
   alias RoboticaUi.Components.Nav
-  alias RoboticaUi.Components.Task
+  alias RoboticaUi.Components.Step
   alias RoboticaUi.Components.Marks
 
   @graph Graph.build(font: :roboto, font_size: 24)
@@ -55,28 +55,25 @@ defmodule RoboticaUi.Scene.Schedule do
     local_locations = configuration.local_locations
 
     steps =
-      Enum.reduce(steps, [], fn step, steps ->
-        Enum.reduce(step.tasks, steps, fn task, steps ->
-          solo_step = %RoboticaPlugins.SingleStep{
-            required_time: step.required_time,
-            latest_time: step.latest_time,
-            task: task
-          }
+      steps
+      |> Enum.map(fn step ->
+        tasks =
+          Enum.filter(step.tasks, fn task ->
+            Enum.any?(task.locations, &(&1 in local_locations))
+          end)
 
-          [solo_step | steps]
-        end)
-      end)
-      |> Enum.reverse()
-      |> Enum.filter(fn step -> Enum.any?(step.task.locations, &(&1 in local_locations)) end)
+        %RoboticaPlugins.ScheduledStep{step | tasks: tasks}
+    end)
+      |> Enum.reject(fn step -> Enum.empty?(step.tasks) end)
       |> Enum.take(20)
 
     graph
     |> group(fn graph ->
       {graph, _} =
-        Enum.reduce(steps, {graph, 0}, fn solo_step, {graph, y} ->
+        Enum.reduce(steps, {graph, 0}, fn step, {graph, y} ->
           graph =
             graph
-            |> Task.add_to_graph(solo_step, translate: {100, y * 40 + 40}, width: width - 100)
+            |> Step.add_to_graph(step, translate: {100, y * 40 + 40}, width: width - 100)
 
           {graph, y + 1}
         end)

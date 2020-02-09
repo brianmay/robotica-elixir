@@ -24,22 +24,17 @@ defmodule RoboticaUi.Components.Marks do
     width = opts[:styles][:width]
     height = opts[:styles][:height]
 
-    task = step.task
-
-    text =
-      case task.action.message do
-        nil -> nil
-        msg -> msg.text
-      end
+    text = RoboticaPlugins.ScheduledStep.step_to_text(step)
+    locations = RoboticaPlugins.ScheduledStep.step_to_locations(step)
 
     graph =
       @graph
       |> rect({width, height}, fill: :black, stroke: {2, :green}, translate: {0, 0})
       |> rect({width - 10, height - 10}, fill: :black, stroke: {1, :green}, translate: {5, 5})
       |> text("Time: #{date_time_to_local(step.required_time)}", translate: {10, 30})
-      |> text("Locations: #{Enum.join(task.locations, ", ")}", translate: {10, 70})
+      |> text("Locations: #{Enum.join(locations, ", ")}", translate: {10, 70})
       |> text("Message: #{text || "N/A"}", translate: {10, 110})
-      |> text("Mark: #{task.mark || "N/A"}", translate: {10, 150})
+      |> text("Mark: #{step.mark || "N/A"}", translate: {10, 150})
       |> button("Done",
         width: width / 2 - 15,
         height: 80,

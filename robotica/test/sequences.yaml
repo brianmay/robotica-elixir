@@ -1,7 +1,7 @@
 "open_presents":
     - required_time: "00:05:00"
-      task:
-          locations:
+      tasks:
+        - locations:
           - kids
           action:
             message:
@@ -9,8 +9,8 @@
             music:
               play_list: wake_up
     - required_time: "00:05:00"
-      task:
-          locations:
+      tasks:
+        - locations:
           - kids
           action:
             message:
@@ -18,8 +18,8 @@
             music:
               play_list: wake_up
     - required_time: "00:05:00"
-      task:
-          locations:
+      tasks:
+        - locations:
           - kids
           action:
             message:
@@ -27,8 +27,8 @@
             music:
               play_list: wake_up
     - required_time: "00:05:00"
-      task:
-          locations:
+      tasks:
+        - locations:
           - kids
           action:
             message:
@@ -36,8 +36,8 @@
             music:
               play_list: wake_up
     - required_time: "00:05:00"
-      task:
-          locations:
+      tasks:
+        - locations:
           - kids
           action:
             message:
@@ -45,8 +45,8 @@
             music:
               play_list: wake_up
     - required_time: "00:05:00"
-      task:
-          locations:
+      tasks:
+        - locations:
           - kids
           action:
             message:
@@ -56,8 +56,8 @@
     - required_time: "00:30:00"
       latest_time: "01:00:00"
       zero_time: true
-      task:
-          locations:
+      tasks:
+        - locations:
           - kids
           action:
             message:

@@ -64,58 +64,53 @@ defmodule Robotica.Scheduler.Sequence.Test do
     assert_tasks(s7.tasks, "Time to open presents.")
   end
 
-  test "squash_schedule" do
+  test "sort_schedule" do
     schedule = [
-      %RoboticaPlugins.MultiStep{
+      %RoboticaPlugins.ScheduledStep{
         required_time: local_datetime(~N[2018-12-25 04:35:00]),
         latest_time: local_datetime(~N[2018-12-25 04:40:00]),
+        id: "1",
         tasks: [
-          %RoboticaPlugins.ScheduledTask{
+          %RoboticaPlugins.Task{
             locations: ["here"],
             devices: ["here"],
-            action: %RoboticaPlugins.Action{},
-            mark: nil,
-            repeat_count: 0,
-            repeat_time: nil
+            action: %RoboticaPlugins.Action{}
           }
         ]
       },
-      %RoboticaPlugins.MultiStep{
-        required_time: local_datetime(~N[2018-12-25 04:35:00]),
-        latest_time: local_datetime(~N[2018-12-25 04:40:00]),
+      %RoboticaPlugins.ScheduledStep{
+        required_time: local_datetime(~N[2018-12-25 03:35:00]),
+        latest_time: local_datetime(~N[2018-12-25 03:40:00]),
+        id: "2",
         tasks: [
-          %RoboticaPlugins.ScheduledTask{
+          %RoboticaPlugins.Task{
             locations: ["here"],
             devices: ["here"],
-            action: %RoboticaPlugins.Action{},
-            mark: nil,
-            repeat_count: 0,
-            repeat_time: nil
+            action: %RoboticaPlugins.Action{}
           }
         ]
       },
-      %RoboticaPlugins.MultiStep{
-        required_time: local_datetime(~N[2018-12-25 05:35:00]),
-        latest_time: local_datetime(~N[2018-12-25 04:40:00]),
+      %RoboticaPlugins.ScheduledStep{
+        required_time: local_datetime(~N[2018-12-25 06:35:00]),
+        latest_time: local_datetime(~N[2018-12-25 06:40:00]),
+        id: "3",
         tasks: [
-          %RoboticaPlugins.ScheduledTask{
+          %RoboticaPlugins.Task{
             locations: ["here"],
             devices: ["here"],
-            action: %RoboticaPlugins.Action{},
-            mark: nil,
-            repeat_count: 0,
-            repeat_time: nil
+            action: %RoboticaPlugins.Action{}
           }
         ]
       }
     ]
 
-    squashed_schedule = squash_schedule(schedule)
-    assert length(squashed_schedule) == 2
+    sorted_schedule = sort_schedule(schedule)
+    assert length(sorted_schedule) == 3
 
-    [s1, s2] = squashed_schedule
+    [s1, s2, s3] = sorted_schedule
 
-    assert length(s1.tasks) == 2
-    assert length(s2.tasks) == 1
+    assert s1.id == "2"
+    assert s2.id == "1"
+    assert s3.id == "3"
   end
 end

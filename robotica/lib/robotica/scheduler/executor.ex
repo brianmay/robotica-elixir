@@ -4,7 +4,6 @@ defmodule Robotica.Scheduler.Executor do
 
   require Logger
 
-  alias RoboticaPlugins.ScheduledTask
   alias Robotica.Scheduler.Sequence
   alias Robotica.Scheduler.Classifier
   alias Robotica.Scheduler.Marks
@@ -33,8 +32,8 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   @spec publish_steps(
-          list(RoboticaPlugins.MultiStep.t()),
-          list(RoboticaPlugins.MultiStep.t())
+          list(RoboticaPlugins.ScheduledStep.t()),
+          list(RoboticaPlugins.ScheduledStep.t())
         ) :: nil
 
   defp publish_steps(steps, steps), do: nil
@@ -47,8 +46,8 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   @spec notify_steps(
-          list(RoboticaPlugins.MultiStep.t()),
-          list(RoboticaPlugins.MultiStep.t())
+          list(RoboticaPlugins.ScheduledStep.t()),
+          list(RoboticaPlugins.ScheduledStep.t())
         ) :: nil
 
   defp notify_steps(steps, steps), do: nil
@@ -69,7 +68,7 @@ defmodule Robotica.Scheduler.Executor do
       |> add_expanded_steps_for_date(yesterday)
       |> add_expanded_steps_for_date(today)
       |> add_expanded_steps_for_date(tomorrow)
-      |> Sequence.squash_schedule()
+      |> Sequence.sort_schedule()
 
     now = Calendar.DateTime.now_utc()
     state = set_timer(now, {today, nil, steps})
@@ -118,8 +117,9 @@ defmodule Robotica.Scheduler.Executor do
     list ++ get_expanded_steps_for_date(date)
   end
 
-  defp add_mark_to_task(required_time, task) do
-    mark = Marks.get_mark(Robotica.Scheduler.Marks, task.id)
+  defp add_mark_to_step(%RoboticaPlugins.ScheduledStep{} = step) do
+    required_time = step.required_time
+    mark = Marks.get_mark(Robotica.Scheduler.Marks, step.id)
 
     mark =
       cond do
@@ -129,40 +129,37 @@ defmodule Robotica.Scheduler.Executor do
         true -> mark.status
       end
 
-    %{task | mark: mark}
+    %{step | mark: mark}
   end
 
-  def add_marks_to_schedule(list) do
-    Enum.map(list, fn step ->
-      tasks =
-        Enum.map(step.tasks, fn task ->
-          add_mark_to_task(step.required_time, task)
+  def add_marks_to_schedule(schedule) do
+    Enum.map(schedule, fn step ->
+      add_mark_to_step(step)
+    end)
+  end
+
+  defp do_step(%RoboticaPlugins.ScheduledStep{id: id, mark: mark, tasks: tasks}) do
+    cond do
+      is_nil(mark) ->
+        Logger.info("Executing step #{id}.")
+
+        Enum.each(tasks, fn scheduled_task ->
+          Robotica.Executor.execute(Robotica.Executor, scheduled_task)
         end)
 
-      %{step | tasks: tasks}
-    end)
-  end
+      mark == :done ->
+        Logger.info("Skipping done step #{id}.")
 
-  defp do_step(%RoboticaPlugins.MultiStep{tasks: tasks}) do
-    Enum.each(tasks, fn scheduled_task ->
-      cond do
-        is_nil(scheduled_task.mark) ->
-          Logger.info("Executing #{inspect(scheduled_task)}.")
-          executable_task = ScheduledTask.to_task(scheduled_task)
-          Robotica.Executor.execute(Robotica.Executor, executable_task)
+      mark == :cancelled ->
+        Logger.info("Skipping cancelled step #{id}.")
 
-        scheduled_task.mark == :done ->
-          Logger.info("Skipping done task #{inspect(scheduled_task)}.")
+      true ->
+        Logger.info("Executing marked task #{id}.")
 
-        scheduled_task.mark == :cancelled ->
-          Logger.info("Skipping cancelled task #{inspect(scheduled_task)}.")
-
-        true ->
-          Logger.info("Executing marked task #{inspect(scheduled_task)}.")
-          executable_task = ScheduledTask.to_task(scheduled_task)
-          Robotica.Executor.execute(Robotica.Executor, executable_task)
-      end
-    end)
+        Enum.each(tasks, fn scheduled_task ->
+          Robotica.Executor.execute(Robotica.Executor, scheduled_task)
+        end)
+    end
   end
 
   def handle_call({:get_schedule}, _from, {_, _, list} = state) do
@@ -253,7 +250,7 @@ defmodule Robotica.Scheduler.Executor do
           |> add_expanded_steps_for_date(today)
           |> add_expanded_steps_for_date(tomorrow)
           |> add_marks_to_schedule()
-          |> Sequence.squash_schedule()
+          |> Sequence.sort_schedule()
 
         # If we have travelled forward in time by one day, we only need to
         # add events for tomorrow.
@@ -261,7 +258,7 @@ defmodule Robotica.Scheduler.Executor do
           list
           |> add_expanded_steps_for_date(tomorrow)
           |> add_marks_to_schedule()
-          |> Sequence.squash_schedule()
+          |> Sequence.sort_schedule()
 
         # If we have travelled forward in time more then one day, regenerate
         # entire events list.
@@ -271,7 +268,7 @@ defmodule Robotica.Scheduler.Executor do
           |> add_expanded_steps_for_date(today)
           |> add_expanded_steps_for_date(tomorrow)
           |> add_marks_to_schedule()
-          |> Sequence.squash_schedule()
+          |> Sequence.sort_schedule()
 
         # No change in date.
         true ->

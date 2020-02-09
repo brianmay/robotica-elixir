@@ -8,7 +8,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
       <thead>
         <tr>
           <th scope="col">Time</th>
-          <th scope="col">Locations</th>
+          <th scope="col">Location</th>
           <th scope="col">Message</th>
           <th scope="col">Marks</th>
           <th scope="col">Actions</th>
@@ -17,19 +17,17 @@ defmodule RoboticaFaceWeb.Live.Schedule do
       <tbody>
         <%= for step <- @schedule do %>
           <% iso_time = Calendar.DateTime.Format.iso8601(step.required_time) %>
-          <%= for task <- step.tasks do %>
-          <tr class="<%= task.mark %>">
+            <tr class="<%= step.mark %>">
               <td><%= date_time_to_local(step.required_time) %></td>
-              <td><%= Enum.join(task.locations, ", ") %></td>
-              <td><%= get_task_message(task) %></td>
-              <td><%= task.mark %></td>
+              <td><%= get_step_locations(step) %></td>
+              <td><%= get_step_message(step) %></td>
+              <td><%= step.mark %></td>
               <td>
-                <button class="btn btn-warning" phx-click="mark" phx-value-mark="done" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Done</button>
-                <button class="btn btn-warning" phx-click="mark" phx-value-mark="cancel" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Cancel</button>
-                <button class="btn btn-warning" phx-click="mark" phx-value-mark="clear" phx-value-step_time="<%= iso_time %>" phx-value-task_id="<%= task.id %>">Clear</button>
+                <button class="btn btn-warning" phx-click="mark" phx-value-mark="done" phx-value-step_time="<%= iso_time %>" phx-value-step_id="<%= step.id %>">Done</button>
+                <button class="btn btn-warning" phx-click="mark" phx-value-mark="cancel" phx-value-step_time="<%= iso_time %>" phx-value-step_id="<%= step.id %>">Cancel</button>
+                <button class="btn btn-warning" phx-click="mark" phx-value-mark="clear" phx-value-step_time="<%= iso_time %>" phx-value-step_id="<%= step.id %>">Clear</button>
               </td>
             </tr>
-          <% end %>
         <% end %>
        </tbody>
     </table>
@@ -60,48 +58,30 @@ defmodule RoboticaFaceWeb.Live.Schedule do
     end
   end
 
-  defp get_task_message(task) do
-    RoboticaPlugins.ScheduledTask.task_to_text(task)
+  defp get_step_message(step) do
+    RoboticaPlugins.ScheduledStep.step_to_text(step)
+  end
+
+  defp get_step_locations(step) do
+    RoboticaPlugins.ScheduledStep.step_to_locations(step)
+    |> Enum.join(", ")
   end
 
   defp head_or_nil([]), do: nil
   defp head_or_nil([head | _]), do: head
 
-  defp get_step(schedule, step_time, task_id) do
-    step =
-      schedule
-      |> Enum.filter(fn step -> DateTime.compare(step.required_time, step_time) == :eq end)
-      |> head_or_nil
-
-    task =
-      case step do
-        nil ->
-          nil
-
-        _ ->
-          step.tasks
-          |> Enum.filter(fn task -> task.id == task_id end)
-          |> head_or_nil
-      end
-
-    case task do
-      nil ->
-        nil
-
-      _ ->
-        %RoboticaPlugins.SingleStep{
-          required_time: step.required_time,
-          latest_time: step.latest_time,
-          task: task
-        }
-    end
+  defp get_step(schedule, step_time, step_id) do
+    schedule
+    |> Enum.filter(fn step -> DateTime.compare(step.required_time, step_time) == :eq end)
+    |> Enum.filter(fn step -> step.id == step_id end)
+    |> head_or_nil
   end
 
   defp do_mark(task, status) do
     RoboticaPlugins.Mark.mark_task(task, status)
   end
 
-  def handle_event("mark", %{"mark" => status, "step_time" => step_time, "task_id" => id}, socket) do
+  def handle_event("mark", %{"mark" => status, "step_time" => step_time, "step_id" => id}, socket) do
     step_time = Timex.parse!(step_time, "{ISO:Extended}")
 
     status =

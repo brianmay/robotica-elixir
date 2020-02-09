@@ -1,4 +1,4 @@
-defmodule RoboticaUi.Components.Task do
+defmodule RoboticaUi.Components.Step do
   @moduledoc false
 
   use Scenic.Component
@@ -24,31 +24,37 @@ defmodule RoboticaUi.Components.Task do
     Timex.format!(local_dt, "%T#{date_offset}", :strftime)
   end
 
-  def init(step, opts) do
-    width = opts[:styles][:width]
-    task = step.task
-
-    text = RoboticaPlugins.ScheduledTask.task_to_text(task)
-
-    color =
-      case task.mark do
+  def draw(step, width, background_color \\ :black) do
+    foreground_color =
+      case step.mark do
         :done -> :green
         :cancelled -> :red
-        _ -> :white
+         _ -> :white
       end
 
-    graph =
-      @graph
-      |> rect({width, 40}, fill: {:green, 0}, translate: {0, 0})
-      |> text(date_time_to_local(step.required_time), translate: {10, 30}, fill: color)
-      |> text(text || "N/A", translate: {110, 30}, fill: color)
+    text = RoboticaPlugins.ScheduledStep.step_to_text(step)
 
-    {:ok, %{step: step}, push: graph}
+    @graph
+    |> rect({width, 40}, fill: background_color, translate: {0, 0})
+    |> text(date_time_to_local(step.required_time), translate: {10, 30}, fill: foreground_color)
+    |> text(text || "N/A", translate: {110, 30}, fill: foreground_color)
+  end
+
+  def init(step, opts) do
+    width = opts[:styles][:width]
+    graph = draw(step, width)
+
+    {:ok, %{step: step, width: width}, push: graph}
   end
 
   def handle_input({:cursor_button, {:left, :press, 0, _click_pos}}, _context, state) do
-    send_event({:click, state.step})
+    graph = draw(state.step, state.width, :blue)
+    RoboticaUi.RootManager.reset_screensaver()
+    {:noreply, state, push: graph}
+  end
 
+  def handle_input({:cursor_button, {:left, :release, 0, _click_pos}}, _context, state) do
+    send_event({:click, state.step})
     RoboticaUi.RootManager.reset_screensaver()
     {:noreply, state}
   end

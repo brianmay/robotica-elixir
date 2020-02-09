@@ -17,7 +17,7 @@ defmodule Robotica.Mqtt do
     publish(topic, action)
   end
 
-  @spec publish_schedule(list(RoboticaPlugins.MultiStep.t())) :: :ok | {:error, String.t()}
+  @spec publish_schedule(list(RoboticaPlugins.ScheduledStep.t())) :: :ok | {:error, String.t()}
   def publish_schedule(steps) do
     client_id = Robotica.Supervisor.get_tortoise_client_id()
     topic = "schedule/#{client_id}"

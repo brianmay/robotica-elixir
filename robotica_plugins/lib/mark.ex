@@ -22,9 +22,9 @@ defmodule RoboticaPlugins.Mark do
   end
 
   def mark_task(step, status) do
-    id = step.task.id
+    id = step.id
     now = DateTime.utc_now()
-    prev_midnight = Date.midnight_utc(step.required_time)
+    prev_midnight = Date.today(step.required_time) |> Date.midnight_utc()
     next_midnight = Date.tomorrow(step.required_time) |> Date.midnight_utc()
 
     mark =

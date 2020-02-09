@@ -28,12 +28,8 @@ defmodule Robotica.Executor do
   end
 
   @spec execute(server :: pid | atom, task :: RoboticaPlugins.Task.t()) :: nil
-  def execute(server, %RoboticaPlugins.Task{
-        locations: locations,
-        devices: devices,
-        action: action
-      }) do
-    GenServer.cast(server, {:execute, locations, devices, action})
+  def execute(server, %RoboticaPlugins.Task{} = task) do
+    GenServer.cast(server, {:execute, task})
     nil
   end
 
@@ -74,11 +70,13 @@ defmodule Robotica.Executor do
 
   @spec handle_execute(
           state :: State.t(),
-          locations :: list(String.t()),
-          devices :: list(String.t()),
-          action :: RoboticaPlugins.Action.t()
+          task :: RoboticaPlugins.Task.t()
         ) :: nil
-  defp handle_execute(state, locations, devices, action) do
+  defp handle_execute(state, task) do
+    locations = task.locations
+    devices = task.devices
+    action = task.action
+
     plugins = get_required_plugins(state, locations, devices)
 
     Enum.each(plugins, fn pid ->
@@ -102,8 +100,8 @@ defmodule Robotica.Executor do
     {:reply, nil, new_state}
   end
 
-  def handle_cast({:execute, locations, devices, action}, state) do
-    handle_execute(state, locations, devices, action)
+  def handle_cast({:execute, task}, state) do
+    handle_execute(state, task)
     {:noreply, state}
   end
 
