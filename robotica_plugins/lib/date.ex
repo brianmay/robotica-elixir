@@ -15,7 +15,7 @@ defmodule RoboticaPlugins.Date do
   ~D[2019-11-09]
 
   iex> import RoboticaPlugins.Date
-  iex> tomorrow(~U[2019-11-09 13:00:00Z])
+  iex> today(~U[2019-11-09 13:00:00Z])
   ~D[2019-11-10]
   """
   @spec today(DateTime.t()) :: Date.t()
