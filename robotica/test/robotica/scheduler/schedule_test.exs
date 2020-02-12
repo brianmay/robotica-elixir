@@ -21,11 +21,11 @@ defmodule Robotica.Scheduler.Schedule.Test do
 
     assert {time, sequence} = wakeup
     assert_datetime(time, local_datetime(~N[2018-12-25 08:30:00]))
-    assert sequence == MapSet.new(["wake_up"])
+    assert sequence == [{"wake_up", MapSet.new()}]
 
     assert {time, sequence} = sleep
     assert_datetime(time, local_datetime(~N[2018-12-25 20:30:00]))
-    assert sequence == MapSet.new(["sleep"])
+    assert sequence == [{"sleep", MapSet.new()}]
   end
 
   test "christmas day" do
@@ -37,15 +37,15 @@ defmodule Robotica.Scheduler.Schedule.Test do
 
     assert {time, sequence} = presents
     assert_datetime(time, local_datetime(~N[2018-12-25 08:00:00]))
-    assert sequence == MapSet.new(["presents"])
+    assert sequence == [{"presents", MapSet.new()}]
 
     assert {time, sequence} = wakeup
     assert_datetime(time, local_datetime(~N[2018-12-25 08:30:00]))
-    assert sequence == MapSet.new(["wake_up"])
+    assert sequence == [{"wake_up", MapSet.new()}]
 
     assert {time, sequence} = sleep
     assert_datetime(time, local_datetime(~N[2018-12-25 20:30:00]))
-    assert sequence == MapSet.new(["sleep"])
+    assert sequence == [{"sleep", MapSet.new()}]
   end
 
   test "boxing day" do
@@ -57,10 +57,10 @@ defmodule Robotica.Scheduler.Schedule.Test do
 
     assert {time, sequence} = wakeup
     assert_datetime(time, local_datetime(~N[2018-12-25 12:30:00]))
-    assert sequence == MapSet.new(["wake_up"])
+    assert sequence == [{"wake_up", MapSet.new()}]
 
     assert {time, sequence} = sleep
     assert_datetime(time, local_datetime(~N[2018-12-25 20:30:00]))
-    assert sequence == MapSet.new(["sleep"])
+    assert sequence == [{"sleep", MapSet.new()}]
   end
 end

@@ -19,7 +19,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
 
   test "expand_schedule" do
     schedule = [
-      {local_datetime(~N[2018-12-25 05:00:00]), MapSet.new(["open_presents"])}
+      {local_datetime(~N[2018-12-25 05:00:00]), [{"open_presents", MapSet.new()}]}
     ]
 
     schedule_with_steps = expand_schedule(schedule)
