@@ -13,9 +13,19 @@ defmodule Robotica.Scheduler.Sequence do
     [step | add_id_to_steps(tail, sequence_name, n + 1)]
   end
 
-  defp get_sequence(sequence_name) do
+  defp filter_options(sequence, options) do
+    Enum.filter(sequence, fn step ->
+      case step.options do
+        nil -> true
+        soptions -> Enum.any?(soptions, fn option -> MapSet.member?(options, option) end)
+      end
+    end)
+  end
+
+  defp get_sequence(sequence_name, options) do
     Map.fetch!(@data, sequence_name)
     |> add_id_to_steps(sequence_name, 0)
+    |> filter_options(options)
   end
 
   defp get_corrected_start_time(start_time, sequence) do
@@ -73,7 +83,7 @@ defmodule Robotica.Scheduler.Sequence do
             required_time - repeat_time
           end
 
-        list = [{step.repeat_count+1, step.repeat_time + extra_time}]
+        list = [{step.repeat_count + 1, step.repeat_time + extra_time}]
 
         list =
           step.repeat_count..1
@@ -91,9 +101,9 @@ defmodule Robotica.Scheduler.Sequence do
     end
   end
 
-  defp expand_sequence(start_time, sequence_name) do
+  defp expand_sequence(start_time, {sequence_name, options}) do
     Logger.debug("Loading sequence #{inspect(sequence_name)} for #{inspect(start_time)}.")
-    sequence = get_sequence(sequence_name)
+    sequence = get_sequence(sequence_name, options)
     start_time = get_corrected_start_time(start_time, sequence)
 
     Logger.debug(
@@ -106,16 +116,16 @@ defmodule Robotica.Scheduler.Sequence do
     |> schedule_steps(start_time)
   end
 
-  defp expand_sequences(start_time, sequence_names) do
-    Enum.map(sequence_names, fn sequence_name ->
-      expand_sequence(start_time, sequence_name)
+  defp expand_sequences(start_time, sequence_details) do
+    Enum.map(sequence_details, fn sequence_detail ->
+      expand_sequence(start_time, sequence_detail)
     end)
     |> List.flatten()
   end
 
   def expand_schedule(schedule) do
-    Enum.map(schedule, fn {start_time, sequence_names} ->
-      expand_sequences(start_time, sequence_names)
+    Enum.map(schedule, fn {start_time, sequence_details} ->
+      expand_sequences(start_time, sequence_details)
     end)
     |> List.flatten()
   end

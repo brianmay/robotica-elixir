@@ -57,7 +57,8 @@ defmodule Robotica.Config do
       latest_time: {:delta, false},
       tasks: {{:list, task_schema()}, true},
       repeat_time: {:delta, false},
-      repeat_count: {{:integer, 0}, false}
+      repeat_count: {{:integer, 0}, false},
+      options: {{:list, :string}, false}
     }
   end
 

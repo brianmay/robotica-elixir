@@ -70,6 +70,7 @@ defmodule RoboticaPlugins do
             repeat_time: integer | nil,
             repeat_count: integer,
             repeat_number: integer | nil,
+            options: list(String.t()) | nil
           }
     @enforce_keys [:required_time, :latest_time, :tasks]
     defstruct id: nil,
@@ -79,7 +80,8 @@ defmodule RoboticaPlugins do
               tasks: [],
               repeat_time: nil,
               repeat_count: 0,
-              repeat_number: nil
+              repeat_number: nil,
+              options: []
   end
 
   defmodule ScheduledStep do

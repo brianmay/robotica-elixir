@@ -6,36 +6,54 @@ defmodule Robotica.Scheduler.Schedule do
   @data Robotica.Config.schedule(@filename)
 
   defp convert_time_to_utc(date, time) do
-    Calendar.DateTime.from_date_and_time_and_zone!(date, time, @timezone)
-    |> Calendar.DateTime.shift_zone!("UTC")
+    {:ok, naive_date_time} = NaiveDateTime.new(date, time)
+    {:ok, date_time} = DateTime.from_naive(naive_date_time, @timezone)
+    {:ok, utc_date_time} = DateTime.shift_zone(date_time, "UTC")
+    utc_date_time
   end
 
-  defp add_schedule(date, scheduled, action, name) do
-    action = Map.get(action, name, %{})
+  defp parse_action(action) do
+    {name, remaining} =
+      case String.split(action, "(", parts: 2) do
+        [name] -> {name, ")"}
+        [name, remaining] -> {name, remaining}
+      end
 
-    action =
-      action
-      |> Enum.map(fn {k, v} -> {convert_time_to_utc(date, k), v} end)
-      |> Enum.reduce(%{}, fn {k, vs}, acc ->
-        Enum.reduce(vs, acc, fn v, acc -> Map.put(acc, v, k) end)
+    case String.split(remaining, ")", parts: 2) do
+      [""] -> {:error, "Right bracket not found"}
+      ["", _] -> {:ok, name, MapSet.new()}
+      [options, ""] -> {:ok, name, String.split(options, ",") |> MapSet.new()}
+      [_, extra] -> {:error, "Extra text found #{extra}"}
+    end
+  end
+
+  defp add_schedule(expanded_schedule, date, schedule, classification) do
+    schedule
+    |> Map.get(classification, %{})
+    |> Enum.map(fn {time, actions} -> {convert_time_to_utc(date, time), actions} end)
+    |> Enum.reduce(expanded_schedule, fn {datetime, actions}, acc ->
+      Enum.reduce(actions, acc, fn action, acc ->
+        {:ok, name, options} = parse_action(action)
+        Map.put(acc, name, {datetime, options})
       end)
-
-    Map.merge(scheduled, action)
+    end)
   end
 
   def get_schedule(classifications, date) do
-    a = @data
+    s = @data
 
-    schedule = add_schedule(date, %{}, a, "*")
+    expanded_schedule = add_schedule(%{}, date, s, "*")
 
-    schedule =
-      Enum.reduce(classifications, schedule, fn v, acc -> add_schedule(date, acc, a, v) end)
-      |> Enum.reduce(%{}, fn {k, v}, acc ->
-        Map.update(acc, v, MapSet.new([k]), &MapSet.put(&1, k))
+    expanded_schedule =
+      classifications
+      |> Enum.reduce(expanded_schedule, fn c, acc -> add_schedule(acc, date, s, c) end)
+      |> Enum.reduce(%{}, fn {name, {datetime, options}}, acc ->
+        action = {name, options}
+        Map.update(acc, datetime, [action], &[action | &1])
       end)
       |> Map.to_list()
       |> Enum.sort(fn x, y -> Calendar.DateTime.before?(elem(x, 0), elem(y, 0)) end)
 
-    schedule
+    expanded_schedule
   end
 end
