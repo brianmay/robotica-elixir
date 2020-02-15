@@ -7,13 +7,15 @@ defmodule RoboticaPlugins do
             lights: map() | nil,
             sound: map() | nil,
             music: map() | nil,
-            hdmi: map() | nil
+            hdmi: map() | nil,
+            device: map() | nil
           }
     defstruct message: nil,
               lights: nil,
               sound: nil,
               music: nil,
-              hdmi: nil
+              hdmi: nil,
+              device: nil
 
     defp v(value), do: not is_nil(value)
 

@@ -39,6 +39,12 @@ defmodule RoboticaPlugins.Schema do
     }
   end
 
+  def device_action_schema do
+    %{
+      action: {:string, true}
+    }
+  end
+
   def action_schema do
     %{
       struct_type: RoboticaPlugins.Action,
@@ -46,7 +52,8 @@ defmodule RoboticaPlugins.Schema do
       music: {music_action_schema(), false},
       message: {message_action_schema(), false},
       lights: {lights_action_schema(), false},
-      hdmi: {hdmi_action_schema(), false}
+      hdmi: {hdmi_action_schema(), false},
+      device: {device_action_schema(), false}
     }
   end
 end
