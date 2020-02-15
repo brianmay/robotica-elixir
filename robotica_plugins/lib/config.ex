@@ -94,15 +94,16 @@ defmodule RoboticaPlugins.Config do
     end)
   end
 
+  def ui_location do
+    host_config = Loader.ui_host_configuration()
+    host_config.location
+  end
+
   def ui_configuration(location \\ nil) do
     location =
       case location do
-        nil ->
-          host_config = Loader.ui_host_configuration()
-          host_config.location
-
-        location ->
-          location
+        nil -> ui_location()
+        location -> location
       end
 
     common_config = @common_config

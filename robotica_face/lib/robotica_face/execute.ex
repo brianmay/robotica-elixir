@@ -28,13 +28,13 @@ defmodule RoboticaFace.Execute do
     GenServer.cast(__MODULE__, {:register, pid})
   end
 
-  def execute(action) do
-    GenServer.cast(__MODULE__, {:execute, action})
+  def execute(task) do
+    GenServer.cast(__MODULE__, {:execute, task})
   end
 
-  def handle_cast({:execute, action}, state) do
+  def handle_cast({:execute, task}, state) do
     Enum.each(state.scenes, fn pid ->
-      GenServer.cast(pid, {:execute, action})
+      GenServer.cast(pid, {:execute, task})
     end)
 
     {:noreply, state}

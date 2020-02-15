@@ -39,11 +39,17 @@ defmodule RoboticaFaceWeb.Live.Messages do
     |> assign(:timer, timer)
   end
 
-  def handle_cast({:execute, action}, socket) do
+  def handle_cast({:execute, task}, socket) do
+    location = RoboticaPlugins.Config.ui_location()
+
+    good_location = Enum.any?(task.locations, fn l -> l == location end)
+    message = RoboticaPlugins.Action.action_to_message(task.action)
+
     socket =
-      case RoboticaPlugins.Action.action_to_message(action) do
-        nil -> socket
-        text -> update_message(socket, text)
+      case {good_location, message} do
+        {false, _} -> socket
+        {_, nil} -> socket
+        {_, text} -> update_message(socket, text)
       end
 
     {:noreply, socket}

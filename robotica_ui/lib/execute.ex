@@ -19,8 +19,8 @@ defmodule RoboticaUi.Execute do
     {:ok, %State{}}
   end
 
-  def execute(action) do
-    GenServer.cast(__MODULE__, {:execute, action})
+  def execute(task) do
+    GenServer.cast(__MODULE__, {:execute, task})
   end
 
   def update_message(state, text) do
@@ -46,11 +46,17 @@ defmodule RoboticaUi.Execute do
     %{state | timer: timer}
   end
 
-  def handle_cast({:execute, action}, state) do
+  def handle_cast({:execute, task}, state) do
+    location = RoboticaPlugins.Config.ui_location()
+
+    good_location = Enum.any?(task.locations, fn l -> l == location end)
+    message = RoboticaPlugins.Action.action_to_message(task.action)
+
     state =
-      case RoboticaPlugins.Action.action_to_message(action) do
-        nil -> state
-        text -> update_message(state, text)
+      case {good_location, message} do
+        {false, _} -> state
+        {_, nil} -> state
+        {_, text} -> update_message(state, text)
       end
 
     {:noreply, state}

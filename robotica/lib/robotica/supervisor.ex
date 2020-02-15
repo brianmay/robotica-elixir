@@ -28,6 +28,7 @@ defmodule Robotica.Supervisor do
     EventBus.register_topic(:tesla)
     EventBus.register_topic(:schedule)
     EventBus.register_topic(:request_schedule)
+    EventBus.register_topic(:execute)
     EventBus.register_topic(:local_execute)
     EventBus.register_topic(:remote_execute)
     EventBus.register_topic(:mark)
