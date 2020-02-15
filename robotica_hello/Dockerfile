@@ -32,6 +32,7 @@ COPY robotica_hello/mix.exs robotica_hello/mix.lock /opt/app/
 RUN mix deps.get --only prod
 
 COPY robotica_plugins/lib /opt/robotica_plugins/lib/
+COPY robotica_plugins/dummy.yaml /opt/robotica_plugins/
 COPY robotica_hello/config /opt/app/config/
 RUN mix deps.compile
 
