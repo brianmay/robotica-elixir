@@ -29,7 +29,7 @@ defmodule RoboticaUi.Components.Step do
       case step.mark do
         :done -> :green
         :cancelled -> :red
-         _ -> :white
+        _ -> :white
       end
 
     text = RoboticaPlugins.ScheduledStep.step_to_text(step)

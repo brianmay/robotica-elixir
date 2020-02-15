@@ -30,7 +30,8 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
   ]
 
 config :robotica_plugins,
-  config_file: "ui.yaml",
+  config_file: "../config/ui.yaml.sample",
+  config_common_file: "../config/common.yaml.sample",
   timezone: "Australia/Melbourne",
   map_types: []
 

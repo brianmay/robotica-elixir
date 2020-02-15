@@ -4,14 +4,12 @@ defmodule RoboticaUi.Scene.Local do
 
   alias Scenic.Graph
   alias Scenic.ViewPort
-  import Scenic.Primitives
 
   alias RoboticaUi.Layout
   import RoboticaUi.Scene.Utils
   alias RoboticaUi.Components.Nav
 
   @graph Graph.build(font: :roboto, font_size: 24)
-         |> rect({800, 480}, fill: {:black, 0})
 
   # ============================================================================
   # setup
@@ -23,7 +21,7 @@ defmodule RoboticaUi.Scene.Local do
 
     graph = @graph
     configuration = RoboticaPlugins.Config.ui_configuration()
-    local_locations = configuration.local_locations
+    local_location = configuration.local_location
     rows = configuration.local_buttons
 
     graph = Layout.add_background(graph, vp_width, vp_height)
@@ -34,7 +32,7 @@ defmodule RoboticaUi.Scene.Local do
 
         {graph, _} =
           Enum.reduce(row.buttons, {graph, 1}, fn button, {graph, x} ->
-            id = {:action, button.devices, button.action}
+            id = {:action, button.tasks}
 
             graph = add_button(graph, button.name, id, x, y, theme: :primary)
 
@@ -45,7 +43,7 @@ defmodule RoboticaUi.Scene.Local do
       end)
 
     graph = Nav.add_to_graph(graph, :local)
-    {:ok, %{locations: local_locations, graph: graph}, push: graph}
+    {:ok, %{location: local_location, graph: graph}, push: graph}
   end
 
   def handle_input(_event, _context, state) do
@@ -58,8 +56,8 @@ defmodule RoboticaUi.Scene.Local do
 
     state =
       case button do
-        {:action, devices, action} ->
-          handle_action_press(action, devices, state)
+        {:action, tasks} ->
+          handle_action_press(tasks, state)
 
         _ ->
           state
@@ -68,16 +66,24 @@ defmodule RoboticaUi.Scene.Local do
     {:halt, state, push: state.graph}
   end
 
-  def handle_action_press(action, devices, state) do
-    event_params = %{topic: :local_execute}
+  def handle_action_press(tasks, state) do
+    event_params = %{topic: :remote_execute}
 
-    EventSource.notify event_params do
-      %RoboticaPlugins.Task{
-        locations: state.locations,
-        devices: devices,
-        action: action
-      }
-    end
+    Enum.each(tasks, fn task ->
+      locations =
+        case task.locations do
+          nil -> [state.location]
+          locations -> locations
+        end
+
+      EventSource.notify event_params do
+        %RoboticaPlugins.Task{
+          locations: locations,
+          devices: task.devices,
+          action: task.action
+        }
+      end
+    end)
 
     state
   end

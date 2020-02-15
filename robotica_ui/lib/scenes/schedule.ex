@@ -52,18 +52,18 @@ defmodule RoboticaUi.Scene.Schedule do
 
   defp update_schedule(graph, steps, width) do
     configuration = RoboticaPlugins.Config.ui_configuration()
-    local_locations = configuration.local_locations
+    local_location = configuration.local_location
 
     steps =
       steps
       |> Enum.map(fn step ->
         tasks =
           Enum.filter(step.tasks, fn task ->
-            Enum.any?(task.locations, &(&1 in local_locations))
+            Enum.any?(task.locations, &(&1 == local_location))
           end)
 
         %RoboticaPlugins.ScheduledStep{step | tasks: tasks}
-    end)
+      end)
       |> Enum.reject(fn step -> Enum.empty?(step.tasks) end)
       |> Enum.take(20)
 

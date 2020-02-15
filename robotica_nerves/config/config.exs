@@ -16,6 +16,7 @@ config :robotica,
 
 config :robotica_plugins,
   config_file: "/etc/robotica/ui-{hostname}.yaml",
+  config_common_file: "../config/common.yaml",
   timezone: "Australia/Melbourne",
   map_types: [
     {Robotica.Plugin, {Robotica.Validation, :validate_plugin_config}}

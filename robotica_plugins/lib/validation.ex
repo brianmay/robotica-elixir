@@ -33,6 +33,7 @@ defmodule RoboticaPlugins.Validation do
 
     case {required, sub_data} do
       {true, nil} ->
+        IO.inspect(data)
         {:error, "Value #{key} is not provided"}
 
       {_, sub_data} ->

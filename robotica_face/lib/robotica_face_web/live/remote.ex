@@ -57,6 +57,7 @@ defmodule RoboticaFaceWeb.Live.Remote do
   def handle_event("activate", %{"row" => row_name, "button" => button_name}, socket) do
     buttons = socket.assigns.buttons
     locations = socket.assigns.locations
+    event_params = %{topic: :remote_execute}
 
     button =
       buttons
@@ -69,13 +70,21 @@ defmodule RoboticaFaceWeb.Live.Remote do
         nil
 
       button ->
-        EventSource.notify %{topic: :remote_execute} do
-          %RoboticaPlugins.Task{
-            locations: MapSet.to_list(locations),
-            devices: button.devices,
-            action: button.action
-          }
-        end
+        Enum.each(button.tasks, fn task ->
+          locations =
+            case task.locations do
+              nil -> MapSet.to_list(locations)
+              locations -> locations
+            end
+
+          EventSource.notify event_params do
+            %RoboticaPlugins.Task{
+              locations: locations,
+              devices: task.devices,
+              action: task.action
+            }
+          end
+        end)
     end
 
     {:noreply, socket}

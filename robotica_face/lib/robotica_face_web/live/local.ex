@@ -21,14 +21,15 @@ defmodule RoboticaFaceWeb.Live.Local do
     socket =
       socket
       |> assign(:buttons, config.local_buttons)
-      |> assign(:locations, config.local_locations)
+      |> assign(:location, config.local_location)
 
     {:ok, socket}
   end
 
   def handle_event("activate", %{"row" => row_name, "button" => button_name}, socket) do
     buttons = socket.assigns.buttons
-    locations = socket.assigns.locations
+    location = socket.assigns.location
+    event_params = %{topic: :remote_execute}
 
     button =
       buttons
@@ -41,13 +42,21 @@ defmodule RoboticaFaceWeb.Live.Local do
         nil
 
       button ->
-        EventSource.notify %{topic: :local_execute} do
-          %RoboticaPlugins.Task{
-            locations: locations,
-            devices: button.devices,
-            action: button.action
-          }
-        end
+        Enum.each(button.tasks, fn task ->
+          locations =
+            case task.locations do
+              nil -> [location]
+              locations -> locations
+            end
+
+          EventSource.notify event_params do
+            %RoboticaPlugins.Task{
+              locations: locations,
+              devices: task.devices,
+              action: task.action
+            }
+          end
+        end)
     end
 
     {:noreply, socket}
