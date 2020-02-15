@@ -20,18 +20,18 @@ defmodule RoboticaPlugins do
     defp v(value), do: not is_nil(value)
 
     def action_to_text(%Action{} = action) do
-      message = action.message
-      lights = action.lights
-      music = action.music
-
-      message_text = get_in(message, [:text])
-      lights_action = get_in(lights, [:action])
-      music_playlist = get_in(music, [:play_list])
-      music_stop = get_in(music, [:stop])
+      message_text = get_in(action.message, [:text])
+      lights_action = get_in(action.lights, [:action])
+      device_action = get_in(action.device, [:action])
+      hdmi_source = get_in(action.hdmi, [:source])
+      music_playlist = get_in(action.music, [:play_list])
+      music_stop = get_in(action.music, [:stop])
 
       cond do
         v(message_text) -> message_text
         v(lights_action) -> "Lights #{lights_action}"
+        v(device_action) -> "Device #{device_action}"
+        v(hdmi_source) -> "HDMI #{hdmi_source}"
         v(music_stop) and music_stop -> "Music stop"
         v(music_playlist) -> "Music #{music_playlist}"
         true -> "N/A"
@@ -57,6 +57,13 @@ defmodule RoboticaPlugins do
 
       action_str = Action.action_to_text(task.action)
       list = [action_str | list]
+
+      list =
+        case task.devices do
+          nil -> list
+          [] -> ["Nowhere:" | list]
+          devices -> [Enum.join(devices, ",") <> ":" | list]
+        end
 
       Enum.join(list, " ")
     end
