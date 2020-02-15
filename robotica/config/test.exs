@@ -8,3 +8,7 @@ config :robotica,
   schedule_file: "test/schedule.yaml",
   sequences_file: "test/sequences.yaml",
   timezone: "Australia/Melbourne"
+
+config :robotica_plugins,
+  config_file: "../config/ui.yaml.sample",
+  config_common_file: "../config/common.yaml.sample"
