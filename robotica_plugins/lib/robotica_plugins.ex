@@ -1,6 +1,4 @@
 defmodule RoboticaPlugins do
-  alias RoboticaPlugins.Mark
-
   defmodule Action do
     @type t :: %__MODULE__{
             message: map() | nil,
@@ -99,7 +97,7 @@ defmodule RoboticaPlugins do
             latest_time: %DateTime{},
             tasks: list(Task.t()),
             id: String.t(),
-            mark: Mark.t() | nil,
+            mark: :done | :cancelled | nil,
             repeat_number: integer | nil
           }
     @enforce_keys [:required_time, :latest_time, :tasks, :id]

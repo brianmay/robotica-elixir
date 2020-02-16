@@ -230,6 +230,45 @@ jobs:
       - store_test_results:
           path: robotica_hello/_build/test/lib/robotica_hello
 
+  build-ceryx:
+    docker:
+      # specify the version you desire here
+      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
+      - image: circleci/elixir:1.9
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install hex and rebar
+          command: |
+            cd ceryx
+            mix local.hex --force
+            mix local.rebar --force
+
+      - run:
+          name: Install dependencies
+          command: |
+            cd ceryx
+            export MIX_ENV=test
+            mix deps.get
+
+      - run:
+          name: Compile
+          command: |
+            cd ceryx
+            export MIX_ENV=test
+            mix compile
+
+      - run:
+          name: Run tests
+          command: |
+            cd ceryx
+            mix test
+
+      - store_test_results:
+          path: ceryx/_build/test/lib/ceryx
+
   deploy-hello-beta:
     docker:
       - image: circleci/elixir:1.9
@@ -265,6 +304,10 @@ workflows:
             tags:
               only: /.*/
       - build-hello:
+          filters:
+            tags:
+              only: /.*/
+      - build-ceryx:
           filters:
             tags:
               only: /.*/

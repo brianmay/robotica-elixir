@@ -30,40 +30,8 @@ defmodule Robotica.Config do
     {:map, :string, {:map, :time, {:list, :string}}}
   end
 
-  defp task_schema do
-    %{
-      struct_type: RoboticaPlugins.Task,
-      action: {Schema.action_schema(), true},
-      locations: {{:list, :string}, true},
-      devices: {{:list, :string}, false}
-    }
-  end
-
-  defp mark_schema do
-    %{
-      struct_type: RoboticaPlugins.Mark,
-      id: {:string, true},
-      status: {:mark_status, true},
-      start_time: {:date_time, true},
-      stop_time: {:date_time, true}
-    }
-  end
-
-  defp step_schema do
-    %{
-      struct_type: RoboticaPlugins.SourceStep,
-      zero_time: {{:boolean, false}, false},
-      required_time: {:delta, true},
-      latest_time: {:delta, false},
-      tasks: {{:list, task_schema()}, true},
-      repeat_time: {:delta, false},
-      repeat_count: {{:integer, 0}, false},
-      options: {{:list, :string}, false}
-    }
-  end
-
   defp sequences_schema do
-    {:map, :string, {:list, step_schema()}}
+    {:map, :string, {:list, Schema.source_step_schema()}}
   end
 
   defp plugin_schema do
@@ -108,30 +76,30 @@ defmodule Robotica.Config do
       Application.get_env(:robotica, :config_file)
       |> replace_values(substitutions())
 
-    {:ok, data} = RoboticaPlugins.Validation.load_and_validate(filename, config_schema())
+    {:ok, data} = Validation.load_and_validate(filename, config_schema())
     data
   end
 
   def classifications(filename) do
-    {:ok, data} = RoboticaPlugins.Validation.load_and_validate(filename, classifications_schema())
+    {:ok, data} = Validation.load_and_validate(filename, classifications_schema())
     data
   end
 
   def schedule(filename) do
-    {:ok, data} = RoboticaPlugins.Validation.load_and_validate(filename, schedule_schema())
+    {:ok, data} = Validation.load_and_validate(filename, schedule_schema())
     data
   end
 
   def sequences(filename) do
-    {:ok, data} = RoboticaPlugins.Validation.load_and_validate(filename, sequences_schema())
+    {:ok, data} = Validation.load_and_validate(filename, sequences_schema())
     data
   end
 
   def validate_task(%{} = data) do
-    Validation.validate_schema(data, task_schema())
+    Validation.validate_schema(data, Schema.task_schema())
   end
 
   def validate_mark(%{} = data) do
-    Validation.validate_schema(data, mark_schema())
+    Validation.validate_schema(data, Schema.mark_schema())
   end
 end

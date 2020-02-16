@@ -279,6 +279,10 @@ defmodule RoboticaPlugins.Validation do
   def validate_schema(true, {:boolean, _}), do: {:ok, true}
   def validate_schema(false, {:boolean, _}), do: {:ok, false}
 
+  def validate_schema(nil, :mark), do: {:ok, nil}
+  def validate_schema("done", :mark), do: {:ok, :done}
+  def validate_schema("cancelled", :mark), do: {:ok, :cancelled}
+
   def validate_schema(value, {:boolean, _}),
     do: {:error, "Non-string boolean detected #{inspect(value)}"}
 

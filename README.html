@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>README.html</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+</head>
+
+<body>
+
+<h1>Robotica</h1>
+
+<p>Robotica is a system written in Elixir designed to manage IOT devices using a an
+automatic schedule.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li>config: configuration files.</li>
+<li>LICENSE README.html README.md: documentation.</li>
+<li>robotica_plugins: common shared code.</li>
+<li>robotica base library for scheduling and interacting with devices.</li>
+<li>robotica_face: Web based interface.</li>
+<li>robotica_hello: Authentication for web based interface.</li>
+<li>robotica_nerves: Deployment for RPI3.</li>
+<li>robotica_ui: Scenic based User Interface.</li>
+</ul>
+
+<h2>Quick start</h2>
+
+<p>Requirements:</p>
+
+<ul>
+<li>Need to have authenticated MQTT server using TLS and username and password.</li>
+<li>Copy CA certificate in <code>./robotica_nerves/cafile.pem</code> and ``robotica<em>nerves/rootfs</em>overlay/etc/cafile.pem```.</li>
+</ul>
+
+<p>Follow the following steps:</p>
+
+<ol>
+<li><p>Install ASDF. Follow <a href="https://asdf-vm.com/#/core-manage-asdf-vm">instructions</a>. Install plugins:</p>
+
+<p><code>
+asdf plugin-add elixir
+asdf plugin-add nodejs
+asdf install elixir 1.9.1-otp-22
+asdf install nodejs 11.10.1
+</code></p></li>
+<li><p>Install source code:</p>
+
+<p><code>
+git clone https://github.com/brianmay/robotica-elixir.git
+cd robotica-elixir
+</code></p></li>
+<li><p>Setup ASDF:</p>
+
+<p><code>
+asdf local elixir 1.9.1-otp-22
+asdf local nodejs 11.10.1
+</code></p></li>
+<li><p>Setup required environment variables:</p>
+
+<p><code>
+export SUDO_ASKPASS=/usr/lib/ssh/x11-ssh-askpass
+export NERVES_NETWORK_SSID=...
+export NERVES_NETWORK_PSK=...
+export NERVES_NETWORK_MGMT="WPA-PSK"
+export MIX_TARGET="rpi3"
+export SECRET_KEY_BASE="$(mix phx.gen.secret)"
+export LOGIN_SECRET="$(mix guardian.gen.secret)"
+export SIGNING_SALT="$(mix phx.gen.secret 32)"
+export GOOGLE_USERNAME=""
+export GOOGLE_PASSWORD=""
+</code></p></li>
+<li><p>Setup required config files. Look at config directory. Copy files ending with
+<code>.sample</code> to <code>.yaml</code> extensions and edit as required.</p></li>
+<li><p>Build JavaScript stuff:</p>
+
+<p><code>
+cd robotica_hello
+mix deps.get
+npm install
+cd ../..
+</code></p></li>
+<li><p>Configure nerves:</p>
+
+<p><code>
+cd robotica_nerves
+mkdir -p rootfs_overlay/etc/robotica/
+vim rootfs_overlay/etc/robotica/config-nerves-$cpuid.yaml  # based on config/config.yaml
+vim rootfs_overlay/etc/robotica/ui-nerves-$cpuid.yaml      # based on config/ui.yaml
+</code></p></li>
+<li><p>Build nerves stuff:</p>
+
+<p><code>
+mix deps.get
+MIX_TARGET=rpi3 MIX_ENV=prod mix firmware
+</code></p></li>
+<li><p>Write image to flash USB device:</p>
+
+<p><code>
+MIX_TARGET=rpi3 MIX_ENV=prod mix firmware.burn
+</code></p></li>
+<li><p>Insert flash into RPI3, and boot.</p></li>
+</ol>
+
+</body>
+</html>

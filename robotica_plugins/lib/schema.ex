@@ -56,4 +56,48 @@ defmodule RoboticaPlugins.Schema do
       device: {device_action_schema(), false}
     }
   end
+
+  def task_schema do
+    %{
+      struct_type: RoboticaPlugins.Task,
+      action: {action_schema(), true},
+      locations: {{:list, :string}, true},
+      devices: {{:list, :string}, false}
+    }
+  end
+
+  def mark_schema do
+    %{
+      struct_type: RoboticaPlugins.Mark,
+      id: {:string, true},
+      status: {:mark_status, true},
+      start_time: {:date_time, true},
+      stop_time: {:date_time, true}
+    }
+  end
+
+  def source_step_schema do
+    %{
+      struct_type: RoboticaPlugins.SourceStep,
+      zero_time: {{:boolean, false}, false},
+      required_time: {:delta, true},
+      latest_time: {:delta, false},
+      tasks: {{:list, task_schema()}, true},
+      repeat_time: {:delta, false},
+      repeat_count: {{:integer, 0}, false},
+      options: {{:list, :string}, false}
+    }
+  end
+
+  def scheduled_step_schema do
+    %{
+      struct_type: RoboticaPlugins.ScheduledStep,
+      required_time: {:date_time, true},
+      latest_time: {:date_time, true},
+      tasks: {{:list, task_schema()}, true},
+      id: {:string, true},
+      mark: {:mark, false},
+      repeat_number: {{:integer, nil}, false}
+    }
+  end
 end
