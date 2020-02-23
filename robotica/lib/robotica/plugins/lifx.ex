@@ -124,6 +124,11 @@ defmodule Robotica.Plugins.LIFX do
     |> Enum.reverse()
   end
 
+  defp stop_task(state) do
+    not is_nil(state.task) and Task.shutdown(state.task)
+    %State{state | task: nil}
+  end
+
   defp get_duration(command) do
     case command.duration do
       nil -> 0
@@ -190,8 +195,7 @@ defmodule Robotica.Plugins.LIFX do
   @spec do_command(state :: Config.t(), command :: map) :: State.t()
 
   defp do_command(state, %{action: "flash"} = command) do
-    Task.shutdown(state.task)
-    state = %State{state | task: nil}
+    state = stop_task(state)
 
     for_every_light(state, fn light ->
       Logger.debug("#{light_to_string(light)}: flash")
@@ -243,8 +247,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp do_command(state, %{action: "turn_off"} = command) do
-    not is_nil(state.task) and Task.shutdown(state.task)
-    state = %State{state | task: nil}
+    state = stop_task(state)
 
     for_every_light(state, fn light ->
       Logger.debug("#{light_to_string(light)}: turn_off")
@@ -282,8 +285,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp do_command(state, %{action: "turn_on"} = command) do
-    not is_nil(state.task) and Task.shutdown(state.task)
-    state = %State{state | task: nil}
+    state = stop_task(state)
 
     duration = get_duration(command)
 
@@ -301,7 +303,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp do_command(state, %{action: "animate"} = command) do
-    not is_nil(state.task) and Task.shutdown(state.task)
+    state = stop_task(state)
 
     animation =
       case command.animation do
