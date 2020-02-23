@@ -132,11 +132,12 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp set_color(light, command, duration) do
-    color = struct(Lifx.Protocol.HSBK, command.color)
+    color = command.color
     colors = expand_colors(command.colors)
 
     cond do
       not is_nil(color) ->
+        color = struct(Lifx.Protocol.HSBK, color)
         Lifx.Device.set_color_wait(light, color, duration)
 
       not is_nil(colors) ->
