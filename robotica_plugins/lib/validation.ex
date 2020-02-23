@@ -158,6 +158,14 @@ defmodule RoboticaPlugins.Validation do
     end
   end
 
+  def validate_schema(value, :integer_or_string) do
+    cond do
+      is_nil(value) -> {:ok, value}
+      is_integer(value) -> {:ok, value}
+      true -> {:ok, value}
+    end
+  end
+
   def validate_schema(nil, :module), do: {:ok, nil}
 
   def validate_schema(module, :module) do

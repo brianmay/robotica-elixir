@@ -18,6 +18,7 @@ defmodule RoboticaPlugins.Schema do
 
   def lights_color do
     %{
+      struct_type: Lifx.Protocol.HSBK,
       brightness: {:integer, true},
       hue: {:integer, true},
       saturation: {:integer, true},
@@ -25,10 +26,43 @@ defmodule RoboticaPlugins.Schema do
     }
   end
 
+  def eval_lights_color do
+    %{
+      brightness: {:integer_or_string, true},
+      hue: {:integer_or_string, true},
+      saturation: {:integer_or_string, true},
+      kelvin: {:integer_or_string, true}
+    }
+  end
+
+  def repeat_colors do
+    %{
+      count: {:integer_or_string, true},
+      colors: {{:list, eval_lights_color()}, true}
+    }
+  end
+
+  def frame do
+    %{
+      sleep: {:integer, true},
+      repeat: {:integer, false},
+      colors: {{:list, repeat_colors()}, false}
+    }
+  end
+
+  def animation do
+    %{
+      repeat: {:integer, false},
+      frames: {{:list, frame()}, true}
+    }
+  end
+
   def lights_action_schema do
     %{
       action: {:string, true},
       color: {lights_color(), false},
+      colors: {{:list, repeat_colors()}, false},
+      animation: {animation(), false},
       duration: {:integer, false}
     }
   end
