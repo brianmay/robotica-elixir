@@ -18,7 +18,6 @@ defmodule RoboticaPlugins.Schema do
 
   def lights_color do
     %{
-      struct_type: Lifx.Protocol.HSBK,
       brightness: {:integer, true},
       hue: {:integer, true},
       saturation: {:integer, true},

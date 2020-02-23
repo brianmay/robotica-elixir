@@ -132,7 +132,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp set_color(light, command, duration) do
-    color = command.color
+    color = struct(Lifx.Protocol.HSBK, command.color)
     colors = expand_colors(command.colors)
 
     cond do
