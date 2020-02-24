@@ -8,15 +8,17 @@ defmodule Robotica.Plugins.LIFX do
 
   defmodule Config do
     @type t :: %__MODULE__{
-            lights: list(String.t())
+            lights: list(String.t()),
+            multizone: boolean
           }
-    defstruct lights: []
+    defstruct lights: [], multizone: false
   end
 
   def config_schema do
     %{
       struct_type: Config,
-      lights: {{:list, :string}, true}
+      lights: {{:list, :string}, true},
+      multizone: {{:boolean, false}, false}
     }
   end
 
@@ -73,13 +75,19 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp solve_string(string) do
-    case String.split(string, "*", parts: 2) do
-      [a] -> String.to_integer(a)
-      [a, b] -> String.to_integer(a) * String.to_integer(b)
-    end
+    sum_parts = String.split(string, "+")
+
+    Enum.reduce(sum_parts, 0, fn sum_value, acc ->
+      multiply_parts = String.split(sum_value, "*")
+      multiply = Enum.reduce(multiply_parts, 1, fn multiply_value, acc ->
+        value = String.to_integer(multiply_value)
+        acc * value
+      end)
+      acc + multiply
+    end)
   end
 
-  def eval_string(string, frame_n, light_n) do
+  defp eval_string(string, frame_n, light_n) do
     IO.puts("IN: #{string} #{frame_n} #{light_n}")
 
     cond do
@@ -97,26 +105,31 @@ defmodule Robotica.Plugins.LIFX do
     |> IO.inspect()
   end
 
-  defp expand_colors(nil), do: nil
+  defp eval_color(nil, _, _), do: nil
 
-  defp expand_colors(colors, frame_n \\ 0) do
+  defp eval_color(color, frame_n, light_n) do
+    %Lifx.Protocol.HSBK{
+      brightness: eval_string(color.brightness, frame_n, light_n),
+      hue: eval_string(color.hue, frame_n, light_n),
+      saturation: eval_string(color.saturation, frame_n, light_n),
+      kelvin: eval_string(color.kelvin, frame_n, light_n)
+    }
+  end
+
+  defp expand_colors(nil, _), do: nil
+
+  defp expand_colors(colors, frame_n) do
     Enum.reduce(colors, [], fn repeat, acc ->
       range =
         case eval_string(repeat.count, frame_n, 0) do
           0 -> []
-          n -> 1..n
+          n -> 0..(n-1)
         end
 
       range
       |> Enum.reduce(acc, fn light_n, acc ->
         Enum.reduce(repeat.colors, acc, fn color, acc ->
-          color = %Lifx.Protocol.HSBK{
-            brightness: eval_string(color.brightness, frame_n, light_n),
-            hue: eval_string(color.hue, frame_n, light_n),
-            saturation: eval_string(color.saturation, frame_n, light_n),
-            kelvin: eval_string(color.kelvin, frame_n, light_n)
-          }
-
+          color = eval_color(color, frame_n, light_n)
           [color | acc]
         end)
       end)
@@ -136,17 +149,15 @@ defmodule Robotica.Plugins.LIFX do
     end
   end
 
-  defp set_color(light, command, duration) do
-    color = command.color
-    colors = expand_colors(command.colors)
-
+  defp set_color(light, frame, config, duration, frame_n) do
     cond do
-      not is_nil(color) ->
-        color = struct(Lifx.Protocol.HSBK, color)
-        Lifx.Device.set_color_wait(light, color, duration)
-
-      not is_nil(colors) ->
+      not is_nil(frame.colors) and config.multizone ->
+        colors = expand_colors(frame.colors, frame_n)
         Lifx.Device.set_extended_color_zones_wait(light, colors, 0, 0, :apply)
+
+      not is_nil(frame.color) ->
+        color = eval_color(frame.color, frame_n, 0)
+        Lifx.Device.set_color_wait(light, color, duration)
 
       true ->
         color = %Lifx.Protocol.HSBK{
@@ -204,7 +215,7 @@ defmodule Robotica.Plugins.LIFX do
            {:ok, colors} <- Lifx.Device.get_extended_color_zones(light),
            Logger.debug("#{light_to_string(light)}: Start flash power #{power}."),
            Logger.debug("#{light_to_string(light)}: Start flash color #{inspect(colors)}."),
-           {:ok, _} <- set_color(light, command, 0),
+           {:ok, _} <- set_color(light, command, state.config, 0, 0),
            {:ok, _} <- Lifx.Device.on_wait(light),
            Process.sleep(400),
            {:ok, _} <-
@@ -216,7 +227,7 @@ defmodule Robotica.Plugins.LIFX do
                :apply
              ),
            Process.sleep(400),
-           {:ok, _} <- set_color(light, command, 0),
+           {:ok, _} <- set_color(light, command, state.config, 0, 0),
            Process.sleep(400),
            {:ok, _} <-
              Lifx.Device.set_extended_color_zones_wait(
@@ -227,15 +238,7 @@ defmodule Robotica.Plugins.LIFX do
                :apply
              ),
            Process.sleep(400),
-           {:ok, _} <- Lifx.Device.set_power_wait(light, power),
-           {:ok, _} <-
-             Lifx.Device.set_extended_color_zones_wait(
-               light,
-               colors.colors,
-               colors.index,
-               0,
-               :apply
-             ) do
+           {:ok, _} <- Lifx.Device.set_power_wait(light, power) do
         nil
       else
         {:error, err} ->
@@ -291,7 +294,7 @@ defmodule Robotica.Plugins.LIFX do
 
     for_every_light(state, fn light ->
       with :ok <- turn_on(light),
-           {:ok, _} <- set_color(light, command, duration) do
+           {:ok, _} <- set_color(light, command, state.config, duration, 0) do
         nil
       else
         {:error, err} ->
@@ -326,13 +329,13 @@ defmodule Robotica.Plugins.LIFX do
         repeat(repeat, nil, fn _count ->
           Enum.each(animation.frames, fn frame ->
             repeat(frame.repeat, 0, fn frame_n ->
-              colors = expand_colors(frame.colors, frame_n)
+              Logger.debug("Setting light")
 
               for_every_light(state, fn light ->
-                turn_on(light, false)
-                Lifx.Device.set_extended_color_zones_wait(light, colors, 0, 0, :apply)
+                set_color(light, frame, state.config, 0, frame_n)
               end)
 
+              Logger.debug("sleeping #{inspect(frame.sleep)}")
               Process.sleep(frame.sleep)
             end)
           end)

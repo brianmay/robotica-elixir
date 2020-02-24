@@ -18,15 +18,6 @@ defmodule RoboticaPlugins.Schema do
 
   def lights_color do
     %{
-      brightness: {:integer, true},
-      hue: {:integer, true},
-      saturation: {:integer, true},
-      kelvin: {:integer, true}
-    }
-  end
-
-  def eval_lights_color do
-    %{
       brightness: {:integer_or_string, true},
       hue: {:integer_or_string, true},
       saturation: {:integer_or_string, true},
@@ -37,7 +28,7 @@ defmodule RoboticaPlugins.Schema do
   def repeat_colors do
     %{
       count: {:integer_or_string, true},
-      colors: {{:list, eval_lights_color()}, true}
+      colors: {{:list, lights_color()}, true}
     }
   end
 
@@ -45,6 +36,7 @@ defmodule RoboticaPlugins.Schema do
     %{
       sleep: {:integer, true},
       repeat: {:integer, false},
+      color: {lights_color(), false},
       colors: {{:list, repeat_colors()}, false}
     }
   end
