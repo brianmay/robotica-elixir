@@ -146,33 +146,36 @@ defmodule Robotica.Plugins.Audio do
     run(state, :music_stop, [])
   end
 
-  defp append_sound(sound_list, %{sound: sound}) do
-    sound_list ++ [{:sound, sound}]
+  defp prepend_sound(sound_list, %{sound: nil}) do
+    sound_list
   end
 
-  defp append_sound(sound_list, _), do: sound_list
-
-  defp append_message(sound_list, %{message: %{text: text}}) do
-    sound_list ++ [{:say, text}]
+  defp prepend_sound(sound_list, %{sound: sound}) do
+    [{:sound, sound} | sound_list]
   end
 
-  defp append_message(sound_list, _), do: sound_list
-
-  defp append_music(sound_list, %{music: %{stop: true}}) do
-    sound_list ++ [{:music, nil}]
+  defp prepend_message(sound_list, %{message: %{text: text}}) do
+    [{:say, text} | sound_list]
   end
 
-  defp append_music(sound_list, %{music: %{play_list: play_list}}) do
-    sound_list ++ [{:music, play_list}]
+  defp prepend_message(sound_list, _), do: sound_list
+
+  defp prepend_music(sound_list, %{music: %{stop: true}}) do
+    [{:music, nil} | sound_list]
   end
 
-  defp append_music(sound_list, _), do: sound_list
+  defp prepend_music(sound_list, %{music: %{play_list: play_list}}) do
+    [{:music, play_list} | sound_list]
+  end
+
+  defp prepend_music(sound_list, _), do: sound_list
 
   defp get_sound_list(action) do
     []
-    |> append_sound(action)
-    |> append_message(action)
-    |> append_music(action)
+    |> prepend_sound(action)
+    |> prepend_message(action)
+    |> prepend_music(action)
+    |> Enum.reverse()
   end
 
   defp process_sound_list(_state, []), do: nil
