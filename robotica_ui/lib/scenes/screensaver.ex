@@ -28,6 +28,11 @@ defmodule RoboticaUi.Scene.Screensaver do
     {:ok, %{}, push: graph}
   end
 
+  def handle_input({:cursor_button, {_, :press, _, _}}, _context, state) do
+    # Ignore button presses, only reset screen saver on releases.
+    {:noreply, state}
+  end
+
   def handle_input(_event, _context, state) do
     RoboticaUi.RootManager.reset_screensaver()
     {:noreply, state}
