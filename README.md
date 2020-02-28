@@ -79,7 +79,6 @@ Follow the following steps:
     cd robotica_nerves
     mkdir -p rootfs_overlay/etc/robotica/
     vim rootfs_overlay/etc/robotica/config-nerves-$cpuid.yaml  # based on config/config.yaml
-    vim rootfs_overlay/etc/robotica/ui-nerves-$cpuid.yaml      # based on config/ui.yaml
     ```
 
 8. Build nerves stuff:

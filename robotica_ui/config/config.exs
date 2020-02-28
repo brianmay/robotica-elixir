@@ -19,7 +19,6 @@ config :robotica_ui, :viewport, %{
 }
 
 config :robotica_plugins,
-  config_file: "../config/ui.yaml.sample",
   config_common_file: "../config/common.yaml.sample",
   timezone: "Australia/Melbourne",
   map_types: []

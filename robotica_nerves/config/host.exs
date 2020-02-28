@@ -17,5 +17,4 @@ config :robotica,
   config_file: "../config/config.yaml"
 
 config :robotica_plugins,
-  config_file: "../config/ui.yaml",
   config_common_file: "../config/common.yaml"

@@ -1,3 +1,5 @@
+hosts:
+  silverfish: AnotherBrian
 locations:
   "Passage":
     remote_locations:

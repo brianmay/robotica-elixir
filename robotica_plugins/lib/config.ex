@@ -1,16 +1,6 @@
 defmodule RoboticaPlugins.Config do
   defmodule Loader do
     alias RoboticaPlugins.Schema
-    alias RoboticaPlugins.String
-
-    defp substitutions do
-      {:ok, hostname} = :inet.gethostname()
-      hostname = to_string(hostname)
-
-      %{
-        "hostname" => hostname
-      }
-    end
 
     defp button_task do
       %{
@@ -34,12 +24,6 @@ defmodule RoboticaPlugins.Config do
       }
     end
 
-    defp config_schema do
-      %{
-        location: {:string, true}
-      }
-    end
-
     defp config_location_schema do
       %{
         local_buttons: {{:list, button_row()}, false},
@@ -49,17 +33,11 @@ defmodule RoboticaPlugins.Config do
 
     defp config_common_schema do
       %{
+        hosts: {{:map, :string, :string}, true},
         locations: {{:map, :string, config_location_schema()}, true},
         local_buttons: {{:list, button_row()}, true},
         remote_buttons: {{:list, button_row()}, true}
       }
-    end
-
-    def ui_host_configuration do
-      filename = Application.get_env(:robotica_plugins, :config_file)
-      {:ok, filename} = String.replace_values(filename, substitutions())
-      {:ok, data} = RoboticaPlugins.Validation.load_and_validate(filename, config_schema())
-      data
     end
 
     def ui_common_configuration(filename) do
@@ -86,9 +64,13 @@ defmodule RoboticaPlugins.Config do
     end)
   end
 
+  defp hostname do
+    {:ok, hostname} = :inet.gethostname()
+    to_string(hostname)
+  end
+
   def ui_location do
-    host_config = Loader.ui_host_configuration()
-    host_config.location
+    Map.fetch!(@common_config.hosts, hostname())
   end
 
   def ui_configuration(location \\ nil) do
@@ -99,7 +81,7 @@ defmodule RoboticaPlugins.Config do
       end
 
     common_config = @common_config
-    local_config = common_config.locations[location]
+    local_config = Map.fetch!(common_config.locations, location)
 
     buttons = merge_buttons([common_config.local_buttons, local_config.local_buttons])
 

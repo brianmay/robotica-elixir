@@ -15,7 +15,6 @@ config :robotica,
   timezone: "Australia/Melbourne"
 
 config :robotica_plugins,
-  config_file: "/etc/robotica/ui-{hostname}.yaml",
   config_common_file: "../config/common.yaml",
   timezone: "Australia/Melbourne",
   map_types: [
