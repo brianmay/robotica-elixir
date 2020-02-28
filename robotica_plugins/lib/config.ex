@@ -1,13 +1,7 @@
 defmodule RoboticaPlugins.Config do
   defmodule Loader do
     alias RoboticaPlugins.Schema
-
-    @spec replace_values(String.t(), %{required(String.t()) => String.t()}) :: String.t()
-    defp replace_values(string, values) do
-      Regex.replace(~r/{([a-z_]+)?}/, string, fn _, match ->
-        Map.fetch!(values, match)
-      end)
-    end
+    alias RoboticaPlugins.String
 
     defp substitutions do
       {:ok, hostname} = :inet.gethostname()
@@ -62,10 +56,8 @@ defmodule RoboticaPlugins.Config do
     end
 
     def ui_host_configuration do
-      filename =
-        Application.get_env(:robotica_plugins, :config_file)
-        |> replace_values(substitutions())
-
+      filename = Application.get_env(:robotica_plugins, :config_file)
+      {:ok, filename} = String.replace_values(filename, substitutions())
       {:ok, data} = RoboticaPlugins.Validation.load_and_validate(filename, config_schema())
       data
     end

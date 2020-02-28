@@ -1,6 +1,8 @@
 defmodule Robotica.Plugins.LIFX do
   use GenServer
   use Robotica.Plugin
+  alias RoboticaPlugins.String
+  alias Robotica.Devices.Lifx, as: RLifx
 
   require Logger
 
@@ -60,83 +62,6 @@ defmodule Robotica.Plugins.LIFX do
     repeat(new_repeats, default, callback, n + 1)
   end
 
-  @spec replace_values(String.t(), %{required(String.t()) => String.t()}) :: String.t()
-  defp replace_values(string, values) do
-    Regex.replace(~r/{([a-z_]+)?}/, string, fn _, match ->
-      Map.fetch!(values, match)
-    end)
-  end
-
-  defp expand_string(string, frame_n, light_n) do
-    replace_values(string, %{
-      "frame" => Integer.to_string(frame_n),
-      "light" => Integer.to_string(light_n)
-    })
-  end
-
-  defp solve_string(string) do
-    sum_parts = String.split(string, "+")
-
-    Enum.reduce(sum_parts, 0, fn sum_value, acc ->
-      multiply_parts = String.split(sum_value, "*")
-      multiply = Enum.reduce(multiply_parts, 1, fn multiply_value, acc ->
-        value = String.to_integer(multiply_value)
-        acc * value
-      end)
-      acc + multiply
-    end)
-  end
-
-  defp eval_string(string, frame_n, light_n) do
-    IO.puts("IN: #{string} #{frame_n} #{light_n}")
-
-    cond do
-      is_nil(string) ->
-        nil
-
-      is_integer(string) ->
-        string
-
-      true ->
-        string
-        |> expand_string(frame_n, light_n)
-        |> solve_string()
-    end
-    |> IO.inspect()
-  end
-
-  defp eval_color(nil, _, _), do: nil
-
-  defp eval_color(color, frame_n, light_n) do
-    %Lifx.Protocol.HSBK{
-      brightness: eval_string(color.brightness, frame_n, light_n),
-      hue: eval_string(color.hue, frame_n, light_n),
-      saturation: eval_string(color.saturation, frame_n, light_n),
-      kelvin: eval_string(color.kelvin, frame_n, light_n)
-    }
-  end
-
-  defp expand_colors(nil, _), do: nil
-
-  defp expand_colors(colors, frame_n) do
-    Enum.reduce(colors, [], fn repeat, acc ->
-      range =
-        case eval_string(repeat.count, frame_n, 0) do
-          0 -> []
-          n -> 0..(n-1)
-        end
-
-      range
-      |> Enum.reduce(acc, fn light_n, acc ->
-        Enum.reduce(repeat.colors, acc, fn color, acc ->
-          color = eval_color(color, frame_n, light_n)
-          [color | acc]
-        end)
-      end)
-    end)
-    |> Enum.reverse()
-  end
-
   defp stop_task(state) do
     not is_nil(state.task) and Task.shutdown(state.task)
     %State{state | task: nil}
@@ -149,25 +74,44 @@ defmodule Robotica.Plugins.LIFX do
     end
   end
 
+  defp debug_colors(colors) do
+    Enum.each(colors, fn color ->
+      IO.puts("---> #{inspect(color)}")
+    end)
+    IO.puts("")
+  end
+
   defp set_color(light, frame, config, duration, frame_n) do
     cond do
       not is_nil(frame.colors) and config.multizone ->
-        colors = expand_colors(frame.colors, frame_n)
-        Lifx.Device.set_extended_color_zones_wait(light, colors, 0, 0, :apply)
+        case RLifx.expand_colors(frame.colors, frame_n) do
+          {:ok, colors} ->
+            debug_colors(colors)
+            Lifx.Device.set_extended_color_zones_wait(light, colors, 0, 0, :apply)
+
+          {:error, error} ->
+            Logger.info(
+              "#{light_to_string(light)}: Got error in lifx expand_colors: #{inspect(error)}"
+            )
+        end
 
       not is_nil(frame.color) ->
-        color = eval_color(frame.color, frame_n, 0)
-        Lifx.Device.set_color_wait(light, color, duration)
+        values = %{"frame" => frame_n}
+
+        case RLifx.eval_color(frame.color, values) do
+          {:ok, color} ->
+            Lifx.Device.set_color_wait(light, color, duration)
+
+          {:error, error} ->
+            Logger.info(
+              "#{light_to_string(light)}: Got error in lifx eval_color: #{inspect(error)}"
+            )
+        end
 
       true ->
-        color = %Lifx.Protocol.HSBK{
-          hue: 0,
-          saturation: 0,
-          brightness: 100,
-          kelvin: 2500
-        }
-
-        Lifx.Device.set_color_wait(light, color, duration)
+        Logger.info(
+          "#{light_to_string(light)}: Got no assigned color in set_color."
+        )
     end
   end
 

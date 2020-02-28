@@ -1,12 +1,6 @@
 defmodule Ceryx.Config do
   alias RoboticaPlugins.Validation
-
-  @spec replace_values(String.t(), %{required(String.t()) => String.t()}) :: String.t()
-  defp replace_values(string, values) do
-    Regex.replace(~r/{([a-z_]+)?}/, string, fn _, match ->
-      Map.fetch!(values, match)
-    end)
-  end
+  alias RoboticaPlugins.String
 
   defp mqtt_config_schema do
     %{
@@ -35,10 +29,8 @@ defmodule Ceryx.Config do
   end
 
   def configuration do
-    filename =
-      Application.get_env(:ceryx, :config_file)
-      |> replace_values(substitutions())
-
+    filename = Application.get_env(:ceryx, :config_file)
+    {:ok, filename} = String.replace_values(filename, substitutions())
     {:ok, data} = Validation.load_and_validate(filename, config_schema())
     data
   end

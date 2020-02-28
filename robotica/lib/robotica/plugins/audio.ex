@@ -4,6 +4,7 @@ defmodule Robotica.Plugins.Audio do
   require Logger
 
   import Robotica.Types
+  alias RoboticaPlugins.String
 
   defmodule Commands do
     @enforce_keys [:init, :play, :say, :music_play, :music_stop, :music_pause, :music_resume]
@@ -67,34 +68,48 @@ defmodule Robotica.Plugins.Audio do
     }
   end
 
-  @spec replace_values(String.t(), %{required(String.t()) => String.t()}) :: String.t()
-  defp replace_values(string, values) do
-    Regex.replace(~r/{([a-z_]+)?}/, string, fn _, match ->
-      Map.fetch!(values, match)
-    end)
-  end
-
   defp run_commands(state, [cmd | tail], values, on_nonzero) do
     [cmd | args] = cmd
-    args = Enum.map(args, &replace_values(&1, values))
+    args = Enum.map(args, &String.replace_values(&1, values))
 
-    string = "#{cmd} #{Enum.join(args, " ")}"
-    Logger.debug("Running '#{string}'.")
+    errors =
+      Enum.filter(args, fn
+        {:ok, _} -> false
+        {:error, _} -> true
+      end)
 
-    {_output, rc} = System.cmd(cmd, args)
+    args =
+      Enum.filter(args, fn
+        {:ok, _} -> true
+        {:error, _} -> false
+      end)
 
-    case {rc, on_nonzero} do
-      {0, _} ->
-        Logger.info("result 0 from '#{string}'.")
-        run_commands(state, tail, values, on_nonzero)
+    errors = Enum.map(errors, fn {:error, msg} -> msg end)
+    args = Enum.map(args, fn {:ok, msg} -> msg end)
 
-      {rc, :error} ->
-        Logger.error("result #{rc} from '#{string}'.")
-        rc
+    case errors do
+      [] ->
+        string = "#{cmd} #{Enum.join(args, " ")}"
+        Logger.debug("Running '#{string}'.")
 
-      {rc, :info} ->
-        Logger.info("result #{rc} from '#{string}'.")
-        rc
+        {_output, rc} = System.cmd(cmd, args)
+
+        case {rc, on_nonzero} do
+          {0, _} ->
+            Logger.info("result 0 from '#{string}'.")
+            run_commands(state, tail, values, on_nonzero)
+
+          {rc, :error} ->
+            Logger.error("result #{rc} from '#{string}'.")
+            rc
+
+          {rc, :info} ->
+            Logger.info("result #{rc} from '#{string}'.")
+            rc
+        end
+
+      errors ->
+        Logger.error("Got errors #{inspect(errors)} from #{inspect(args)}")
     end
   end
 
