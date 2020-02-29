@@ -1,3 +1,4 @@
+hosts: {}
 locations: {}
 local_buttons: []
 remote_buttons: []
