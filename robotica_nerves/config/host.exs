@@ -12,9 +12,3 @@ config :robotica_ui, :viewport, %{
     }
   ]
 }
-
-config :robotica,
-  config_file: "../config/config.yaml"
-
-config :robotica_plugins,
-  config_common_file: "../config/common.yaml"

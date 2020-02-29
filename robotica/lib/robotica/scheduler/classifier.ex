@@ -10,7 +10,7 @@ defmodule Robotica.Scheduler.Classifier do
 
   @filename Application.get_env(:robotica, :classifications_file)
   @external_resource @filename
-  @data Robotica.Config.classifications(@filename)
+  @data Robotica.Config.Loader.classifications(@filename)
 
   defp is_date_in_classification?(%Types.Classification{} = classification, date) do
     cond do

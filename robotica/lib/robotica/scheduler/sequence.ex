@@ -3,7 +3,7 @@ defmodule Robotica.Scheduler.Sequence do
 
   @filename Application.get_env(:robotica, :sequences_file)
   @external_resource @filename
-  @data Robotica.Config.sequences(@filename)
+  @data Robotica.Config.Loader.sequences(@filename)
 
   defp add_id_to_steps([], _, _), do: []
 

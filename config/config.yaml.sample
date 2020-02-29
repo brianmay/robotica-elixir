@@ -4,46 +4,48 @@ mqtt:
   user_name: username
   password: password
   ca_cert_file: "cafile.pem"
-plugins:
-  - module: Robotica.Plugins.Audio
-    location: "AnotherBrian"
-    device: "Robotica"
-    config:
-        sounds:
-            beep: "sounds/ding1.wav"
-            prefix: "sounds/login.wav"
-            repeat: "sounds/cymbal.wav"
-            postfix: "sounds/logout.wav"
-        commands:
-            init:
-              - ["amixer", "sset", "Master", "100%"]
-              - ["mpc", "repeat", "on"]
-            play:
-              - ["aplay", "-q", "{file}"]
-            say:
-              - ["espeak", "-ven+f5", "-k5", "{text}"]
-            music_play:
-              - ["mpc", "clear"]
-              - ["mpc", "load", "{play_list}"]
-              - ["mpc", "play"]
-            music_stop:
-              - ["mpc", "stop"]
-            music_pause:
-              - ["mpc", "pause-if-playing"]
-            music_resume:
-              - ["mpc", "play"]
-  - module: Robotica.Plugins.LIFX
-    location: "AnotherBrian"
-    device: "Light"
-    config:
-        lights: ["Brian"]
-  - module: Robotica.Plugins.MQTT
-    location: "AnotherBrian"
-    device: "Mobile"
-    config: {}
-  - module: Robotica.Plugins.HDMI
-    location: "AnotherBrian"
-    device: "TV"
-    config:
-        host: hdmi.pri
-        destination: 1
+hosts:
+  silverfish:
+    plugins:
+      - module: Robotica.Plugins.Audio
+        location: "AnotherBrian"
+        device: "Robotica"
+        config:
+            sounds:
+                beep: "sounds/ding1.wav"
+                prefix: "sounds/login.wav"
+                repeat: "sounds/cymbal.wav"
+                postfix: "sounds/logout.wav"
+            commands:
+                init:
+                  - ["amixer", "sset", "Master", "100%"]
+                  - ["mpc", "repeat", "on"]
+                play:
+                  - ["aplay", "-q", "{file}"]
+                say:
+                  - ["espeak", "-ven+f5", "-k5", "{text}"]
+                music_play:
+                  - ["mpc", "clear"]
+                  - ["mpc", "load", "{play_list}"]
+                  - ["mpc", "play"]
+                music_stop:
+                  - ["mpc", "stop"]
+                music_pause:
+                  - ["mpc", "pause-if-playing"]
+                music_resume:
+                  - ["mpc", "play"]
+      - module: Robotica.Plugins.LIFX
+        location: "AnotherBrian"
+        device: "Light"
+        config:
+            lights: ["Brian"]
+      - module: Robotica.Plugins.MQTT
+        location: "AnotherBrian"
+        device: "Mobile"
+        config: {}
+      - module: Robotica.Plugins.HDMI
+        location: "AnotherBrian"
+        device: "TV"
+        config:
+            host: hdmi.pri
+            destination: 1

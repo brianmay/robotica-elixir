@@ -3,7 +3,7 @@ defmodule Robotica.Scheduler.Schedule do
 
   @filename Application.get_env(:robotica, :schedule_file)
   @external_resource @filename
-  @data Robotica.Config.schedule(@filename)
+  @data Robotica.Config.Loader.schedule(@filename)
 
   defp convert_time_to_utc(date, time) do
     {:ok, naive_date_time} = NaiveDateTime.new(date, time)

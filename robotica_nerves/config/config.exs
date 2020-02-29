@@ -8,7 +8,7 @@ use Mix.Config
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :robotica,
-  config_file: "/etc/robotica/config-{hostname}.yaml",
+  config_file: "../config/config.yaml",
   classifications_file: "../config/classifications.yaml",
   schedule_file: "../config/schedule.yaml",
   sequences_file: "../config/sequences.yaml",

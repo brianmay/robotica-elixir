@@ -1,4 +1,5 @@
 mqtt:
   host: localhost
   port: 1883
-plugins: []
+  ca_cert_file: nil
+hosts: {}
