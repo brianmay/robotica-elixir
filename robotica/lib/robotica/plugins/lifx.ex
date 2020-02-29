@@ -78,6 +78,7 @@ defmodule Robotica.Plugins.LIFX do
     Enum.each(colors, fn color ->
       IO.puts("---> #{inspect(color)}")
     end)
+
     IO.puts("")
   end
 
@@ -109,9 +110,7 @@ defmodule Robotica.Plugins.LIFX do
         end
 
       true ->
-        Logger.info(
-          "#{light_to_string(light)}: Got no assigned color in set_color."
-        )
+        Logger.info("#{light_to_string(light)}: Got no assigned color in set_color.")
     end
   end
 
