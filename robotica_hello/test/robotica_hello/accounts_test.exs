@@ -36,7 +36,7 @@ defmodule RoboticaHello.AccountsTest do
         |> Enum.into(@valid_attrs)
         |> Accounts.create_user()
 
-      user
+      %{user | password: nil}
     end
 
     test "list_users/0 returns all users" do
