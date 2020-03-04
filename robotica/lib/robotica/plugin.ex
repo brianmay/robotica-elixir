@@ -1,4 +1,6 @@
 defmodule Robotica.Plugin do
+  require Logger
+
   @type t :: %__MODULE__{
           module: atom,
           location: String.t(),
@@ -40,5 +42,7 @@ defmodule Robotica.Plugin do
   @spec wait(server :: pid) :: nil
   def wait(server) do
     GenServer.call(server, {:wait}, 60000)
+  catch
+    :exit, value -> Logger.error("The plugin #{inspect(server)} is dead: #{inspect(value)}.")
   end
 end

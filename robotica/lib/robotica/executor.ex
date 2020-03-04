@@ -117,15 +117,18 @@ defmodule Robotica.Executor do
     for {key, val} <- values, into: %{}, do: {key, val}
   end
 
+  @spec delete_pid_from_list(list, pid) :: list
+  defp delete_pid_from_list(list, pid) do
+    Enum.reject(list, fn {_, list_pid} -> list_pid == pid end)
+  end
+
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
     new_plugins =
       state.plugins
-      |> Enum.map(fn {_location, l} -> List.delete(l, pid) end)
+      |> Enum.map(fn {location, l} -> {location, delete_pid_from_list(l, pid)} end)
       |> keyword_list_to_map()
 
-    new_state =
-      state
-      |> Map.put(:plugins, new_plugins)
+    new_state = Map.put(state, :plugins, new_plugins)
 
     {:noreply, new_state}
   end
