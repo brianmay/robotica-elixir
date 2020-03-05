@@ -83,34 +83,41 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp set_color(light, frame, config, duration, frame_n) do
-    cond do
-      not is_nil(frame.colors) and config.multizone ->
-        case RLifx.expand_colors(frame.colors, frame_n) do
-          {:ok, colors} ->
-            debug_colors(colors)
-            Lifx.Device.set_extended_color_zones_wait(light, colors, 0, 0, :apply)
+    result =
+      cond do
+        not is_nil(frame.colors) and config.multizone ->
+          case RLifx.expand_colors(frame.colors, frame_n) do
+            {:ok, colors} ->
+              debug_colors(colors)
+              Lifx.Device.set_extended_color_zones_wait(light, colors, 0, 0, :apply)
 
-          {:error, error} ->
-            Logger.info(
-              "#{light_to_string(light)}: Got error in lifx expand_colors: #{inspect(error)}"
-            )
-        end
+            {:error, error} ->
+              Logger.info(
+                "#{light_to_string(light)}: Got error in lifx expand_colors: #{inspect(error)}"
+              )
+          end
 
-      not is_nil(frame.color) ->
-        values = %{"frame" => frame_n}
+        not is_nil(frame.color) ->
+          values = %{"frame" => frame_n}
 
-        case RLifx.eval_color(frame.color, values) do
-          {:ok, color} ->
-            Lifx.Device.set_color_wait(light, color, duration)
+          case RLifx.eval_color(frame.color, values) do
+            {:ok, color} ->
+              Lifx.Device.set_color_wait(light, color, duration)
 
-          {:error, error} ->
-            Logger.info(
-              "#{light_to_string(light)}: Got error in lifx eval_color: #{inspect(error)}"
-            )
-        end
+            {:error, error} ->
+              Logger.info(
+                "#{light_to_string(light)}: Got error in lifx eval_color: #{inspect(error)}"
+              )
+          end
 
-      true ->
-        Logger.info("#{light_to_string(light)}: Got no assigned color in set_color.")
+        true ->
+          Logger.info("#{light_to_string(light)}: Got no assigned color in set_color.")
+      end
+
+    case result do
+      :ok -> :ok
+      {:ok, _} -> :ok
+      {:error, error} -> {:error, error}
     end
   end
 
@@ -158,7 +165,7 @@ defmodule Robotica.Plugins.LIFX do
            {:ok, colors} <- Lifx.Device.get_extended_color_zones(light),
            Logger.debug("#{light_to_string(light)}: Start flash power #{power}."),
            Logger.debug("#{light_to_string(light)}: Start flash color #{inspect(colors)}."),
-           {:ok, _} <- set_color(light, command, state.config, 0, 0),
+           :ok <- set_color(light, command, state.config, 0, 0),
            {:ok, _} <- Lifx.Device.on_wait(light),
            Process.sleep(400),
            {:ok, _} <-
@@ -170,7 +177,7 @@ defmodule Robotica.Plugins.LIFX do
                :apply
              ),
            Process.sleep(400),
-           {:ok, _} <- set_color(light, command, state.config, 0, 0),
+           :ok <- set_color(light, command, state.config, 0, 0),
            Process.sleep(400),
            {:ok, _} <-
              Lifx.Device.set_extended_color_zones_wait(
@@ -237,7 +244,7 @@ defmodule Robotica.Plugins.LIFX do
 
     for_every_light(state, fn light ->
       with :ok <- turn_on(light),
-           {:ok, _} <- set_color(light, command, state.config, duration, 0) do
+           :ok <- set_color(light, command, state.config, duration, 0) do
         nil
       else
         {:error, err} ->
