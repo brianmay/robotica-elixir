@@ -72,14 +72,8 @@ defmodule Robotica.Plugins.Audio do
     [cmd | args] = cmd
     args = Enum.map(args, &String.replace_values(&1, values))
 
-    errors =
-      Enum.filter(args, fn
-        {:ok, _} -> false
-        {:error, _} -> true
-      end)
-
-    args =
-      Enum.filter(args, fn
+    {args, errors} =
+      Enum.split_with(args, fn
         {:ok, _} -> true
         {:error, _} -> false
       end)
