@@ -89,7 +89,8 @@ defmodule Robotica.Plugins.LIFX do
           case RLifx.expand_colors(frame.colors, frame_n) do
             {:ok, colors} ->
               debug_colors(colors)
-              Lifx.Device.set_extended_color_zones_wait(light, colors, 0, 0, :apply)
+              colors = %Lifx.Protocol.HSBKS{list: colors}
+              Lifx.Device.set_extended_color_zones_wait(light, colors, 0)
 
             {:error, error} ->
               Logger.info(
@@ -168,25 +169,11 @@ defmodule Robotica.Plugins.LIFX do
            :ok <- set_color(light, command, state.config, 0, 0),
            {:ok, _} <- Lifx.Device.on_wait(light),
            Process.sleep(400),
-           {:ok, _} <-
-             Lifx.Device.set_extended_color_zones_wait(
-               light,
-               colors.colors,
-               colors.index,
-               0,
-               :apply
-             ),
+           {:ok, _} <- Lifx.Device.set_extended_color_zones_wait(light, colors, 0),
            Process.sleep(400),
            :ok <- set_color(light, command, state.config, 0, 0),
            Process.sleep(400),
-           {:ok, _} <-
-             Lifx.Device.set_extended_color_zones_wait(
-               light,
-               colors.colors,
-               colors.index,
-               0,
-               :apply
-             ),
+           {:ok, _} <- Lifx.Device.set_extended_color_zones_wait(light, colors, 0),
            Process.sleep(400),
            {:ok, _} <- Lifx.Device.set_power_wait(light, power) do
         nil
