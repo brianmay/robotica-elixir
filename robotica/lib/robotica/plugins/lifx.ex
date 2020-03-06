@@ -43,23 +43,9 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp for_every_light(state, callback) do
-    lights = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.config.lights, &1.label))
-    Enum.each(lights, callback)
-  end
-
-  defp repeat(repeats, default, callback, n \\ 0)
-
-  defp repeat(0, _, _, _), do: nil
-
-  defp repeat(repeats, default, callback, n) do
-    new_repeats =
-      case repeats do
-        nil -> default
-        r -> r - 1
-      end
-
-    callback.(n)
-    repeat(new_repeats, default, callback, n + 1)
+    Enum.filter(Lifx.Client.devices(), &Enum.member?(state.config.lights, &1.label))
+    |> Enum.map(fn light -> Task.async(fn -> callback.(light) end) end)
+    |> Enum.map(fn task -> Task.await(task, :infinity) end)
   end
 
   defp stop_task(state) do
@@ -150,8 +136,56 @@ defmodule Robotica.Plugins.LIFX do
     end
   end
 
-  defp turn_off(light) do
-    Lifx.Device.off_wait(light)
+  defp animate(light, animation, config) do
+    repeat_count =
+      case animation.frames do
+        [] -> 0
+        _ -> animation.repeat
+      end
+
+    animate_repeat(light, animation, repeat_count, 0, config)
+  end
+
+  defp animate_repeat(_, _, repeat_count, repeat_n, _)
+       when not is_nil(repeat_n) and repeat_n >= repeat_count do
+    :ok
+  end
+
+  defp animate_repeat(light, animation, repeat_count, repeat_n, config) do
+    case animate_frames(light, animation.frames, config) do
+      :ok -> animate_repeat(light, animation, repeat_count, repeat_n + 1, config)
+      {:error, error} -> {:error, error}
+    end
+  end
+
+  defp animate_frames(_, [], _), do: :ok
+
+  defp animate_frames(light, [frame | tail], config) do
+    frame_count =
+      case frame.repeat do
+        nil -> 1
+        frame_count -> frame_count
+      end
+
+    case animate_frame_repeat(light, frame, frame_count, 0, config) do
+      :ok -> animate_frames(light, tail, config)
+      {:error, error} -> {:error, error}
+    end
+  end
+
+  defp animate_frame_repeat(_, _, frame_count, frame_n, _) when frame_n >= frame_count do
+    :ok
+  end
+
+  defp animate_frame_repeat(light, frame, frame_count, frame_n, config) do
+    Logger.debug("{light_to_string(light)}: setting next color")
+    case set_color(light, frame, config, 0, frame_n) do
+      :ok ->
+        Logger.debug("{light_to_string(light)}: sleeping #{inspect(frame.sleep)}")
+        Process.sleep(frame.sleep)
+        animate_frame_repeat(light, frame, frame_count, frame_n + 1, config)
+      {:error, error} -> {:error, error}
+    end
   end
 
   @spec do_command(state :: Config.t(), command :: map) :: State.t()
@@ -251,35 +285,22 @@ defmodule Robotica.Plugins.LIFX do
         animation -> animation
       end
 
-    repeat =
-      case animation.frames do
-        [] -> 0
-        _ -> animation.repeat
-      end
-
-    for_every_light(state, fn light ->
-      turn_on(light, true)
-    end)
-
     task =
       Task.async(fn ->
-        repeat(repeat, nil, fn _count ->
-          Enum.each(animation.frames, fn frame ->
-            repeat(frame.repeat, 0, fn frame_n ->
-              Logger.debug("Setting light")
-
-              for_every_light(state, fn light ->
-                set_color(light, frame, state.config, 0, frame_n)
-              end)
-
-              Logger.debug("sleeping #{inspect(frame.sleep)}")
-              Process.sleep(frame.sleep)
-            end)
-          end)
-        end)
-
         for_every_light(state, fn light ->
-          turn_off(light)
+          Logger.debug("#{light_to_string(light)}: animate")
+
+          with {:ok, power} <- Lifx.Device.get_power(light),
+               {:ok, colors} <- Lifx.Device.get_extended_color_zones(light),
+               :ok <- turn_on(light, true),
+               :ok <- animate(light, animation, state.config),
+               {:ok, _} <- Lifx.Device.set_extended_color_zones_wait(light, colors, 0),
+               {:ok, _} <- Lifx.Device.set_power_wait(light, power) do
+            nil
+          else
+            {:error, err} ->
+              Logger.info("#{light_to_string(light)}: Got error in lifx animate: #{inspect(err)}")
+          end
         end)
       end)
 
