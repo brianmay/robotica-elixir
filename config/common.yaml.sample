@@ -1,5 +1,5 @@
 hosts:
-  silverfish: AnotherBrian
+  silverfish: Brian
 locations:
   "Passage":
     remote_locations:
