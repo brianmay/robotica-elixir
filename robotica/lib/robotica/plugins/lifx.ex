@@ -136,6 +136,46 @@ defmodule Robotica.Plugins.LIFX do
     end
   end
 
+  defp save_light(light, config) do
+    case config.multizone do
+      true ->
+        with {:ok, power} <- Lifx.Device.get_power(light),
+             {:ok, colors} <- Lifx.Device.get_extended_color_zones(light) do
+          {:ok, {power, colors}}
+        else
+          {:error, error} -> {:error, error}
+        end
+
+      false ->
+        with {:ok, power} <- Lifx.Device.get_power(light),
+             {:ok, colors} <- Lifx.Device.get_color(light) do
+          {:ok, {power, colors}}
+        else
+          {:error, error} -> {:error, error}
+        end
+    end
+  end
+
+  def restore_light(light, {power, colors}, config) do
+    case config.multizone do
+      true ->
+        with {:ok, _} <- Lifx.Device.set_extended_color_zones_wait(light, colors, 0),
+             {:ok, _} <- Lifx.Device.set_power_wait(light, power) do
+          :ok
+        else
+          {:error, error} -> {:error, error}
+        end
+
+      false ->
+        with {:ok, _} <- Lifx.Device.set_color_wait(light, colors, 0),
+             {:ok, _} <- Lifx.Device.set_power_wait(light, power) do
+          :ok
+        else
+          {:error, error} -> {:error, error}
+        end
+    end
+  end
+
   defp animate(light, animation, config) do
     repeat_count =
       case animation.frames do
@@ -179,12 +219,15 @@ defmodule Robotica.Plugins.LIFX do
 
   defp animate_frame_repeat(light, frame, frame_count, frame_n, config) do
     Logger.debug("{light_to_string(light)}: setting next color")
+
     case set_color(light, frame, config, 0, frame_n) do
       :ok ->
         Logger.debug("{light_to_string(light)}: sleeping #{inspect(frame.sleep)}")
         Process.sleep(frame.sleep)
         animate_frame_repeat(light, frame, frame_count, frame_n + 1, config)
-      {:error, error} -> {:error, error}
+
+      {:error, error} ->
+        {:error, error}
     end
   end
 
@@ -196,20 +239,15 @@ defmodule Robotica.Plugins.LIFX do
     for_every_light(state, fn light ->
       Logger.debug("#{light_to_string(light)}: flash")
 
-      with {:ok, power} <- Lifx.Device.get_power(light),
-           {:ok, colors} <- Lifx.Device.get_extended_color_zones(light),
-           Logger.debug("#{light_to_string(light)}: Start flash power #{power}."),
-           Logger.debug("#{light_to_string(light)}: Start flash color #{inspect(colors)}."),
+      with {:ok, light_state} <- save_light(light, state.config),
            :ok <- set_color(light, command, state.config, 0, 0),
            {:ok, _} <- Lifx.Device.on_wait(light),
            Process.sleep(400),
-           {:ok, _} <- Lifx.Device.set_extended_color_zones_wait(light, colors, 0),
+           :ok <- restore_light(light, light_state, state.config),
            Process.sleep(400),
            :ok <- set_color(light, command, state.config, 0, 0),
            Process.sleep(400),
-           {:ok, _} <- Lifx.Device.set_extended_color_zones_wait(light, colors, 0),
-           Process.sleep(400),
-           {:ok, _} <- Lifx.Device.set_power_wait(light, power) do
+           {:ok, _} <- restore_light(light, light_state, state.config) do
         nil
       else
         {:error, err} ->
@@ -290,12 +328,10 @@ defmodule Robotica.Plugins.LIFX do
         for_every_light(state, fn light ->
           Logger.debug("#{light_to_string(light)}: animate")
 
-          with {:ok, power} <- Lifx.Device.get_power(light),
-               {:ok, colors} <- Lifx.Device.get_extended_color_zones(light),
+          with {:ok, light_state} <- save_light(light, state.config),
                :ok <- turn_on(light, true),
                :ok <- animate(light, animation, state.config),
-               {:ok, _} <- Lifx.Device.set_extended_color_zones_wait(light, colors, 0),
-               {:ok, _} <- Lifx.Device.set_power_wait(light, power) do
+               :ok <- restore_light(light, light_state, state.config) do
             nil
           else
             {:error, err} ->
