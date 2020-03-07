@@ -1,11 +1,19 @@
 defmodule RoboticaFaceWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :robotica_face
 
+  @session_options [
+    store: :cookie,
+    max_age: 60 * 60 * 24 * 365,
+    key: "_robotica_face_key",
+    signing_salt: "/P1irGF1"
+  ]
+
   socket "/socket", RoboticaFaceWeb.UserSocket,
     websocket: true,
     longpoll: false
 
-  socket "/live", Phoenix.LiveView.Socket
+  socket "/live", Phoenix.LiveView.Socket,
+    websocket: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -39,11 +47,7 @@ defmodule RoboticaFaceWeb.Endpoint do
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
-  plug Plug.Session,
-    store: :cookie,
-    max_age: 60 * 60 * 24 * 365,
-    key: "_robotica_face_key",
-    signing_salt: "/P1irGF1"
+  plug Plug.Session, @session_options
 
   plug RoboticaFaceWeb.Router
 end

@@ -35,7 +35,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
     """
   end
 
-  def mount(_, socket) do
+  def mount(_params, _session, socket) do
     RoboticaFace.Schedule.register(self())
     schedule = get_schedule()
     {:ok, assign(socket, :schedule, schedule)}

@@ -11,7 +11,7 @@ defmodule RoboticaFaceWeb.Live.Messages do
     """
   end
 
-  def mount(_, socket) do
+  def mount(_params, _session, socket) do
     RoboticaFace.Execute.register(self())
 
     socket =

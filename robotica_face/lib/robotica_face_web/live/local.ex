@@ -15,7 +15,7 @@ defmodule RoboticaFaceWeb.Live.Local do
     """
   end
 
-  def mount(_, socket) do
+  def mount(_params, _session, socket) do
     config = RoboticaPlugins.Config.ui_configuration()
 
     socket =

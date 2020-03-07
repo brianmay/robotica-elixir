@@ -1,3 +1,3 @@
 <h1>Local</h1>
-<%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Local) %>
-<%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
+<%= live_render(@conn, RoboticaFaceWeb.Live.Local) %>
+<%= live_render(@conn, RoboticaFaceWeb.Live.Messages) %>

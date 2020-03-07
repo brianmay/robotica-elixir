@@ -5,7 +5,7 @@ defmodule RoboticaFaceWeb.Live.Tesla do
     RoboticaFaceWeb.LiveView.render("tesla.html", assigns)
   end
 
-  def mount(_, socket) do
+  def mount(_params, _session, socket) do
     RoboticaFace.Tesla.register(self())
     tesla_state = RoboticaFace.Tesla.get_tesla_state()
     {:ok, assign(socket, :tesla_state, tesla_state)}

@@ -4,7 +4,7 @@
 
 
 <%= if RoboticaFace.Auth.user_signed_in?(@conn) do %>
-    <%= Phoenix.LiveView.live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
+    <%= live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
 
     <ul>
         <li><%= link("Local", to: Routes.page_path(@conn, :local)) %></li>
