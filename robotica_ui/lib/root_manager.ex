@@ -96,7 +96,7 @@ defmodule RoboticaUi.RootManager do
     new_state = callback.(state)
     new_scene = get_current_scene(new_state)
 
-    if old_scene != :off and new_scene == :off do
+    if old_scene != :screen_off and new_scene == :screen_off do
       screen_off()
     end
 
