@@ -11,6 +11,6 @@
     </div>
   <% end %>
 <% else %>
-  <h1>Hello <%= @maybe_user.name%>!</h1>
+  <p>Hello <%= @maybe_user["name"] %>!</p>
   <span><%= link "Logout", to: Routes.session_path(@conn, :logout), method: :post%></span>
 <% end %>
