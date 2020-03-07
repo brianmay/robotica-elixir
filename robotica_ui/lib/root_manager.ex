@@ -55,23 +55,23 @@ defmodule RoboticaUi.RootManager do
 
   @spec set_priority_scene(atom() | {atom(), any()} | nil) :: nil
   def set_priority_scene(scene) do
-    GenServer.call(__MODULE__, {:set_priority_scene, scene})
+    GenServer.cast(__MODULE__, {:set_priority_scene, scene})
   end
 
   @spec set_tab_scene(:clock | :schedule | :local | :remote, atom() | {atom(), any()} | nil) ::
           nil
   def set_tab_scene(id, scene) do
-    GenServer.call(__MODULE__, {:set_tab_scene, id, scene})
+    GenServer.cast(__MODULE__, {:set_tab_scene, id, scene})
   end
 
   @spec set_tab(:clock | :schedule | :local | :remote) :: nil
   def set_tab(id) do
-    GenServer.call(__MODULE__, {:set_tab, id})
+    GenServer.cast(__MODULE__, {:set_tab, id})
   end
 
   @spec reset_screensaver :: nil
   def reset_screensaver() do
-    GenServer.call(__MODULE__, {:reset_screensaver})
+    GenServer.cast(__MODULE__, {:reset_screensaver})
   end
 
   # PRIVATE STUFF BELOW
@@ -172,7 +172,7 @@ defmodule RoboticaUi.RootManager do
   end
 
   @impl true
-  def handle_call({:set_priority_scene, scene}, _from, state) do
+  def handle_cast({:set_priority_scene, scene}, state) do
     Logger.info("set_priority_scene #{inspect(scene)}")
 
     state =
@@ -180,23 +180,21 @@ defmodule RoboticaUi.RootManager do
         %State{state | priority_scene: scene}
       end)
 
-    {:reply, :ok, state}
+    {:noreply, state}
   end
 
   @impl true
-  def handle_call({:set_tab_scene, id, scene}, _from, state) do
+  def handle_cast({:set_tab_scene, id, scene}, state) do
     Logger.info("set_tab_scene #{inspect(id)} #{inspect(scene)}")
 
-    state =
-      update_state(state, fn state ->
-        %State{state | tabs: %{state.tabs | id => scene}}
-      end)
+    # We update the saved state but do not update the display.
+    state = %State{state | tabs: %{state.tabs | id => scene}}
 
-    {:reply, :ok, state}
+    {:noreply, state}
   end
 
   @impl true
-  def handle_call({:set_tab, id}, _from, state) do
+  def handle_cast({:set_tab, id}, state) do
     Logger.info("set_tab #{inspect(id)}")
 
     state =
@@ -204,11 +202,11 @@ defmodule RoboticaUi.RootManager do
         %State{state | tab: id}
       end)
 
-    {:reply, :ok, state}
+    {:noreply, state}
   end
 
   @impl true
-  def handle_call({:reset_screensaver}, _from, state) do
+  def handle_cast({:reset_screensaver}, state) do
     Logger.info("reset_screensaver")
 
     state =
@@ -216,6 +214,6 @@ defmodule RoboticaUi.RootManager do
         reset_timer(state)
       end)
 
-    {:reply, :ok, state}
+    {:noreply, state}
   end
 end
