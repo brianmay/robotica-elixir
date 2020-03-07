@@ -16,13 +16,18 @@ defmodule RoboticaUi.Scene.Remote do
   # setup
 
   # --------------------------------------------------------
-  def init(_, opts) do
+  def init(params, opts) do
     viewport = opts[:viewport]
     {:ok, %ViewPort.Status{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
 
     configuration = RoboticaPlugins.Config.ui_configuration()
     remote_locations = configuration.remote_locations
     rows = configuration.remote_buttons
+
+    locations = case params[:locations] do
+                  nil -> MapSet.new()
+                  locations -> locations
+                end
 
     graph =
       @graph
@@ -31,13 +36,15 @@ defmodule RoboticaUi.Scene.Remote do
 
     {graph, _} =
       Enum.reduce(remote_locations, {graph, 1}, fn location, {graph, x} ->
+        value = MapSet.member?(locations, location)
+
         id_false = {:location, location, false}
         id_true = {:location, location, true}
 
         graph =
           graph
-          |> add_button(location, id_false, x, 0, theme: :primary, hidden: false)
-          |> add_button(location, id_true, x, 0, theme: :danger, hidden: true)
+          |> add_button(location, id_false, x, 0, theme: :primary, hidden: value != false)
+          |> add_button(location, id_true, x, 0, theme: :danger, hidden: value != true)
 
         {graph, x + 1}
       end)
@@ -60,7 +67,7 @@ defmodule RoboticaUi.Scene.Remote do
 
     graph = Nav.add_to_graph(graph, :remote)
 
-    {:ok, %{locations: MapSet.new(), remote_locations: remote_locations, graph: graph},
+    {:ok, %{locations: locations, remote_locations: remote_locations, graph: graph},
      push: graph}
   end
 
@@ -109,6 +116,7 @@ defmodule RoboticaUi.Scene.Remote do
         |> Graph.modify(id_true, &update_opts(&1, hidden: value != true))
       end)
 
+    RoboticaUi.RootManager.set_tab_scene(:remote, {RoboticaUi.Scene.Remote, locations: locations})
     %{state | locations: locations, graph: graph}
   end
 
