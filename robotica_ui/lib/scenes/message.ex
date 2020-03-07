@@ -32,6 +32,7 @@ defmodule RoboticaUi.Scene.Message do
 
   def handle_input(_event, _context, state) do
     RoboticaUi.RootManager.reset_screensaver()
+    RoboticaUi.RootManager.set_priority_scene(nil)
     {:noreply, state}
   end
 end

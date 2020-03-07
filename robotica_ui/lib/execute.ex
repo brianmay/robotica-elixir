@@ -30,7 +30,7 @@ defmodule RoboticaUi.Execute do
 
       timer ->
         Process.cancel_timer(timer)
-        RoboticaUi.RootManager.set_scene(:message, nil)
+        RoboticaUi.RootManager.set_priority_scene(nil)
     end
 
     timer =
@@ -39,7 +39,7 @@ defmodule RoboticaUi.Execute do
           nil
 
         text ->
-          RoboticaUi.RootManager.set_scene(:message, {RoboticaUi.Scene.Message, text: text})
+          RoboticaUi.RootManager.set_priority_scene({RoboticaUi.Scene.Message, text: text})
           Process.send_after(self(), :timer, 10_000)
       end
 
@@ -63,7 +63,7 @@ defmodule RoboticaUi.Execute do
   end
 
   def handle_info(:timer, state) do
-    RoboticaUi.RootManager.set_scene(:message, nil)
+    RoboticaUi.RootManager.set_priority_scene(nil)
     state = %{state | timer: nil}
     {:noreply, state}
   end
