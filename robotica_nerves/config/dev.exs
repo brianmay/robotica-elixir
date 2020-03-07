@@ -8,6 +8,7 @@ use Mix.Config
 # with webpack to recompile .js and .css sources.
 config :robotica_face, RoboticaFaceWeb.Endpoint,
   http: [port: 4000],
+  https: [port: 4443],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,

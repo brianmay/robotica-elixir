@@ -19,6 +19,15 @@ config :robotica_face,
 # Configures the endpoint
 config :robotica_face, RoboticaFaceWeb.Endpoint,
   http: [port: 80, ip: {0, 0, 0, 0, 0, 0, 0, 0}],
+  https: [
+    port: 443,
+    ip: {0, 0, 0, 0, 0, 0, 0, 0},
+    otp_app: :robotica_nerves,
+    keyfile: "priv/key.pem",
+    certfile: "priv/cert.pem",
+    # OPTIONAL Key for intermediate certificates
+    cacertfile: "priv/cacert.pem"
+  ],
   url: [host: {:system, "HOST"}],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: RoboticaFaceWeb.ErrorView, accepts: ~w(html json)],
@@ -31,7 +40,8 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
 
 if Mix.Project.config()[:target] == "host" do
   config :robotica_face, RoboticaFaceWeb.Endpoint,
-    http: [port: 4000, ip: {0, 0, 0, 0, 0, 0, 0, 0}]
+    http: [port: 4000, ip: {0, 0, 0, 0, 0, 0, 0, 0}],
+    https: [port: 4443, ip: {0, 0, 0, 0, 0, 0, 0, 0}]
 end
 
 config :joken,
