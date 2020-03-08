@@ -3,7 +3,7 @@ use Mix.Config
 config :robotica_ui, :viewport, %{
   name: :main_viewport,
   size: {800, 480},
-  default_scene: {RoboticaUi.Scene.Schedule, nil},
+  default_scene: {RoboticaUi.Scene.Clock, nil},
   drivers: [
     %{
       module: Scenic.Driver.Nerves.Rpi

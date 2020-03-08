@@ -49,7 +49,7 @@ defmodule RoboticaUi.RootManager do
 
   @impl true
   def init(_opts) do
-    state = update_state(%State{}, fn state -> reset_timer(state) end)
+    state = reset_timer(%State{})
     {:ok, state}
   end
 
