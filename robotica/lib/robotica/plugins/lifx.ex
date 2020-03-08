@@ -247,7 +247,7 @@ defmodule Robotica.Plugins.LIFX do
            Process.sleep(400),
            :ok <- set_color(light, command, state.config, 0, 0),
            Process.sleep(400),
-           {:ok, _} <- restore_light(light, light_state, state.config) do
+           :ok <- restore_light(light, light_state, state.config) do
         nil
       else
         {:error, err} ->
