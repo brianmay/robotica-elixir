@@ -160,7 +160,7 @@ defmodule RoboticaUi.RootManager do
 
   @impl true
   def handle_info(:screen_off, state) do
-    Logger.info("screen_off")
+    Logger.info("rx screen_off")
 
     state =
       update_state(state, fn state ->
@@ -173,7 +173,7 @@ defmodule RoboticaUi.RootManager do
 
   @impl true
   def handle_cast({:set_priority_scene, scene}, state) do
-    Logger.info("set_priority_scene #{inspect(scene)}")
+    Logger.info("rx set_priority_scene #{inspect(scene)}")
 
     state =
       update_state(state, fn state ->
@@ -185,7 +185,7 @@ defmodule RoboticaUi.RootManager do
 
   @impl true
   def handle_cast({:set_tab_scene, id, scene}, state) do
-    Logger.info("set_tab_scene #{inspect(id)} #{inspect(scene)}")
+    Logger.info("rx set_tab_scene #{inspect(id)} #{inspect(scene)}")
 
     # We update the saved state but do not update the display.
     state = %State{state | tabs: %{state.tabs | id => scene}}
@@ -195,7 +195,7 @@ defmodule RoboticaUi.RootManager do
 
   @impl true
   def handle_cast({:set_tab, id}, state) do
-    Logger.info("set_tab #{inspect(id)}")
+    Logger.info("rx set_tab #{inspect(id)}")
 
     state =
       update_state(state, fn state ->
@@ -207,7 +207,7 @@ defmodule RoboticaUi.RootManager do
 
   @impl true
   def handle_cast({:reset_screensaver}, state) do
-    Logger.info("reset_screensaver")
+    Logger.info("rx reset_screensaver")
 
     state =
       update_state(state, fn state ->
