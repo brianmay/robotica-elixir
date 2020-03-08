@@ -49,6 +49,9 @@ config :shoehorn,
     :nerves_init_gadget,
     :lifx,
     {RoboticaNerves.Application, :config, []},
+    :robotica_plugins,
+    :robotica_face,
+    :robotica_ui,
     :robotica
   ],
   app: Mix.Project.config()[:app]
