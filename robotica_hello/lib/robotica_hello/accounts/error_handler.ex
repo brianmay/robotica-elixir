@@ -1,5 +1,6 @@
 defmodule RoboticaHello.Accounts.ErrorHandler do
   import Plug.Conn
+  use RoboticaHelloWeb, :controller
 
   @behaviour Guardian.Plug.ErrorHandler
 
@@ -8,7 +9,7 @@ defmodule RoboticaHello.Accounts.ErrorHandler do
     body = to_string(type)
 
     conn
-    |> put_resp_content_type("text/plain")
-    |> send_resp(401, body)
+    |> put_flash(:error, "Permission denied: #{body}")
+    |> redirect(to: Routes.session_path(conn, :login))
   end
 end
