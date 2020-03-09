@@ -3,7 +3,7 @@
 use Mix.Config
 
 config :ceryx,
-  config_file: "test/ceryx.yaml"
+  config_file: "../config/ceryx.yaml.sample"
 
 config :robotica_plugins,
   config_common_file: "../config/common.yaml.sample"

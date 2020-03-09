@@ -46,9 +46,17 @@ defmodule RoboticaPlugins.Config do
     end
   end
 
-  @filename Application.get_env(:robotica_plugins, :config_common_file)
-  @external_resource @filename
-  @common_config Loader.ui_common_configuration(@filename)
+  if Application.get_env(:robotica_plugins, :config_common_file) do
+    @filename Application.get_env(:robotica_plugins, :config_common_file)
+    @external_resource @filename
+    @common_config Loader.ui_common_configuration(@filename)
+    defp common_config(), do: @common_config
+  else
+    defp common_config() do
+      filename = Application.get_env(:robotica_plugins, :config_common_file)
+      Loader.ui_common_configuration(filename)
+    end
+  end
 
   defp list_or_empty_list(list) do
     case list do
@@ -70,7 +78,13 @@ defmodule RoboticaPlugins.Config do
   end
 
   def ui_location do
-    Map.fetch!(@common_config.hosts, hostname())
+    case Application.get_env(:robotica_plugins, :location) do
+      nil ->
+        Map.fetch!(common_config().hosts, hostname())
+
+      location ->
+        location
+    end
   end
 
   def ui_configuration(location \\ nil) do
@@ -80,7 +94,7 @@ defmodule RoboticaPlugins.Config do
         location -> location
       end
 
-    common_config = @common_config
+    common_config = common_config()
     local_config = Map.fetch!(common_config.locations, location)
 
     buttons = merge_buttons([common_config.local_buttons, local_config.local_buttons])

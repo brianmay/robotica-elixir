@@ -12,9 +12,3 @@ config :robotica_ui, :viewport, %{
     }
   ]
 }
-
-config :ceryx,
-  config_file: "../config/ceryx.yaml"
-
-config :robotica_plugins,
-  config_common_file: "../config/common.yaml"

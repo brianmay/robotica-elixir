@@ -8,9 +8,10 @@ use Mix.Config
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :ceryx,
-  config_file: "/etc/robotica/config-{hostname}.yaml"
+  config_file: "../config/ceryx.yaml"
 
 config :robotica_plugins,
+  location: nil,
   config_common_file: "../config/common.yaml",
   timezone: "Australia/Melbourne",
   map_types: [

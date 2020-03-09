@@ -24,6 +24,7 @@ config :robotica_hello, RoboticaHelloWeb.Endpoint,
   pubsub: [name: RoboticaHello.PubSub, adapter: Phoenix.PubSub.PG2]
 
 config :robotica_plugins,
+  location: nil,
   config_common_file: "dummy.yaml",
   timezone: "Australia/Melbourne",
   map_types: []

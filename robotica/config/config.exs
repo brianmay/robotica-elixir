@@ -12,6 +12,7 @@ config :robotica,
   timezone: "Australia/Melbourne"
 
 config :robotica_plugins,
+  location: nil,
   config_common_file: "../config/common.yaml",
   map_types: [
     {Robotica.Plugin, {Robotica.Validation, :validate_plugin_config}}

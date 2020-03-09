@@ -23,6 +23,7 @@ use Mix.Config
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :robotica_plugins,
+  location: nil,
   config_common_file: "../config/common.yaml.sample",
   timezone: "Australia/Melbourne",
   map_types: []
