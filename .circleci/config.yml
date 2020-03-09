@@ -8,7 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/elixir:1.9
+      - image: circleci/elixir:1.10
 
     steps:
       - checkout
@@ -47,7 +47,7 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/elixir:1.9
+      - image: circleci/elixir:1.10
 
     steps:
       - checkout
@@ -86,7 +86,7 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/elixir:1.9
+      - image: circleci/elixir:1.10
 
     steps:
       - checkout
@@ -125,7 +125,7 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/elixir:1.9
+      - image: circleci/elixir:1.10
 
     steps:
       - checkout
@@ -174,7 +174,7 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/elixir:1.9
+      - image: circleci/elixir:1.10
         environment:
           DATABASE_URL_TEST: postgresql://root@localhost/circle_test?sslmode=disable
 
@@ -234,7 +234,7 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/elixir:1.9
+      - image: circleci/elixir:1.10
 
     steps:
       - checkout
@@ -269,9 +269,48 @@ jobs:
       - store_test_results:
           path: ceryx/_build/test/lib/ceryx
 
+  build-ceryx-docker:
+    docker:
+      # specify the version you desire here
+      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
+      - image: circleci/elixir:1.10
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install hex and rebar
+          command: |
+            cd ceryx_docker
+            mix local.hex --force
+            mix local.rebar --force
+
+      - run:
+          name: Install dependencies
+          command: |
+            cd ceryx_docker
+            export MIX_ENV=test
+            mix deps.get
+
+      - run:
+          name: Compile
+          command: |
+            cd ceryx_docker
+            export MIX_ENV=test
+            mix compile
+
+      - run:
+          name: Run tests
+          command: |
+            cd ceryx_docker
+            mix test
+
+      - store_test_results:
+          path: ceryx_docker/_build/test/lib/ceryx_docker
+
   deploy-hello-beta:
     docker:
-      - image: circleci/elixir:1.9
+      - image: circleci/elixir:1.10
     steps:
       - checkout
       - setup_remote_docker
@@ -286,6 +325,24 @@ jobs:
               .
             docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
             docker push "brianmay/robotica_hello:latest"
+
+  deploy-ceryx-docker-beta:
+    docker:
+      - image: circleci/elixir:1.10
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and upload docker image
+          command: |
+            docker build \
+              --file "ceryx_docker/Dockerfile" \
+              --tag "brianmay/ceryx_docker:latest" \
+              --build-arg "BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`" \
+              --build-arg "VCS_REF=$CIRCLE_SHA1" \
+              .
+            docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
+            docker push "brianmay/ceryx_docker:latest"
 
 workflows:
   version: 2
@@ -311,10 +368,21 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - build-ceryx-docker:
+          filters:
+            tags:
+              only: /.*/
       - deploy-hello-beta:
           context: Docker
           requires:
             - build-hello
+          filters:
+            branches:
+              only: master
+      - deploy-ceryx-docker-beta:
+          context: Docker
+          requires:
+            - build-ceryx-docker
           filters:
             branches:
               only: master
