@@ -225,6 +225,7 @@ jobs:
           name: Run tests
           command: |
             cd robotica_hello
+            export LOGIN_SECRET="dBm4y+SgHK/N5ghbNrDhiiOcvUhtu31Y0xaKtt0ZlY0WklWoVBz/FpnmL7pejBW2"
             mix test
 
       - store_test_results:
