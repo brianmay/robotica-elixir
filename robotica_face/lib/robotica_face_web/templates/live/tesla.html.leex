@@ -113,7 +113,9 @@
      data-heading=<%= @tesla_state["history"]["heading"] %>
 ></div>
 
-<div id="mapid" phx-update="ignore"></div>
+<div phx-update="ignore">
+  <div id="mapid"></div>
+</div>
 
 <% else %>
 No state date found.
