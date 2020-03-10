@@ -9,6 +9,9 @@ config :robotica_hello, RoboticaHelloWeb.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
+config :robotica_hello,
+  config_file: "../config/hello.yaml.sample"
+
 config :robotica_hello, RoboticaHello.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   url: System.get_env("DATABASE_URL_TEST")
