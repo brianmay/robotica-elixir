@@ -31,9 +31,16 @@ defmodule Ceryx.Config do
     @config Loader.configuration(@filename)
     def configuration(), do: @config
   else
-    def configuration() do
-      filename = Application.get_env(:ceryx, :config_file)
-      Loader.configuration(filename)
+    def configuration do
+      %Ceryx.Supervisor.State{
+        mqtt: %{
+          host: System.get_env("MQTT_HOST"),
+          port: String.to_integer(System.get_env("MQTT_PORT")),
+          user_name: System.get_env("MQTT_USERNAME"),
+          password: System.get_env("MQTT_PASSWORD"),
+          ca_cert_file: System.get_env("MQTT_CA_CERT_FILE"),
+        }
+      }
     end
   end
 end
