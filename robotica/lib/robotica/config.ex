@@ -1,7 +1,6 @@
 defmodule Robotica.Config do
   alias RoboticaPlugins.Schema
   alias RoboticaPlugins.Validation
-  alias RoboticaPlugins.String
 
   defmodule Loader do
     defp classification_schema do

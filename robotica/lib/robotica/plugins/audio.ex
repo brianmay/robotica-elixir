@@ -7,8 +7,18 @@ defmodule Robotica.Plugins.Audio do
   alias RoboticaPlugins.String
 
   defmodule Commands do
-    @enforce_keys [:init, :play, :say, :music_play, :music_stop, :music_pause, :music_resume]
+    @enforce_keys [
+      :init,
+      :volume,
+      :play,
+      :say,
+      :music_play,
+      :music_stop,
+      :music_pause,
+      :music_resume
+    ]
     defstruct init: nil,
+              volume: nil,
               play: nil,
               say: nil,
               music_play: nil,
@@ -19,11 +29,20 @@ defmodule Robotica.Plugins.Audio do
 
   defmodule Config do
     @type t :: %__MODULE__{
-            commands: %{required(String.t()) => String.t()},
+            commands: Commands.t(),
             sounds: %{required(String.t()) => String.t()}
           }
     @enforce_keys [:commands, :sounds]
-    defstruct commands: %{},
+    defstruct commands: %Commands{
+                init: nil,
+                volume: nil,
+                play: nil,
+                say: nil,
+                music_play: nil,
+                music_stop: nil,
+                music_pause: nil,
+                music_resume: nil
+              },
               sounds: %{}
   end
 
@@ -42,6 +61,7 @@ defmodule Robotica.Plugins.Audio do
     %{
       struct_type: Commands,
       init: {command_list(), true},
+      volume: {command_list(), true},
       music_pause: {command_list(), true},
       music_play: {command_list(), true},
       music_resume: {command_list(), true},
@@ -70,7 +90,7 @@ defmodule Robotica.Plugins.Audio do
 
   defp run_commands(state, [cmd | tail], values, on_nonzero) do
     [cmd | args] = cmd
-    args = Enum.map(args, &String.replace_values(&1, values))
+    args = Enum.map(args, &String.solve_string_combined(&1, values))
 
     {args, errors} =
       Enum.split_with(args, fn
@@ -216,6 +236,11 @@ defmodule Robotica.Plugins.Audio do
   @spec handle_execute(state :: Config.t(), action :: RoboticaPlugins.Action.t()) :: nil
   defp handle_execute(state, action) do
     sound_list = get_sound_list(action)
+
+    case action.music.volume do
+      nil -> nil
+      volume -> run(state, :volume, volume: volume)
+    end
 
     if length(sound_list) > 0 do
       paused = music_paused?(state)

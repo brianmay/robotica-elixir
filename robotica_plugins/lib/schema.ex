@@ -6,7 +6,8 @@ defmodule RoboticaPlugins.Schema do
   def music_action_schema do
     %{
       play_list: {:string, false},
-      stop: {{:boolean, false}, false}
+      stop: {{:boolean, false}, false},
+      volume: {:integer, false}
     }
   end
 
