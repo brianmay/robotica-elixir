@@ -193,6 +193,8 @@ defmodule Robotica.Plugins.Audio do
     [{:music, nil} | sound_list]
   end
 
+  defp prepend_music(sound_list, %{music: %{play_list: nil}}), do: sound_list
+
   defp prepend_music(sound_list, %{music: %{play_list: play_list}}) do
     [{:music, play_list} | sound_list]
   end
