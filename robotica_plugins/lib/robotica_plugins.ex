@@ -17,6 +17,12 @@ defmodule RoboticaPlugins do
 
     defp v(value), do: not is_nil(value)
 
+    defp add_list_if_cond(list, :true, item), do: [item | list]
+    defp add_list_if_cond(list, :false, _), do: list
+
+    defp add_list_if_empty([], item), do: [item]
+    defp add_list_if_empty(list, _), do: list
+
     def action_to_text(%Action{} = action) do
       message_text = get_in(action.message, [:text])
       lights_action = get_in(action.lights, [:action])
@@ -24,16 +30,18 @@ defmodule RoboticaPlugins do
       hdmi_source = get_in(action.hdmi, [:source])
       music_playlist = get_in(action.music, [:play_list])
       music_stop = get_in(action.music, [:stop])
+      music_volume = get_in(action.music, [:volume])
 
-      cond do
-        v(message_text) -> message_text
-        v(lights_action) -> "Lights #{lights_action}"
-        v(device_action) -> "Device #{device_action}"
-        v(hdmi_source) -> "HDMI #{hdmi_source}"
-        v(music_stop) and music_stop -> "Music stop"
-        v(music_playlist) -> "Music #{music_playlist}"
-        true -> "N/A"
-      end
+      []
+      |> add_list_if_cond(v(message_text), "Say #{message_text}")
+      |> add_list_if_cond(v(lights_action), "Lights #{lights_action}")
+      |> add_list_if_cond(v(device_action), "Device #{device_action}")
+      |> add_list_if_cond(v(hdmi_source), "HDMI #{hdmi_source}")
+      |> add_list_if_cond(v(music_stop) and music_stop, "Music Stop")
+      |> add_list_if_cond(v(music_playlist), "Music #{music_playlist}")
+      |> add_list_if_cond(v(music_volume), "Volume #{music_volume}%")
+      |> add_list_if_empty("N/A")
+      |> Enum.join(",")
     end
 
     def action_to_message(%Action{} = action) do

@@ -9,7 +9,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
         <tr>
           <th scope="col">Time</th>
           <th scope="col">Location</th>
-          <th scope="col">Message</th>
+          <th scope="col">Step</th>
           <th scope="col">Marks</th>
           <th scope="col">Actions</th>
         </th>
