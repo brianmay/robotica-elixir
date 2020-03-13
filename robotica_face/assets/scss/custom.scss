@@ -29,10 +29,8 @@ h1 {
 #mapid { height: 480px; }
 
 @media only screen and (max-width: 640px) {
-    .schedule th:nth-child(2),
-    .schedule th:nth-child(4) { display: none; }
-    .schedule td:nth-child(2),
-    .schedule td:nth-child(4) { display: none; }
+     .schedule th:nth-child(3) { display: none; }
+     .schedule td:nth-child(3) { display: none; }
 }
 
 .schedule .btn {

@@ -24,7 +24,7 @@ defmodule RoboticaUi.Components.Marks do
     width = opts[:styles][:width]
     height = opts[:styles][:height]
 
-    text = RoboticaPlugins.ScheduledStep.step_to_text(step)
+    text = RoboticaPlugins.ScheduledStep.step_to_text(step) |> Enum.join(", ")
     locations = RoboticaPlugins.ScheduledStep.step_to_locations(step)
 
     graph =

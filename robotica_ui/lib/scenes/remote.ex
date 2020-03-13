@@ -24,10 +24,11 @@ defmodule RoboticaUi.Scene.Remote do
     remote_locations = configuration.remote_locations
     rows = configuration.remote_buttons
 
-    locations = case params[:locations] do
-                  nil -> MapSet.new()
-                  locations -> locations
-                end
+    locations =
+      case params[:locations] do
+        nil -> MapSet.new()
+        locations -> locations
+      end
 
     graph =
       @graph
@@ -67,8 +68,7 @@ defmodule RoboticaUi.Scene.Remote do
 
     graph = Nav.add_to_graph(graph, :remote)
 
-    {:ok, %{locations: locations, remote_locations: remote_locations, graph: graph},
-     push: graph}
+    {:ok, %{locations: locations, remote_locations: remote_locations, graph: graph}, push: graph}
   end
 
   def handle_input(_event, _context, state) do

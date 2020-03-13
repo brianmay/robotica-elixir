@@ -8,7 +8,6 @@ defmodule RoboticaFaceWeb.Live.Schedule do
       <thead>
         <tr>
           <th scope="col">Time</th>
-          <th scope="col">Location</th>
           <th scope="col">Step</th>
           <th scope="col">Marks</th>
           <th scope="col">Actions</th>
@@ -19,8 +18,11 @@ defmodule RoboticaFaceWeb.Live.Schedule do
           <% iso_time = Calendar.DateTime.Format.iso8601(step.required_time) %>
             <tr class="<%= step.mark %>">
               <td><%= date_time_to_local(step.required_time) %></td>
-              <td><%= get_step_locations(step) %></td>
-              <td><%= get_step_message(step) %></td>
+              <td>
+                <%= for line <- get_step_message(step) do %>
+                  <p><%= line %></p>
+                <% end %>
+              </td>
               <td><%= step.mark %></td>
               <td>
                 <button class="btn btn-warning" phx-click="mark" phx-value-mark="done" phx-value-step_time="<%= iso_time %>" phx-value-step_id="<%= step.id %>">Done</button>
@@ -59,12 +61,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
   end
 
   defp get_step_message(step) do
-    RoboticaPlugins.ScheduledStep.step_to_text(step)
-  end
-
-  defp get_step_locations(step) do
-    RoboticaPlugins.ScheduledStep.step_to_locations(step)
-    |> Enum.join(", ")
+    RoboticaPlugins.ScheduledStep.step_to_text(step, include_locations: true)
   end
 
   defp head_or_nil([]), do: nil

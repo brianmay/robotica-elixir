@@ -17,8 +17,8 @@ defmodule RoboticaPlugins do
 
     defp v(value), do: not is_nil(value)
 
-    defp add_list_if_cond(list, :true, item), do: [item | list]
-    defp add_list_if_cond(list, :false, _), do: list
+    defp add_list_if_cond(list, true, item), do: [item | list]
+    defp add_list_if_cond(list, false, _), do: list
 
     defp add_list_if_empty([], item), do: [item]
     defp add_list_if_empty(list, _), do: list
@@ -41,7 +41,7 @@ defmodule RoboticaPlugins do
       |> add_list_if_cond(v(music_playlist), "Music #{music_playlist}")
       |> add_list_if_cond(v(music_volume), "Volume #{music_volume}%")
       |> add_list_if_empty("N/A")
-      |> Enum.join(",")
+      |> Enum.join(", ")
     end
 
     def action_to_message(%Action{} = action) do
@@ -58,7 +58,7 @@ defmodule RoboticaPlugins do
     @enforce_keys [:locations, :devices, :action]
     defstruct locations: [], devices: [], action: nil
 
-    def task_to_text(%Task{} = task) do
+    def task_to_text(%Task{} = task, opts \\ []) do
       list = []
 
       action_str = Action.action_to_text(task.action)
@@ -68,7 +68,20 @@ defmodule RoboticaPlugins do
         case task.devices do
           nil -> list
           [] -> ["Nowhere:" | list]
-          devices -> [Enum.join(devices, ",") <> ":" | list]
+          devices -> [Enum.join(devices, ", ") <> ":" | list]
+        end
+
+      list =
+        case opts[:include_locations] do
+          true ->
+            case task.locations do
+              nil -> list
+              [] -> ["Nowhere:" | list]
+              locations -> [Enum.join(locations, ", ") <> ":" | list]
+            end
+
+          _ ->
+            list
         end
 
       Enum.join(list, " ")
@@ -116,17 +129,15 @@ defmodule RoboticaPlugins do
               mark: nil,
               repeat_number: 0
 
-    def step_to_text(%ScheduledStep{} = step) do
-      text =
-        step.tasks
-        |> Enum.map(fn task -> Task.task_to_text(task) end)
-        |> Enum.join(", ")
-
-      if not is_nil(step.repeat_number) do
-        "#{text}. (#{step.repeat_number})"
-      else
-        "#{text}."
-      end
+    def step_to_text(%ScheduledStep{} = step, opts \\ []) do
+      step.tasks
+      |> Enum.map(fn task -> Task.task_to_text(task, opts) end)
+      |> Enum.map(fn text ->
+        case step.repeat_number do
+          nil -> text
+          repeat_number -> "#{text}. (#{repeat_number})"
+        end
+      end)
     end
 
     def step_to_locations(%ScheduledStep{} = step) do

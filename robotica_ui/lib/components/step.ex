@@ -32,7 +32,9 @@ defmodule RoboticaUi.Components.Step do
         _ -> :white
       end
 
-    text = RoboticaPlugins.ScheduledStep.step_to_text(step)
+    text =
+      RoboticaPlugins.ScheduledStep.step_to_text(step)
+      |> Enum.join(", ")
 
     @graph
     |> rect({width, 40}, fill: background_color, translate: {0, 0})
