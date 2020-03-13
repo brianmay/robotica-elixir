@@ -239,7 +239,7 @@ defmodule Robotica.Plugins.Audio do
   defp handle_execute(state, action) do
     sound_list = get_sound_list(action)
 
-    case action.music.volume do
+    case get_in(action.music, [:volume]) do
       nil -> nil
       volume -> run(state, :volume, volume: volume)
     end
