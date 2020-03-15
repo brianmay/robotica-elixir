@@ -30,9 +30,10 @@ defmodule Robotica.Plugins.Audio do
   defmodule Config do
     @type t :: %__MODULE__{
             commands: Commands.t(),
-            sounds: %{required(String.t()) => String.t()}
+            sounds: %{required(String.t()) => String.t()},
+            volumes: %{required(atom()) => String.t()}
           }
-    @enforce_keys [:commands, :sounds]
+    @enforce_keys [:commands, :sounds, :volumes]
     defstruct commands: %Commands{
                 init: nil,
                 volume: nil,
@@ -43,13 +44,15 @@ defmodule Robotica.Plugins.Audio do
                 music_pause: nil,
                 music_resume: nil
               },
-              sounds: %{}
+              sounds: %{},
+              volumes: %{}
   end
 
   ## Server Callbacks
 
   def init(plugin) do
     run(plugin.config, :init, [])
+    set_volume(plugin.config, plugin.config.volumes.music)
     {:ok, plugin.config}
   end
 
@@ -80,11 +83,19 @@ defmodule Robotica.Plugins.Audio do
     }
   end
 
+  defp volumes do
+    %{
+      say: {:integer, true},
+      music: {:integer, true}
+    }
+  end
+
   def config_schema do
     %{
       struct_type: Robotica.Plugins.Audio.Config,
       commands: {commands(), true},
-      sounds: {sounds(), true}
+      sounds: {sounds(), true},
+      volumes: {volumes(), true}
     }
   end
 
@@ -145,7 +156,15 @@ defmodule Robotica.Plugins.Audio do
     end
   end
 
-  defp say(state, text) do
+  defp say(state, text, volume) do
+    say_volume =
+      case volume do
+        nil -> state.volumes.say
+        volume -> volume
+      end
+
+    set_volume(state, say_volume)
+
     play_sound(state, "prefix")
     run(state, :say, text: text)
     play_sound(state, "repeat")
@@ -161,12 +180,18 @@ defmodule Robotica.Plugins.Audio do
     end
   end
 
+  defp set_volume(state, volume) do
+    run(state, :volume, volume: volume)
+  end
+
   defp music_resume(state) do
+    set_volume(state, state.volumes.music)
     run(state, :music_resume, [])
     nil
   end
 
   defp music_play(state, play_list) do
+    set_volume(state, state.volumes.music)
     run(state, :music_play, play_list: play_list)
     nil
   end
@@ -183,8 +208,12 @@ defmodule Robotica.Plugins.Audio do
     [{:sound, sound} | sound_list]
   end
 
+  defp prepend_message(sound_list, %{message: %{text: text, volume: volume}}) do
+    [{:say, text, volume} | sound_list]
+  end
+
   defp prepend_message(sound_list, %{message: %{text: text}}) do
-    [{:say, text} | sound_list]
+    [{:say, text, nil} | sound_list]
   end
 
   defp prepend_message(sound_list, _), do: sound_list
@@ -216,8 +245,8 @@ defmodule Robotica.Plugins.Audio do
       {:sound, sound} ->
         play_sound(state, sound)
 
-      {:say, text} ->
-        say(state, text)
+      {:say, text, volume} ->
+        say(state, text, volume)
 
       {:music, nil} ->
         music_stop(state)
@@ -239,22 +268,34 @@ defmodule Robotica.Plugins.Audio do
   defp handle_execute(state, action) do
     sound_list = get_sound_list(action)
 
-    case get_in(action.music, [:volume]) do
-      nil -> nil
-      volume -> run(state, :volume, volume: volume)
-    end
-
     if length(sound_list) > 0 do
       paused = music_paused?(state)
+
       process_sound_list(state, sound_list)
 
-      if paused and not sound_list_has_music(sound_list) do
-        music_resume(state)
+      if not sound_list_has_music(sound_list) do
+        if paused do
+          music_resume(state)
+        else
+          set_volume(state, state.volumes.music)
+        end
       end
+    else
+      set_volume(state, state.volumes.music)
     end
   end
 
   def handle_cast({:execute, action}, state) do
+    state =
+      case get_in(action.music, [:volume]) do
+        nil ->
+          state
+
+        volume ->
+          volumes = %{state.volumes | music: volume}
+          %Config{state | volumes: volumes}
+      end
+
     handle_execute(state, action)
     {:noreply, state}
   end

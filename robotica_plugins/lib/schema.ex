@@ -13,7 +13,8 @@ defmodule RoboticaPlugins.Schema do
 
   def message_action_schema do
     %{
-      text: {:string, true}
+      text: {:string, true},
+      volume: {:integer, false}
     }
   end
 
