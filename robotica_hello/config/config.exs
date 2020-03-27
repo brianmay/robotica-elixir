@@ -9,7 +9,7 @@ use Mix.Config
 
 config :robotica_hello,
   ecto_repos: [RoboticaHello.Repo],
-  config_file: "../config/hello.yaml"
+  config_file: "../../local/config/hello.yaml"
 
 config :robotica_hello, RoboticaHello.Repo,
   url: System.get_env("DATABASE_URL"),

@@ -1,10 +1,10 @@
 use Mix.Config
 
 config :ceryx,
-  config_file: "../config/ceryx.yaml"
+  config_file: "../../local/config/ceryx.yaml"
 
 config :robotica_plugins,
-  config_common_file: "../config/common.yaml"
+  config_common_file: "../../local/config/common.yaml"
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

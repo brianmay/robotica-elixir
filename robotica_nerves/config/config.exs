@@ -8,15 +8,15 @@ use Mix.Config
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :robotica,
-  config_file: "../config/config.yaml",
-  classifications_file: "../config/classifications.yaml",
-  schedule_file: "../config/schedule.yaml",
-  sequences_file: "../config/sequences.yaml",
+  config_file: "../../local/config/config.yaml",
+  classifications_file: "../../local/config/classifications.yaml",
+  schedule_file: "../../local/config/schedule.yaml",
+  sequences_file: "../../local/config/sequences.yaml",
   timezone: "Australia/Melbourne"
 
 config :robotica_plugins,
   location: nil,
-  config_common_file: "../config/common.yaml",
+  config_common_file: "../../local/config/common.yaml",
   timezone: "Australia/Melbourne",
   map_types: [
     {Robotica.Plugin, {Robotica.Validation, :validate_plugin_config}}

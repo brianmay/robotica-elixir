@@ -5,11 +5,11 @@ use Mix.Config
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :ceryx,
-  config_file: "../config/ceryx.yaml"
+  config_file: "../../local/config/ceryx.yaml"
 
 config :robotica_plugins,
   location: nil,
-  config_common_file: "../config/common.yaml",
+  config_common_file: "../../local/config/common.yaml",
   map_types: []
 
 config :logger,
