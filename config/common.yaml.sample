@@ -61,7 +61,6 @@ locations:
         - action:
             music:
               stop: true
-    local_buttons:
     - name: "TV"
       buttons:
       - name: "WiiU"
