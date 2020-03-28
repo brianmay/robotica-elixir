@@ -1,3 +1,4 @@
 <h1>Local</h1>
-<%= live_render(@conn, RoboticaFaceWeb.Live.Local) %>
+<% user = RoboticaFace.Auth.current_user(@conn) %>
+<%= live_render(@conn, RoboticaFaceWeb.Live.Local, session: %{"user" => user}) %>
 <%= live_render(@conn, RoboticaFaceWeb.Live.Messages) %>

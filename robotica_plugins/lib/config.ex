@@ -26,7 +26,7 @@ defmodule RoboticaPlugins.Config do
 
     defp config_location_schema do
       %{
-        local_buttons: {{:list, button_row()}, false},
+        local_buttons: {{:list, button_row()}, true},
         remote_locations: {{:list, :string}, true}
       }
     end
@@ -35,7 +35,6 @@ defmodule RoboticaPlugins.Config do
       %{
         hosts: {{:map, :string, :string}, true},
         locations: {{:map, :string, config_location_schema()}, true},
-        local_buttons: {{:list, button_row()}, true},
         remote_buttons: {{:list, button_row()}, true}
       }
     end
@@ -56,20 +55,6 @@ defmodule RoboticaPlugins.Config do
       filename = Application.get_env(:robotica_plugins, :config_common_file)
       Loader.ui_common_configuration(filename)
     end
-  end
-
-  defp list_or_empty_list(list) do
-    case list do
-      nil -> []
-      list -> list
-    end
-  end
-
-  defp merge_buttons(lists_of_buttons) do
-    Enum.reduce(lists_of_buttons, [], fn buttons, list ->
-      buttons = list_or_empty_list(buttons)
-      list ++ buttons
-    end)
   end
 
   defp hostname do
@@ -97,13 +82,16 @@ defmodule RoboticaPlugins.Config do
     common_config = common_config()
     local_config = Map.fetch!(common_config.locations, location)
 
-    buttons = merge_buttons([common_config.local_buttons, local_config.local_buttons])
-
     %{
       local_location: location,
-      local_buttons: buttons,
+      local_buttons: local_config.local_buttons,
       remote_locations: local_config.remote_locations,
       remote_buttons: common_config.remote_buttons
     }
+  end
+
+  def ui_locations do
+    common_config = common_config()
+    Map.keys(common_config.locations)
   end
 end

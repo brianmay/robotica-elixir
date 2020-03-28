@@ -1,9 +1,6 @@
 hosts:
   silverfish: Brian
 locations:
-  "Passage":
-    remote_locations:
-    - "Passage"
   "Brian":
     remote_locations:
     - "Passage"
@@ -12,14 +9,58 @@ locations:
     - "Twins"
     - "Akira"
     - "Extension"
-  "Dining":
-    remote_locations:
-    - "Passage"
-    - "Brian"
-    - "Dining"
-    - "Twins"
-    - "Akira"
-    - "Extension"
+    local_buttons:
+    - name: "Lights"
+      buttons:
+      - name: "On"
+        tasks:
+        - action:
+            lights:
+              action: turn_on
+              color: {hue: 0, saturation: 0, brightness: 100, kelvin: 5000}
+            sound: "beep"
+      - name: "Dim"
+        tasks:
+        - action:
+            lights:
+              action: turn_on
+              color: {hue: 0, saturation: 0, brightness: 20, kelvin: 5000}
+            sound: "beep"
+      - name: "Sleep"
+        tasks:
+        - action:
+            lights:
+              action: turn_off
+              duration: 30
+            sound: "beep"
+      - name: "Off"
+        tasks:
+        - action:
+            lights:
+              action: turn_off
+            sound: "beep"
+    - name: "Music"
+      buttons:
+      - name: "Red"
+        tasks:
+        - action:
+            music:
+              play_list: "red"
+      - name: "Green"
+        tasks:
+        - action:
+            music:
+              play_list: "green"
+      - name: "Blue"
+        tasks:
+        - action:
+            music:
+              play_list: "blue"
+      - name: "Off"
+        tasks:
+        - action:
+            music:
+              stop: true
     local_buttons:
     - name: "TV"
       buttons:
@@ -43,92 +84,6 @@ locations:
         - action:
             hdmi:
               source: 4
-  "Twins":
-    remote_locations:
-    - "Twins"
-  "Akira":
-    remote_locations:
-    - "Akira"
-    - "Extension"
-  "Extension":
-    remote_locations:
-    - "Akira"
-    - "Extension"
-    local_buttons:
-    - name: "TV"
-      buttons:
-      - name: "WiiU"
-        tasks:
-        - action:
-            hdmi:
-              source: 1
-      - name: "Google"
-        tasks:
-        - action:
-            hdmi:
-              source: 2
-      - name: "XBox1"
-        tasks:
-        - action:
-            hdmi:
-              source: 3
-      - name: "MythTV"
-        tasks:
-        - action:
-            hdmi:
-              source: 4
-local_buttons:
-- name: "Lights"
-  buttons:
-  - name: "On"
-    tasks:
-    - action:
-        lights:
-          action: turn_on
-          color: {hue: 0, saturation: 0, brightness: 100, kelvin: 5000}
-        sound: "beep"
-  - name: "Dim"
-    tasks:
-    - action:
-        lights:
-          action: turn_on
-          color: {hue: 0, saturation: 0, brightness: 20, kelvin: 5000}
-        sound: "beep"
-  - name: "Sleep"
-    tasks:
-    - action:
-        lights:
-          action: turn_off
-          duration: 30
-        sound: "beep"
-  - name: "Off"
-    tasks:
-    - action:
-        lights:
-          action: turn_off
-        sound: "beep"
-- name: "Music"
-  buttons:
-  - name: "Red"
-    tasks:
-    - action:
-        music:
-          play_list: "red"
-  - name: "Green"
-    tasks:
-    - action:
-        music:
-          play_list: "green"
-  - name: "Blue"
-    tasks:
-    - action:
-        music:
-          play_list: "blue"
-  - name: "Off"
-    tasks:
-    - action:
-        music:
-          stop: true
 remote_buttons:
 - name: "Lights"
   buttons:
@@ -155,28 +110,6 @@ remote_buttons:
     - action:
         lights:
           action: turn_off
-- name: "Music"
-  buttons:
-  - name: "Red"
-    tasks:
-    - action:
-        music:
-          play_list: "red"
-  - name: "Green"
-    tasks:
-    - action:
-        music:
-          play_list: "green"
-  - name: "Blue"
-    tasks:
-    - action:
-        music:
-          play_list: "blue"
-  - name: "Off"
-    tasks:
-    - action:
-        music:
-          stop: true
 - name: "Message"
   buttons:
   - name: "Grandma"

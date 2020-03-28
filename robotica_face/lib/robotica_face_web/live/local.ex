@@ -2,8 +2,17 @@ defmodule RoboticaFaceWeb.Live.Local do
   use Phoenix.LiveView
   use EventBus.EventSource
 
+  alias RoboticaPlugins.Config
+
   def render(assigns) do
     ~L"""
+    <form phx-change="location">
+    <select name="location">
+    <%= for location <- @locations do %>
+    <option value="<%= location %>" <%= if location == @location do %>selected="True"<% end %>><%= location %></option>
+    <% end %>
+    </select>
+    </form>
     <%= for row <- @buttons do %>
     <div>
     <div><%= row.name %></div>
@@ -15,15 +24,20 @@ defmodule RoboticaFaceWeb.Live.Local do
     """
   end
 
-  def mount(_params, _session, socket) do
-    config = RoboticaPlugins.Config.ui_configuration()
+  def mount(_params, session, socket) do
+    locations = Config.ui_locations()
 
     socket =
       socket
-      |> assign(:buttons, config.local_buttons)
-      |> assign(:location, config.local_location)
+      |> set_location(session["user"]["location"])
+      |> assign(:locations, locations)
 
     {:ok, socket}
+  end
+
+  def handle_event("location", param, socket) do
+    socket = set_location(socket, param["location"])
+    {:noreply, socket}
   end
 
   def handle_event("activate", %{"row" => row_name, "button" => button_name}, socket) do
@@ -60,5 +74,21 @@ defmodule RoboticaFaceWeb.Live.Local do
     end
 
     {:noreply, socket}
+  end
+
+  defp set_location(socket, location) do
+    locations = Config.ui_locations()
+
+    location =
+      case Enum.member?(locations, location) do
+        true -> location
+        false -> Config.ui_location()
+      end
+
+    config = Config.ui_configuration(location)
+
+    socket
+    |> assign(:buttons, config.local_buttons)
+    |> assign(:location, config.local_location)
   end
 end

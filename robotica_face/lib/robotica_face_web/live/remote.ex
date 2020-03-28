@@ -2,6 +2,8 @@ defmodule RoboticaFaceWeb.Live.Remote do
   use Phoenix.LiveView
   use EventBus.EventSource
 
+  alias RoboticaPlugins.Config
+
   def render(assigns) do
     ~L"""
     <div>
@@ -27,12 +29,12 @@ defmodule RoboticaFaceWeb.Live.Remote do
   end
 
   def mount(_params, _session, socket) do
-    config = RoboticaPlugins.Config.ui_configuration()
+    config = Config.ui_configuration()
 
     socket =
       socket
       |> assign(:buttons, config.remote_buttons)
-      |> assign(:all_locations, config.remote_locations)
+      |> assign(:all_locations, MapSet.new(Config.ui_locations()))
       |> assign(:locations, MapSet.new())
 
     {:ok, socket}
