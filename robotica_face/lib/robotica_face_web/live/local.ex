@@ -8,6 +8,7 @@ defmodule RoboticaFaceWeb.Live.Local do
     ~L"""
     <form phx-change="location">
     <select name="location">
+    <option value="">None</option>
     <%= for location <- @locations do %>
     <option value="<%= location %>" <%= if location == @location do %>selected="True"<% end %>><%= location %></option>
     <% end %>
@@ -79,16 +80,14 @@ defmodule RoboticaFaceWeb.Live.Local do
   defp set_location(socket, location) do
     locations = Config.ui_locations()
 
-    location =
+    buttons =
       case Enum.member?(locations, location) do
-        true -> location
-        false -> Config.ui_location()
+        true -> Config.ui_local_buttons(location)
+        false -> []
       end
 
-    config = Config.ui_configuration(location)
-
     socket
-    |> assign(:buttons, config.local_buttons)
-    |> assign(:location, config.local_location)
+    |> assign(:buttons, buttons)
+    |> assign(:location, location)
   end
 end

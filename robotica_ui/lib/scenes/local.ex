@@ -5,6 +5,7 @@ defmodule RoboticaUi.Scene.Local do
   alias Scenic.Graph
   alias Scenic.ViewPort
 
+  alias RoboticaPlugins.Config
   alias RoboticaUi.Layout
   import RoboticaUi.Scene.Utils
   alias RoboticaUi.Components.Nav
@@ -20,9 +21,8 @@ defmodule RoboticaUi.Scene.Local do
     {:ok, %ViewPort.Status{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
 
     graph = @graph
-    configuration = RoboticaPlugins.Config.ui_configuration()
-    local_location = configuration.local_location
-    rows = configuration.local_buttons
+    location = Config.ui_default_location()
+    rows = Config.ui_local_buttons(location)
 
     graph = Layout.add_background(graph, vp_width, vp_height)
 
@@ -43,7 +43,7 @@ defmodule RoboticaUi.Scene.Local do
       end)
 
     graph = Nav.add_to_graph(graph, :local)
-    {:ok, %{location: local_location, graph: graph}, push: graph}
+    {:ok, %{location: location, graph: graph}, push: graph}
   end
 
   def handle_input(_event, _context, state) do

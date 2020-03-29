@@ -47,7 +47,7 @@ defmodule RoboticaUi.Execute do
   end
 
   def handle_cast({:execute, task}, state) do
-    location = RoboticaPlugins.Config.ui_location()
+    location = RoboticaPlugins.Config.ui_default_location()
 
     good_location = Enum.any?(task.locations, fn l -> l == location end)
     message = RoboticaPlugins.Action.action_to_message(task.action)

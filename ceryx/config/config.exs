@@ -8,7 +8,6 @@ config :ceryx,
   config_file: "../../local/config/ceryx.yaml"
 
 config :robotica_plugins,
-  location: nil,
   config_common_file: "../../local/config/common.yaml",
   map_types: []
 

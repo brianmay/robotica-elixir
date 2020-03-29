@@ -11,7 +11,6 @@ config :ceryx,
   config_file: nil
 
 config :robotica_plugins,
-  location: nil,
   config_common_file: nil,
   timezone: "Australia/Melbourne",
   map_types: [

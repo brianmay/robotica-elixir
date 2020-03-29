@@ -29,11 +29,9 @@ defmodule RoboticaFaceWeb.Live.Remote do
   end
 
   def mount(_params, _session, socket) do
-    config = Config.ui_configuration()
-
     socket =
       socket
-      |> assign(:buttons, config.remote_buttons)
+      |> assign(:buttons, Config.ui_remote_buttons())
       |> assign(:all_locations, MapSet.new(Config.ui_locations()))
       |> assign(:locations, MapSet.new())
 

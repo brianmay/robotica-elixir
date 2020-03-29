@@ -3,7 +3,6 @@ import Config
 port = String.to_integer(System.get_env("PORT") || "4000")
 
 config :robotica_plugins,
-  location: System.get_env("LOCATION"),
   config_common_file: System.get_env("ROBOTICA_COMMON_CONFIG")
 
 config :robotica_face, RoboticaFaceWeb.Endpoint,

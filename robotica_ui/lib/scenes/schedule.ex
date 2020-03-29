@@ -7,6 +7,7 @@ defmodule RoboticaUi.Scene.Schedule do
   alias Scenic.ViewPort
   import Scenic.Primitives
 
+  alias RoboticaPlugins.Config
   alias RoboticaUi.Layout
   alias RoboticaUi.Components.Nav
   alias RoboticaUi.Components.Step
@@ -51,8 +52,7 @@ defmodule RoboticaUi.Scene.Schedule do
   end
 
   defp update_schedule(graph, steps, width) do
-    configuration = RoboticaPlugins.Config.ui_configuration()
-    local_location = configuration.local_location
+    local_location = Config.ui_default_location()
 
     steps =
       steps

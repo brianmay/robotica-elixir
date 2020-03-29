@@ -6,6 +6,7 @@ defmodule RoboticaUi.Scene.Remote do
   alias Scenic.ViewPort
   import Scenic.Primitives
 
+  alias RoboticaPlugins.Config
   alias RoboticaUi.Layout
   import RoboticaUi.Scene.Utils
   alias RoboticaUi.Components.Nav
@@ -20,9 +21,9 @@ defmodule RoboticaUi.Scene.Remote do
     viewport = opts[:viewport]
     {:ok, %ViewPort.Status{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
 
-    configuration = RoboticaPlugins.Config.ui_configuration()
-    remote_locations = configuration.remote_locations
-    rows = configuration.remote_buttons
+    location = Config.ui_default_location()
+    remote_locations = Config.ui_remote_locations(location)
+    rows = Config.ui_remote_buttons()
 
     locations =
       case params[:locations] do

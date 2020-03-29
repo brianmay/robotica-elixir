@@ -1,6 +1,8 @@
 defmodule RoboticaFaceWeb.Live.Messages do
   use Phoenix.LiveView
 
+  alias RoboticaPlugins.Config
+
   def render(assigns) do
     ~L"""
     <%= if not is_nil(@text) do %>
@@ -11,13 +13,14 @@ defmodule RoboticaFaceWeb.Live.Messages do
     """
   end
 
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     RoboticaFace.Execute.register(self())
 
     socket =
       socket
       |> assign(:text, nil)
       |> assign(:timer, nil)
+      |> set_location(session["user"]["location"])
 
     {:ok, socket}
   end
@@ -40,7 +43,7 @@ defmodule RoboticaFaceWeb.Live.Messages do
   end
 
   def handle_cast({:execute, task}, socket) do
-    location = RoboticaPlugins.Config.ui_location()
+    location = socket.assigns.location
 
     good_location = Enum.any?(task.locations, fn l -> l == location end)
     message = RoboticaPlugins.Action.action_to_message(task.action)
@@ -62,5 +65,18 @@ defmodule RoboticaFaceWeb.Live.Messages do
       |> assign(:timer, nil)
 
     {:noreply, socket}
+  end
+
+  defp set_location(socket, location) do
+    locations = Config.ui_locations()
+
+    location =
+      case Enum.member?(locations, location) do
+        true -> location
+        false -> nil
+      end
+
+    socket
+    |> assign(:location, location)
   end
 end

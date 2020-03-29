@@ -62,7 +62,7 @@ defmodule RoboticaPlugins.Config do
     to_string(hostname)
   end
 
-  def ui_location do
+  def ui_default_location do
     case Application.get_env(:robotica_plugins, :location) do
       nil ->
         Map.fetch!(common_config().hosts, hostname())
@@ -72,22 +72,21 @@ defmodule RoboticaPlugins.Config do
     end
   end
 
-  def ui_configuration(location \\ nil) do
-    location =
-      case location do
-        nil -> ui_location()
-        location -> location
-      end
-
+  def ui_local_buttons(location) do
     common_config = common_config()
     local_config = Map.fetch!(common_config.locations, location)
+    local_config.local_buttons
+  end
 
-    %{
-      local_location: location,
-      local_buttons: local_config.local_buttons,
-      remote_locations: local_config.remote_locations,
-      remote_buttons: common_config.remote_buttons
-    }
+  def ui_remote_locations(location) do
+    common_config = common_config()
+    local_config = Map.fetch!(common_config.locations, location)
+    local_config.remote_locations
+  end
+
+  def ui_remote_buttons() do
+    common_config = common_config()
+    common_config.remote_buttons
   end
 
   def ui_locations do

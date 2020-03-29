@@ -1,3 +1,4 @@
 <h1>Tesla</h1>
-<%= live_render(@conn, RoboticaFaceWeb.Live.Tesla) %>
-<%= live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
+<% user = RoboticaFace.Auth.current_user(@conn) %>
+<%= live_render(@conn, RoboticaFaceWeb.Live.Tesla, session: %{"user" => user}) %>
+<%= live_render(@conn, RoboticaFaceWeb.Live.Messages, session: %{"user" => user}) %>
