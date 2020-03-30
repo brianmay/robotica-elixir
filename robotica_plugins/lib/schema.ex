@@ -39,6 +39,7 @@ defmodule RoboticaPlugins.Schema do
       sleep: {:integer, true},
       repeat: {:integer, false},
       color: {lights_color(), false},
+      colors_index: {:integer, false},
       colors: {{:list, repeat_colors()}, false}
     }
   end
@@ -54,6 +55,7 @@ defmodule RoboticaPlugins.Schema do
     %{
       action: {:string, true},
       color: {lights_color(), false},
+      colors_index: {:integer, false},
       colors: {{:list, repeat_colors()}, false},
       animation: {animation(), false},
       duration: {:integer, false}

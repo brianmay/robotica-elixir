@@ -72,10 +72,16 @@ defmodule Robotica.Plugins.LIFX do
     result =
       cond do
         not is_nil(frame.colors) and config.multizone ->
+          colors_index =
+            case frame.colors_index do
+              nil -> 0
+              index -> index
+            end
+
           case RLifx.expand_colors(frame.colors, frame_n) do
             {:ok, colors} ->
               debug_colors(colors)
-              colors = %Lifx.Protocol.HSBKS{list: colors}
+              colors = %Lifx.Protocol.HSBKS{list: colors, index: colors_index}
               Lifx.Device.set_extended_color_zones_wait(light, colors, 0)
 
             {:error, error} ->
