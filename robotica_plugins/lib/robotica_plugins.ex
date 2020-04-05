@@ -33,10 +33,11 @@ defmodule RoboticaPlugins do
       music_stop = get_in(action.music, [:stop])
       music_volume = get_in(action.music, [:volume])
 
-      volume = case message_volume do
-        nil -> ""
-        volume -> " at volume #{volume}%"
-      end
+      volume =
+        case message_volume do
+          nil -> ""
+          volume -> " at volume #{volume}%"
+        end
 
       []
       |> add_list_if_cond(v(message_text), "Say #{message_text}#{volume}")

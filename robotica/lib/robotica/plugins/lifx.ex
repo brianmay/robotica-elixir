@@ -49,15 +49,17 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp stop_task(state, stop_list) do
-    {stop_tasks, new_tasks} = Enum.split_with(state.tasks, fn {name, _} -> Enum.member?(stop_list, name) end)
-    Enum.each(stop_tasks, fn {_, task} ->  not is_nil(task) and Task.shutdown(task) end)
+    {stop_tasks, new_tasks} =
+      Enum.split_with(state.tasks, fn {name, _} -> Enum.member?(stop_list, name) end)
+
+    Enum.each(stop_tasks, fn {_, task} -> not is_nil(task) and Task.shutdown(task) end)
     %State{state | tasks: new_tasks |> Enum.into(%{})}
   end
 
   defp stop_all_tasks(state) do
     stop_tasks = state.tasks
     new_tasks = []
-    Enum.each(stop_tasks, fn {_, task} ->  not is_nil(task) and Task.shutdown(task) end)
+    Enum.each(stop_tasks, fn {_, task} -> not is_nil(task) and Task.shutdown(task) end)
     %State{state | tasks: new_tasks |> Enum.into(%{})}
   end
 
@@ -254,7 +256,6 @@ defmodule Robotica.Plugins.LIFX do
   defp do_stop(state, stop_list) do
     stop_task(state, stop_list)
   end
-
 
   @spec do_command(state :: Config.t(), command :: map | nil) :: State.t()
 
