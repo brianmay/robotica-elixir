@@ -27,15 +27,15 @@ defmodule Robotica.Plugins.LIFX do
   defmodule State do
     @type t :: %__MODULE__{
             config: Config.t(),
-            task: Task.t() | nil
+            tasks: %{required(String.t()) => Task.t()}
           }
-    defstruct [:config, :task]
+    defstruct [:config, :tasks]
   end
 
   ## Server Callbacks
 
   def init(plugin) do
-    {:ok, %State{config: plugin.config, task: nil}}
+    {:ok, %State{config: plugin.config, tasks: %{}}}
   end
 
   defp light_to_string(light) do
@@ -48,9 +48,17 @@ defmodule Robotica.Plugins.LIFX do
     |> Enum.map(fn task -> Task.await(task, :infinity) end)
   end
 
-  defp stop_task(state) do
-    not is_nil(state.task) and Task.shutdown(state.task)
-    %State{state | task: nil}
+  defp stop_task(state, stop_list) do
+    {stop_tasks, new_tasks} = Enum.split_with(state.tasks, fn {name, _} -> Enum.member?(stop_list, name) end)
+    Enum.each(stop_tasks, fn {_, task} ->  not is_nil(task) and Task.shutdown(task) end)
+    %State{state | tasks: new_tasks |> Enum.into(%{})}
+  end
+
+  defp stop_all_tasks(state) do
+    stop_tasks = state.tasks
+    new_tasks = []
+    Enum.each(stop_tasks, fn {_, task} ->  not is_nil(task) and Task.shutdown(task) end)
+    %State{state | tasks: new_tasks |> Enum.into(%{})}
   end
 
   defp get_duration(command) do
@@ -237,11 +245,20 @@ defmodule Robotica.Plugins.LIFX do
     end
   end
 
-  @spec do_command(state :: Config.t(), command :: map) :: State.t()
+  @spec do_stop(state :: Config.t(), stop_list :: list | nil) :: State.t()
+
+  defp do_stop(state, nil) do
+    stop_task(state, ["default"])
+  end
+
+  defp do_stop(state, stop_list) do
+    stop_task(state, stop_list)
+  end
+
+
+  @spec do_command(state :: Config.t(), command :: map | nil) :: State.t()
 
   defp do_command(state, %{action: "flash"} = command) do
-    state = stop_task(state)
-
     for_every_light(state, fn light ->
       Logger.debug("#{light_to_string(light)}: flash")
 
@@ -265,7 +282,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp do_command(state, %{action: "turn_off"} = command) do
-    state = stop_task(state)
+    state = stop_all_tasks(state)
 
     for_every_light(state, fn light ->
       Logger.debug("#{light_to_string(light)}: turn_off")
@@ -303,8 +320,6 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp do_command(state, %{action: "turn_on"} = command) do
-    state = stop_task(state)
-
     duration = get_duration(command)
 
     for_every_light(state, fn light ->
@@ -321,11 +336,9 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp do_command(state, %{action: "animate"} = command) do
-    state = stop_task(state)
-
     animation =
       case command.animation do
-        nil -> %{repeat: 0, frames: []}
+        nil -> %{repeat: 0, frames: [], name: "default"}
         animation -> animation
       end
 
@@ -335,7 +348,7 @@ defmodule Robotica.Plugins.LIFX do
           Logger.debug("#{light_to_string(light)}: animate")
 
           with {:ok, light_state} <- save_light(light, state.config),
-               :ok <- turn_on(light, true),
+               :ok <- turn_on(light, false),
                :ok <- animate(light, animation, state.config),
                :ok <- restore_light(light, light_state, state.config) do
             nil
@@ -346,7 +359,8 @@ defmodule Robotica.Plugins.LIFX do
         end)
       end)
 
-    %State{state | task: task}
+    tasks = Map.put(state.tasks, animation.name, task)
+    %State{state | tasks: tasks}
   end
 
   defp do_command(state, _command) do
@@ -355,13 +369,9 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec handle_execute(state :: Config.t(), action :: RoboticaPlugins.Action.t()) :: State.t()
   defp handle_execute(state, action) do
-    case action.lights do
-      %{} = lights ->
-        do_command(state, lights)
-
-      _ ->
-        state
-    end
+    state
+    |> do_stop(get_in(action.lights, [:stop]))
+    |> do_command(action.lights)
   end
 
   def handle_cast({:execute, action}, state) do
@@ -370,14 +380,8 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
-    state =
-      if state.task.pid == pid do
-        %State{state | task: nil}
-      else
-        state
-      end
-
-    {:noreply, state}
+    new_tasks = Enum.reject(state.tasks, fn {_, task_pid} -> task_pid == pid end)
+    {:noreply, %State{state | tasks: new_tasks}}
   end
 
   def handle_info({_ref, _status}, state) do

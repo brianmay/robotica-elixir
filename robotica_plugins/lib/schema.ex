@@ -46,6 +46,7 @@ defmodule RoboticaPlugins.Schema do
 
   def animation do
     %{
+      name: {:string, true},
       repeat: {:integer, false},
       frames: {{:list, frame()}, true}
     }
@@ -53,6 +54,7 @@ defmodule RoboticaPlugins.Schema do
 
   def lights_action_schema do
     %{
+      stop: {{:list, :string}, false},
       action: {:string, true},
       color: {lights_color(), false},
       colors_index: {:integer, false},
