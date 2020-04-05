@@ -24,6 +24,7 @@ defmodule RoboticaPlugins do
     defp add_list_if_empty(list, _), do: list
 
     def action_to_text(%Action{} = action) do
+      message_volume = get_in(action.message, [:volume])
       message_text = get_in(action.message, [:text])
       lights_action = get_in(action.lights, [:action])
       device_action = get_in(action.device, [:action])
@@ -32,8 +33,13 @@ defmodule RoboticaPlugins do
       music_stop = get_in(action.music, [:stop])
       music_volume = get_in(action.music, [:volume])
 
+      volume = case message_volume do
+        nil -> ""
+        volume -> " at volume #{volume}%"
+      end
+
       []
-      |> add_list_if_cond(v(message_text), "Say #{message_text}")
+      |> add_list_if_cond(v(message_text), "Say #{message_text}#{volume}")
       |> add_list_if_cond(v(lights_action), "Lights #{lights_action}")
       |> add_list_if_cond(v(device_action), "Device #{device_action}")
       |> add_list_if_cond(v(hdmi_source), "HDMI #{hdmi_source}")
