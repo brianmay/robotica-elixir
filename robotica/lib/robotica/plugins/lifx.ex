@@ -343,6 +343,8 @@ defmodule Robotica.Plugins.LIFX do
         animation -> animation
       end
 
+    stop_task(state, [animation.name])
+
     task =
       Task.async(fn ->
         for_every_light(state, fn light ->
