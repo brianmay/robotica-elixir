@@ -122,6 +122,13 @@ defmodule Robotica.Executor do
     Enum.reject(list, fn {_, list_pid} -> list_pid == pid end)
   end
 
+  def handle_info({_ref, nil}, state) do
+    # I have no idea where this message comes from, but it kills the executor
+    # process if we don't catch it. Often occurs after recovery from network
+    # failure.
+    state
+  end
+
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
     new_plugins =
       state.plugins
