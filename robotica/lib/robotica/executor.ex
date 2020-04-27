@@ -126,7 +126,7 @@ defmodule Robotica.Executor do
     # I have no idea where this message comes from, but it kills the executor
     # process if we don't catch it. Often occurs after recovery from network
     # failure.
-    state
+    {:noreply, state}
   end
 
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
