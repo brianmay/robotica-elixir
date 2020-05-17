@@ -54,7 +54,6 @@ defmodule RoboticaFaceWeb.Router do
     get "/local", PageController, :local
     get "/remote", PageController, :remote
     get "/schedule", PageController, :schedule
-    get "/tesla", PageController, :tesla
   end
 
   scope "/api", RoboticaFaceWeb do

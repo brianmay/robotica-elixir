@@ -91,22 +91,6 @@ defmodule Ceryx.Client do
     {:ok, state}
   end
 
-  def handle_message(["tesla"] = topic, publish, state) do
-    Logger.info("Received mqtt topic: #{Enum.join(topic, "/")}")
-
-    case Poison.decode(publish) do
-      {:ok, message} ->
-        EventSource.notify %{topic: :tesla} do
-          message
-        end
-
-      {:error, error} ->
-        Logger.error("Invalid tesla message received: #{inspect(error)}.")
-    end
-
-    {:ok, state}
-  end
-
   def handle_message(topic, publish, state) do
     Logger.info("Received unknown topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
     {:ok, state}

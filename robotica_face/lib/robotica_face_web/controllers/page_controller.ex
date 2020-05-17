@@ -16,8 +16,4 @@ defmodule RoboticaFaceWeb.PageController do
   def schedule(conn, _params) do
     render(conn, "schedule.html", active: "schedule")
   end
-
-  def tesla(conn, _params) do
-    render(conn, "tesla.html", active: "tesla")
-  end
 end

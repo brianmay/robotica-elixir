@@ -24,7 +24,6 @@ defmodule Ceryx.Supervisor do
   def init(opts) do
     client_id = get_tortoise_client_id()
 
-    EventBus.register_topic(:tesla)
     EventBus.register_topic(:schedule)
     EventBus.register_topic(:request_schedule)
     EventBus.register_topic(:execute)
@@ -49,7 +48,6 @@ defmodule Ceryx.Supervisor do
        subscriptions: [
          {"execute", 0},
          {"schedule/robotica-nerves-f447", 0},
-         {"tesla", 0}
        ]}
     ]
 
