@@ -83,6 +83,14 @@ defmodule RoboticaPlugins.String do
   {:ok, 3}
 
   iex> import RoboticaPlugins.String
+  iex> solve_string("1+-2")
+  {:ok, -1}
+
+  iex> import RoboticaPlugins.String
+  iex> solve_string("-1+2")
+  {:ok, 1}
+
+  iex> import RoboticaPlugins.String
   iex> solve_string("2*3")
   {:ok, 6}
 
