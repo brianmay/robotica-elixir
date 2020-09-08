@@ -8,10 +8,12 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const postcss_loader = {
     loader: 'postcss-loader',
     options: {
-      plugins: function () {
-        return [
-          require('autoprefixer')
-        ];
+      postcssOptions: {
+        plugins: function () {
+          return [
+            require('autoprefixer')
+          ];
+        }
       }
     }
 };
