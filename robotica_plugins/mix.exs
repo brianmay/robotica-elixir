@@ -22,7 +22,6 @@ defmodule RoboticaPlugins.MixProject do
   defp deps do
     [
       {:tzdata, "~> 1.0.2"},
-      {:hackney, "~> 1.15.2"},
       {:event_bus, "~> 1.6.0"},
       {:yaml_elixir, "~> 2.5.0"},
       {:dialyxir, "~> 1.0.0-rc.2", only: [:dev], runtime: false}

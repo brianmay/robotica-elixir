@@ -1,0 +1,33 @@
+#!/bin/sh -ex
+OLD_PWD="$PWD"
+
+cd robotica_face
+mix deps.get
+cd assets
+npm install
+npm run deploy
+cd ../
+mix phx.digest
+cd "$OLD_PWD"
+
+for i in robotica_plugins robotica robotica_face robotica_hello robotica_ui ceryx ceryx_docker; do
+    cd "$i"
+    mix deps.get
+    mix deps.clean --unlock --unused
+    mix compile
+    cd "$OLD_PWD"
+done
+
+for i in robotica_nerves ceryx_nerves; do
+    cd "$i"
+    for j in host rpi3; do
+        export MIX_TARGET="$j"
+        export NERVES_NETWORK_MGMT="WPA-PSK"
+
+        mix deps.get
+        mix deps.clean --unlock --unused
+        mix compile
+        unset MIX_TARGET
+    done
+    cd "$OLD_PWD"
+done
