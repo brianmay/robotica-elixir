@@ -15,7 +15,7 @@
     "@babel/preset-env": "^7.11.5",
     "autoprefixer": "^9.8.6",
     "babel-loader": "^8.1.0",
-    "bootstrap": "^4.5.2",
+    "bootstrap": "^4.5.3",
     "copy-webpack-plugin": "^6.2.1",
     "css-loader": "^4.3.0",
     "fibers": "^5.0.0",
