@@ -318,13 +318,13 @@ jobs:
       - run:
           name: Build and upload docker image
           command: |
+            docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
             docker build \
               --file "robotica_hello/Dockerfile" \
               --tag "brianmay/robotica_hello:latest" \
               --build-arg "BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`" \
               --build-arg "VCS_REF=$CIRCLE_SHA1" \
               .
-            docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
             docker push "brianmay/robotica_hello:latest"
 
   deploy-ceryx-docker-beta:
@@ -336,13 +336,13 @@ jobs:
       - run:
           name: Build and upload docker image
           command: |
+            docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
             docker build \
               --file "ceryx_docker/Dockerfile" \
               --tag "brianmay/ceryx_docker:latest" \
               --build-arg "BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`" \
               --build-arg "VCS_REF=$CIRCLE_SHA1" \
               .
-            docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
             docker push "brianmay/ceryx_docker:latest"
 
 workflows:
