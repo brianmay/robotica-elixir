@@ -67,7 +67,7 @@ case Mix.env() do
             "node_modules/webpack/bin/webpack.js",
             "--mode",
             "development",
-            "--watch-stdin",
+            "--watch",
             cd: Path.expand("../../robotica_face/assets", __DIR__)
           ]
         ],
