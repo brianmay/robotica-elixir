@@ -3,8 +3,7 @@ defmodule Robotica.Executor do
   use EventBus.EventSource
 
   defmodule State do
-    @type t :: %__MODULE__{
-          }
+    @type t :: %__MODULE__{}
     defstruct []
   end
 
@@ -68,5 +67,4 @@ defmodule Robotica.Executor do
     handle_execute(state, task)
     {:noreply, state}
   end
-
 end

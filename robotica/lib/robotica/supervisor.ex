@@ -55,6 +55,7 @@ defmodule Robotica.Supervisor do
          {"mark", 0},
          {"request/all/#", 0},
          {"request/#{client_id}/#", 0},
+         {"command/#", 0}
        ]}
     ]
 

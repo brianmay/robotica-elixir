@@ -208,6 +208,10 @@ defmodule Robotica.Plugins.Audio do
     [{:sound, sound} | sound_list]
   end
 
+  defp prepend_sound(sound_list, _) do
+    sound_list
+  end
+
   defp prepend_message(sound_list, %{message: %{text: text, volume: volume}}) do
     [{:say, text, volume} | sound_list]
   end
@@ -285,9 +289,9 @@ defmodule Robotica.Plugins.Audio do
     end
   end
 
-  def handle_cast({:execute, action}, state) do
+  def handle_command(state, command) do
     state =
-      case get_in(action.music, [:volume]) do
+      case get_in(command.music, [:volume]) do
         nil ->
           state
 
@@ -296,7 +300,20 @@ defmodule Robotica.Plugins.Audio do
           %Config{state | volumes: volumes}
       end
 
-    handle_execute(state, action)
+    handle_execute(state, command)
+  end
+
+  def handle_cast({:command, command}, state) do
+    case Robotica.Config.validate_audio_command(command) do
+      {:ok, command} -> handle_command(state, command)
+      {:error, error} -> Logger.error("Invalid audio command received: #{inspect(error)}.")
+    end
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:execute, action}, state) do
+    handle_command(state, action)
     {:noreply, state}
   end
 end

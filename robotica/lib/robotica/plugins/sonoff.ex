@@ -21,24 +21,36 @@ defmodule Robotica.Plugins.SonOff do
     }
   end
 
+  defp handle_command(state, command) do
+    power =
+      case command.action do
+        "turn_on" -> "on"
+        "turn_off" -> "off"
+        "toggle" -> "toggle"
+        _ -> "off"
+      end
+
+    case Robotica.Mqtt.publish_raw("cmnd/#{state.config.topic}/power", power) do
+      :ok -> nil
+      {:error, _} -> Logger.debug("Cannot send sonoff action On.")
+    end
+  end
+
+  def handle_cast({:command, command}, state) do
+    case Robotica.Config.validate_device_command(command) do
+      {:ok, command} -> handle_command(state, command)
+      {:error, error} -> Logger.error("Invalid sonoff command received: #{inspect(error)}.")
+    end
+    {:noreply, state}
+  end
+
   def handle_cast({:execute, action}, state) do
     case action.device do
       nil ->
         nil
 
-      device ->
-        power =
-          case device.action do
-            "turn_on" -> "on"
-            "turn_off" -> "off"
-            "toggle" -> "toggle"
-            _ -> "off"
-          end
-
-        case Robotica.Mqtt.publish_raw("cmnd/#{state.config.topic}/power", power) do
-          :ok -> nil
-          {:error, _} -> Logger.debug("Cannot send sonoff action On.")
-        end
+      command ->
+        handle_command(state, command)
     end
 
     {:noreply, state}

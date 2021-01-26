@@ -22,6 +22,12 @@ defmodule Robotica.Plugins.HDMI do
     }
   end
 
+  def handle_command(state, command) do
+    IO.puts("#{state.config.host} #{command.source} #{state.config.destination}")
+    Robotica.Devices.HDMI.switch(state.config.host, command.source, state.config.destination)
+    {:noreply, state}
+  end
+
   def handle_cast({:execute, %{hdmi: nil}}, state) do
     {:noreply, state}
   end
@@ -29,6 +35,26 @@ defmodule Robotica.Plugins.HDMI do
   def handle_cast({:execute, %{hdmi: hdmi}}, state) do
     IO.puts("#{state.config.host} #{hdmi.source} #{state.config.destination}")
     Robotica.Devices.HDMI.switch(state.config.host, hdmi.source, state.config.destination)
+    {:noreply, state}
+  end
+
+  def handle_cast({:command, command}, state) do
+    case Robotica.Config.validate_hdmi_command(command) do
+      {:ok, command} -> handle_command(state, command)
+      {:error, error} -> Logger.error("Invalid hdmi command received: #{inspect(error)}.")
+    end
+    {:noreply, state}
+  end
+
+  def handle_cast({:execute, action}, state) do
+    case action.hdmi do
+      nil ->
+        nil
+
+      command ->
+        handle_command(state, command)
+    end
+
     {:noreply, state}
   end
 end

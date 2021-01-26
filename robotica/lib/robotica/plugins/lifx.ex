@@ -370,15 +370,28 @@ defmodule Robotica.Plugins.LIFX do
     state
   end
 
-  @spec handle_execute(state :: Config.t(), action :: RoboticaPlugins.Action.t()) :: State.t()
-  defp handle_execute(state, action) do
+  @spec handle_command(state :: Config.t(), command :: map()) :: State.t()
+  defp handle_command(state, command) do
     state
-    |> do_stop(get_in(action.lights, [:stop]))
-    |> do_command(action.lights)
+    |> do_stop(get_in(command, [:stop]))
+    |> do_command(command)
+  end
+
+  def handle_cast({:command, command}, state) do
+    state = case Robotica.Config.validate_lights_command(command) do
+      {:ok, command} -> handle_command(state, command)
+      {:error, error} -> Logger.error("Invalid lifx command received: #{inspect(error)}.")
+    end
+    {:noreply, state}
   end
 
   def handle_cast({:execute, action}, state) do
-    state = handle_execute(state, action)
+    state =
+      case action.lights do
+        nil -> nil
+        command -> handle_command(state, command)
+      end
+
     {:noreply, state}
   end
 

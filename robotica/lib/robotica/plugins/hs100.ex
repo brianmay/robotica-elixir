@@ -21,18 +21,30 @@ defmodule Robotica.Plugins.Hs100 do
     }
   end
 
+  def handle_command(state, command) do
+    case command.action do
+      "turn_on" -> TpLinkHs100.on(state.config.id)
+      "turn_off" -> TpLinkHs100.off(state.config.id)
+      "toggle" -> :ok
+      _ -> :ok
+    end
+  end
+
+  def handle_cast({:command, command}, state) do
+    case Robotica.Config.validate_device_command(command) do
+      {:ok, command} -> IO.inspect(command); handle_command(state, command)
+      {:error, error} -> Logger.error("Invalid hs100 command received: #{inspect(error)}.")
+    end
+    {:noreply, state}
+  end
+
   def handle_cast({:execute, action}, state) do
     case action.device do
       nil ->
         nil
 
-      device ->
-        case device.action do
-          "turn_on" -> TpLinkHs100.on(state.config.id)
-          "turn_off" -> TpLinkHs100.off(state.config.id)
-          "toggle" -> :ok
-          _ -> :ok
-        end
+      command ->
+        handle_command(state, command)
     end
 
     {:noreply, state}

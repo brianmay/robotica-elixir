@@ -33,6 +33,12 @@ defmodule Robotica.Plugin do
     end
   end
 
+  @spec command(server :: pid, command :: map()) :: nil
+  def command(server, command) do
+    GenServer.cast(server, {:command, command})
+    nil
+  end
+
   @spec execute(server :: pid, action :: Action.t()) :: nil
   def execute(server, action) do
     GenServer.cast(server, {:execute, action})

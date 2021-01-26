@@ -82,6 +82,7 @@ defmodule Robotica.Config do
     end
   end
 
+
   @filename Application.get_env(:robotica, :config_file)
   @external_resource @filename
   @config Loader.configuration(@filename)
@@ -104,6 +105,22 @@ defmodule Robotica.Config do
 
   def validate_task(%{} = data) do
     Validation.validate_schema(data, Schema.task_schema())
+  end
+
+  def validate_audio_command(%{} = data) do
+    Validation.validate_schema(data, Schema.audio_action_schema())
+  end
+
+  def validate_hdmi_command(%{} = data) do
+    Validation.validate_schema(data, Schema.hdmi_action_schema())
+  end
+
+  def validate_device_command(%{} = data) do
+    Validation.validate_schema(data, Schema.device_action_schema())
+  end
+
+  def validate_lights_command(%{} = data) do
+    Validation.validate_schema(data, Schema.lights_action_schema())
   end
 
   def validate_mark(%{} = data) do

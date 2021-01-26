@@ -20,6 +20,11 @@ defmodule Robotica.Plugins.MQTT do
     }
   end
 
+  def handle_command({:command, _command}, state) do
+    # Do nothing for now
+    {:noreply, state}
+  end
+
   def handle_cast({:execute, action}, state) do
     case Robotica.Mqtt.publish_action(state.location, action) do
       :ok -> nil

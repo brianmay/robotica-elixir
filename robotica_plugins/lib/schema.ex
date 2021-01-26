@@ -76,6 +76,14 @@ defmodule RoboticaPlugins.Schema do
     }
   end
 
+  def audio_action_schema do
+    %{
+      sound: {sound_action_schema(), false},
+      music: {music_action_schema(), false},
+      message: {message_action_schema(), false},
+    }
+  end
+
   def action_schema do
     %{
       struct_type: RoboticaPlugins.Action,
