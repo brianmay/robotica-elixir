@@ -8,10 +8,28 @@ defmodule Robotica.Plugins.SonOff do
     defstruct [:topic]
   end
 
+  defmodule State do
+    @type t :: %__MODULE__{
+            config: Config.t(),
+            location: String.t(),
+            device: String.t()
+          }
+    defstruct [:config, :location, :device]
+  end
+
+  defp set_device_state(state, device_state) do
+    Robotica.Mqtt.publish_state(state.location, state.device, device_state)
+  end
+
   ## Server Callbacks
 
   def init(plugin) do
-    {:ok, plugin}
+    {:ok,
+     %State{
+       config: plugin.config,
+       location: plugin.location,
+       device: plugin.device
+     }}
   end
 
   def config_schema do
@@ -22,11 +40,11 @@ defmodule Robotica.Plugins.SonOff do
   end
 
   defp handle_command(state, command) do
-    power =
+    {power, on} =
       case command.action do
-        "turn_on" -> "on"
-        "turn_off" -> "off"
-        _ -> nil
+        "turn_on" -> {"on", true}
+        "turn_off" -> {"off", false}
+        _ -> {nil, nil}
       end
 
     if power != nil do
@@ -34,16 +52,23 @@ defmodule Robotica.Plugins.SonOff do
         :ok -> nil
         {:error, _} -> Logger.debug("Cannot send sonoff action On.")
       end
+    end
 
-      device_state = %{"state" => power}
-      Robotica.Mqtt.publish_state(state.location, state.device, device_state)
+    if on != nil do
+      device_state = %{"state" => on}
+      set_device_state(state, device_state)
+    else
+      state
     end
   end
 
   def handle_cast({:command, command}, state) do
     case Robotica.Config.validate_device_command(command) do
-      {:ok, command} -> handle_command(state, command)
-      {:error, error} -> Logger.error("Invalid sonoff command received: #{inspect(error)}.")
+      {:ok, command} ->
+        handle_command(state, command)
+
+      {:error, error} ->
+        Logger.error("Invalid sonoff command received: #{inspect(error)}.")
     end
 
     {:noreply, state}
