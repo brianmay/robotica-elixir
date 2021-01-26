@@ -20,7 +20,7 @@ defmodule Robotica.Plugin do
               {:ok, pid} | {:error, String.t()}
       def start_link(plugin) do
         with {:ok, pid} <- GenServer.start_link(__MODULE__, plugin, []) do
-          Robotica.Executor.add(Robotica.Executor, plugin.location, plugin.device, pid)
+          Robotica.PluginRegistry.add(plugin.location, plugin.device, pid)
           {:ok, pid}
         else
           err -> err

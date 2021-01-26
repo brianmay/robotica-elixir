@@ -38,6 +38,7 @@ defmodule Robotica.Supervisor do
     )
 
     children = [
+      {Robotica.PluginRegistry, name: Robotica.PluginRegistry},
       {Robotica.Executor, name: Robotica.Executor},
       {Robotica.Scheduler.Marks, name: Robotica.Scheduler.Marks},
       {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor},
