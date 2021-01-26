@@ -378,10 +378,12 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   def handle_cast({:command, command}, state) do
-    state = case Robotica.Config.validate_lights_command(command) do
-      {:ok, command} -> handle_command(state, command)
-      {:error, error} -> Logger.error("Invalid lifx command received: #{inspect(error)}.")
-    end
+    state =
+      case Robotica.Config.validate_lights_command(command) do
+        {:ok, command} -> handle_command(state, command)
+        {:error, error} -> Logger.error("Invalid lifx command received: #{inspect(error)}.")
+      end
+
     {:noreply, state}
   end
 

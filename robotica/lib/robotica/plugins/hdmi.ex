@@ -25,6 +25,8 @@ defmodule Robotica.Plugins.HDMI do
   def handle_command(state, command) do
     IO.puts("#{state.config.host} #{command.source} #{state.config.destination}")
     Robotica.Devices.HDMI.switch(state.config.host, command.source, state.config.destination)
+    device_state = %{"source" => command.source}
+    Robotica.Mqtt.publish_state(state.location, state.device, device_state)
     {:noreply, state}
   end
 
@@ -43,6 +45,7 @@ defmodule Robotica.Plugins.HDMI do
       {:ok, command} -> handle_command(state, command)
       {:error, error} -> Logger.error("Invalid hdmi command received: #{inspect(error)}.")
     end
+
     {:noreply, state}
   end
 

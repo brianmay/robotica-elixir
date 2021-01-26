@@ -1,14 +1,15 @@
 defmodule Robotica.Mqtt do
-  @spec publish_raw(String.t(), String.t()) :: :ok | {:error, String.t()}
-  def publish_raw(topic, data) do
+  @spec publish_raw(String.t(), String.t(), keyword()) :: :ok | {:error, String.t()}
+  def publish_raw(topic, data, opts \\ []) do
+    opts = Keyword.put_new(opts, :qos, 0)
     client_id = Robotica.Supervisor.get_tortoise_client_id()
-    Tortoise.publish(client_id, topic, data, qos: 0)
+    Tortoise.publish(client_id, topic, data, opts)
   end
 
-  @spec publish_json(String.t(), list() | map()) :: :ok | {:error, String.t()}
-  def publish_json(topic, data) do
+  @spec publish_json(String.t(), list() | map(), keyword()) :: :ok | {:error, String.t()}
+  def publish_json(topic, data, opts \\ []) do
     with {:ok, data} <- Poison.encode(data),
-         :ok <- publish_raw(topic, data) do
+         :ok <- publish_raw(topic, data, opts) do
       :ok
     else
       {:error, msg} -> {:error, "Tortoise.publish got error '#{msg}'"}
@@ -19,6 +20,13 @@ defmodule Robotica.Mqtt do
   def publish_action(location, action) do
     topic = "action/#{location}"
     publish_json(topic, action)
+  end
+
+  @spec publish_state(String.t(), String.t(), map()) :: :ok | {:error, String.t()}
+  def publish_state(location, device, state) do
+    topic = "state/#{location}/#{device}"
+    IO.puts("#{topic} #{inspect(state)}")
+    publish_json(topic, state, retain: true)
   end
 
   @spec publish_schedule(list(RoboticaPlugins.ScheduledStep.t())) :: :ok | {:error, String.t()}

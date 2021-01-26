@@ -82,7 +82,6 @@ defmodule Robotica.Config do
     end
   end
 
-
   @filename Application.get_env(:robotica, :config_file)
   @external_resource @filename
   @config Loader.configuration(@filename)
