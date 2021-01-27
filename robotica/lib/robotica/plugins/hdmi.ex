@@ -30,16 +30,6 @@ defmodule Robotica.Plugins.HDMI do
     {:noreply, state}
   end
 
-  def handle_cast({:execute, %{hdmi: nil}}, state) do
-    {:noreply, state}
-  end
-
-  def handle_cast({:execute, %{hdmi: hdmi}}, state) do
-    IO.puts("#{state.config.host} #{hdmi.source} #{state.config.destination}")
-    Robotica.Devices.HDMI.switch(state.config.host, hdmi.source, state.config.destination)
-    {:noreply, state}
-  end
-
   def handle_cast({:mqtt, _, :command, command}, state) do
     case Robotica.Config.validate_hdmi_command(command) do
       {:ok, command} -> handle_command(state, command)
