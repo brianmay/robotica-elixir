@@ -287,6 +287,8 @@ defmodule Robotica.Plugins.Audio do
     else
       set_volume(state, state.volumes.music)
     end
+
+    nil
   end
 
   def handle_command(state, command) do
@@ -301,19 +303,26 @@ defmodule Robotica.Plugins.Audio do
       end
 
     handle_execute(state, command)
+
+    state
   end
 
   def handle_cast({:mqtt, _, :command, command}, state) do
-    case Robotica.Config.validate_audio_command(command) do
-      {:ok, command} -> handle_command(state, command)
-      {:error, error} -> Logger.error("Invalid audio command received: #{inspect(error)}.")
-    end
+    state =
+      case Robotica.Config.validate_audio_command(command) do
+        {:ok, command} ->
+          handle_command(state, command)
+
+        {:error, error} ->
+          Logger.error("Invalid audio command received: #{inspect(error)}.")
+          state
+      end
 
     {:noreply, state}
   end
 
   def handle_cast({:execute, action}, state) do
-    handle_command(state, action)
+    state = handle_command(state, action)
     {:noreply, state}
   end
 end

@@ -431,7 +431,7 @@ defmodule Robotica.Plugins.LIFX do
   def handle_cast({:execute, action}, state) do
     state =
       case action.lights do
-        nil -> nil
+        nil -> state
         command -> handle_command(state, command)
       end
 
