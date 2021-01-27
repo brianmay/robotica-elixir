@@ -54,24 +54,6 @@ defmodule Robotica.Client do
     {:ok, state}
   end
 
-  def handle_message(["command", location, device] = topic, publish, state) do
-    Logger.info("Received mqtt topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
-
-    case Poison.decode(publish) do
-      {:ok, message} ->
-        pids = Robotica.PluginRegistry.lookup([location], [device])
-
-        Enum.each(pids, fn pid ->
-          Robotica.Plugin.command(pid, message)
-        end)
-
-      {:error, error} ->
-        Logger.error("Invalid command message received: #{inspect(error)}.")
-    end
-
-    {:ok, state}
-  end
-
   def handle_message(["execute"] = topic, publish, state) do
     Logger.info("Received mqtt topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
 
@@ -106,7 +88,20 @@ defmodule Robotica.Client do
   end
 
   def handle_message(topic, publish, state) do
-    Logger.info("Received unknown topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
+    case Poison.decode(publish) do
+      {:ok, message} ->
+        case Robotica.Subscriptions.message(topic, message) do
+          :ignored ->
+            Logger.info("Received unknown topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
+
+          :processed ->
+            Logger.info("Processed topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
+        end
+
+      {:error, error} ->
+        Logger.error("Invalid command message received: #{inspect(error)}.")
+    end
+
     {:ok, state}
   end
 

@@ -377,7 +377,7 @@ defmodule Robotica.Plugins.LIFX do
     |> do_command(command)
   end
 
-  def handle_cast({:command, command}, state) do
+  def handle_cast({:mqtt, _, :command, command}, state) do
     state =
       case Robotica.Config.validate_lights_command(command) do
         {:ok, command} -> handle_command(state, command)

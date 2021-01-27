@@ -25,7 +25,7 @@ defmodule Robotica.Mqtt do
   @spec publish_state(String.t(), String.t(), map()) :: :ok | {:error, String.t()}
   def publish_state(location, device, state) do
     topic = "state/#{location}/#{device}"
-    IO.puts("#{topic} #{inspect(state)}")
+    IO.puts("Publishing state #{topic} #{inspect(state)}")
     publish_json(topic, state, retain: true)
   end
 

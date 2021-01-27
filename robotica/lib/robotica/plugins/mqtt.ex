@@ -20,7 +20,7 @@ defmodule Robotica.Plugins.MQTT do
     }
   end
 
-  def handle_command({:command, _command}, state) do
+  def handle_command({:mqtt, _, :command, _command}, state) do
     # Do nothing for now
     {:noreply, state}
   end

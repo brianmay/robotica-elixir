@@ -21,10 +21,9 @@ defmodule Robotica.PluginRegistry do
     GenServer.call(Robotica.PluginRegistry, {:lookup, locations, devices})
   end
 
-  @spec add(location :: String.t(), device :: String.t(), pid :: pid) :: nil
+  @spec add(location :: String.t(), device :: String.t(), pid :: pid) :: :ok
   def add(location, device, pid) do
     GenServer.call(Robotica.PluginRegistry, {:add, location, device, pid})
-    nil
   end
 
   ## Server Callbacks
@@ -42,8 +41,7 @@ defmodule Robotica.PluginRegistry do
 
     _ref = Process.monitor(pid)
 
-    state
-    |> Map.put(:plugins, new_plugins)
+    %State{state | plugins: new_plugins}
   end
 
   @spec get_required_plugins(
@@ -69,7 +67,7 @@ defmodule Robotica.PluginRegistry do
 
   def handle_call({:add, location, device, pid}, _from, state) do
     new_state = handle_add(state, location, device, pid)
-    {:reply, nil, new_state}
+    {:reply, :ok, new_state}
   end
 
   @spec keyword_list_to_map(values :: list) :: map
@@ -88,7 +86,7 @@ defmodule Robotica.PluginRegistry do
       |> Enum.map(fn {location, l} -> {location, delete_pid_from_list(l, pid)} end)
       |> keyword_list_to_map()
 
-    new_state = Map.put(state, :plugins, new_plugins)
+    new_state = %State{state | plugins: new_plugins}
 
     {:noreply, new_state}
   end

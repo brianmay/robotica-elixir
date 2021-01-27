@@ -24,6 +24,11 @@ defmodule Robotica.Plugins.SonOff do
   ## Server Callbacks
 
   def init(plugin) do
+    Robotica.Subscriptions.subscribe(
+      ["stat", plugin.config.topic, "RESULT"],
+      :state,
+      self()
+    )
     {:ok,
      %State{
        config: plugin.config,
@@ -40,11 +45,11 @@ defmodule Robotica.Plugins.SonOff do
   end
 
   defp handle_command(state, command) do
-    {power, on} =
+    power =
       case command.action do
-        "turn_on" -> {"on", true}
-        "turn_off" -> {"off", false}
-        _ -> {nil, nil}
+        "turn_on" -> "on"
+        "turn_off" -> "off"
+        _ -> nil
       end
 
     if power != nil do
@@ -53,16 +58,9 @@ defmodule Robotica.Plugins.SonOff do
         {:error, _} -> Logger.debug("Cannot send sonoff action On.")
       end
     end
-
-    if on != nil do
-      device_state = %{"state" => on}
-      set_device_state(state, device_state)
-    else
-      state
-    end
   end
 
-  def handle_cast({:command, command}, state) do
+  def handle_cast({:mqtt, _, :command, command}, state) do
     case Robotica.Config.validate_device_command(command) do
       {:ok, command} ->
         handle_command(state, command)
@@ -71,6 +69,12 @@ defmodule Robotica.Plugins.SonOff do
         Logger.error("Invalid sonoff command received: #{inspect(error)}.")
     end
 
+    {:noreply, state}
+  end
+
+  def handle_cast({:mqtt, _, :state, msg}, state) do
+    power = Map.fetch!(msg, "POWER")
+    set_device_state(state, %{"POWER": power})
     {:noreply, state}
   end
 

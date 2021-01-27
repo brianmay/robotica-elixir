@@ -21,6 +21,13 @@ defmodule Robotica.Plugin do
       def start_link(plugin) do
         with {:ok, pid} <- GenServer.start_link(__MODULE__, plugin, []) do
           Robotica.PluginRegistry.add(plugin.location, plugin.device, pid)
+
+          Robotica.Subscriptions.subscribe(
+            ["command", plugin.location, plugin.device],
+            :command,
+            pid
+          )
+
           {:ok, pid}
         else
           err -> err
@@ -33,9 +40,9 @@ defmodule Robotica.Plugin do
     end
   end
 
-  @spec command(server :: pid, command :: map()) :: nil
-  def command(server, command) do
-    GenServer.cast(server, {:command, command})
+  @spec mqtt(server :: pid, topic :: list(String.t()), label :: atom(), command :: map()) :: nil
+  def mqtt(server, topic, label, command) do
+    GenServer.cast(server, {:mqtt, topic, label, command})
     nil
   end
 

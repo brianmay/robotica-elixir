@@ -40,7 +40,7 @@ defmodule Robotica.Plugins.HDMI do
     {:noreply, state}
   end
 
-  def handle_cast({:command, command}, state) do
+  def handle_cast({:mqtt, _, :command, command}, state) do
     case Robotica.Config.validate_hdmi_command(command) do
       {:ok, command} -> handle_command(state, command)
       {:error, error} -> Logger.error("Invalid hdmi command received: #{inspect(error)}.")

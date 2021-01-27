@@ -44,11 +44,11 @@ defmodule Robotica.Plugins.Hs100 do
       case command.action do
         "turn_on" ->
           TpLinkHs100.on(state.config.id)
-          %{"on" => true}
+          %{"POWER" => "ON"}
 
         "turn_off" ->
           TpLinkHs100.off(state.config.id)
-          %{"on" => false}
+          %{"POWER" => "OFF"}
 
         _ ->
           nil
@@ -59,7 +59,7 @@ defmodule Robotica.Plugins.Hs100 do
     end
   end
 
-  def handle_cast({:command, command}, state) do
+  def handle_cast({:mqtt, _, :command, command}, state) do
     case Robotica.Config.validate_device_command(command) do
       {:ok, command} ->
         handle_command(state, command)

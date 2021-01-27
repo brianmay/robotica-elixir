@@ -39,6 +39,7 @@ defmodule Robotica.Supervisor do
 
     children = [
       {Robotica.PluginRegistry, name: Robotica.PluginRegistry},
+      {Robotica.Subscriptions, name: Robotica.Subscriptions},
       {Robotica.Executor, name: Robotica.Executor},
       {Robotica.Scheduler.Marks, name: Robotica.Scheduler.Marks},
       {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor},
@@ -54,8 +55,7 @@ defmodule Robotica.Supervisor do
          {"execute", 0},
          {"mark", 0},
          {"request/all/#", 0},
-         {"request/#{client_id}/#", 0},
-         {"command/#", 0}
+         {"request/#{client_id}/#", 0}
        ]}
     ]
 
