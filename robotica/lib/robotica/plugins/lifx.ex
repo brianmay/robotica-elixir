@@ -37,6 +37,8 @@ defmodule Robotica.Plugins.LIFX do
   ## Server Callbacks
 
   def init(plugin) do
+    {:ok, _} = :timer.send_interval(5_000, :check_light)
+
     {:ok,
      %State{location: plugin.location, device: plugin.device, config: plugin.config, tasks: %{}}}
   end
@@ -59,7 +61,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp set_device_power(state, power) do
-    power = if power, do: "ON", else: "OFF"
+    power = if power != 0, do: "ON", else: "OFF"
 
     device_state = %{
       "POWER" => power
@@ -68,8 +70,63 @@ defmodule Robotica.Plugins.LIFX do
     Robotica.Mqtt.publish_state(state.location, state.device, device_state, topic: "power")
   end
 
+  defp set_device_hard_off(state) do
+    device_state = %{
+      "POWER" => "HARD_OFF"
+    }
+
+    Robotica.Mqtt.publish_state(state.location, state.device, device_state, topic: "power")
+  end
+
+  defp set_color_wait(state, light, color, duration) do
+    rc = Lifx.Device.set_color_wait(light, color, duration)
+
+    case rc do
+      {:ok, _} -> set_device_color(state, color)
+      {:error, _} -> set_device_hard_off(state)
+    end
+
+    rc
+  end
+
+  defp set_power_wait(state, light, power) do
+    rc = Lifx.Device.set_power_wait(light, power)
+
+    case rc do
+      {:ok, _} -> set_device_power(state, power)
+      {:error, _} -> set_device_hard_off(state)
+    end
+
+    rc
+  end
+
+  def on_wait(state, light) do
+    set_power_wait(state, light, 65535)
+  end
+
+  def off_wait(state, light) do
+    set_power_wait(state, light, 0)
+  end
+
+  defp set_extended_color_zones_wait(state, light, colors, duration) do
+    rc = Lifx.Device.set_extended_color_zones_wait(light, colors, duration)
+
+    case rc do
+      {:ok, _} -> set_device_color(state, hd(colors.list))
+      {:error, _} -> set_device_hard_off(state)
+    end
+
+    rc
+  end
+
   defp for_every_light(state, callback) do
-    Enum.filter(Lifx.Client.devices(), &Enum.member?(state.config.lights, &1.label))
+    devices = Enum.filter(Lifx.Client.devices(), &Enum.member?(state.config.lights, &1.label))
+
+    if length(devices) == 0 do
+      set_device_hard_off(state)
+    end
+
+    devices
     |> Enum.map(fn light -> Task.async(fn -> callback.(light) end) end)
     |> Enum.map(fn task -> Task.await(task, :infinity) end)
   end
@@ -118,8 +175,7 @@ defmodule Robotica.Plugins.LIFX do
             {:ok, colors} ->
               debug_colors(colors)
               colors = %Lifx.Protocol.HSBKS{list: colors, index: colors_index}
-              Lifx.Device.set_extended_color_zones_wait(light, colors, 0)
-              set_device_color(state, hd(colors.lights))
+              set_extended_color_zones_wait(state, light, colors, 0)
 
             {:error, error} ->
               Logger.info(
@@ -132,8 +188,7 @@ defmodule Robotica.Plugins.LIFX do
 
           case RLifx.eval_color(frame.color, values) do
             {:ok, color} ->
-              Lifx.Device.set_color_wait(light, color, duration)
-              set_device_color(state, color)
+              set_color_wait(state, light, color, duration)
 
             {:error, error} ->
               Logger.info(
@@ -164,7 +219,7 @@ defmodule Robotica.Plugins.LIFX do
       Logger.debug("#{light_to_string(light)}: turn_on")
 
       if power == 0 or force_brightness_off do
-        Lifx.Device.set_color_wait(light, color_off, 0)
+        set_color_wait(state, light, color_off, 0)
       else
         {:ok, nil}
       end
@@ -173,9 +228,7 @@ defmodule Robotica.Plugins.LIFX do
     with {:ok, power} <- Lifx.Device.get_power(light),
          Logger.debug("#{light_to_string(light)}: Turn on power #{power}."),
          {:ok, _} <- set_off_color.(light, power),
-         {:ok, _} <- Lifx.Device.on_wait(light) do
-      set_device_power(state, true)
-      set_device_color(state, color_off)
+         {:ok, _} <- on_wait(state, light) do
       :ok
     else
       {:error, err} -> {:error, err}
@@ -205,20 +258,16 @@ defmodule Robotica.Plugins.LIFX do
   def restore_light(state, light, {power, colors}, config) do
     case config.multizone do
       true ->
-        with {:ok, _} <- Lifx.Device.set_extended_color_zones_wait(light, colors, 0),
-             {:ok, _} <- Lifx.Device.set_power_wait(light, power) do
-          set_device_power(state, power)
-          set_device_color(state, hd(colors.lights))
+        with {:ok, _} <- set_extended_color_zones_wait(state, light, colors, 0),
+             {:ok, _} <- set_power_wait(state, light, power) do
           :ok
         else
           {:error, error} -> {:error, error}
         end
 
       false ->
-        with {:ok, _} <- Lifx.Device.set_color_wait(light, colors, 0),
-             {:ok, _} <- Lifx.Device.set_power_wait(light, power) do
-          set_device_power(state, power)
-          set_device_color(state, colors)
+        with {:ok, _} <- set_color_wait(state, light, colors, 0),
+             {:ok, _} <- set_power_wait(state, light, power) do
           :ok
         else
           {:error, error} -> {:error, error}
@@ -299,7 +348,7 @@ defmodule Robotica.Plugins.LIFX do
 
       with {:ok, light_state} <- save_light(light, state.config),
            :ok <- set_color(state, light, command, state.config, 0, 0),
-           {:ok, _} <- Lifx.Device.on_wait(light),
+           {:ok, _} <- on_wait(state, light),
            Process.sleep(400),
            :ok <- restore_light(state, light, light_state, state.config),
            Process.sleep(400),
@@ -327,7 +376,7 @@ defmodule Robotica.Plugins.LIFX do
       set_off =
         if duration == 0 do
           fn light ->
-            Lifx.Device.off_wait(light)
+            off_wait(state, light)
           end
         else
           color_off = %Lifx.Protocol.HSBK{
@@ -338,15 +387,12 @@ defmodule Robotica.Plugins.LIFX do
           }
 
           fn light ->
-            rc = Lifx.Device.set_color_wait(light, color_off, duration)
-            set_device_color(state, color_off)
-            rc
+            set_color_wait(state, light, color_off, duration)
           end
         end
 
       case set_off.(light) do
         {:ok, _} ->
-          set_device_power(state, false)
           nil
 
         {:error, err} ->
@@ -434,6 +480,24 @@ defmodule Robotica.Plugins.LIFX do
         nil -> state
         command -> handle_command(state, command)
       end
+
+    {:noreply, state}
+  end
+
+  def handle_info(:check_light, state) do
+    if state.tasks == %{} do
+      for_every_light(state, fn light ->
+        case save_light(light, state.config) do
+          {:ok, {power, %Lifx.Protocol.HSBK{} = color}} ->
+            set_device_power(state, power)
+            set_device_color(state, color)
+
+          {:ok, {power, %Lifx.Protocol.HSBKS{} = colors}} ->
+            set_device_power(state, power)
+            set_device_color(state, hd(colors.list))
+        end
+      end)
+    end
 
     {:noreply, state}
   end

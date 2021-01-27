@@ -34,8 +34,6 @@ defmodule Robotica.Mqtt do
         "state/#{location}/#{device}/#{topic}"
       end
 
-    IO.puts("Publishing state #{topic} #{inspect(state)}")
-
     publish_json(topic, state, opts)
   end
 
