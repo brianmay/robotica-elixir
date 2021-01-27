@@ -217,6 +217,9 @@ defmodule RoboticaPlugins.String do
       is_integer(string) ->
         {:ok, string}
 
+      is_float(string) ->
+        {:ok, round(string)}
+
       true ->
         with {:ok, string} <- replace_values(string, values),
              {:ok, result} <- solve_string(string) do

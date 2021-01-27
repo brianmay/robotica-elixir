@@ -22,11 +22,21 @@ defmodule Robotica.Mqtt do
     publish_json(topic, action)
   end
 
-  @spec publish_state(String.t(), String.t(), map()) :: :ok | {:error, String.t()}
-  def publish_state(location, device, state) do
-    topic = "state/#{location}/#{device}"
+  @spec publish_state(String.t(), String.t(), map(), keyword()) :: :ok | {:error, String.t()}
+  def publish_state(location, device, state, opts \\ []) do
+    {topic, opts} = Keyword.pop(opts, :topic)
+    opts = Keyword.put(opts, :retain, true)
+
+    topic =
+      if topic == nil do
+        "state/#{location}/#{device}"
+      else
+        "state/#{location}/#{device}/#{topic}"
+      end
+
     IO.puts("Publishing state #{topic} #{inspect(state)}")
-    publish_json(topic, state, retain: true)
+
+    publish_json(topic, state, opts)
   end
 
   @spec publish_schedule(list(RoboticaPlugins.ScheduledStep.t())) :: :ok | {:error, String.t()}

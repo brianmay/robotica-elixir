@@ -29,6 +29,7 @@ defmodule Robotica.Plugins.SonOff do
       :state,
       self()
     )
+
     {:ok,
      %State{
        config: plugin.config,
@@ -74,7 +75,7 @@ defmodule Robotica.Plugins.SonOff do
 
   def handle_cast({:mqtt, _, :state, msg}, state) do
     power = Map.fetch!(msg, "POWER")
-    set_device_state(state, %{"POWER": power})
+    set_device_state(state, %{"POWER" => power})
     {:noreply, state}
   end
 
