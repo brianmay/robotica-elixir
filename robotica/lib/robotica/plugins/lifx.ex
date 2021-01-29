@@ -495,6 +495,8 @@ defmodule Robotica.Plugins.LIFX do
           {:ok, {power, %Lifx.Protocol.HSBKS{} = colors}} ->
             set_device_power(state, power)
             set_device_color(state, hd(colors.list))
+
+          {:error, _} -> nil
         end
       end)
     end
