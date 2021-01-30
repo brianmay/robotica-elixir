@@ -6,7 +6,6 @@ defmodule Ceryx.CeryxService do
   def process({:request_schedule = topic, id}) do
     Logger.info("got request_schedule")
     EventBus.fetch_event_data({topic, id})
-    Ceryx.Mqtt.request_schedule()
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 
