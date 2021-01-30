@@ -8,7 +8,6 @@
 
     <ul>
         <li><%= link("Local", to: Routes.page_path(@conn, :local)) %></li>
-        <li><%= link("Remote", to: Routes.page_path(@conn, :remote)) %></li>
         <li><%= link("Schedule", to: Routes.page_path(@conn, :schedule)) %></li>
     </ul>
 <% else %>

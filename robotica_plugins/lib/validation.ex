@@ -6,10 +6,7 @@ defmodule RoboticaPlugins.Validation do
   end
 
   defp plugin_available?(module) do
-    case module_compiled?(module) do
-      true -> function_exported?(module, :config_schema, 0)
-      false -> false
-    end
+    true
   end
 
   defp split_time(value) do

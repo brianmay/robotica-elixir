@@ -9,10 +9,6 @@ defmodule RoboticaFaceWeb.PageController do
     render(conn, "local.html", active: "local")
   end
 
-  def remote(conn, _params) do
-    render(conn, "remote.html", active: "remote")
-  end
-
   def schedule(conn, _params) do
     render(conn, "schedule.html", active: "schedule")
   end

@@ -52,7 +52,6 @@ defmodule RoboticaFaceWeb.Router do
     pipe_through :ensure_auth
 
     get "/local", PageController, :local
-    get "/remote", PageController, :remote
     get "/schedule", PageController, :schedule
   end
 

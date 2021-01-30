@@ -1,4 +1,0 @@
-<h1>Remote</h1>
-<% user = RoboticaFace.Auth.current_user(@conn) %>
-<%= live_render(@conn, RoboticaFaceWeb.Live.Remote, session: %{"user" => user}) %>
-<%= live_render(@conn, RoboticaFaceWeb.Live.Messages, session: %{"user" => user}) %>

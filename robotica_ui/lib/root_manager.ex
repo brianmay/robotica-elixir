@@ -18,16 +18,15 @@ defmodule RoboticaUi.RootManager do
             clock: atom() | {atom(), any()} | nil,
             schedule: atom() | {atom(), any()} | nil,
             local: atom() | {atom(), any()} | nil,
-            remote: atom() | {atom(), any()} | nil
           }
-    defstruct [:clock, :schedule, :local, :remote]
+    defstruct [:clock, :schedule, :local]
   end
 
   defmodule State do
     @type t :: %__MODULE__{
             scenes: Scenes.t(),
             tabs: Tabs.t(),
-            tab: :clock | :schedule | :local | :remote,
+            tab: :clock | :schedule | :local,
             timer: reference() | nil,
             priority_scene: atom() | {atom(), any()} | nil
           }
@@ -35,8 +34,7 @@ defmodule RoboticaUi.RootManager do
               tabs: %Tabs{
                 clock: {RoboticaUi.Scene.Clock, nil},
                 schedule: {RoboticaUi.Scene.Schedule, nil},
-                local: {RoboticaUi.Scene.Local, nil},
-                remote: {RoboticaUi.Scene.Remote, nil}
+                local: {RoboticaUi.Scene.Local, nil}
               },
               tab: :clock,
               timer: nil,
@@ -58,13 +56,13 @@ defmodule RoboticaUi.RootManager do
     GenServer.cast(__MODULE__, {:set_priority_scene, scene})
   end
 
-  @spec set_tab_scene(:clock | :schedule | :local | :remote, atom() | {atom(), any()} | nil) ::
+  @spec set_tab_scene(:clock | :schedule | :local, atom() | {atom(), any()} | nil) ::
           nil
   def set_tab_scene(id, scene) do
     GenServer.cast(__MODULE__, {:set_tab_scene, id, scene})
   end
 
-  @spec set_tab(:clock | :schedule | :local | :remote) :: nil
+  @spec set_tab(:clock | :schedule | :local) :: nil
   def set_tab(id) do
     GenServer.cast(__MODULE__, {:set_tab, id})
   end
