@@ -41,7 +41,7 @@ defmodule Robotica.Mqtt do
   def publish_schedule(steps) do
     client_id = Robotica.Supervisor.get_tortoise_client_id()
     topic = "schedule/#{client_id}"
-    publish_json(topic, steps)
+    publish_json(topic, steps, retain: true)
   end
 
   @spec publish_mark(map()) :: :ok | {:error, String.t()}

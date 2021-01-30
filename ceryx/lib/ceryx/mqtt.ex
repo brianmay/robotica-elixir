@@ -21,12 +21,6 @@ defmodule Ceryx.Mqtt do
     publish_json(topic, action)
   end
 
-  @spec request_schedule() :: :ok | {:error, String.t()}
-  def request_schedule() do
-    topic = "request/robotica-nerves-f447/schedule"
-    publish_json(topic, %{})
-  end
-
   @spec publish_schedule_delete(list(RoboticaPlugins.ScheduledStep.t())) ::
           :ok | {:error, String.t()}
   def publish_schedule_delete(steps) do

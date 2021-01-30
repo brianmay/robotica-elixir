@@ -81,12 +81,6 @@ defmodule Robotica.Client do
     {:ok, state}
   end
 
-  def handle_message(["request", _, "schedule"] = topic, publish, state) do
-    Logger.info("Received mqtt topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
-    Robotica.Scheduler.Executor.publish_schedule(Robotica.Scheduler.Executor)
-    {:ok, state}
-  end
-
   def handle_message(topic, publish, state) do
     case Poison.decode(publish) do
       {:ok, message} ->
