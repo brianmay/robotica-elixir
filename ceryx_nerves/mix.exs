@@ -9,6 +9,7 @@ defmodule CeryxNerves.MixProject do
       app: @app,
       version: "0.1.0",
       elixir: "~> 1.4",
+      elixirc_options: [warnings_as_errors: true],
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       target: @target,
       archives: [nerves_bootstrap: "~> 1.6"],

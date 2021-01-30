@@ -6,6 +6,7 @@ defmodule CeryxDocker.MixProject do
       app: :ceryx_docker,
       version: "0.1.0",
       elixir: "~> 1.10",
+      elixirc_options: [warnings_as_errors: true],
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
