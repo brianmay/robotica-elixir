@@ -44,7 +44,7 @@ defmodule RoboticaFaceWeb.Live.Local do
   def handle_event("activate", %{"row" => row_name, "button" => button_name}, socket) do
     buttons = socket.assigns.buttons
     location = socket.assigns.location
-    event_params = %{topic: :remote_execute}
+    event_params = %{topic: :command}
 
     button =
       buttons
@@ -57,18 +57,18 @@ defmodule RoboticaFaceWeb.Live.Local do
         nil
 
       button ->
-        Enum.each(button.tasks, fn task ->
+        Enum.each(button.commands, fn command ->
           locations =
-            case task.locations do
+            case command.locations do
               nil -> [location]
               locations -> locations
             end
 
           EventSource.notify event_params do
-            %RoboticaPlugins.Task{
+            %RoboticaPlugins.Command{
               locations: locations,
-              devices: task.devices,
-              action: task.action
+              devices: command.devices,
+              msg: command.msg
             }
           end
         end)

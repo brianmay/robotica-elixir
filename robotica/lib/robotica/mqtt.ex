@@ -62,4 +62,10 @@ defmodule Robotica.Mqtt do
     topic = "execute"
     publish_json(topic, task)
   end
+
+  @spec publish_command(String.t(), String.t(), map()) :: :ok | {:error, String.t()}
+  def publish_command(location, device, msg) do
+    topic =  "command/#{location}/#{device}"
+    publish_json(topic, msg)
+  end
 end

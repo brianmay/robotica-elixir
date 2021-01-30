@@ -1,19 +1,17 @@
 defmodule RoboticaPlugins.Config do
   defmodule Loader do
-    alias RoboticaPlugins.Schema
-
-    defp button_task do
+    defp button_command do
       %{
         locations: {{:list, :string}, false},
-        devices: {{:list, :string}, false},
-        action: {Schema.action_schema(), true}
+        devices: {{:list, :string}, true},
+        msg: {{:map, :string, :any}, true}
       }
     end
 
     defp button do
       %{
         name: {:string, true},
-        tasks: {{:list, button_task()}, true}
+        commands: {{:list, button_command()}, true}
       }
     end
 

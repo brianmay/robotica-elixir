@@ -56,6 +56,16 @@ defmodule RoboticaPlugins do
     end
   end
 
+  defmodule Command do
+    @type t :: %__MODULE__{
+            locations: list(String.t()),
+            devices: list(String.t()),
+            msg: map(),
+          }
+    @enforce_keys [:locations, :devices, :msg]
+    defstruct locations: nil, devices: nil, msg: nil
+  end
+
   defmodule Task do
     @type t :: %__MODULE__{
             locations: list(String.t()),

@@ -32,7 +32,7 @@ defmodule RoboticaUi.Scene.Local do
 
         {graph, _} =
           Enum.reduce(row.buttons, {graph, 1}, fn button, {graph, x} ->
-            id = {:action, button.tasks}
+            id = {:command, button.commands}
 
             graph = add_button(graph, button.name, id, x, y, theme: :primary)
 
@@ -56,8 +56,8 @@ defmodule RoboticaUi.Scene.Local do
 
     state =
       case button do
-        {:action, tasks} ->
-          handle_action_press(tasks, state)
+        {:command, commands} ->
+          handle_command_press(commands, state)
 
         _ ->
           state
@@ -66,21 +66,21 @@ defmodule RoboticaUi.Scene.Local do
     {:halt, state, push: state.graph}
   end
 
-  def handle_action_press(tasks, state) do
-    event_params = %{topic: :remote_execute}
+  def handle_command_press(commands, state) do
+    event_params = %{topic: :command}
 
-    Enum.each(tasks, fn task ->
+    Enum.each(commands, fn command ->
       locations =
-        case task.locations do
+        case command.locations do
           nil -> [state.location]
           locations -> locations
         end
 
       EventSource.notify event_params do
-        %RoboticaPlugins.Task{
+        %RoboticaPlugins.Command{
           locations: locations,
-          devices: task.devices,
-          action: task.action
+          devices: command.devices,
+          msg: command.msg
         }
       end
     end)

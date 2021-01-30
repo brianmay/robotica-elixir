@@ -9,10 +9,13 @@ defmodule Ceryx.CeryxService do
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 
-  def process({:remote_execute = topic, id}) do
-    task = EventBus.fetch_event_data({topic, id})
-    Logger.info("got remote execute #{inspect(task)}")
-    Ceryx.Mqtt.publish_execute(task)
+  def process({:command = topic, id}) do
+    Logger.info("got command #{inspect(command)}")
+    Enum.each(command.locations, fn location ->
+        Enum.each(command.devices, fn device ->
+            Ceryx.Mqtt.publish_command(location, device, command.msg)
+        end)
+    end)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 

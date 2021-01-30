@@ -10,10 +10,14 @@ defmodule Robotica.RoboticaService do
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 
-  def process({:remote_execute = topic, id}) do
-    task = EventBus.fetch_event_data({topic, id})
-    Logger.info("got remote execute #{inspect(task)}")
-    Robotica.Mqtt.publish_execute(task)
+  def process({:command = topic, id}) do
+    command = EventBus.fetch_event_data({topic, id})
+    Logger.info("got remote execute #{inspect(command)}")
+    Enum.each(command.locations, fn location ->
+        Enum.each(command.devices, fn device ->
+            Robotica.Mqtt.publish_command(location, device, command.msg)
+        end)
+    end)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 

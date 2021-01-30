@@ -117,9 +117,11 @@ defmodule RoboticaPlugins.Validation do
       end
     else
       {:error,
-       "Map #{inspect(struct_type)} has keys #{inspect(unwanted_keys)} that are not supported"}
+       "Map #{inspect(data)} of type #{inspect(struct_type)} has keys #{inspect(unwanted_keys)} that are not supported"}
     end
   end
+
+  def validate_schema(data, :any), do: {:ok, data}
 
   def validate_schema(value, %{}), do: {:error, "Value #{inspect(value)} is not a map"}
 

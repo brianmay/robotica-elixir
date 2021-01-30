@@ -27,12 +27,12 @@ defmodule Ceryx.Supervisor do
     EventBus.register_topic(:schedule)
     EventBus.register_topic(:request_schedule)
     EventBus.register_topic(:execute)
-    EventBus.register_topic(:remote_execute)
+    EventBus.register_topic(:command)
     EventBus.register_topic(:mark)
 
     EventBus.subscribe(
       {Ceryx.CeryxService,
-       ["^request_schedule$", "^remote_execute$", "^mark$"]}
+       ["^request_schedule$", "^command$", "^mark$"]}
     )
 
     children = [
