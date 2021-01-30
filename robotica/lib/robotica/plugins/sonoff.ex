@@ -18,7 +18,7 @@ defmodule Robotica.Plugins.SonOff do
   end
 
   defp set_device_state(state, device_state) do
-    Robotica.Mqtt.publish_state(state.location, state.device, device_state)
+    RoboticaPlugins.Mqtt.publish_state(state.location, state.device, device_state)
   end
 
   ## Server Callbacks
@@ -54,7 +54,7 @@ defmodule Robotica.Plugins.SonOff do
       end
 
     if power != nil do
-      case Robotica.Mqtt.publish_raw("cmnd/#{state.config.topic}/power", power) do
+      case RoboticaPlugins.Mqtt.publish_raw("cmnd/#{state.config.topic}/power", power) do
         :ok -> nil
         {:error, _} -> Logger.debug("Cannot send sonoff action On.")
       end

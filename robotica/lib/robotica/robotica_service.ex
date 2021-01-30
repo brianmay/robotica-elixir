@@ -15,7 +15,7 @@ defmodule Robotica.RoboticaService do
     Logger.info("got remote execute #{inspect(command)}")
     Enum.each(command.locations, fn location ->
         Enum.each(command.devices, fn device ->
-            Robotica.Mqtt.publish_command(location, device, command.msg)
+            RoboticaPlugins.Mqtt.publish_command(location, device, command.msg)
         end)
     end)
     EventBus.mark_as_completed({__MODULE__, topic, id})
@@ -26,7 +26,7 @@ defmodule Robotica.RoboticaService do
     mark = EventBus.fetch_event_data({topic, id})
     #    Robotica.Scheduler.Marks.put_mark(Robotica.Scheduler.Marks, mark)
     #    Robotica.Scheduler.Executor.reload_marks(Robotica.Scheduler.Executor)
-    Robotica.Mqtt.publish_mark(mark)
+    RoboticaPlugins.Mqtt.publish_mark(mark)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 end

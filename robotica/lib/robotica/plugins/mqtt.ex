@@ -26,7 +26,7 @@ defmodule Robotica.Plugins.MQTT do
   end
 
   def handle_cast({:execute, action}, state) do
-    case Robotica.Mqtt.publish_action(state.location, action) do
+    case RoboticaPlugins.Mqtt.publish_action(state.location, action) do
       :ok -> nil
       {:error, _} -> Logger.debug("Cannot send outgoing action #{inspect(action)}.")
     end

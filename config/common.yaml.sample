@@ -6,73 +6,73 @@ locations:
     - name: "Lights"
       buttons:
       - name: "On"
-        tasks:
-        - action:
-            lights:
+        commands:
+        - msg:
               action: turn_on
               color: {hue: 0, saturation: 0, brightness: 100, kelvin: 5000}
-            sound: "beep"
+          devices: ["Light"]
       - name: "Dim"
-        tasks:
-        - action:
-            lights:
+        commands:
+        - msg:
               action: turn_on
               color: {hue: 0, saturation: 0, brightness: 20, kelvin: 5000}
-            sound: "beep"
+          devices: ["Light"]
       - name: "Sleep"
-        tasks:
-        - action:
-            lights:
+        commands:
+        - msg:
               action: turn_off
               duration: 30
-            sound: "beep"
+          devices: ["Light"]
       - name: "Off"
-        tasks:
-        - action:
-            lights:
+        commands:
+        - msg:
               action: turn_off
-            sound: "beep"
+          devices: ["Light"]
     - name: "Music"
       buttons:
       - name: "Red"
-        tasks:
-        - action:
+        commands:
+        - msg:
             music:
               play_list: "red"
+          devices: ["Robotica"]
       - name: "Green"
-        tasks:
-        - action:
+        commands:
+        - msg:
             music:
               play_list: "green"
+          devices: ["Robotica"]
       - name: "Blue"
-        tasks:
-        - action:
+        commands:
+        - msg:
             music:
               play_list: "blue"
+          devices: ["Robotica"]
       - name: "Off"
-        tasks:
-        - action:
+        commands:
+        - msg:
             music:
               stop: true
+          devices: ["Robotica"]
     - name: "TV"
       buttons:
       - name: "WiiU"
-        tasks:
-        - action:
-            hdmi:
+        commands:
+        - msg:
               source: 1
+          devices: ["TV"]
       - name: "Google"
-        tasks:
-        - action:
-            hdmi:
+        commands:
+        - msg:
               source: 2
+          devices: ["TV"]
       - name: "XBox1"
-        tasks:
-        - action:
-            hdmi:
+        commands:
+        - msg:
               source: 3
+          devices: ["TV"]
       - name: "MythTV"
-        tasks:
-        - action:
-            hdmi:
+        commands:
+        - msg:
               source: 4
+          devices: ["TV"]

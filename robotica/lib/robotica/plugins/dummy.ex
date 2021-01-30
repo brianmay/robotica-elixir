@@ -21,7 +21,7 @@ defmodule Robotica.Plugins.Dummy do
   end
 
   defp set_device_state(state, device_state) do
-    Robotica.Mqtt.publish_state(state.location, state.device, device_state)
+    RoboticaPlugins.Mqtt.publish_state(state.location, state.device, device_state)
   end
 
   def handle_command(state, command) do

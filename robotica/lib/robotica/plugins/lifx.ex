@@ -57,7 +57,7 @@ defmodule Robotica.Plugins.LIFX do
       }
     }
 
-    Robotica.Mqtt.publish_state(state.location, state.device, device_state, topic: "color")
+    RoboticaPlugins.Mqtt.publish_state(state.location, state.device, device_state, topic: "color")
   end
 
   defp set_device_power(state, power) do
@@ -67,7 +67,7 @@ defmodule Robotica.Plugins.LIFX do
       "POWER" => power
     }
 
-    Robotica.Mqtt.publish_state(state.location, state.device, device_state, topic: "power")
+    RoboticaPlugins.Mqtt.publish_state(state.location, state.device, device_state, topic: "power")
   end
 
   defp set_device_hard_off(state) do
@@ -75,7 +75,7 @@ defmodule Robotica.Plugins.LIFX do
       "POWER" => "HARD_OFF"
     }
 
-    Robotica.Mqtt.publish_state(state.location, state.device, device_state, topic: "power")
+    RoboticaPlugins.Mqtt.publish_state(state.location, state.device, device_state, topic: "power")
   end
 
   defp set_color_wait(state, light, color, duration) do

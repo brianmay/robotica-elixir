@@ -26,7 +26,7 @@ defmodule Robotica.Plugins.HDMI do
     IO.puts("#{state.config.host} #{command.source} #{state.config.destination}")
     Robotica.Devices.HDMI.switch(state.config.host, command.source, state.config.destination)
     device_state = %{"source" => command.source}
-    Robotica.Mqtt.publish_state(state.location, state.device, device_state)
+    RoboticaPlugins.Mqtt.publish_state(state.location, state.device, device_state)
     {:noreply, state}
   end
 
