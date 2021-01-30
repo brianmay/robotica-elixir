@@ -12,7 +12,7 @@ defmodule Robotica.RoboticaService do
 
   def process({:command = topic, id}) do
     command = EventBus.fetch_event_data({topic, id})
-    Logger.info("got remote execute #{inspect(command)}")
+    Logger.info("got command #{inspect(command)}")
     Enum.each(command.locations, fn location ->
         Enum.each(command.devices, fn device ->
             RoboticaPlugins.Mqtt.publish_command(location, device, command.msg)
