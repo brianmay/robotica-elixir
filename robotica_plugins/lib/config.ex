@@ -25,7 +25,6 @@ defmodule RoboticaPlugins.Config do
     defp config_location_schema do
       %{
         local_buttons: {{:list, button_row()}, true},
-        remote_locations: {{:list, :string}, false}
       }
     end
 
@@ -33,7 +32,6 @@ defmodule RoboticaPlugins.Config do
       %{
         hosts: {{:map, :string, :string}, true},
         locations: {{:map, :string, config_location_schema()}, true},
-        remote_buttons: {{:list, button_row()}, false}
       }
     end
 
