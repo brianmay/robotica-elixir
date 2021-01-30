@@ -58,8 +58,8 @@ defmodule RoboticaPlugins.Mqtt do
 
     action = %{
       action
-      | start_time: Calendar.DateTime.Format.iso8601(action.start_time),
-        stop_time: Calendar.DateTime.Format.iso8601(action.stop_time)
+      | start_time: DateTime.to_iso8601(action.start_time),
+        stop_time: DateTime.to_iso8601(action.stop_time)
     }
 
     publish_json(topic, action)
