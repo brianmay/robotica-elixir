@@ -14,15 +14,9 @@ defmodule Ceryx.Supervisor do
     {:ok, _pid} = Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
-  def get_tortoise_client_id do
-    {:ok, hostname} = :inet.gethostname()
-    hostname = to_string(hostname)
-    "ceryx-#{hostname}"
-  end
-
   @impl true
   def init(opts) do
-    client_id = get_tortoise_client_id()
+    client_id = RoboticaPlugins.Mqtt.get_tortoise_client_id()
 
     EventBus.register_topic(:schedule)
     EventBus.register_topic(:request_schedule)

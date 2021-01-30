@@ -41,7 +41,7 @@ defmodule Robotica.Subscriptions do
     pids =
       case Map.get(state.subscriptions, topic, []) do
         [] ->
-          client_id = Robotica.Supervisor.get_tortoise_client_id()
+          client_id = RoboticaPlugins.Mqtt.get_tortoise_client_id()
 
           topics = [
             {topic_str, 0}
@@ -101,7 +101,7 @@ defmodule Robotica.Subscriptions do
 
     Enum.each(new_subscriptions, fn
       {topic, []} ->
-        client_id = Robotica.Supervisor.get_tortoise_client_id()
+        client_id = RoboticaPlugins.Mqtt.get_tortoise_client_id()
         topic_str = Enum.join(topic, "/")
         Logger.debug("Unsubscribing from #{topic_str}.")
         Tortoise.Connection.unsubscribe(client_id, [topic_str])

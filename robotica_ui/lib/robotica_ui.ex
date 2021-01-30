@@ -3,12 +3,6 @@ defmodule RoboticaUi do
   Starter application using the Scenic framework.
   """
 
-  def get_tortoise_client_id do
-    {:ok, hostname} = :inet.gethostname()
-    hostname = to_string(hostname)
-    "robotica_ui-#{hostname}"
-  end
-
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 

@@ -23,8 +23,6 @@ defmodule Ceryx.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:poison, "~> 4.0.1"},
-      {:tortoise, "~> 0.9.2"},
       {:dialyxir, "~> 1.0.0-rc.2", only: [:dev], runtime: false},
       {:credo, "~> 1.2.0", only: [:dev, :test], runtime: false},
       {:calendar, "~> 1.0.0"},
