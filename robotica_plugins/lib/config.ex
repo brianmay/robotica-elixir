@@ -27,7 +27,7 @@ defmodule RoboticaPlugins.Config do
     defp config_location_schema do
       %{
         local_buttons: {{:list, button_row()}, true},
-        remote_locations: {{:list, :string}, true}
+        remote_locations: {{:list, :string}, false}
       }
     end
 
@@ -35,7 +35,7 @@ defmodule RoboticaPlugins.Config do
       %{
         hosts: {{:map, :string, :string}, true},
         locations: {{:map, :string, config_location_schema()}, true},
-        remote_buttons: {{:list, button_row()}, true}
+        remote_buttons: {{:list, button_row()}, false}
       }
     end
 
@@ -76,17 +76,6 @@ defmodule RoboticaPlugins.Config do
     common_config = common_config()
     local_config = Map.fetch!(common_config.locations, location)
     local_config.local_buttons
-  end
-
-  def ui_remote_locations(location) do
-    common_config = common_config()
-    local_config = Map.fetch!(common_config.locations, location)
-    local_config.remote_locations
-  end
-
-  def ui_remote_buttons() do
-    common_config = common_config()
-    common_config.remote_buttons
   end
 
   def ui_locations do
