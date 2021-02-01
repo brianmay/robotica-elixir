@@ -17,8 +17,12 @@ defmodule Robotica.Plugins.SonOff do
     defstruct [:config, :location, :device]
   end
 
-  defp set_device_state(state, device_state) do
-    RoboticaPlugins.Mqtt.publish_state(state.location, state.device, device_state)
+  @spec publish_device_state(State.t(), String.t()) :: :ok
+  defp publish_device_state(state, device_state) do
+    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, device_state) do
+      :ok -> :ok
+      {:error, msg} -> Logger.error("set_device_state() got #{msg}")
+    end
   end
 
   ## Server Callbacks
@@ -75,7 +79,7 @@ defmodule Robotica.Plugins.SonOff do
 
   def handle_cast({:mqtt, _, :state, msg}, state) do
     power = Map.fetch!(msg, "POWER")
-    set_device_state(state, %{"POWER" => power})
+    publish_device_state(state, power)
     {:noreply, state}
   end
 

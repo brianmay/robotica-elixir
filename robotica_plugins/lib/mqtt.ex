@@ -11,16 +11,17 @@ defmodule RoboticaPlugins.Mqtt do
   def publish_raw(topic, data, opts \\ []) do
     opts = Keyword.put_new(opts, :qos, 0)
     client_id = get_tortoise_client_id()
-    Tortoise.publish(client_id, topic, data, opts)
+    case Tortoise.publish(client_id, topic, data, opts) do
+      :ok -> :ok
+      {:error, msg} -> {:error, "Tortoise.publish() got error '#{msg}'"}
+    end
   end
 
   @spec publish_json(String.t(), list() | map(), keyword()) :: :ok | {:error, String.t()}
   def publish_json(topic, data, opts \\ []) do
-    with {:ok, data} <- Poison.encode(data),
-         :ok <- publish_raw(topic, data, opts) do
-      :ok
-    else
-      {:error, msg} -> {:error, "Tortoise.publish got error '#{msg}'"}
+    case Poison.encode(data) do
+      {:ok, data} -> publish_raw(topic, data, opts)
+      {:error, msg} -> {:error, "Poision.encode() got error '#{msg}'"}
     end
   end
 
@@ -30,18 +31,28 @@ defmodule RoboticaPlugins.Mqtt do
     publish_json(topic, action)
   end
 
-  @spec publish_state(String.t(), String.t(), map(), keyword()) :: :ok | {:error, String.t()}
-  def publish_state(location, device, state, opts \\ []) do
+  @spec get_state_topic(String.t(), String.t(), String.t() | nil) :: String.t()
+  defp get_state_topic(location, device, nil) do
+    "state/#{location}/#{device}"
+  end
+
+  defp get_state_topic(location, device, topic) do
+    "state/#{location}/#{device}/#{topic}"
+  end
+
+  @spec publish_state_raw(String.t(), String.t(), String.t(), keyword()) :: :ok | {:error, String.t()}
+  def publish_state_raw(location, device, state, opts \\ []) do
     {topic, opts} = Keyword.pop(opts, :topic)
     opts = Keyword.put(opts, :retain, true)
+    topic = get_state_topic(location, device, topic)
+    publish_raw(topic, state, opts)
+  end
 
-    topic =
-      if topic == nil do
-        "state/#{location}/#{device}"
-      else
-        "state/#{location}/#{device}/#{topic}"
-      end
-
+  @spec publish_state_json(String.t(), String.t(), map(), keyword()) :: :ok | {:error, String.t()}
+  def publish_state_json(location, device, state, opts \\ []) do
+    {topic, opts} = Keyword.pop(opts, :topic)
+    opts = Keyword.put(opts, :retain, true)
+    topic = get_state_topic(location, device, topic)
     publish_json(topic, state, opts)
   end
 

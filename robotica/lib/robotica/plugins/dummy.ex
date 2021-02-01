@@ -20,20 +20,24 @@ defmodule Robotica.Plugins.Dummy do
     }
   end
 
-  defp set_device_state(state, device_state) do
-    RoboticaPlugins.Mqtt.publish_state(state.location, state.device, device_state)
+  @spec publish_device_state(Robotica.Plugin.t(), String.t()) :: :ok
+  defp publish_device_state(state, device_state) do
+    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, device_state) do
+      :ok -> :ok
+      {:error, msg} -> Logger.error("set_device_state() got #{msg}")
+    end
   end
 
   def handle_command(state, command) do
     device_state =
       case command.action do
-        "turn_on" -> %{"POWER" => "ON"}
-        "turn_off" -> %{"POWER" => "OFF"}
+        "turn_on" -> "ON"
+        "turn_off" -> "POWER"
         _ -> nil
       end
 
     if device_state != nil do
-      set_device_state(state, device_state)
+      publish_device_state(state, device_state)
     end
   end
 

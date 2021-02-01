@@ -22,11 +22,18 @@ defmodule Robotica.Plugins.HDMI do
     }
   end
 
+  @spec publish_device_state(Robotica.Plugin.t(), String.t()) :: :ok
+  defp publish_device_state(state, device_state) do
+    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, device_state) do
+      :ok -> :ok
+      {:error, msg} -> Logger.error("set_device_state() got #{msg}")
+    end
+  end
+
   def handle_command(state, command) do
     IO.puts("#{state.config.host} #{command.source} #{state.config.destination}")
     Robotica.Devices.HDMI.switch(state.config.host, command.source, state.config.destination)
-    device_state = %{"source" => command.source}
-    RoboticaPlugins.Mqtt.publish_state(state.location, state.device, device_state)
+    publish_device_state(state, command.source)
     {:noreply, state}
   end
 
