@@ -591,19 +591,16 @@ defmodule Robotica.Plugins.LIFX do
 
   defp do_command(%State{} = state, %{action: "turn_off"} = command) do
     Logger.debug("#{device_to_string(state, nil)}: turn_off")
-    pid = self()
     number = get_number(state)
-    colors = replicate(@black_alpha, number)
 
-    sender = fn power, colors ->
-      GenServer.cast(pid, {:update, self(), "default", power, colors})
-      :ok
-    end
+    # Ensure light really is turned off
+    state = %State{state | base_power: 0, base_colors: replicate(@black, number)}
 
     state
     |> do_command_stop(command)
-    |> add_task("default", 100, fn -> FixedColor.go(sender, 0, colors) end)
+    |> remove_task("default")
     |> publish_device_state()
+    |> handle_update()
   end
 
   defp do_command(%State{} = state, %{action: "stop"} = command) do
