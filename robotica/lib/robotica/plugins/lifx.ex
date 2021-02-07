@@ -368,13 +368,15 @@ defmodule Robotica.Plugins.LIFX do
           color == nil ->
             base_color
 
-          # FIXME: should take into account color.alpha
           true ->
+            alpha = color.alpha / 100
+            base_alpha = (100 - color.alpha) / 100
+
             %HSBK{
-              hue: color.hue,
-              saturation: color.saturation,
-              brightness: color.brightness,
-              kelvin: color.kelvin
+              hue: round(base_color.hue * base_alpha + color.hue * alpha),
+              saturation: round(base_color.saturation * base_alpha + color.saturation * alpha),
+              brightness: round(base_color.brightness * base_alpha + color.brightness * alpha),
+              kelvin: round(base_color.kelvin * base_alpha + color.kelvin * alpha)
             }
         end
       end)
