@@ -5,6 +5,24 @@ defmodule Robotica.Devices.Lifx do
 
   alias RoboticaPlugins.String
 
+  defmodule HSBKA do
+    @moduledoc "A color with alpha channel"
+    @type t :: %__MODULE__{
+            hue: integer(),
+            saturation: integer(),
+            brightness: integer(),
+            kelvin: integer(),
+            alpha: integer()
+          }
+    defstruct hue: 120,
+              saturation: 100,
+              brightness: 100,
+              kelvin: 4000,
+              alpha: 100
+  end
+
+  @type callback :: (boolean | nil, list(HSBKA | nil) -> :ok)
+
   @doc """
   Eval a dictionary of strings into a Lifx HSBK object.
 
@@ -18,24 +36,31 @@ defmodule Robotica.Devices.Lifx do
   ...>   hue: "{frame}*2",
   ...>   saturation: "{light}*2",
   ...>   kelvin: 3500,
+  ...>   alpha: 100,
   ...> }, values)
-  {:ok, %Lifx.Protocol.HSBK{
+  {:ok, %Robotica.Devices.Lifx.HSBKA{
     brightness: 100,
     hue: 2,
     saturation: 4,
     kelvin: 3500,
+    alpha: 100
   }}
   """
+  @spec eval_color(map(), map()) :: {:ok, HSBKA.t()} | {:error, String.t()}
   def eval_color(color, values) do
+    alpha = if color.alpha == nil, do: 100, else: color.alpha
+
     with {:ok, brightness} <- String.eval_string(color.brightness, values),
          {:ok, hue} <- String.eval_string(color.hue, values),
          {:ok, saturation} <- String.eval_string(color.saturation, values),
-         {:ok, kelvin} <- String.eval_string(color.kelvin, values) do
-      color = %Lifx.Protocol.HSBK{
+         {:ok, kelvin} <- String.eval_string(color.kelvin, values),
+         {:ok, alpha} <- String.eval_string(alpha, values) do
+      color = %HSBKA{
         brightness: brightness,
         hue: hue,
         saturation: saturation,
-        kelvin: kelvin
+        kelvin: kelvin,
+        alpha: alpha
       }
 
       {:ok, color}
@@ -48,12 +73,12 @@ defmodule Robotica.Devices.Lifx do
   Expand and eval a condensed list of colors.
 
   iex> import Robotica.Devices.Lifx
-  iex> alias Lifx.Protocol.HSBK
   iex> color = %{
   ...>   brightness: 100,
   ...>   hue: "{frame}*30",
   ...>   saturation: "{light}*100",
   ...>   kelvin: 3500,
+  ...>   alpha: 100,
   ...>  }
   iex> colors = [
   ...>   %{
@@ -65,24 +90,24 @@ defmodule Robotica.Devices.Lifx do
   {:ok, []}
   iex> expand_colors(colors, 1)
   {:ok, [
-    %HSBK{brightness: 100, hue: 30, saturation: 0, kelvin: 3500},
-    %HSBK{brightness: 100, hue: 30, saturation: 0, kelvin: 3500},
+    %Robotica.Devices.Lifx.HSBKA{brightness: 100, hue: 30, saturation: 0, kelvin: 3500, alpha: 100},
+    %Robotica.Devices.Lifx.HSBKA{brightness: 100, hue: 30, saturation: 0, kelvin: 3500, alpha: 100},
   ]}
   iex> expand_colors(colors, 2)
   {:ok, [
-  %HSBK{brightness: 100, hue: 60, saturation: 0, kelvin: 3500},
-  %HSBK{brightness: 100, hue: 60, saturation: 0, kelvin: 3500},
-  %HSBK{brightness: 100, hue: 60, saturation: 100, kelvin: 3500},
-  %HSBK{brightness: 100, hue: 60, saturation: 100, kelvin: 3500},
+  %Robotica.Devices.Lifx.HSBKA{brightness: 100, hue: 60, saturation: 0, kelvin: 3500, alpha: 100},
+  %Robotica.Devices.Lifx.HSBKA{brightness: 100, hue: 60, saturation: 0, kelvin: 3500, alpha: 100},
+  %Robotica.Devices.Lifx.HSBKA{brightness: 100, hue: 60, saturation: 100, kelvin: 3500, alpha: 100},
+  %Robotica.Devices.Lifx.HSBKA{brightness: 100, hue: 60, saturation: 100, kelvin: 3500, alpha: 100},
   ]}
   iex> expand_colors(colors, 3)
   {:ok, [
-  %HSBK{brightness: 100, hue: 90, saturation: 0, kelvin: 3500},
-  %HSBK{brightness: 100, hue: 90, saturation: 0, kelvin: 3500},
-  %HSBK{brightness: 100, hue: 90, saturation: 100, kelvin: 3500},
-  %HSBK{brightness: 100, hue: 90, saturation: 100, kelvin: 3500},
-  %HSBK{brightness: 100, hue: 90, saturation: 200, kelvin: 3500},
-  %HSBK{brightness: 100, hue: 90, saturation: 200, kelvin: 3500},
+  %Robotica.Devices.Lifx.HSBKA{brightness: 100, hue: 90, saturation: 0, kelvin: 3500, alpha: 100},
+  %Robotica.Devices.Lifx.HSBKA{brightness: 100, hue: 90, saturation: 0, kelvin: 3500, alpha: 100},
+  %Robotica.Devices.Lifx.HSBKA{brightness: 100, hue: 90, saturation: 100, kelvin: 3500, alpha: 100},
+  %Robotica.Devices.Lifx.HSBKA{brightness: 100, hue: 90, saturation: 100, kelvin: 3500, alpha: 100},
+  %Robotica.Devices.Lifx.HSBKA{brightness: 100, hue: 90, saturation: 200, kelvin: 3500, alpha: 100},
+  %Robotica.Devices.Lifx.HSBKA{brightness: 100, hue: 90, saturation: 200, kelvin: 3500, alpha: 100},
   ]}
   """
   def expand_colors(list, frame_n), do: loop_colors(list, frame_n, [])
@@ -131,6 +156,51 @@ defmodule Robotica.Devices.Lifx do
 
       {:error, error} ->
         {:error, error}
+    end
+  end
+
+  @spec replicate(any(), integer()) :: list(any())
+  defp replicate(x, n), do: for(i <- 0..n, i > 0, do: x)
+
+  @spec fill_colors(list(HSBKA.t()), integer()) :: list(HSBKA.t() | nil)
+  defp fill_colors(list_hsbks, index) do
+    replicate(nil, index) ++ list_hsbks
+  end
+
+  @spec get_colors_from_command(integer, map(), integer()) ::
+          {:ok, list(HSBKA.t() | nil)} | {:error, String.t()}
+  def get_colors_from_command(number, frame, frame_n) do
+    cond do
+      not is_nil(frame.colors) and number > 0 ->
+        colors_index =
+          case frame.colors_index do
+            nil -> 0
+            index -> index
+          end
+
+        case expand_colors(frame.colors, frame_n) do
+          {:ok, colors} ->
+            colors = fill_colors(colors, colors_index)
+            {:ok, colors}
+
+          {:error, error} ->
+            {:error, "Got error in lifx expand_colors: #{error}"}
+        end
+
+      not is_nil(frame.color) ->
+        values = %{"frame" => frame_n}
+
+        case eval_color(frame.color, values) do
+          {:ok, color} ->
+            colors = replicate(color, number)
+            {:ok, colors}
+
+          {:error, error} ->
+            {:error, "Got error in lifx eval_color: #{error}"}
+        end
+
+      true ->
+        {:error, "No assigned color in get_colors_from_command"}
     end
   end
 end

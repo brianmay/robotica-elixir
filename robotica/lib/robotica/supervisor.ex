@@ -25,10 +25,7 @@ defmodule Robotica.Supervisor do
     EventBus.register_topic(:command)
     EventBus.register_topic(:mark)
 
-    EventBus.subscribe(
-      {Robotica.RoboticaService,
-       ["^request_schedule$", "^command$", "^mark$"]}
-    )
+    EventBus.subscribe({Robotica.RoboticaService, ["^request_schedule$", "^command$", "^mark$"]})
 
     children = [
       {Robotica.PluginRegistry, name: Robotica.PluginRegistry},

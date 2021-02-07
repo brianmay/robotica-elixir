@@ -48,7 +48,7 @@ defmodule RoboticaPlugins.Mqtt do
     publish_raw(topic, state, opts)
   end
 
-  @spec publish_state_json(String.t(), String.t(), map(), keyword()) :: :ok | {:error, String.t()}
+  @spec publish_state_json(String.t(), String.t(), list() | map(), keyword()) :: :ok | {:error, String.t()}
   def publish_state_json(location, device, state, opts \\ []) do
     {topic, opts} = Keyword.pop(opts, :topic)
     opts = Keyword.put(opts, :retain, true)

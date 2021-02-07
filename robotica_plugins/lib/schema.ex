@@ -23,7 +23,8 @@ defmodule RoboticaPlugins.Schema do
       brightness: {:integer_or_string, true},
       hue: {:integer_or_string, true},
       saturation: {:integer_or_string, true},
-      kelvin: {:integer_or_string, true}
+      kelvin: {:integer_or_string, true},
+      alpha: {:integer_or_string, false}
     }
   end
 
@@ -48,7 +49,8 @@ defmodule RoboticaPlugins.Schema do
     %{
       name: {:string, true},
       repeat: {:integer, false},
-      frames: {{:list, frame()}, true}
+      frames: {{:list, frame()}, true},
+      priority: {:integer, true}
     }
   end
 
@@ -59,8 +61,8 @@ defmodule RoboticaPlugins.Schema do
       color: {lights_color(), false},
       colors_index: {:integer, false},
       colors: {{:list, repeat_colors()}, false},
-      animation: {animation(), false},
-      duration: {:integer, false}
+      duration: {:integer, false},
+      animation: {animation(), false}
     }
   end
 
