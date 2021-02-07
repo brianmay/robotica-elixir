@@ -392,6 +392,7 @@ defmodule Robotica.Plugins.LIFX do
   defp merge_colors(list_hsbkas, start_colors) do
     # Receives list of colors for each task. e.g. for 2 tasks with 4 lights
     # [
+    #   nil,   # task not updated colors yet
     #   [%HSBKA{}, nil, %HSBKA{}, %HSBKA{}],
     #   [%HSBKA{}, %HSBKA{}, nil, %HSBKA{}]
     # ]
@@ -399,6 +400,7 @@ defmodule Robotica.Plugins.LIFX do
     #
     # [%HSBK{}, %HSBK{}, %HSBK{}, %HSBK{}]
 
+    list_hsbkas = Enum.reject(list_hsbkas, fn list -> list == nil end)
     Enum.zip([start_colors | list_hsbkas])
     |> merge_light_colors()
   end
