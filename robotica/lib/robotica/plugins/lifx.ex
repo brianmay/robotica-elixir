@@ -60,9 +60,11 @@ defmodule Robotica.Plugins.LIFX do
             location: String.t(),
             device: String.t(),
             config: Config.t(),
-            tasks: %{required(String.t()) => TaskState.t()}
+            tasks: %{required(String.t()) => TaskState.t()},
+            base_power: integer(),
+            base_colors: list(HSBK.t())
           }
-    defstruct [:location, :device, :config, :tasks]
+    defstruct [:location, :device, :config, :tasks, :base_power, :base_colors]
   end
 
   ## Server Callbacks
@@ -71,12 +73,15 @@ defmodule Robotica.Plugins.LIFX do
           {:ok, Robotica.Plugins.LIFX.State.t()}
   def init(plugin) do
     {:ok, _} = :timer.send_interval(5_000, :check_light)
+    number = if plugin.config.number == nil, do: 1, else: plugin.config.number
 
     state = %State{
       location: plugin.location,
       device: plugin.device,
       config: plugin.config,
-      tasks: %{}
+      tasks: %{},
+      base_power: 0,
+      base_colors: replicate(@black, number)
     }
 
     state = publish_device_state(state)
@@ -414,11 +419,14 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec handle_update(State.t()) :: State.t()
   defp handle_update(%State{} = state) do
-    number = get_number(state)
-    base_power = 0
-    base_colors = replicate(@black, number)
-
     Logger.info("#{device_to_string(state, nil)}: update")
+
+    base_power = state.base_power
+    base_colors = state.base_colors
+
+    Logger.info(
+      "#{device_to_string(state, nil)}: base #{inspect(base_power)} #{inspect(base_colors)}"
+    )
 
     list_tasks =
       state.tasks
@@ -581,12 +589,19 @@ defmodule Robotica.Plugins.LIFX do
 
   defp do_command(%State{} = state, %{action: "turn_off"} = command) do
     Logger.debug("#{device_to_string(state, nil)}: turn_off")
+    pid = self()
+    number = get_number(state)
+    colors = replicate(@black_alpha, number)
+
+    sender = fn power, colors ->
+      GenServer.cast(pid, {:update, self(), "default", power, colors})
+      :ok
+    end
 
     state
     |> do_command_stop(command)
-    |> remove_task("default")
+    |> add_task("default", 100, fn -> FixedColor.go(sender, 0, colors) end)
     |> publish_device_state()
-    |> handle_update()
   end
 
   defp do_command(%State{} = state, %{action: "stop"} = command) do
@@ -614,8 +629,8 @@ defmodule Robotica.Plugins.LIFX do
 
     pid = self()
 
-    sender = fn power, color ->
-      GenServer.cast(pid, {:update, self(), "default", power, color})
+    sender = fn power, colors ->
+      GenServer.cast(pid, {:update, self(), "default", power, colors})
       :ok
     end
 
@@ -653,14 +668,20 @@ defmodule Robotica.Plugins.LIFX do
         %{
           sleep: 500,
           repeat: 1,
-          color: @black_alpha,
+          color: %HSBKA{
+            hue: 0,
+            saturation: 0,
+            brightness: 0,
+            kelvin: 3500,
+            alpha: 50
+          },
           colors: nil
         }
       ]
     }
 
-    sender = fn power, color ->
-      GenServer.cast(pid, {:update, self(), animation.name, power, color})
+    sender = fn power, colors ->
+      GenServer.cast(pid, {:update, self(), animation.name, power, colors})
       :ok
     end
 
@@ -739,9 +760,22 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   def handle_info(:check_light, %State{} = state) do
-    if state.tasks != %{} do
-      save_device(state)
-    end
+    state =
+      if state.tasks == %{} do
+        case save_device(state) do
+          {:ok, {power, color}} ->
+            %State{state | base_power: power, base_colors: color}
+
+          {:error, error} ->
+            Logger.info(
+              "#{device_to_string(state, nil)}: check_light cannot get light state: #{error}"
+            )
+
+            state
+        end
+      else
+        state
+      end
 
     {:noreply, state}
   end
