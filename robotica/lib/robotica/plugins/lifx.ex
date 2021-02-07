@@ -72,13 +72,15 @@ defmodule Robotica.Plugins.LIFX do
   def init(plugin) do
     {:ok, _} = :timer.send_interval(5_000, :check_light)
 
-    {:ok,
-     %State{
-       location: plugin.location,
-       device: plugin.device,
-       config: plugin.config,
-       tasks: %{}
-     }}
+    state = %State{
+      location: plugin.location,
+      device: plugin.device,
+      config: plugin.config,
+      tasks: %{}
+    }
+
+    state = publish_device_state(state)
+    {:ok, state}
   end
 
   @spec get_number(State.t()) :: integer()
