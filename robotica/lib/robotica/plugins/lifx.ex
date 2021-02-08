@@ -72,7 +72,6 @@ defmodule Robotica.Plugins.LIFX do
   @spec init(atom | %{:config => any, :device => any, :location => any, optional(any) => any}) ::
           {:ok, Robotica.Plugins.LIFX.State.t()}
   def init(plugin) do
-    {:ok, _} = :timer.send_interval(5_000, :check_light)
     number = if plugin.config.number == nil, do: 1, else: plugin.config.number
 
     state = %State{
@@ -84,7 +83,11 @@ defmodule Robotica.Plugins.LIFX do
       base_colors: replicate(@black, number)
     }
 
+    state = poll_device(state)
     state = publish_device_state(state)
+
+    :ok = Lifx.Client.add_handler(self())
+    :ok = Lifx.Poller.add_handler(self())
     {:ok, state}
   end
 
@@ -112,6 +115,21 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec replicate(any(), integer()) :: list(any())
   defp replicate(x, n), do: for(i <- 0..n, i > 0, do: x)
+
+  @spec poll_device(State.t()) :: State.t()
+  def poll_device(state) do
+    if state.tasks == %{} do
+      case save_device(state) do
+        {:ok, {power, color}} ->
+          %State{state | base_power: power, base_colors: color}
+
+        {:error, _} ->
+          state
+      end
+    else
+      state
+    end
+  end
 
   # Publish state to MQTT
 
@@ -378,10 +396,10 @@ defmodule Robotica.Plugins.LIFX do
             base_alpha = (100 - color.alpha) / 100
 
             %HSBK{
-              hue: round(base_color.hue * base_alpha + color.hue * alpha),
-              saturation: round(base_color.saturation * base_alpha + color.saturation * alpha),
-              brightness: round(base_color.brightness * base_alpha + color.brightness * alpha),
-              kelvin: round(base_color.kelvin * base_alpha + color.kelvin * alpha)
+              hue: base_color.hue * base_alpha + color.hue * alpha,
+              saturation: base_color.saturation * base_alpha + color.saturation * alpha,
+              brightness: base_color.brightness * base_alpha + color.brightness * alpha,
+              kelvin: base_color.kelvin * base_alpha + color.kelvin * alpha
             }
         end
       end)
@@ -401,6 +419,7 @@ defmodule Robotica.Plugins.LIFX do
     # [%HSBK{}, %HSBK{}, %HSBK{}, %HSBK{}]
 
     list_hsbkas = Enum.reject(list_hsbkas, fn list -> list == nil end)
+
     Enum.zip([start_colors | list_hsbkas])
     |> merge_light_colors()
   end
@@ -748,32 +767,41 @@ defmodule Robotica.Plugins.LIFX do
     {:noreply, state}
   end
 
-  def handle_cast({:execute, action}, %State{} = state) do
+  def handle_cast({:added, %Lifx.Device{}}, %State{} = state) do
+    # Note device.label will not be set yet
+    {:noreply, state}
+  end
+
+  def handle_cast({:updated, %Lifx.Device{}}, %State{} = state) do
+    {:noreply, state}
+  end
+
+  def handle_cast({:deleted, %Lifx.Device{} = device}, %State{} = state) do
+    if device.label == state.config.label do
+      Logger.info("#{device_to_string(state, nil)}: got deleted #{inspect(device)}")
+      publish_device_error(state, nil, "Device is offline")
+    end
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:polled, %Lifx.Device{} = device}, %State{} = state) do
     state =
-      case action.lights do
-        nil -> state
-        command -> handle_command(state, command)
+      if device.label == state.config.label do
+        Logger.debug("#{device_to_string(state, nil)}: got polled")
+        poll_device(state)
+      else
+        state
       end
 
     {:noreply, state}
   end
 
-  def handle_info(:check_light, %State{} = state) do
+  def handle_cast({:execute, action}, %State{} = state) do
     state =
-      if state.tasks == %{} do
-        case save_device(state) do
-          {:ok, {power, color}} ->
-            %State{state | base_power: power, base_colors: color}
-
-          {:error, error} ->
-            Logger.info(
-              "#{device_to_string(state, nil)}: check_light cannot get light state: #{error}"
-            )
-
-            state
-        end
-      else
-        state
+      case action.lights do
+        nil -> state
+        command -> handle_command(state, command)
       end
 
     {:noreply, state}
