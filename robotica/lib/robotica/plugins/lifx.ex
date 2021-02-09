@@ -104,6 +104,14 @@ defmodule Robotica.Plugins.LIFX do
   #   end
   # end
 
+  @spec get_priority(map(), integer) :: integer
+  defp get_priority(command, default) do
+    case command.priority do
+      nil -> default
+      priority -> priority
+    end
+  end
+
   @spec device_to_string(State.t(), Lifx.Device.t() | nil) :: String.t()
   defp device_to_string(%State{} = state, nil) do
     "Lifx #{state.config.label}"
@@ -135,10 +143,23 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec publish_device_tasks(State.t(), %{required(String.t()) => TaskState.t()}) :: :ok
   defp publish_device_tasks(%State{} = state, tasks) do
-    list = Enum.map(tasks, fn {task_name, _} -> task_name end)
+    task_list = Enum.map(tasks, fn {task_name, _} -> task_name end)
 
-    case RoboticaPlugins.Mqtt.publish_state_json(state.location, state.device, list,
+    case RoboticaPlugins.Mqtt.publish_state_json(state.location, state.device, task_list,
            topic: "tasks"
+         ) do
+      :ok ->
+        :ok
+
+      {:error, msg} ->
+        Logger.error("#{device_to_string(state, nil)}: publish_device_color() got #{msg}")
+    end
+
+    priority_list =
+      Enum.map(tasks, fn {_, %TaskState{priority: priority}} -> priority end) |> Enum.uniq()
+
+    case RoboticaPlugins.Mqtt.publish_state_json(state.location, state.device, priority_list,
+           topic: "priorities"
          ) do
       :ok ->
         :ok
@@ -188,10 +209,10 @@ defmodule Robotica.Plugins.LIFX do
     :ok
   end
 
-  @spec publish_device_error(State.t(), Lifx.Device.t() | nil, String.t()) :: :ok
-  defp publish_device_error(%State{} = state, device, error) do
+  @spec publish_device_hard_off(State.t(), Lifx.Device.t() | nil) :: :ok
+  defp publish_device_hard_off(%State{} = state, device) do
     power = "HARD_OFF"
-    Logger.info("#{device_to_string(state, device)}: Got LIFX error #{error}.")
+    Logger.info("#{device_to_string(state, device)}: Got LIFX hard off.")
 
     case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, power,
            topic: "power"
@@ -204,8 +225,11 @@ defmodule Robotica.Plugins.LIFX do
           "#{device_to_string(state, device)}: publish_device_hard_off() power got #{msg}."
         )
     end
+  end
 
-    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, power,
+  @spec publish_device_error(State.t(), Lifx.Device.t() | nil, String.t()) :: :ok
+  defp publish_device_error(%State{} = state, device, error) do
+    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, error,
            topic: "error",
            retain: false
          ) do
@@ -214,7 +238,7 @@ defmodule Robotica.Plugins.LIFX do
 
       {:error, msg} ->
         Logger.error(
-          "#{device_to_string(state, device)}: publish_device_hard_off() error got #{msg}."
+          "#{device_to_string(state, device)}: publish_device_error() error got #{msg}."
         )
     end
 
@@ -445,7 +469,7 @@ defmodule Robotica.Plugins.LIFX do
     base_power = state.base_power
     base_colors = state.base_colors
 
-    Logger.info(
+    Logger.debug(
       "#{device_to_string(state, nil)}: base #{inspect(base_power)} #{inspect(base_colors)}"
     )
 
@@ -464,7 +488,7 @@ defmodule Robotica.Plugins.LIFX do
       |> Enum.map(fn task -> task.power end)
       |> merge_power(base_power)
 
-    Logger.info("#{device_to_string(state, nil)}: GOT #{inspect(power)} #{inspect(colors)}")
+    Logger.debug("#{device_to_string(state, nil)}: GOT #{inspect(power)} #{inspect(colors)}")
     restore_device(state, {power, colors})
     state
   end
@@ -489,7 +513,6 @@ defmodule Robotica.Plugins.LIFX do
     task = Map.fetch!(state.tasks, task_name)
 
     if task.pid.pid == pid do
-      Logger.info("#{device_to_string(state, nil)}: update_task_state #{task_name} same pid")
       task = %TaskState{task | colors: hsbkas, power: power}
       tasks = Map.put(state.tasks, task_name, task)
       state = %State{state | tasks: tasks}
@@ -546,9 +569,17 @@ defmodule Robotica.Plugins.LIFX do
     %State{state | tasks: tasks}
   end
 
-  @spec remove_all_tasks(State.t()) :: State.t()
-  def remove_all_tasks(%State{} = state) do
-    Enum.reduce(state.tasks, state, fn {task_name, _}, state -> remove_task(state, task_name) end)
+  # @spec remove_all_tasks(State.t()) :: State.t()
+  # defp remove_all_tasks(%State{} = state) do
+  #   Enum.reduce(state.tasks, state, fn {task_name, _}, state -> remove_task(state, task_name) end)
+  # end
+
+  @spec remove_all_tasks_with_priority(State.t(), integer) :: State.t()
+  defp remove_all_tasks_with_priority(%State{} = state, priority) do
+    Enum.reduce(state.tasks, state, fn
+      {task_name, %TaskState{priority: ^priority}}, state -> remove_task(state, task_name)
+      {_, %TaskState{}}, state -> state
+    end)
   end
 
   @spec keyword_list_to_map(values :: list) :: map
@@ -598,35 +629,40 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   @spec do_command_stop(State.t(), map()) :: State.t()
-  defp do_command_stop(state, %{stop: nil}), do: state
-
   defp do_command_stop(state, command) do
-    Enum.reduce(command.stop, state, fn task, state ->
-      remove_task(state, task)
-    end)
-  end
+    state =
+      if command.stop_tasks == nil do
+        state
+      else
+        Enum.reduce(command.stop_tasks, state, fn task, state ->
+          remove_task(state, task)
+        end)
+      end
 
-  @spec do_command(State.t(), map) :: State.t()
+    state =
+      if command.stop_priorities == nil do
+        state
+      else
+        Enum.reduce(command.stop_priorities, state, fn priority, state ->
+          remove_all_tasks_with_priority(state, priority)
+        end)
+      end
+
+    state
+  end
 
   defp do_command(%State{} = state, %{action: "turn_off"} = command) do
     Logger.debug("#{device_to_string(state, nil)}: turn_off")
     number = get_number(state)
+    priority = get_priority(command, 100)
 
     # Ensure light really is turned off
     state = %State{state | base_power: 0, base_colors: replicate(@black, number)}
 
     state
     |> do_command_stop(command)
-    |> remove_task("default")
-    |> publish_device_state()
-    |> handle_update()
-  end
-
-  defp do_command(%State{} = state, %{action: "stop"} = command) do
-    Logger.debug("#{device_to_string(state, nil)}: stop")
-
-    state
-    |> do_command_stop(command)
+    |> remove_task(command.task)
+    |> remove_all_tasks_with_priority(priority)
     |> publish_device_state()
     |> handle_update()
   end
@@ -634,6 +670,7 @@ defmodule Robotica.Plugins.LIFX do
   defp do_command(%State{} = state, %{action: "turn_on"} = command) do
     Logger.debug("#{device_to_string(state, nil)}: turn_on")
     number = get_number(state)
+    priority = get_priority(command, 100)
 
     colors =
       case RLifx.get_colors_from_command(number, command, 0) do
@@ -648,13 +685,15 @@ defmodule Robotica.Plugins.LIFX do
     pid = self()
 
     sender = fn power, colors ->
-      GenServer.cast(pid, {:update, self(), "default", power, colors})
+      GenServer.cast(pid, {:update, self(), command.task, power, colors})
       :ok
     end
 
     state
     |> do_command_stop(command)
-    |> add_task("default", 100, fn -> FixedColor.go(sender, 65535, colors) end)
+    |> remove_task(command.task)
+    |> remove_all_tasks_with_priority(priority)
+    |> add_task(command.task, priority, fn -> FixedColor.go(sender, 65535, colors) end)
     |> publish_device_state()
   end
 
@@ -663,6 +702,7 @@ defmodule Robotica.Plugins.LIFX do
     pid = self()
     number = get_number(state)
     state = do_command_stop(state, command)
+    priority = get_priority(command, 900)
 
     color = %HSBKA{
       hue: command.color.hue,
@@ -673,7 +713,7 @@ defmodule Robotica.Plugins.LIFX do
     }
 
     animation = %{
-      name: "flash",
+      name: command.task,
       priority: 900,
       repeat: 2,
       frames: [
@@ -704,7 +744,10 @@ defmodule Robotica.Plugins.LIFX do
     end
 
     state
-    |> add_task(animation.name, animation.priority, fn ->
+    |> do_command_stop(command)
+    |> remove_task(command.task)
+    |> remove_all_tasks_with_priority(priority)
+    |> add_task(animation.name, priority, fn ->
       Animate.go(sender, number, animation)
     end)
     |> publish_device_state()
@@ -714,6 +757,7 @@ defmodule Robotica.Plugins.LIFX do
     Logger.debug("#{device_to_string(state, nil)}: animate")
     pid = self()
     number = get_number(state)
+    priority = get_priority(command, 100)
     state = do_command_stop(state, command)
 
     case command.animation do
@@ -722,12 +766,15 @@ defmodule Robotica.Plugins.LIFX do
 
       animation ->
         sender = fn power, hsbkas ->
-          GenServer.cast(pid, {:update, self(), animation.name, power, hsbkas})
+          GenServer.cast(pid, {:update, self(), command.task, power, hsbkas})
           :ok
         end
 
         state
-        |> add_task(animation.name, animation.priority, fn ->
+        |> do_command_stop(command)
+        |> remove_task(command.task)
+        |> remove_all_tasks_with_priority(priority)
+        |> add_task(command.task, priority, fn ->
           Animate.go(sender, number, animation)
         end)
         |> publish_device_state()
@@ -779,7 +826,7 @@ defmodule Robotica.Plugins.LIFX do
   def handle_cast({:deleted, %Lifx.Device{} = device}, %State{} = state) do
     if device.label == state.config.label do
       Logger.info("#{device_to_string(state, nil)}: got deleted #{inspect(device)}")
-      publish_device_error(state, nil, "Device is offline")
+      publish_device_hard_off(state, nil)
     end
 
     {:noreply, state}

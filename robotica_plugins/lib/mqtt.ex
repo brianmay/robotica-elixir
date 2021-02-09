@@ -1,5 +1,4 @@
 defmodule RoboticaPlugins.Mqtt do
-
   @spec get_tortoise_client_id() :: String.t()
   def get_tortoise_client_id do
     {:ok, hostname} = :inet.gethostname()
@@ -11,6 +10,7 @@ defmodule RoboticaPlugins.Mqtt do
   def publish_raw(topic, data, opts \\ []) do
     opts = Keyword.put_new(opts, :qos, 0)
     client_id = get_tortoise_client_id()
+
     case Tortoise.publish(client_id, topic, data, opts) do
       :ok -> :ok
       {:error, msg} -> {:error, "Tortoise.publish() got error '#{msg}'"}
@@ -40,7 +40,8 @@ defmodule RoboticaPlugins.Mqtt do
     "state/#{location}/#{device}/#{topic}"
   end
 
-  @spec publish_state_raw(String.t(), String.t(), String.t(), keyword()) :: :ok | {:error, String.t()}
+  @spec publish_state_raw(String.t(), String.t(), String.t(), keyword()) ::
+          :ok | {:error, String.t()}
   def publish_state_raw(location, device, state, opts \\ []) do
     {topic, opts} = Keyword.pop(opts, :topic)
     opts = Keyword.put(opts, :retain, true)
@@ -48,7 +49,8 @@ defmodule RoboticaPlugins.Mqtt do
     publish_raw(topic, state, opts)
   end
 
-  @spec publish_state_json(String.t(), String.t(), list() | map(), keyword()) :: :ok | {:error, String.t()}
+  @spec publish_state_json(String.t(), String.t(), list() | map(), keyword()) ::
+          :ok | {:error, String.t()}
   def publish_state_json(location, device, state, opts \\ []) do
     {topic, opts} = Keyword.pop(opts, :topic)
     opts = Keyword.put(opts, :retain, true)
@@ -84,7 +86,7 @@ defmodule RoboticaPlugins.Mqtt do
 
   @spec publish_command(String.t(), String.t(), map()) :: :ok | {:error, String.t()}
   def publish_command(location, device, msg) do
-    topic =  "command/#{location}/#{device}"
+    topic = "command/#{location}/#{device}"
     publish_json(topic, msg)
   end
 end

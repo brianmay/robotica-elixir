@@ -24,12 +24,17 @@ defmodule Robotica.Supervisor do
     EventBus.register_topic(:execute)
     EventBus.register_topic(:command)
     EventBus.register_topic(:mark)
+    EventBus.register_topic(:subscribe)
+    EventBus.register_topic(:unsubscribe_all)
 
-    EventBus.subscribe({Robotica.RoboticaService, ["^request_schedule$", "^command$", "^mark$"]})
+    EventBus.subscribe(
+      {Robotica.RoboticaService,
+       ["^request_schedule$", "^command$", "^mark$", "^subscribe$", "^unsubscribe_all$"]}
+    )
 
     children = [
       {Robotica.PluginRegistry, name: Robotica.PluginRegistry},
-      {Robotica.Subscriptions, name: Robotica.Subscriptions},
+      {RoboticaPlugins.Subscriptions, name: RoboticaPlugins.Subscriptions},
       {Robotica.Executor, name: Robotica.Executor},
       {Robotica.Scheduler.Marks, name: Robotica.Scheduler.Marks},
       {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor},
@@ -45,7 +50,17 @@ defmodule Robotica.Supervisor do
          {"execute", 0},
          {"mark", 0},
          {"request/all/#", 0},
-         {"request/#{client_id}/#", 0}
+         {"request/#{client_id}/#", 0},
+
+         # Dynamic subscriptions,
+         # Here because of https://github.com/gausby/tortoise/issues/130
+         # Should be done in subscriptions.ex
+         # All plugins
+         {"command/#", 0},
+         # sonoff plugin
+         {"stat/#", 0},
+         # robotica_ui and robotica_face
+         {"state/#", 0}
        ]}
     ]
 

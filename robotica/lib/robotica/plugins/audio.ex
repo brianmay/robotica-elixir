@@ -48,12 +48,31 @@ defmodule Robotica.Plugins.Audio do
               volumes: %{}
   end
 
+  defmodule State do
+    @type t :: %__MODULE__{
+            location: String.t(),
+            device: String.t(),
+            config: Config.t(),
+            volumes: %{required(atom()) => String.t()}
+          }
+    @enforce_keys [:location, :device, :config, :volumes]
+    defstruct [:location, :device, :config, :volumes]
+  end
+
   ## Server Callbacks
 
+  @spec init(Robotica.Plugin.t()) :: {:ok, State.t()}
   def init(plugin) do
-    run(plugin.config, :init, [])
-    set_volume(plugin.config, plugin.config.volumes.music)
-    {:ok, plugin.config}
+    state = %State{
+      location: plugin.location,
+      device: plugin.device,
+      config: plugin.config,
+      volumes: plugin.config.volumes
+    }
+
+    run(state, :init, [])
+    set_volume(state, state.volumes.music)
+    {:ok, state}
   end
 
   defp command_list do
@@ -99,7 +118,24 @@ defmodule Robotica.Plugins.Audio do
     }
   end
 
-  defp run_commands(state, [cmd | tail], values, on_nonzero) do
+  @spec publish_play_list(State.t(), String.t()) :: :ok
+  defp publish_play_list(%State{} = state, play_list) do
+    play_list = if play_list == nil, do: "", else: play_list
+
+    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, play_list,
+           topic: "play_list"
+         ) do
+      :ok -> :ok
+      {:error, msg} -> Logger.error("publish_play_list() got #{msg}")
+    end
+  end
+
+  @spec publish_error(State.t()) :: :ok
+  defp publish_error(%State{} = state) do
+    publish_play_list(state, "ERROR")
+  end
+
+  defp run_commands(%State{} = state, [cmd | tail], values, on_nonzero) do
     [cmd | args] = cmd
     args = Enum.map(args, &String.solve_string_combined(&1, values))
 
@@ -117,46 +153,50 @@ defmodule Robotica.Plugins.Audio do
         string = "#{cmd} #{Enum.join(args, " ")}"
         Logger.debug("Running '#{string}'.")
 
-        {_output, rc} = System.cmd(cmd, args)
+        try do
+          {_output, rc} = System.cmd(cmd, args)
 
-        case {rc, on_nonzero} do
-          {0, _} ->
-            Logger.info("result 0 from '#{string}'.")
-            run_commands(state, tail, values, on_nonzero)
+          case {rc, on_nonzero} do
+            {0, _} ->
+              Logger.info("result 0 from '#{string}'.")
+              run_commands(state, tail, values, on_nonzero)
 
-          {rc, :error} ->
-            Logger.error("result #{rc} from '#{string}'.")
-            rc
+            {rc, :error} ->
+              Logger.error("result #{rc} from '#{string}'.")
+              {:error, "result #{rc} from '#{string}'"}
 
-          {rc, :info} ->
-            Logger.info("result #{rc} from '#{string}'.")
-            rc
+            {rc, :info} ->
+              Logger.info("result #{rc} from '#{string}'.")
+              {:rc, rc}
+          end
+        rescue
+          error -> {:error, "Got error #{inspect(error.original)}"}
         end
 
       errors ->
-        Logger.error("Got errors #{inspect(errors)} from #{inspect(args)}")
+        {:error, "Got errors #{inspect(errors)} from #{inspect(args)}"}
     end
   end
 
-  defp run_commands(_state, [], _values, _on_nonzero) do
-    0
+  defp run_commands(%State{}, [], _values, _on_nonzero) do
+    :ok
   end
 
-  defp run(state, cmd, values, on_nonzero \\ :error) do
+  defp run(%State{} = state, cmd, values, on_nonzero \\ :error) do
     values = for {key, val} <- values, into: %{}, do: {Atom.to_string(key), val}
 
-    cmds = Map.fetch!(state.commands, cmd)
+    cmds = Map.fetch!(state.config.commands, cmd)
     run_commands(state, cmds, values, on_nonzero)
   end
 
-  defp play_sound(state, sound) do
-    case Map.get(state.sounds, sound) do
+  defp play_sound(%State{} = state, sound) do
+    case Map.get(state.config.sounds, sound) do
       nil -> nil
       sound_file -> run(state, :play, file: sound_file)
     end
   end
 
-  defp say(state, text, volume) do
+  defp say(%State{} = state, text, volume) do
     say_volume =
       case volume do
         nil -> state.volumes.say
@@ -173,31 +213,41 @@ defmodule Robotica.Plugins.Audio do
     nil
   end
 
-  defp music_paused?(state) do
+  defp music_paused?(%State{} = state) do
     case run(state, :music_pause, [], :info) do
-      0 -> true
+      :ok -> true
       _ -> false
     end
   end
 
-  defp set_volume(state, volume) do
+  defp set_volume(%State{} = state, volume) do
     run(state, :volume, volume: volume)
   end
 
-  defp music_resume(state) do
+  defp music_resume(%State{} = state) do
     set_volume(state, state.volumes.music)
     run(state, :music_resume, [])
     nil
   end
 
-  defp music_play(state, play_list) do
+  defp music_play(%State{} = state, play_list) do
     set_volume(state, state.volumes.music)
-    run(state, :music_play, play_list: play_list)
+
+    case run(state, :music_play, play_list: play_list) do
+      :ok -> publish_play_list(state, play_list)
+      _ -> publish_error(state)
+    end
+
     nil
   end
 
-  defp music_stop(state) do
-    run(state, :music_stop, [])
+  defp music_stop(%State{} = state) do
+    case run(state, :music_stop, []) do
+      :ok -> publish_play_list(state, nil)
+      _ -> publish_error(state)
+    end
+
+    nil
   end
 
   defp prepend_sound(sound_list, %{sound: nil}) do
@@ -242,9 +292,9 @@ defmodule Robotica.Plugins.Audio do
     |> Enum.reverse()
   end
 
-  defp process_sound_list(_state, []), do: nil
+  defp process_sound_list(%State{}, []), do: nil
 
-  defp process_sound_list(state, [head | tail]) do
+  defp process_sound_list(%State{} = state, [head | tail]) do
     case head do
       {:sound, sound} ->
         play_sound(state, sound)
@@ -268,8 +318,8 @@ defmodule Robotica.Plugins.Audio do
   defp sound_list_has_music([{:music, _} | _]), do: true
   defp sound_list_has_music([_ | tail]), do: sound_list_has_music(tail)
 
-  @spec handle_execute(state :: Config.t(), action :: RoboticaPlugins.Action.t()) :: nil
-  defp handle_execute(state, action) do
+  @spec handle_execute(state :: State.t(), action :: RoboticaPlugins.Action.t()) :: nil
+  defp handle_execute(%State{} = state, action) do
     sound_list = get_sound_list(action)
 
     if length(sound_list) > 0 do
@@ -291,7 +341,9 @@ defmodule Robotica.Plugins.Audio do
     nil
   end
 
-  def handle_command(state, command) do
+  @spec handle_command(Robotica.Plugins.Audio.State.t(), RoboticaPlugins.Action.t()) ::
+          Robotica.Plugins.Audio.State.t()
+  def handle_command(%State{} = state, command) do
     state =
       case get_in(command.music, [:volume]) do
         nil ->
@@ -299,7 +351,7 @@ defmodule Robotica.Plugins.Audio do
 
         volume ->
           volumes = %{state.volumes | music: volume}
-          %Config{state | volumes: volumes}
+          %State{state | volumes: volumes}
       end
 
     handle_execute(state, command)

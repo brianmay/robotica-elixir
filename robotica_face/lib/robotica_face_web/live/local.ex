@@ -1,9 +1,12 @@
 defmodule RoboticaFaceWeb.Live.Local do
   use Phoenix.LiveView
-  use EventBus.EventSource
+  use RoboticaPlugins.EventBus
 
   alias RoboticaPlugins.Config
 
+  require Logger
+
+  @impl true
   def render(assigns) do
     ~L"""
     <form phx-change="location">
@@ -18,13 +21,17 @@ defmodule RoboticaFaceWeb.Live.Local do
     <div>
     <div><%= row.name %></div>
     <%= for button <- row.buttons do %>
-    <button class="btn btn-primary btn-robotica" phx-click="activate" phx-value-row="<%= row.name %>" phx-value-button="<%= button.name %>"><%= button.name %></button>
+    <% class = get_button_state(@button_states, button.id) |> button_state_to_class(button) %>
+    <button class="btn <%= class %> btn-robotica" phx-click="activate" phx-value-button="<%= button.id %>"><%= button.name %></button>
     <% end %>
     </div>
     <% end %>
     """
   end
 
+  @impl true
+  @spec mount(any, nil | maybe_improper_list | map, Phoenix.LiveView.Socket.t()) ::
+          {:ok, Phoenix.LiveView.Socket.t()}
   def mount(_params, session, socket) do
     locations = Config.ui_locations()
 
@@ -36,45 +43,78 @@ defmodule RoboticaFaceWeb.Live.Local do
     {:ok, socket}
   end
 
+  def handle_cast({:mqtt, _, {button_id, label}, data}, socket) do
+    socket =
+      case get_button(socket, button_id) do
+        nil ->
+          Logger.error("Unknown button #{button_id}")
+          socket
+
+        button ->
+          button_state = get_button_state(socket.assigns.button_states, button_id)
+
+          button_state =
+            RoboticaPlugins.Buttons.process_message(button, label, data, button_state)
+
+          button_states = Map.put(socket.assigns.button_states, button_id, button_state)
+          assign(socket, :button_states, button_states)
+      end
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("location", param, socket) do
     socket = set_location(socket, param["location"])
     {:noreply, socket}
   end
 
-  def handle_event("activate", %{"row" => row_name, "button" => button_name}, socket) do
-    buttons = socket.assigns.buttons
-    location = socket.assigns.location
-    event_params = %{topic: :command}
-
-    button =
-      buttons
-      |> Enum.find(%{}, fn row -> row.name == row_name end)
-      |> Map.get(:buttons, [])
-      |> Enum.find(nil, fn button -> button.name == button_name end)
+  @impl true
+  def handle_event("activate", %{"button" => button_id}, socket) do
+    button = get_button(socket, button_id)
 
     case button do
       nil ->
-        nil
+        Logger.error("Unknown button #{button_id}")
 
       button ->
-        Enum.each(button.commands, fn command ->
-          locations =
-            case command.locations do
-              nil -> [location]
-              locations -> locations
-            end
-
-          EventSource.notify event_params do
-            %RoboticaPlugins.Command{
-              locations: locations,
-              devices: command.devices,
-              msg: command.msg
-            }
-          end
-        end)
+        button_state = get_button_state(socket.assigns.button_states, button_id)
+        RoboticaPlugins.Buttons.execute_press_commands(button, button_state)
     end
 
     {:noreply, socket}
+  end
+
+  defp search_row(row, button_id) do
+    Enum.find(row, nil, fn button -> button.id == button_id end)
+  end
+
+  defp search_button([], _), do: nil
+
+  defp search_button([head | tail], button_id) do
+    case search_row(head.buttons, button_id) do
+      nil -> search_button(tail, button_id)
+      button -> button
+    end
+  end
+
+  defp get_button(socket, button_id) do
+    search_button(socket.assigns.buttons, button_id)
+  end
+
+  defp get_button_state(button_states, id) do
+    Map.get(button_states, id)
+  end
+
+  @spec display_state_to_class(RoboticaPlugins.Buttons.display_state()) :: String.t()
+  defp display_state_to_class(:state_on), do: "btn-success"
+  defp display_state_to_class(:state_off), do: "btn-primary"
+  defp display_state_to_class(:state_hard_off), do: "btn-light"
+  # defp display_state_to_class(:state_error), do: "btn-danger"
+  defp display_state_to_class(nil), do: "btn-secondary"
+
+  defp button_state_to_class(button_state, button) do
+    RoboticaPlugins.Buttons.get_display_state(button, button_state) |> display_state_to_class()
   end
 
   defp set_location(socket, location) do
@@ -86,8 +126,19 @@ defmodule RoboticaFaceWeb.Live.Local do
         false -> []
       end
 
+    RoboticaPlugins.Buttons.unsubscribe_all()
+
+    button_states =
+      Enum.reduce(buttons, %{}, fn row, button_states ->
+        Enum.reduce(row.buttons, button_states, fn button, button_states ->
+          RoboticaPlugins.Buttons.subscribe_topics(button)
+          Map.put(button_states, button.id, RoboticaPlugins.Buttons.get_initial_state(button))
+        end)
+      end)
+
     socket
     |> assign(:buttons, buttons)
+    |> assign(:button_states, button_states)
     |> assign(:location, location)
   end
 end

@@ -23,13 +23,16 @@ defmodule Ceryx.Supervisor do
     EventBus.register_topic(:execute)
     EventBus.register_topic(:command)
     EventBus.register_topic(:mark)
+    EventBus.register_topic(:subscribe)
+    EventBus.register_topic(:unsubscribe_all)
 
     EventBus.subscribe(
       {Ceryx.CeryxService,
-       ["^request_schedule$", "^command$", "^mark$"]}
+       ["^request_schedule$", "^command$", "^mark$", "^subscribe$", "^unsubscribe_all$"]}
     )
 
     children = [
+      {RoboticaPlugins.Subscriptions, name: RoboticaPlugins.Subscriptions},
       {Tortoise.Connection,
        client_id: client_id,
        handler: {Ceryx.Client, []},
@@ -41,6 +44,13 @@ defmodule Ceryx.Supervisor do
        subscriptions: [
          {"execute", 0},
          {"schedule/robotica-nerves-f447", 0},
+
+         # Dynamic subscriptions,
+         # Here because of https://github.com/gausby/tortoise/issues/130
+         # Should be done in subscriptions.ex
+
+         # robotica_ui and robotica_face
+         {"state/#", 0}
        ]}
     ]
 

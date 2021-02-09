@@ -17,7 +17,7 @@ defmodule RoboticaUi.RootManager do
     @type t :: %__MODULE__{
             clock: atom() | {atom(), any()} | nil,
             schedule: atom() | {atom(), any()} | nil,
-            local: atom() | {atom(), any()} | nil,
+            local: atom() | {atom(), any()} | nil
           }
     defstruct [:clock, :schedule, :local]
   end

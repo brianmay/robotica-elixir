@@ -3,7 +3,8 @@ defmodule RoboticaPlugins.Date do
   Provides data/time functions for Robotica.
   """
 
-  @timezone Application.get_env(:robotica_plugins, :timezone)
+  @spec get_timezone :: String.t()
+  def get_timezone(), do: Application.get_env(:robotica_plugins, :timezone)
 
   @doc """
   Converts an UTC date time to a local Date for today.
@@ -20,7 +21,7 @@ defmodule RoboticaPlugins.Date do
   """
   @spec today(DateTime.t()) :: Date.t()
   def today(date_time) do
-    {:ok, local_date_time} = DateTime.shift_zone(date_time, @timezone)
+    {:ok, local_date_time} = DateTime.shift_zone(date_time, get_timezone())
     Date.add(local_date_time, 0)
   end
 
@@ -39,7 +40,7 @@ defmodule RoboticaPlugins.Date do
   """
   @spec tomorrow(DateTime.t()) :: Date.t()
   def tomorrow(date_time) do
-    {:ok, local_date_time} = DateTime.shift_zone(date_time, @timezone)
+    {:ok, local_date_time} = DateTime.shift_zone(date_time, get_timezone())
     Date.add(local_date_time, 1)
   end
 
@@ -66,7 +67,7 @@ defmodule RoboticaPlugins.Date do
     # S 6 --> +2
     # S 7 --> +1
 
-    {:ok, date_time} = DateTime.shift_zone(date_time, @timezone)
+    {:ok, date_time} = DateTime.shift_zone(date_time, get_timezone())
     day_of_week = Date.day_of_week(date_time)
     add_days = 7 - day_of_week + 1
     Date.add(date_time, add_days)
@@ -82,7 +83,7 @@ defmodule RoboticaPlugins.Date do
   @spec midnight_utc(Date.t()) :: DateTime.t()
   def midnight_utc(date) do
     {:ok, naive_date_time} = NaiveDateTime.new(date, ~T[00:00:00])
-    {:ok, local_date_time} = DateTime.from_naive(naive_date_time, @timezone)
+    {:ok, local_date_time} = DateTime.from_naive(naive_date_time, get_timezone())
     {:ok, utc_date_time} = DateTime.shift_zone(local_date_time, "Etc/UTC")
     utc_date_time
   end

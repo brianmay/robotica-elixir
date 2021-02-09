@@ -82,18 +82,14 @@ defmodule Robotica.Client do
   end
 
   def handle_message(topic, publish, state) do
-    case Poison.decode(publish) do
-      {:ok, message} ->
-        case Robotica.Subscriptions.message(topic, message) do
-          :ignored ->
-            Logger.info("Received unknown topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
+    Logger.debug("handle message #{inspect(topic)} #{inspect(publish)}")
 
-          :processed ->
-            Logger.info("Processed topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
-        end
+    case RoboticaPlugins.Subscriptions.message(topic, publish) do
+      :ignored ->
+        Logger.debug("Received unknown topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
 
-      {:error, error} ->
-        Logger.error("Invalid command message received: #{inspect(error)}.")
+      :processed ->
+        Logger.debug("Processed topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
     end
 
     {:ok, state}

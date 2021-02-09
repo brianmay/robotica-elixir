@@ -1,4 +1,5 @@
 defmodule Robotica.Executor do
+  use RoboticaPlugins.EventBus
   use GenServer
   use EventBus.EventSource
 
@@ -47,9 +48,7 @@ defmodule Robotica.Executor do
     plugins = get_required_plugins(state, locations, devices)
 
     if task.devices == nil or Enum.member?(task.devices, "Robotica") do
-      EventSource.notify %{topic: :execute} do
-        task
-      end
+      RoboticaPlugins.EventBus.notify(:execute, task)
     end
 
     Enum.each(plugins, fn pid ->

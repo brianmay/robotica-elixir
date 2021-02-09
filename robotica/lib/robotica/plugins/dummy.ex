@@ -24,7 +24,7 @@ defmodule Robotica.Plugins.Dummy do
   defp publish_device_state(state, device_state) do
     case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, device_state) do
       :ok -> :ok
-      {:error, msg} -> Logger.error("set_device_state() got #{msg}")
+      {:error, msg} -> Logger.error("publish_device_state() got #{msg}")
     end
   end
 

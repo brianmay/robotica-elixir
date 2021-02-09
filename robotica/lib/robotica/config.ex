@@ -61,21 +61,25 @@ defmodule Robotica.Config do
       }
     end
 
+    @spec configuration(String.t()) :: map()
     def configuration(filename) do
       {:ok, data} = Validation.load_and_validate(filename, config_schema())
       data
     end
 
+    @spec classifications(String.t()) :: map()
     def classifications(filename) do
       {:ok, data} = Validation.load_and_validate(filename, classifications_schema())
       data
     end
 
+    @spec schedule(String.t()) :: map()
     def schedule(filename) do
       {:ok, data} = Validation.load_and_validate(filename, schedule_schema())
       data
     end
 
+    @spec sequences(String.t()) :: map()
     def sequences(filename) do
       {:ok, data} = Validation.load_and_validate(filename, sequences_schema())
       data
@@ -86,15 +90,30 @@ defmodule Robotica.Config do
   @external_resource @filename
   @config Loader.configuration(@filename)
 
+  @spec get_hosts :: %{required(String.t()) => map()}
+  def get_hosts() do
+    @config.hosts
+  end
+
+  @spec hostname :: String.t()
   defp hostname do
-    {:ok, hostname} = :inet.gethostname()
-    to_string(hostname)
+    case Application.get_env(:robotica, :hostname) do
+      nil ->
+        {:ok, hostname} = :inet.gethostname()
+        to_string(hostname)
+
+      hostname ->
+        hostname
+    end
   end
 
+  @spec plugins :: list(RoboticaPlugins.Plugin.t())
   defp plugins do
-    Map.fetch!(@config.hosts, hostname()).plugins
+    hosts = get_hosts()
+    Map.fetch!(hosts, hostname()).plugins
   end
 
+  @spec configuration :: Robotica.Supervisor.State.t()
   def configuration do
     %Robotica.Supervisor.State{
       mqtt: @config.mqtt,
@@ -102,26 +121,32 @@ defmodule Robotica.Config do
     }
   end
 
+  @spec validate_task(map) :: {:error, any} | {:ok, RoboticaPlugins.Task.t()}
   def validate_task(%{} = data) do
     Validation.validate_schema(data, Schema.task_schema())
   end
 
+  @spec validate_audio_command(map) :: {:error, any} | {:ok, any}
   def validate_audio_command(%{} = data) do
     Validation.validate_schema(data, Schema.audio_action_schema())
   end
 
+  @spec validate_hdmi_command(map) :: {:error, any} | {:ok, any}
   def validate_hdmi_command(%{} = data) do
     Validation.validate_schema(data, Schema.hdmi_action_schema())
   end
 
+  @spec validate_device_command(map) :: {:error, any} | {:ok, any}
   def validate_device_command(%{} = data) do
     Validation.validate_schema(data, Schema.device_action_schema())
   end
 
+  @spec validate_lights_command(map) :: {:error, any} | {:ok, any}
   def validate_lights_command(%{} = data) do
     Validation.validate_schema(data, Schema.lights_action_schema())
   end
 
+  @spec validate_mark(map) :: {:error, any} | {:ok, RoboticaPlugins.Mark.t()}
   def validate_mark(%{} = data) do
     Validation.validate_schema(data, Schema.mark_schema())
   end

@@ -60,7 +60,7 @@ defmodule RoboticaPlugins do
     @type t :: %__MODULE__{
             locations: list(String.t()),
             devices: list(String.t()),
-            msg: map(),
+            msg: map()
           }
     @enforce_keys [:locations, :devices, :msg]
     defstruct locations: nil, devices: nil, msg: nil

@@ -1,6 +1,6 @@
 defmodule RoboticaPlugins.Mark do
+  use RoboticaPlugins.EventBus
   alias RoboticaPlugins.Date
-  use EventBus.EventSource
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -14,14 +14,13 @@ defmodule RoboticaPlugins.Mark do
             start_time: nil,
             stop_time: nil
 
-  @spec publish_mark(t()) :: :ok | {:error, String.t()}
-  def publish_mark(mark) do
-    EventSource.notify %{topic: :mark} do
-      mark
-    end
+  @spec publish_mark(RoboticaPlugins.Mark.t()) :: :ok
+  def publish_mark(%RoboticaPlugins.Mark{} = mark) do
+    RoboticaPlugins.EventBus.notify(:mark, mark)
   end
 
-  def mark_task(step, status) do
+  @spec mark_task(RoboticaPlugins.ScheduledStep.t(), :done | :cancelled | :clear) :: :error | :ok
+  def mark_task(%RoboticaPlugins.ScheduledStep{} = step, status) do
     id = step.id
     now = DateTime.utc_now()
     prev_midnight = Date.today(step.required_time) |> Date.midnight_utc()
@@ -63,7 +62,6 @@ defmodule RoboticaPlugins.Mark do
 
       _ ->
         publish_mark(mark)
-        :ok
     end
   end
 end

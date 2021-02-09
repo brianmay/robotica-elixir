@@ -22,10 +22,11 @@ defmodule Robotica.Plugin do
         with {:ok, pid} <- GenServer.start_link(__MODULE__, plugin, []) do
           Robotica.PluginRegistry.add(plugin.location, plugin.device, pid)
 
-          Robotica.Subscriptions.subscribe(
+          RoboticaPlugins.Subscriptions.subscribe(
             ["command", plugin.location, plugin.device],
             :command,
-            pid
+            pid,
+            :json
           )
 
           {:ok, pid}
@@ -38,12 +39,6 @@ defmodule Robotica.Plugin do
         {:reply, nil, state}
       end
     end
-  end
-
-  @spec mqtt(server :: pid, topic :: list(String.t()), label :: atom(), command :: map()) :: nil
-  def mqtt(server, topic, label, command) do
-    GenServer.cast(server, {:mqtt, topic, label, command})
-    nil
   end
 
   @spec execute(server :: pid, action :: Action.t()) :: nil

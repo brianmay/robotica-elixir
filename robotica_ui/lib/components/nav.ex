@@ -23,7 +23,7 @@ defmodule RoboticaUi.Components.Nav do
   @scenes [
     {:clock, {0, 0}},
     {:schedule, {0, 100}},
-    {:local, {0, 200}},
+    {:local, {0, 200}}
   ]
 
   defp in_bounding_box({click_x, click_y}, {x, y}) do

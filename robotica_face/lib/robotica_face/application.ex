@@ -12,7 +12,7 @@ defmodule RoboticaFace.Application do
       RoboticaFaceWeb.Endpoint,
       RoboticaFaceWeb.Strategy,
       RoboticaFace.Schedule,
-      RoboticaFace.Execute,
+      RoboticaFace.Execute
     ]
 
     EventBus.subscribe({RoboticaFace.RoboticaService, ["^schedule", "^execute"]})

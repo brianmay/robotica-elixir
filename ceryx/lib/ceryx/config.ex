@@ -38,7 +38,7 @@ defmodule Ceryx.Config do
           port: String.to_integer(System.get_env("MQTT_PORT")),
           user_name: System.get_env("MQTT_USERNAME"),
           password: System.get_env("MQTT_PASSWORD"),
-          ca_cert_file: System.get_env("MQTT_CA_CERT_FILE"),
+          ca_cert_file: System.get_env("MQTT_CA_CERT_FILE")
         }
       }
     end
