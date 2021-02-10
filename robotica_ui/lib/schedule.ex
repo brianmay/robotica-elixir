@@ -15,12 +15,7 @@ defmodule RoboticaUi.Schedule do
   end
 
   def init(_) do
-    event_params = %{topic: :request_schedule}
-
-    EventSource.notify event_params do
-      nil
-    end
-
+    RoboticaPlugins.EventBus.notify(:request_schedule, nil)
     {:ok, %State{}}
   end
 

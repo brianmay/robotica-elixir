@@ -30,6 +30,7 @@ defmodule RoboticaPlugins.Buttons.Switch do
   @spec get_display_state(Config.t(), state) :: Buttons.display_state()
   def get_display_state(%Config{action: _}, "ERROR"), do: :state_error
   def get_display_state(%Config{action: _}, "HARD_OFF"), do: :state_hard_off
+  def get_display_state(%Config{action: _}, nil), do: nil
   def get_display_state(%Config{action: "turn_on"}, "ON"), do: :state_on
   def get_display_state(%Config{action: "turn_on"}, "OFF"), do: :state_off
   def get_display_state(%Config{action: "toggle"}, "ON"), do: :state_on
@@ -43,10 +44,10 @@ defmodule RoboticaPlugins.Buttons.Switch do
   defp turn_on(%Config{} = config) do
     [
       %RoboticaPlugins.Command{
-        locations: [config.location],
-        devices: [config.device],
+        location: config.location,
+        device: config.device,
         msg: %{
-          action: "turn_on"
+          "action" => "turn_on"
         }
       }
     ]
@@ -56,10 +57,10 @@ defmodule RoboticaPlugins.Buttons.Switch do
   defp turn_off(%Config{} = config) do
     [
       %RoboticaPlugins.Command{
-        locations: [config.location],
-        devices: [config.device],
+        location: config.location,
+        device: config.device,
         msg: %{
-          action: "turn_off"
+          "action" => "turn_off"
         }
       }
     ]

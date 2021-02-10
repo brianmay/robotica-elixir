@@ -8,7 +8,7 @@ defmodule RoboticaPlugins.Buttons.HDMI do
   alias RoboticaPlugins.Buttons.Config
   alias RoboticaPlugins.Buttons
 
-  @type state :: String.t() | nil
+  @type state :: String.t() | nil | :off
 
   @spec get_topics(Config.t()) :: list({list(String.t()), atom(), {atom(), atom()}})
   def get_topics(%Config{} = config) do
@@ -23,8 +23,8 @@ defmodule RoboticaPlugins.Buttons.HDMI do
   end
 
   @spec process_message(Config.t(), atom(), any(), state) :: state
-  def process_message(%Config{}, :input, "", _) do
-    nil
+  def process_message(%Config{}, :input, "OFF", _) do
+    :off
   end
 
   def process_message(%Config{}, :input, data, _) do
@@ -44,10 +44,10 @@ defmodule RoboticaPlugins.Buttons.HDMI do
   defp input(%Config{} = config, source) do
     [
       %RoboticaPlugins.Command{
-        locations: [config.location],
-        devices: [config.device],
+        location: config.location,
+        device: config.device,
         msg: %{
-          source: source
+          "source" => source
         }
       }
     ]

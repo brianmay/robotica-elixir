@@ -21,6 +21,14 @@ defmodule Robotica.PluginRegistry do
     GenServer.call(Robotica.PluginRegistry, {:lookup, locations, devices})
   end
 
+  @spec lookup_single(location :: String.t(), device :: String.t()) :: pid | nil
+  def lookup_single(location, device) do
+    case lookup([location], [device]) do
+      [] -> nil
+      [pid] -> pid
+    end
+  end
+
   @spec add(location :: String.t(), device :: String.t(), pid :: pid) :: :ok
   def add(location, device, pid) do
     GenServer.call(Robotica.PluginRegistry, {:add, location, device, pid})

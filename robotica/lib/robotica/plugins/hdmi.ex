@@ -35,7 +35,7 @@ defmodule Robotica.Plugins.HDMI do
   def handle_command(state, command) do
     Logger.info("HDMI #{state.config.host} #{command.source} #{state.config.destination}")
 
-    publish_device_state(state, "")
+    publish_device_state(state, "OFF")
 
     case Robotica.Devices.HDMI.switch(state.config.host, command.source, state.config.destination) do
       :ok ->

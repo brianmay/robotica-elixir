@@ -37,7 +37,9 @@ defmodule Robotica.Plugins.Hs100 do
 
   @spec publish_device_state(State.t(), String.t()) :: :ok
   defp publish_device_state(state, device_state) do
-    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, device_state, topic: "power") do
+    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, device_state,
+           topic: "power"
+         ) do
       :ok -> :ok
       {:error, msg} -> Logger.error("publish_device_state() got #{msg}")
     end

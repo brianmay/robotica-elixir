@@ -12,13 +12,16 @@ defmodule Robotica.RoboticaService do
 
   def process({:command = topic, id}) do
     command = EventBus.fetch_event_data({topic, id})
-    Logger.info("got command #{inspect(command)}")
 
-    Enum.each(command.locations, fn location ->
-      Enum.each(command.devices, fn device ->
-        RoboticaPlugins.Mqtt.publish_command(location, device, command.msg)
-      end)
-    end)
+    case Robotica.PluginRegistry.lookup_single(command.location, command.device) do
+      nil ->
+        Logger.info("got command #{inspect(command)} - remote")
+        RoboticaPlugins.Mqtt.publish_command(command.location, command.device, command.msg)
+
+      pid ->
+        Logger.info("got command #{inspect(command)} - local")
+        :ok = GenServer.cast(pid, {:mqtt, [], :command, command.msg})
+    end
 
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end

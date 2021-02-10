@@ -8,7 +8,7 @@ defmodule RoboticaPlugins.Buttons.Music do
   alias RoboticaPlugins.Buttons.Config
   alias RoboticaPlugins.Buttons
 
-  @type state :: String.t() | nil
+  @type state :: String.t() | nil | :stop
 
   @spec get_topics(Config.t()) :: list({list(String.t()), atom(), {atom(), atom()}})
   def get_topics(%Config{} = config) do
@@ -23,8 +23,8 @@ defmodule RoboticaPlugins.Buttons.Music do
   end
 
   @spec process_message(Config.t(), atom(), any(), state) :: state
-  def process_message(%Config{}, :play_list, "", _) do
-    nil
+  def process_message(%Config{}, :play_list, "STOP", _) do
+    :stop
   end
 
   def process_message(%Config{}, :play_list, data, _) do
@@ -33,8 +33,8 @@ defmodule RoboticaPlugins.Buttons.Music do
 
   @spec get_display_state(Config.t(), state) :: Buttons.display_state()
   def get_display_state(%Config{action: _}, "ERROR"), do: :state_error
-  def get_display_state(%Config{action: "stop"}, nil), do: :state_on
-  def get_display_state(%Config{action: "stop"}, _), do: :state_off
+  def get_display_state(%Config{action: _}, nil), do: nil
+  def get_display_state(%Config{action: "stop"}, :stop), do: :state_off
   def get_display_state(%Config{action: "play_red"}, "red"), do: :state_on
   def get_display_state(%Config{action: "play_green"}, "green"), do: :state_on
   def get_display_state(%Config{action: "play_blue"}, "blue"), do: :state_on
@@ -45,10 +45,10 @@ defmodule RoboticaPlugins.Buttons.Music do
   defp play(%Config{} = config, play_list) do
     [
       %RoboticaPlugins.Command{
-        locations: [config.location],
-        devices: [config.device],
+        location: config.location,
+        device: config.device,
         msg: %{
-          music: %{play_list: play_list}
+          "music" => %{"play_list" => play_list}
         }
       }
     ]
@@ -58,11 +58,11 @@ defmodule RoboticaPlugins.Buttons.Music do
   defp stop(%Config{} = config) do
     [
       %RoboticaPlugins.Command{
-        locations: [config.location],
-        devices: [config.device],
+        location: config.location,
+        device: config.device,
         msg: %{
-          music: %{
-            stop: true
+          "music" => %{
+            "stop" => true
           }
         }
       }

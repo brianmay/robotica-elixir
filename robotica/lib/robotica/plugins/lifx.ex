@@ -141,32 +141,41 @@ defmodule Robotica.Plugins.LIFX do
 
   # Publish state to MQTT
 
-  @spec publish_device_tasks(State.t(), %{required(String.t()) => TaskState.t()}) :: :ok
-  defp publish_device_tasks(%State{} = state, tasks) do
-    task_list = Enum.map(tasks, fn {task_name, _} -> task_name end)
-
-    case RoboticaPlugins.Mqtt.publish_state_json(state.location, state.device, task_list,
-           topic: "tasks"
-         ) do
+  @spec publish_raw(State.t(), Lifx.Device.t() | nil, String.t(), String.t()) :: :ok
+  defp publish_raw(%State{} = state, device, topic, value) do
+    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic) do
       :ok ->
         :ok
 
       {:error, msg} ->
-        Logger.error("#{device_to_string(state, nil)}: publish_device_color() got #{msg}")
+        Logger.error("#{device_to_string(state, device)}: publish_raw() got #{msg}")
     end
+
+    :ok
+  end
+
+  @spec publish_json(State.t(), Lifx.Device.t() | nil, String.t(), map() | list()) :: :ok
+  defp publish_json(%State{} = state, device, topic, value) do
+    case RoboticaPlugins.Mqtt.publish_state_json(state.location, state.device, value, topic: topic) do
+      :ok ->
+        :ok
+
+      {:error, msg} ->
+        Logger.error("#{device_to_string(state, device)}: publish_raw() got #{msg}")
+    end
+
+    :ok
+  end
+
+  @spec publish_device_tasks(State.t(), %{required(String.t()) => TaskState.t()}) :: :ok
+  defp publish_device_tasks(%State{} = state, tasks) do
+    task_list = Enum.map(tasks, fn {task_name, _} -> task_name end)
+    :ok = publish_json(state, nil, "tasks", task_list)
 
     priority_list =
       Enum.map(tasks, fn {_, %TaskState{priority: priority}} -> priority end) |> Enum.uniq()
 
-    case RoboticaPlugins.Mqtt.publish_state_json(state.location, state.device, priority_list,
-           topic: "priorities"
-         ) do
-      :ok ->
-        :ok
-
-      {:error, msg} ->
-        Logger.error("#{device_to_string(state, nil)}: publish_device_color() got #{msg}")
-    end
+    :ok = publish_json(state, nil, "priorities", priority_list)
 
     :ok
   end
@@ -179,69 +188,29 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec publish_device_colors(State.t(), Lifx.Device.t(), list(HSBK.t())) :: :ok
   defp publish_device_colors(%State{} = state, %Lifx.Device{} = device, colors) do
-    case RoboticaPlugins.Mqtt.publish_state_json(state.location, state.device, colors,
-           topic: "colors"
-         ) do
-      :ok ->
-        :ok
-
-      {:error, msg} ->
-        Logger.error("#{device_to_string(state, device)}: publish_device_color() got #{msg}")
-    end
-
+    :ok = publish_json(state, device, "colors", colors)
     :ok
   end
 
   @spec publish_device_power(State.t(), Lifx.Device.t(), integer()) :: :ok
   defp publish_device_power(%State{} = state, %Lifx.Device{} = device, power) do
     power = if power != 0, do: "ON", else: "OFF"
-
-    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, power,
-           topic: "power"
-         ) do
-      :ok ->
-        :ok
-
-      {:error, msg} ->
-        Logger.error("#{device_to_string(state, device)}: publish_device_power() got #{msg}")
-    end
-
+    :ok = publish_raw(state, device, "power", power)
+    :ok = publish_raw(state, device, "error", "")
     :ok
   end
 
   @spec publish_device_hard_off(State.t(), Lifx.Device.t() | nil) :: :ok
   defp publish_device_hard_off(%State{} = state, device) do
     power = "HARD_OFF"
-    Logger.info("#{device_to_string(state, device)}: Got LIFX hard off.")
-
-    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, power,
-           topic: "power"
-         ) do
-      :ok ->
-        :ok
-
-      {:error, msg} ->
-        Logger.error(
-          "#{device_to_string(state, device)}: publish_device_hard_off() power got #{msg}."
-        )
-    end
+    :ok = publish_raw(state, device, "power", power)
+    :ok = publish_raw(state, device, "error", "")
+    :ok
   end
 
   @spec publish_device_error(State.t(), Lifx.Device.t() | nil, String.t()) :: :ok
   defp publish_device_error(%State{} = state, device, error) do
-    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, error,
-           topic: "error",
-           retain: false
-         ) do
-      :ok ->
-        :ok
-
-      {:error, msg} ->
-        Logger.error(
-          "#{device_to_string(state, device)}: publish_device_error() error got #{msg}."
-        )
-    end
-
+    :ok = publish_raw(state, device, "error", error)
     :ok
   end
 

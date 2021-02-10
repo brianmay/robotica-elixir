@@ -11,7 +11,8 @@ defmodule RoboticaPlugins.Mqtt do
     opts = Keyword.put_new(opts, :qos, 0)
     client_id = get_tortoise_client_id()
 
-    case Tortoise.publish(client_id, topic, data, opts) do
+
+    case Tortoise.publish(client_id, topic, data, qos: 0, retain: true) do
       :ok -> :ok
       {:error, msg} -> {:error, "Tortoise.publish() got error '#{msg}'"}
     end
@@ -21,7 +22,7 @@ defmodule RoboticaPlugins.Mqtt do
   def publish_json(topic, data, opts \\ []) do
     case Poison.encode(data) do
       {:ok, data} -> publish_raw(topic, data, opts)
-      {:error, msg} -> {:error, "Poision.encode() got error '#{msg}'"}
+      {:error, msg} -> {:error, "Poison.encode() got error '#{msg}'"}
     end
   end
 
@@ -44,7 +45,7 @@ defmodule RoboticaPlugins.Mqtt do
           :ok | {:error, String.t()}
   def publish_state_raw(location, device, state, opts \\ []) do
     {topic, opts} = Keyword.pop(opts, :topic)
-    opts = Keyword.put(opts, :retain, true)
+    opts = Keyword.put_new(opts, :retain, true)
     topic = get_state_topic(location, device, topic)
     publish_raw(topic, state, opts)
   end
@@ -53,7 +54,7 @@ defmodule RoboticaPlugins.Mqtt do
           :ok | {:error, String.t()}
   def publish_state_json(location, device, state, opts \\ []) do
     {topic, opts} = Keyword.pop(opts, :topic)
-    opts = Keyword.put(opts, :retain, true)
+    opts = Keyword.put_new(opts, :retain, true)
     topic = get_state_topic(location, device, topic)
     publish_json(topic, state, opts)
   end

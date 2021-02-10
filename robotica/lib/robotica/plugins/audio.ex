@@ -120,7 +120,7 @@ defmodule Robotica.Plugins.Audio do
 
   @spec publish_play_list(State.t(), String.t()) :: :ok
   defp publish_play_list(%State{} = state, play_list) do
-    play_list = if play_list == nil, do: "", else: play_list
+    play_list = if play_list == nil, do: "STOP", else: play_list
 
     case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, play_list,
            topic: "play_list"

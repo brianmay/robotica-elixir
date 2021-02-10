@@ -77,22 +77,26 @@ defmodule RoboticaPlugins.Buttons.Light do
   def get_display_state(%Config{action: "turn_on"}, {power, tasks, _}) do
     has_default? = has_task?(tasks, "default")
 
-    case {power, has_default?} do
-      {"HARD_OFF", _} -> :state_hard_off
-      {_, nil} -> nil
-      {_, true} -> :state_on
-      {_, false} -> :state_off
+    case {power, tasks, has_default?} do
+      {"HARD_OFF", _, _} -> :state_hard_off
+      {"ON", [], _} -> :state_on
+      {"OFF", [], _} -> :state_off
+      {_, _, nil} -> nil
+      {_, _, true} -> :state_on
+      {_, _, false} -> :state_off
     end
   end
 
   def get_display_state(%Config{action: "turn_off"}, {power, _tasks, priorities}) do
     has_priority? = has_priority?(priorities, 100)
 
-    case {power, has_priority?} do
-      {"HARD_OFF", _} -> :state_hard_off
-      {_, nil} -> nil
-      {_, true} -> :state_off
-      {_, false} -> :state_on
+    case {power, priorities, has_priority?} do
+      {"HARD_OFF", _, _} -> :state_hard_off
+      {"ON", [], _} -> :state_off
+      {"OFF", [], _} -> :state_on
+      {_, _, nil} -> nil
+      {_, _, true} -> :state_off
+      {_, _, false} -> :state_on
     end
   end
 
@@ -154,11 +158,13 @@ defmodule RoboticaPlugins.Buttons.Light do
   def get_display_state(%Config{action: "toggle"}, {power, tasks, _priorities}) do
     has_default? = has_task?(tasks, "default")
 
-    case {power, has_default?} do
-      {"HARD_OFF", _} -> :state_hard_off
-      {_, nil} -> nil
-      {_, true} -> :state_on
-      {_, false} -> :state_off
+    case {power, tasks, has_default?} do
+      {"HARD_OFF", _, _} -> :state_hard_off
+      {"ON", [], _} -> :state_on
+      {"OFF", [], _} -> :state_off
+      {_, _, nil} -> nil
+      {_, _, true} -> :state_on
+      {_, _, false} -> :state_off
     end
   end
 
@@ -166,12 +172,12 @@ defmodule RoboticaPlugins.Buttons.Light do
   defp turn_on(%Config{} = config) do
     [
       %RoboticaPlugins.Command{
-        locations: [config.location],
-        devices: [config.device],
+        location: config.location,
+        device: config.device,
         msg: %{
-          action: "turn_on",
-          task: "default",
-          color: %{saturation: 0, hue: 0, brightness: 100, kelvin: 3500}
+          "action" => "turn_on",
+          "task" => "default",
+          "color" => %{"saturation" => 0, "hue" => 0, "brightness" => 100, "kelvin" => 3500}
         }
       }
     ]
@@ -181,11 +187,11 @@ defmodule RoboticaPlugins.Buttons.Light do
   defp turn_off(%Config{} = config) do
     [
       %RoboticaPlugins.Command{
-        locations: [config.location],
-        devices: [config.device],
+        location: config.location,
+        device: config.device,
         msg: %{
-          task: "default",
-          action: "turn_off"
+          "task" => "default",
+          "action" => "turn_off"
         }
       }
     ]
@@ -195,12 +201,12 @@ defmodule RoboticaPlugins.Buttons.Light do
   defp dim(%Config{} = config) do
     [
       %RoboticaPlugins.Command{
-        locations: [config.location],
-        devices: [config.device],
+        location: config.location,
+        device: config.device,
         msg: %{
-          action: "turn_on",
-          task: "dim",
-          color: %{saturation: 0, hue: 0, brightness: 10, kelvin: 3500}
+          "action" => "turn_on",
+          "task" => "dim",
+          "color" => %{"saturation" => 0, "hue" => 0, "brightness" => 10, "kelvin" => 3500}
         }
       }
     ]
@@ -210,26 +216,31 @@ defmodule RoboticaPlugins.Buttons.Light do
   defp rainbow(%Config{} = config) do
     [
       %RoboticaPlugins.Command{
-        locations: [config.location],
-        devices: [config.device],
+        location: config.location,
+        device: config.device,
         msg: %{
-          action: "animate",
-          task: "rainbow",
-          animation: %{
-            frames: [
+          "action" => "animate",
+          "task" => "rainbow",
+          "animation" => %{
+            "frames" => [
               %{
-                sleep: 500,
-                repeat: 12,
-                color: %{hue: "{frame}*30", saturation: 100, brightness: 100, kelvin: 3500},
-                colors: [
+                "sleep" => 500,
+                "repeat" => 12,
+                "color" => %{
+                  "hue" => "{frame}*30",
+                  "saturation" => 100,
+                  "brightness" => 100,
+                  "kelvin" => 3500
+                },
+                "colors" => [
                   %{
-                    count: 32,
-                    colors: [
+                    "count" => 32,
+                    "colors" => [
                       %{
-                        hue: "{light}*30+{frame}*30",
-                        saturation: 100,
-                        brightness: 100,
-                        kelvin: 3500
+                        "hue" => "{light}*30+{frame}*30",
+                        "saturation" => 100,
+                        "brightness" => 100,
+                        "kelvin" => 350
                       }
                     ]
                   }
@@ -246,14 +257,14 @@ defmodule RoboticaPlugins.Buttons.Light do
   defp night_1(%Config{} = config) do
     [
       %RoboticaPlugins.Command{
-        locations: [config.location],
-        devices: [config.device],
+        location: config.location,
+        device: config.device,
         msg: %{
-          stop_priorities: [100],
-          action: "turn_on",
-          task: "night_1",
-          priority: 0,
-          color: %{hue: 57, saturation: 100, brightness: 6, kelvin: 3500}
+          "stop_priorities" => [100],
+          "action" => "turn_on",
+          "task" => "night_1",
+          "priority" => 0,
+          "color" => %{"hue" => 57, "saturation" => 100, "brightness" => 6, "kelvin" => 3500}
         }
       }
     ]
@@ -263,14 +274,14 @@ defmodule RoboticaPlugins.Buttons.Light do
   defp night_2(%Config{} = config) do
     [
       %RoboticaPlugins.Command{
-        locations: [config.location],
-        devices: [config.device],
+        location: config.location,
+        device: config.device,
         msg: %{
-          stop_priorities: [100],
-          action: "turn_on",
-          task: "night_2",
-          priority: 0,
-          color: %{hue: 64, saturation: 100, brightness: 6, kelvin: 3500}
+          "stop_priorities" => [100],
+          "action" => "turn_on",
+          "task" => "night_2",
+          "priority" => 0,
+          "color" => %{"hue" => 64, "saturation" => 100, "brightness" => 6, "kelvin" => 3500}
         }
       }
     ]
@@ -280,13 +291,13 @@ defmodule RoboticaPlugins.Buttons.Light do
   defp night_off(%Config{} = config) do
     [
       %RoboticaPlugins.Command{
-        locations: [config.location],
-        devices: [config.device],
+        location: config.location,
+        device: config.device,
         msg: %{
-          stop_priorities: [100],
-          task: "default",
-          priority: 0,
-          action: "turn_off"
+          "stop_priorities" => [100],
+          "task" => "default",
+          "priority" => 0,
+          "action" => "turn_off"
         }
       }
     ]
