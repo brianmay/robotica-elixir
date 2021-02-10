@@ -731,7 +731,7 @@ defmodule Robotica.Plugins.LIFX do
             saturation: 0,
             brightness: 0,
             kelvin: 3500,
-            alpha: 50
+            alpha: 0
           },
           colors: nil
         }
