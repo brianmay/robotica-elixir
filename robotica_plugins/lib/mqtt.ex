@@ -11,8 +11,7 @@ defmodule RoboticaPlugins.Mqtt do
     opts = Keyword.put_new(opts, :qos, 0)
     client_id = get_tortoise_client_id()
 
-
-    case Tortoise.publish(client_id, topic, data, qos: 0, retain: true) do
+    case Tortoise.publish(client_id, topic, data, opts) do
       :ok -> :ok
       {:error, msg} -> {:error, "Tortoise.publish() got error '#{msg}'"}
     end
