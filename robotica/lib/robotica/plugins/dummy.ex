@@ -22,7 +22,7 @@ defmodule Robotica.Plugins.Dummy do
 
   @spec publish_device_state(Robotica.Plugin.t(), String.t()) :: :ok
   defp publish_device_state(state, device_state) do
-    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, device_state) do
+    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, device_state, topic: "power") do
       :ok -> :ok
       {:error, msg} -> Logger.error("publish_device_state() got #{msg}")
     end
@@ -32,7 +32,7 @@ defmodule Robotica.Plugins.Dummy do
     device_state =
       case command.action do
         "turn_on" -> "ON"
-        "turn_off" -> "POWER"
+        "turn_off" -> "OFF"
         _ -> nil
       end
 
