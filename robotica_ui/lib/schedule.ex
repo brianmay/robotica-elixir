@@ -1,6 +1,6 @@
 defmodule RoboticaUi.Schedule do
   use GenServer
-  use EventBus.EventSource
+  use RoboticaPlugins.EventBus
 
   defmodule State do
     @type t :: %__MODULE__{

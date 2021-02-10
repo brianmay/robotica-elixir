@@ -51,23 +51,22 @@ defmodule RoboticaUi.RootManager do
     {:ok, state}
   end
 
-  @spec set_priority_scene(atom() | {atom(), any()} | nil) :: nil
+  @spec set_priority_scene(any) :: :ok
   def set_priority_scene(scene) do
     GenServer.cast(__MODULE__, {:set_priority_scene, scene})
   end
 
-  @spec set_tab_scene(:clock | :schedule | :local, atom() | {atom(), any()} | nil) ::
-          nil
+  @spec set_tab_scene(any, any) :: :ok
   def set_tab_scene(id, scene) do
     GenServer.cast(__MODULE__, {:set_tab_scene, id, scene})
   end
 
-  @spec set_tab(:clock | :schedule | :local) :: nil
+  @spec set_tab(any) :: :ok
   def set_tab(id) do
     GenServer.cast(__MODULE__, {:set_tab, id})
   end
 
-  @spec reset_screensaver :: nil
+  @spec reset_screensaver :: :ok
   def reset_screensaver() do
     GenServer.cast(__MODULE__, {:reset_screensaver})
   end
