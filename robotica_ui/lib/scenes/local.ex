@@ -47,9 +47,14 @@ defmodule RoboticaUi.Scene.Local do
                 hidden: true
               )
 
+            theme =
+              :info
+              |> Scenic.Primitive.Style.Theme.preset()
+              |> Map.put(:background, {0, 0, 0})
+
             graph =
               add_button(graph, button.name, {:state_hard_off, button.id}, x, y,
-                theme: :info,
+                theme: theme,
                 hidden: true
               )
 
