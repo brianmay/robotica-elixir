@@ -16,7 +16,7 @@ defmodule Robotica.Devices.HDMI do
     "http://#{host}/cgi-bin/submit?cmd=hex(" <> Enum.join(cmd, ",") <> ")"
   end
 
-  @spec switch(any, any, any) :: :ok | {:error, String.t()}
+  @spec switch(String.t(), integer, integer) :: :ok | {:error, String.t()}
   def switch(host, input, output) do
     cmd = [0xA5, 0x5B, 0x02, 0x03, input, 0x00, output, 0x00, 0x00, 0x00, 0x00, 0x00]
     url = cmd_to_url(host, cmd)
