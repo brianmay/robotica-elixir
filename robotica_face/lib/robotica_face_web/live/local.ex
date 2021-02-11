@@ -105,7 +105,7 @@ defmodule RoboticaFaceWeb.Live.Local do
   defp display_state_to_class(:state_on), do: "btn-success"
   defp display_state_to_class(:state_off), do: "btn-primary"
   defp display_state_to_class(:state_hard_off), do: "btn-light"
-  # defp display_state_to_class(:state_error), do: "btn-danger"
+  defp display_state_to_class(:state_error), do: "btn-danger"
   defp display_state_to_class(nil), do: "btn-secondary"
 
   defp button_state_to_class(button_state, button) do
