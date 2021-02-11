@@ -1,6 +1,6 @@
 defmodule RoboticaFace.Schedule do
   use GenServer
-  use EventBus.EventSource
+  use RoboticaPlugins.EventBus
 
   defmodule State do
     @type t :: %__MODULE__{
@@ -15,12 +15,7 @@ defmodule RoboticaFace.Schedule do
   end
 
   def init(_) do
-    event_params = %{topic: :request_schedule}
-
-    EventSource.notify event_params do
-      nil
-    end
-
+    RoboticaPlugins.EventBus.notify(:request_schedule, nil)
     {:ok, %State{}}
   end
 
