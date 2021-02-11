@@ -2,7 +2,10 @@ defmodule RoboticaPlugins.Validation do
   @map_types Application.get_env(:robotica_plugins, :map_types)
 
   defp module_compiled?(module) do
-    function_exported?(module, :__info__, 1)
+    case Code.ensure_compiled(module) do
+      {:module, _} -> true
+      _ -> false
+    end
   end
 
   defp plugin_available?(module) do

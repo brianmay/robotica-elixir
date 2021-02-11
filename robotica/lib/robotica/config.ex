@@ -107,7 +107,7 @@ defmodule Robotica.Config do
     end
   end
 
-  @spec plugins :: list(RoboticaPlugins.Plugin.t())
+  @spec plugins :: list(Robotica.Plugin.t())
   defp plugins do
     hosts = get_hosts()
     Map.fetch!(hosts, hostname()).plugins

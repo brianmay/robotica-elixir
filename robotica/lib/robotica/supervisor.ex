@@ -3,7 +3,7 @@ defmodule Robotica.Supervisor do
 
   defmodule State do
     @type t :: %__MODULE__{
-            plugins: list(RoboticaPlugins.Plugin.t()),
+            plugins: list(Robotica.Plugin.t()),
             mqtt: map()
           }
     @enforce_keys [:plugins, :mqtt]

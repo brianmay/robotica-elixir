@@ -4,9 +4,19 @@ defmodule Robotica.Plugins.Audio do
   require Logger
 
   import Robotica.Types
-  alias RoboticaPlugins.String
+  alias RoboticaPlugins.Strings
 
   defmodule Commands do
+    @type t :: %__MODULE__{
+            init: list(String.t()),
+            volume: list(String.t()),
+            play: list(String.t()),
+            say: list(String.t()),
+            music_play: list(String.t()),
+            music_stop: list(String.t()),
+            music_pause: list(String.t()),
+            music_resume: list(String.t())
+          }
     @enforce_keys [
       :init,
       :volume,
@@ -111,14 +121,14 @@ defmodule Robotica.Plugins.Audio do
 
   def config_schema do
     %{
-      struct_type: Robotica.Plugins.Audio.Config,
+      struct_type: Config,
       commands: {commands(), true},
       sounds: {sounds(), true},
       volumes: {volumes(), true}
     }
   end
 
-  @spec publish_play_list(State.t(), String.t()) :: :ok
+  @spec publish_play_list(State.t(), String.t() | nil) :: :ok
   defp publish_play_list(%State{} = state, play_list) do
     play_list = if play_list == nil, do: "STOP", else: play_list
 
@@ -137,7 +147,7 @@ defmodule Robotica.Plugins.Audio do
 
   defp run_commands(%State{} = state, [cmd | tail], values, on_nonzero) do
     [cmd | args] = cmd
-    args = Enum.map(args, &String.solve_string_combined(&1, values))
+    args = Enum.map(args, &Strings.solve_string_combined(&1, values))
 
     {args, errors} =
       Enum.split_with(args, fn

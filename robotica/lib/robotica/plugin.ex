@@ -16,7 +16,7 @@ defmodule Robotica.Plugin do
     quote do
       @behaviour Robotica.Plugin
 
-      @spec start_link(plugin :: Robotica.Plugins.Plugin.t()) ::
+      @spec start_link(plugin :: Robotica.Plugin.t()) ::
               {:ok, pid} | {:error, String.t()}
       def start_link(plugin) do
         with {:ok, pid} <- GenServer.start_link(__MODULE__, plugin, []) do
@@ -41,7 +41,7 @@ defmodule Robotica.Plugin do
     end
   end
 
-  @spec execute(server :: pid, action :: Action.t()) :: nil
+  @spec execute(server :: pid, action :: RoboticaPlugins.Action.t()) :: nil
   def execute(server, action) do
     GenServer.cast(server, {:execute, action})
     nil

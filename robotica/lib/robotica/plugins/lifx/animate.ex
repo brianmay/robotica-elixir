@@ -6,7 +6,7 @@ defmodule Robotica.Plugins.Lifx.Animate do
 
   @type hsbkas :: {integer(), list(HSBKA.t()), integer()}
 
-  @spec animate(map(), integer()) :: list(HSBKAS.t())
+  @spec animate(map(), integer()) :: list(hsbkas)
   defp animate(animation, number) do
     animate_frames(animation.frames, number)
   end

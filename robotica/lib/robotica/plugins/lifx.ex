@@ -216,7 +216,7 @@ defmodule Robotica.Plugins.LIFX do
 
   # Recurse throught every online light
 
-  @spec get_device(State.t(), (Light.Device.t() -> any())) :: any() | {:error, String.t()}
+  @spec get_device(State.t(), (Lifx.Device.t() -> any())) :: any() | {:error, String.t()}
   defp get_device(state, callback) do
     devices = Enum.filter(Lifx.Client.devices(), &(&1.label == state.config.label))
 
@@ -342,7 +342,7 @@ defmodule Robotica.Plugins.LIFX do
   #   :ok
   # end
 
-  @spec set_colors(State.t(), list(Lifx.Protocol.HSBK.t({}))) :: :ok
+  @spec set_colors(State.t(), list(Lifx.Protocol.HSBK.t())) :: :ok
   defp set_colors(state, colors) do
     duration = 0
 
