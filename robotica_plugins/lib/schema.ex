@@ -56,14 +56,29 @@ defmodule RoboticaPlugins.Schema do
     %{
       stop_tasks: {{:list, :string}, false},
       stop_priorities: {{:list, :integer}, false},
-      task: {:string, true},
+      task: {:string, false},
+      scene: {:string, false},
       priority: {:integer, false},
-      action: {:string, true},
+      action: {:string, false},
       color: {lights_color(), false},
       colors_index: {:integer, false},
       colors: {{:list, repeat_colors()}, false},
       duration: {:integer, false},
       animation: {animation(), false}
+    }
+  end
+
+  def scene_schema do
+    %{
+      locations: {{:list, :string}, false},
+      devices: {{:list, :string}, false},
+      lights: {lights_action_schema(), true}
+    }
+  end
+
+  def scenes_schema do
+    %{
+      scenes: {{:map, :string, {:list, scene_schema()}}, true}
     }
   end
 

@@ -2,6 +2,8 @@ defmodule Robotica.Config do
   alias RoboticaPlugins.Schema
   alias RoboticaPlugins.Validation
 
+  require Logger
+
   defmodule Loader do
     defp classification_schema do
       %{
@@ -84,11 +86,21 @@ defmodule Robotica.Config do
       {:ok, data} = Validation.load_and_validate(filename, sequences_schema())
       data
     end
+
+    @spec scenes(String.t()) :: map()
+    def scenes(filename) do
+      {:ok, data} = Validation.load_and_validate(filename, Schema.scenes_schema())
+      data
+    end
   end
 
   @filename Application.get_env(:robotica, :config_file)
   @external_resource @filename
   @config Loader.configuration(@filename)
+
+  @scenes_filename Application.get_env(:robotica, :scenes_file)
+  @external_resource @scenes_filename
+  @scenes Loader.scenes(@scenes_filename)
 
   @spec get_hosts :: %{required(String.t()) => map()}
   def get_hosts() do
@@ -119,6 +131,18 @@ defmodule Robotica.Config do
       mqtt: @config.mqtt,
       plugins: plugins()
     }
+  end
+
+  @spec get_scene(String.t()) :: list()
+  def get_scene(scene_name) do
+    case Map.get(@scenes.scenes, scene_name) do
+      nil ->
+        Logger.error("Unknown scene name #{scene_name}")
+        []
+
+      scenes ->
+        scenes
+    end
   end
 
   @spec validate_task(map) :: {:error, any} | {:ok, RoboticaPlugins.Task.t()}

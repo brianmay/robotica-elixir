@@ -9,6 +9,7 @@ config :robotica,
   classifications_file: "../../local/config/classifications.yaml",
   schedule_file: "../../local/config/schedule.yaml",
   sequences_file: "../../local/config/sequences.yaml",
+  scenes_file: "../../local/config/scenes.yaml",
   timezone: "Australia/Melbourne"
 
 config :robotica_plugins,

@@ -96,6 +96,33 @@ defmodule Robotica.Plugins.LIFX do
     if state.config.number == nil, do: 1, else: state.config.number
   end
 
+  @spec merge_maps(map(), map()) :: map()
+  defp merge_maps(map1, map2) do
+    Map.merge(map1, map2, fn
+      _, value, nil -> value
+      _, _, value -> value
+    end)
+  end
+
+  @spec apply_scenes_to_command(map(), State.t()) :: map()
+  defp apply_scenes_to_command(%{scene: nil} = command, _), do: command
+
+  defp apply_scenes_to_command(%{scene: scene} = command, %State{} = state) do
+    scene
+    |> Robotica.Config.get_scene()
+    |> Enum.reduce(%{}, fn scene, command ->
+      got_location? = scene.locations == nil or Enum.member?(scene.locations, state.location)
+      got_device? = scene.devices == nil or Enum.member?(scene.devices, state.device)
+
+      if got_location? and got_device? do
+        merge_maps(command, scene.lights())
+      else
+        command
+      end
+    end)
+    |> merge_maps(command)
+  end
+
   # @spec get_duration(map()) :: integer
   # defp get_duration(command) do
   #   case command.duration do
@@ -103,6 +130,14 @@ defmodule Robotica.Plugins.LIFX do
   #     duration -> duration * 1000
   #   end
   # end
+
+  @spec get_task(map(), String.t()) :: String.t()
+  defp get_task(command, default) do
+    case command.task do
+      nil -> default
+      task -> task
+    end
+  end
 
   @spec get_priority(map(), integer) :: integer
   defp get_priority(command, default) do
@@ -624,13 +659,12 @@ defmodule Robotica.Plugins.LIFX do
     Logger.debug("#{device_to_string(state, nil)}: turn_off")
     number = get_number(state)
     priority = get_priority(command, 100)
+    task = get_task(command, "default")
 
-    # Ensure light really is turned off
-    state = %State{state | base_power: 0, base_colors: replicate(@black, number)}
-
-    state
+    # Ensure light is turned off even if it was previously on.
+    %State{state | base_power: 0, base_colors: replicate(@black, number)}
     |> do_command_stop(command)
-    |> remove_task(command.task)
+    |> remove_task(task)
     |> remove_all_tasks_with_priority(priority)
     |> publish_device_state()
     |> handle_update()
@@ -640,6 +674,7 @@ defmodule Robotica.Plugins.LIFX do
     Logger.debug("#{device_to_string(state, nil)}: turn_on")
     number = get_number(state)
     priority = get_priority(command, 100)
+    task = get_task(command, "default")
 
     colors =
       case RLifx.get_colors_from_command(number, command, 0) do
@@ -654,15 +689,15 @@ defmodule Robotica.Plugins.LIFX do
     pid = self()
 
     sender = fn power, colors ->
-      GenServer.cast(pid, {:update, self(), command.task, power, colors})
+      GenServer.cast(pid, {:update, self(), task, power, colors})
       :ok
     end
 
     state
     |> do_command_stop(command)
-    |> remove_task(command.task)
+    |> remove_task(task)
     |> remove_all_tasks_with_priority(priority)
-    |> add_task(command.task, priority, fn -> FixedColor.go(sender, 65535, colors) end)
+    |> add_task(task, priority, fn -> FixedColor.go(sender, 65535, colors) end)
     |> publish_device_state()
   end
 
@@ -672,6 +707,7 @@ defmodule Robotica.Plugins.LIFX do
     number = get_number(state)
     state = do_command_stop(state, command)
     priority = get_priority(command, 900)
+    task = get_task(command, "flash")
 
     color = %HSBKA{
       hue: command.color.hue,
@@ -682,7 +718,7 @@ defmodule Robotica.Plugins.LIFX do
     }
 
     animation = %{
-      name: command.task,
+      name: task,
       priority: 900,
       repeat: 2,
       frames: [
@@ -708,15 +744,15 @@ defmodule Robotica.Plugins.LIFX do
     }
 
     sender = fn power, colors ->
-      GenServer.cast(pid, {:update, self(), animation.name, power, colors})
+      GenServer.cast(pid, {:update, self(), task, power, colors})
       :ok
     end
 
     state
     |> do_command_stop(command)
-    |> remove_task(command.task)
+    |> remove_task(task)
     |> remove_all_tasks_with_priority(priority)
-    |> add_task(animation.name, priority, fn ->
+    |> add_task(task, priority, fn ->
       Animate.go(sender, number, animation)
     end)
     |> publish_device_state()
@@ -727,6 +763,7 @@ defmodule Robotica.Plugins.LIFX do
     pid = self()
     number = get_number(state)
     priority = get_priority(command, 100)
+    task = get_task(command, "default")
     state = do_command_stop(state, command)
 
     case command.animation do
@@ -735,15 +772,16 @@ defmodule Robotica.Plugins.LIFX do
 
       animation ->
         sender = fn power, hsbkas ->
-          GenServer.cast(pid, {:update, self(), command.task, power, hsbkas})
+          GenServer.cast(pid, {:update, self(), task, power, hsbkas})
           :ok
         end
 
-        state
+        # We old don't want base colors showing through.
+        %State{state | base_power: 0, base_colors: replicate(@black, number)}
         |> do_command_stop(command)
-        |> remove_task(command.task)
+        |> remove_task(task)
         |> remove_all_tasks_with_priority(priority)
-        |> add_task(command.task, priority, fn ->
+        |> add_task(task, priority, fn ->
           Animate.go(sender, number, animation)
         end)
         |> publish_device_state()
@@ -757,8 +795,8 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec handle_command(state :: State.t(), command :: map()) :: State.t()
   defp handle_command(%State{} = state, command) do
-    state
-    |> do_command(command)
+    command = apply_scenes_to_command(command, state)
+    do_command(state, command)
   end
 
   def handle_cast({:mqtt, _, :command, command}, %State{} = state) do
