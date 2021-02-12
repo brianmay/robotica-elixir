@@ -44,15 +44,15 @@ defmodule Robotica.Plugins.LIFX do
     }
   end
 
-  defmodule TaskState do
+  defmodule SceneState do
     @type t :: %__MODULE__{
             priority: integer(),
             power: integer() | nil,
             colors: list(HSBKA.t()) | nil,
-            pid: Task.t()
+            task: Task.t()
           }
-    @enforce_keys [:priority, :pid]
-    defstruct [:priority, :power, :colors, :pid]
+    @enforce_keys [:priority, :task]
+    defstruct [:priority, :power, :colors, :task]
   end
 
   defmodule State do
@@ -60,11 +60,11 @@ defmodule Robotica.Plugins.LIFX do
             location: String.t(),
             device: String.t(),
             config: Config.t(),
-            tasks: %{required(String.t()) => TaskState.t()},
+            scenes: %{required(String.t()) => SceneState.t()},
             base_power: integer(),
             base_colors: list(HSBK.t())
           }
-    defstruct [:location, :device, :config, :tasks, :base_power, :base_colors]
+    defstruct [:location, :device, :config, :scenes, :base_power, :base_colors]
   end
 
   ## Server Callbacks
@@ -78,7 +78,7 @@ defmodule Robotica.Plugins.LIFX do
       location: plugin.location,
       device: plugin.device,
       config: plugin.config,
-      tasks: %{},
+      scenes: %{},
       base_power: 0,
       base_colors: replicate(@black, number)
     }
@@ -105,8 +105,6 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   @spec apply_scenes_to_command(map(), State.t()) :: map()
-  defp apply_scenes_to_command(%{scene: nil} = command, _), do: command
-
   defp apply_scenes_to_command(%{scene: scene} = command, %State{} = state) do
     scene
     |> Robotica.Config.get_scene()
@@ -121,6 +119,7 @@ defmodule Robotica.Plugins.LIFX do
       end
     end)
     |> merge_maps(command)
+    |> Map.put(:scene, scene)
   end
 
   # @spec get_duration(map()) :: integer
@@ -130,14 +129,6 @@ defmodule Robotica.Plugins.LIFX do
   #     duration -> duration * 1000
   #   end
   # end
-
-  @spec get_task(map(), String.t()) :: String.t()
-  defp get_task(command, default) do
-    case command.task do
-      nil -> default
-      task -> task
-    end
-  end
 
   @spec get_priority(map(), integer) :: integer
   defp get_priority(command, default) do
@@ -161,7 +152,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec poll_device(State.t()) :: State.t()
   def poll_device(state) do
-    if state.tasks == %{} do
+    if state.scenes == %{} do
       case save_device(state) do
         {:ok, {power, color}} ->
           %State{state | base_power: power, base_colors: color}
@@ -202,13 +193,13 @@ defmodule Robotica.Plugins.LIFX do
     :ok
   end
 
-  @spec publish_device_tasks(State.t(), %{required(String.t()) => TaskState.t()}) :: :ok
-  defp publish_device_tasks(%State{} = state, tasks) do
-    task_list = Enum.map(tasks, fn {task_name, _} -> task_name end)
-    :ok = publish_json(state, nil, "tasks", task_list)
+  @spec publish_device_scenes(State.t(), %{required(String.t()) => SceneState.t()}) :: :ok
+  defp publish_device_scenes(%State{} = state, scenes) do
+    scene_list = Enum.map(scenes, fn {scene_name, _} -> scene_name end)
+    :ok = publish_json(state, nil, "scenes", scene_list)
 
     priority_list =
-      Enum.map(tasks, fn {_, %TaskState{priority: priority}} -> priority end) |> Enum.uniq()
+      Enum.map(scenes, fn {_, %SceneState{priority: priority}} -> priority end) |> Enum.uniq()
 
     :ok = publish_json(state, nil, "priorities", priority_list)
 
@@ -217,7 +208,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec publish_device_state(State.t()) :: State.t()
   defp publish_device_state(%State{} = state) do
-    :ok = publish_device_tasks(state, state.tasks)
+    :ok = publish_device_scenes(state, state.scenes)
     state
   end
 
@@ -397,7 +388,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec merge_light_colors(list(list(HSBKA.t() | HSBK.t()))) :: list(HSBK.t())
   defp merge_light_colors(colors) do
-    # Receives list of colors sorted by light, e.g. for 2 tasks with 4 lights.
+    # Receives list of colors sorted by light, e.g. for 2 scenes with 4 lights.
     # [
     #   {%HSBK{}, %HSBKA{}, %HSBKA{}},
     #   {%HSBK{}, nil, %HSBKA{}},
@@ -436,9 +427,9 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec merge_colors(list(list(HSBKA.t() | nil)), list(HSBK.t())) :: list(HSBK.t())
   defp merge_colors(list_hsbkas, start_colors) do
-    # Receives list of colors for each task. e.g. for 2 tasks with 4 lights
+    # Receives list of colors for each scene. e.g. for 2 scenes with 4 lights
     # [
-    #   nil,   # task not updated colors yet
+    #   nil,   # scene not updated colors yet
     #   [%HSBKA{}, nil, %HSBKA{}, %HSBKA{}],
     #   [%HSBKA{}, %HSBKA{}, nil, %HSBKA{}]
     # ]
@@ -454,7 +445,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec merge_power(list(boolean | nil), integer) :: integer
   defp merge_power(power_list, base_power) do
-    # Recieves a list of powers for each task, e.g. for 2 tasks
+    # Recieves a list of powers for each scene, e.g. for 2 scenes
     # [nil, true]
     # Merges these into a start_power:
     # true
@@ -477,19 +468,19 @@ defmodule Robotica.Plugins.LIFX do
       "#{device_to_string(state, nil)}: base #{inspect(base_power)} #{inspect(base_colors)}"
     )
 
-    list_tasks =
-      state.tasks
-      |> Enum.sort_by(fn {_, task} -> task.priority end)
-      |> Enum.map(fn {_, task} -> task end)
+    list_scenes =
+      state.scenes
+      |> Enum.sort_by(fn {_, scene} -> scene.priority end)
+      |> Enum.map(fn {_, scene} -> scene end)
 
     colors =
-      list_tasks
-      |> Enum.map(fn task -> task.colors end)
+      list_scenes
+      |> Enum.map(fn scene -> scene.colors end)
       |> merge_colors(base_colors)
 
     power =
-      list_tasks
-      |> Enum.map(fn task -> task.power end)
+      list_scenes
+      |> Enum.map(fn scene -> scene.power end)
       |> merge_power(base_power)
 
     Logger.debug("#{device_to_string(state, nil)}: GOT #{inspect(power)} #{inspect(colors)}")
@@ -497,9 +488,9 @@ defmodule Robotica.Plugins.LIFX do
     state
   end
 
-  @spec update_task_state(State.t(), pid(), String.t(), integer(), list(HSBKA)) :: State.t()
-  defp update_task_state(state, pid, task_name, power, hsbkas) do
-    Logger.info("#{device_to_string(state, nil)}: update_task_state #{task_name}")
+  @spec update_scene_state(State.t(), pid(), String.t(), integer(), list(HSBKA)) :: State.t()
+  defp update_scene_state(state, pid, scene_name, power, hsbkas) do
+    Logger.info("#{device_to_string(state, nil)}: update_scene_state #{scene_name}")
     number = get_number(state)
     length = length(hsbkas)
 
@@ -514,75 +505,75 @@ defmodule Robotica.Plugins.LIFX do
       length(hsbkas) == number -> nil
     end
 
-    task = Map.fetch!(state.tasks, task_name)
+    scene = Map.fetch!(state.scenes, scene_name)
 
-    if task.pid.pid == pid do
-      task = %TaskState{task | colors: hsbkas, power: power}
-      tasks = Map.put(state.tasks, task_name, task)
-      state = %State{state | tasks: tasks}
+    if scene.task.pid == pid do
+      scene = %SceneState{scene | colors: hsbkas, power: power}
+      scenes = Map.put(state.scenes, scene_name, scene)
+      state = %State{state | scenes: scenes}
       handle_update(state)
     else
-      Logger.info("#{device_to_string(state, nil)}: update_task_state #{task_name} wrong pid")
+      Logger.info("#{device_to_string(state, nil)}: update_scene_state #{scene_name} wrong pid")
       state
     end
   end
 
-  # Add/remove tasks
+  # Add/remove scenes
 
-  @spec task_exists?(State.t(), String.t()) :: boolean()
-  def task_exists?(%State{} = state, task_name) do
-    Map.has_key?(state.tasks, task_name)
+  @spec scene_exists?(State.t(), String.t()) :: boolean()
+  def scene_exists?(%State{} = state, scene_name) do
+    Map.has_key?(state.scenes, scene_name)
   end
 
-  @spec stop_task(State.t(), String.t()) :: :ok
-  def stop_task(state, task_name) do
-    case Map.fetch(state.tasks, task_name) do
-      {:ok, task} -> Task.shutdown(task.pid)
+  @spec stop_scene(State.t(), String.t()) :: :ok
+  def stop_scene(state, scene_name) do
+    case Map.fetch(state.scenes, scene_name) do
+      {:ok, scene} -> Task.shutdown(scene.task)
       :error -> nil
     end
 
     :ok
   end
 
-  @spec add_task(State.t(), String.t(), integer(), (() -> :ok)) :: State.t()
-  defp add_task(%State{} = state, task_name, priority, function) do
-    Logger.info("#{device_to_string(state, nil)}: add_task #{task_name}")
-    already_exists = task_exists?(state, task_name)
+  @spec add_scene(State.t(), String.t(), integer(), (() -> :ok)) :: State.t()
+  defp add_scene(%State{} = state, scene_name, priority, function) do
+    Logger.info("#{device_to_string(state, nil)}: add_scene #{scene_name}")
+    already_exists = scene_exists?(state, scene_name)
 
     if already_exists do
-      :ok = stop_task(state, task_name)
+      :ok = stop_scene(state, scene_name)
     end
 
-    pid = Task.async(function)
+    task = Task.async(function)
 
-    task = %TaskState{
+    scene = %SceneState{
       priority: priority,
-      pid: pid
+      task: task
     }
 
-    tasks = Map.put(state.tasks, task_name, task)
-    %State{state | tasks: tasks}
+    scenes = Map.put(state.scenes, scene_name, scene)
+    %State{state | scenes: scenes}
   end
 
-  @spec remove_task(State.t(), String.t()) :: State.t()
-  defp remove_task(%State{} = state, task_name) do
-    Logger.info("remove_task #{task_name}")
+  @spec remove_scene(State.t(), String.t()) :: State.t()
+  defp remove_scene(%State{} = state, scene_name) do
+    Logger.info("remove_scene #{scene_name}")
 
-    :ok = stop_task(state, task_name)
-    tasks = Map.delete(state.tasks, task_name)
-    %State{state | tasks: tasks}
+    :ok = stop_scene(state, scene_name)
+    scenes = Map.delete(state.scenes, scene_name)
+    %State{state | scenes: scenes}
   end
 
-  # @spec remove_all_tasks(State.t()) :: State.t()
-  # defp remove_all_tasks(%State{} = state) do
-  #   Enum.reduce(state.tasks, state, fn {task_name, _}, state -> remove_task(state, task_name) end)
+  # @spec remove_all_scenes(State.t()) :: State.t()
+  # defp remove_all_scenes(%State{} = state) do
+  #   Enum.reduce(state.scenes, state, fn {scene_name, _}, state -> remove_scene(state, scene_name) end)
   # end
 
-  @spec remove_all_tasks_with_priority(State.t(), integer) :: State.t()
-  defp remove_all_tasks_with_priority(%State{} = state, priority) do
-    Enum.reduce(state.tasks, state, fn
-      {task_name, %TaskState{priority: ^priority}}, state -> remove_task(state, task_name)
-      {_, %TaskState{}}, state -> state
+  @spec remove_all_scenes_with_priority(State.t(), integer) :: State.t()
+  defp remove_all_scenes_with_priority(%State{} = state, priority) do
+    Enum.reduce(state.scenes, state, fn
+      {scene_name, %SceneState{priority: ^priority}}, state -> remove_scene(state, scene_name)
+      {_, %SceneState{}}, state -> state
     end)
   end
 
@@ -591,18 +582,18 @@ defmodule Robotica.Plugins.LIFX do
     for {key, val} <- values, into: %{}, do: {key, val}
   end
 
-  @spec handle_task_has_died(State.t(), pid()) :: State.t()
-  defp handle_task_has_died(%State{} = state, pid) do
-    Logger.info("#{device_to_string(state, nil)}: handle_task_has_died #{inspect(pid)}")
+  @spec handle_scene_has_died(State.t(), pid()) :: State.t()
+  defp handle_scene_has_died(%State{} = state, pid) do
+    Logger.info("#{device_to_string(state, nil)}: handle_scene_has_died #{inspect(pid)}")
 
-    tasks =
-      state.tasks
-      |> Enum.reject(fn {_, task} -> task.pid.pid == pid end)
+    scenes =
+      state.scenes
+      |> Enum.reject(fn {_, scene} -> scene.pid.pid == pid end)
       |> keyword_list_to_map()
 
     state = %State{
       state
-      | tasks: tasks
+      | scenes: scenes
     }
 
     state
@@ -635,11 +626,11 @@ defmodule Robotica.Plugins.LIFX do
   @spec do_command_stop(State.t(), map()) :: State.t()
   defp do_command_stop(state, command) do
     state =
-      if command.stop_tasks == nil do
+      if command.stop_scenes == nil do
         state
       else
-        Enum.reduce(command.stop_tasks, state, fn task, state ->
-          remove_task(state, task)
+        Enum.reduce(command.stop_scenes, state, fn scene, state ->
+          remove_scene(state, scene)
         end)
       end
 
@@ -648,7 +639,7 @@ defmodule Robotica.Plugins.LIFX do
         state
       else
         Enum.reduce(command.stop_priorities, state, fn priority, state ->
-          remove_all_tasks_with_priority(state, priority)
+          remove_all_scenes_with_priority(state, priority)
         end)
       end
 
@@ -659,13 +650,13 @@ defmodule Robotica.Plugins.LIFX do
     Logger.debug("#{device_to_string(state, nil)}: turn_off")
     number = get_number(state)
     priority = get_priority(command, 100)
-    task = get_task(command, "default")
+    scene = command.scene
 
     # Ensure light is turned off even if it was previously on.
     %State{state | base_power: 0, base_colors: replicate(@black, number)}
     |> do_command_stop(command)
-    |> remove_task(task)
-    |> remove_all_tasks_with_priority(priority)
+    |> remove_scene(scene)
+    |> remove_all_scenes_with_priority(priority)
     |> publish_device_state()
     |> handle_update()
   end
@@ -674,7 +665,7 @@ defmodule Robotica.Plugins.LIFX do
     Logger.debug("#{device_to_string(state, nil)}: turn_on")
     number = get_number(state)
     priority = get_priority(command, 100)
-    task = get_task(command, "default")
+    scene = command.scene
 
     colors =
       case RLifx.get_colors_from_command(number, command, 0) do
@@ -689,72 +680,15 @@ defmodule Robotica.Plugins.LIFX do
     pid = self()
 
     sender = fn power, colors ->
-      GenServer.cast(pid, {:update, self(), task, power, colors})
+      GenServer.cast(pid, {:update, self(), scene, power, colors})
       :ok
     end
 
     state
     |> do_command_stop(command)
-    |> remove_task(task)
-    |> remove_all_tasks_with_priority(priority)
-    |> add_task(task, priority, fn -> FixedColor.go(sender, 65535, colors) end)
-    |> publish_device_state()
-  end
-
-  defp do_command(%State{} = state, %{action: "flash"} = command) do
-    Logger.debug("#{device_to_string(state, nil)}: flash")
-    pid = self()
-    number = get_number(state)
-    state = do_command_stop(state, command)
-    priority = get_priority(command, 900)
-    task = get_task(command, "flash")
-
-    color = %HSBKA{
-      hue: command.color.hue,
-      saturation: command.color.saturation,
-      brightness: command.color.brightness,
-      kelvin: command.color.kelvin,
-      alpha: command.color.alpha
-    }
-
-    animation = %{
-      name: task,
-      priority: 900,
-      repeat: 2,
-      frames: [
-        %{
-          sleep: 500,
-          repeat: 1,
-          color: color,
-          colors: nil
-        },
-        %{
-          sleep: 500,
-          repeat: 1,
-          color: %HSBKA{
-            hue: 0,
-            saturation: 0,
-            brightness: 0,
-            kelvin: 3500,
-            alpha: 0
-          },
-          colors: nil
-        }
-      ]
-    }
-
-    sender = fn power, colors ->
-      GenServer.cast(pid, {:update, self(), task, power, colors})
-      :ok
-    end
-
-    state
-    |> do_command_stop(command)
-    |> remove_task(task)
-    |> remove_all_tasks_with_priority(priority)
-    |> add_task(task, priority, fn ->
-      Animate.go(sender, number, animation)
-    end)
+    |> remove_scene(scene)
+    |> remove_all_scenes_with_priority(priority)
+    |> add_scene(scene, priority, fn -> FixedColor.go(sender, 65535, colors) end)
     |> publish_device_state()
   end
 
@@ -763,7 +697,7 @@ defmodule Robotica.Plugins.LIFX do
     pid = self()
     number = get_number(state)
     priority = get_priority(command, 100)
-    task = get_task(command, "default")
+    scene = command.scene
     state = do_command_stop(state, command)
 
     case command.animation do
@@ -772,16 +706,16 @@ defmodule Robotica.Plugins.LIFX do
 
       animation ->
         sender = fn power, hsbkas ->
-          GenServer.cast(pid, {:update, self(), task, power, hsbkas})
+          GenServer.cast(pid, {:update, self(), scene, power, hsbkas})
           :ok
         end
 
         # We old don't want base colors showing through.
         %State{state | base_power: 0, base_colors: replicate(@black, number)}
         |> do_command_stop(command)
-        |> remove_task(task)
-        |> remove_all_tasks_with_priority(priority)
-        |> add_task(task, priority, fn ->
+        |> remove_scene(scene)
+        |> remove_all_scenes_with_priority(priority)
+        |> add_scene(scene, priority, fn ->
           Animate.go(sender, number, animation)
         end)
         |> publish_device_state()
@@ -794,6 +728,10 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   @spec handle_command(state :: State.t(), command :: map()) :: State.t()
+  defp handle_command(%State{}, %{scene: nil} = command) do
+    Logger.error("Cannot handle LIFX command #{inspect(command)} without scene")
+  end
+
   defp handle_command(%State{} = state, command) do
     command = apply_scenes_to_command(command, state)
     do_command(state, command)
@@ -816,8 +754,8 @@ defmodule Robotica.Plugins.LIFX do
     {:noreply, state}
   end
 
-  def handle_cast({:update, pid, task_name, power, hsbkas}, %State{} = state) do
-    state = update_task_state(state, pid, task_name, power, hsbkas)
+  def handle_cast({:update, pid, scene_name, power, hsbkas}, %State{} = state) do
+    state = update_scene_state(state, pid, scene_name, power, hsbkas)
     {:noreply, state}
   end
 
@@ -862,7 +800,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   def handle_info({:DOWN, _ref, :process, pid, _reason}, %State{} = state) do
-    new_state = handle_task_has_died(state, pid)
+    new_state = handle_scene_has_died(state, pid)
     {:noreply, new_state}
   end
 

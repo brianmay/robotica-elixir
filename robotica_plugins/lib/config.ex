@@ -10,7 +10,8 @@ defmodule RoboticaPlugins.Config do
         location: {:string, false},
         device: {:string, true},
         type: {:string, true},
-        action: {:string, true}
+        action: {:string, true},
+        params: {{:map, :string, :any}, false}
       }
     end
 

@@ -136,6 +136,8 @@ defmodule RoboticaPlugins.Validation do
     validate_map(data_keyword_list, key_schema, value_schema)
   end
 
+  def validate_schema(nil, {:map, _, _}), do: {:ok, %{}}
+
   def validate_schema(value, {:map, _, _}), do: {:error, "Value #{inspect(value)} is not a map"}
 
   def validate_schema(_, :set_nil), do: {:ok, nil}

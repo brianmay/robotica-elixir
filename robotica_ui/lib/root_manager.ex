@@ -116,7 +116,7 @@ defmodule RoboticaUi.RootManager do
 
   @spec reset_timer(State.t()) :: State.t()
   defp reset_timer(state) do
-    Logger.info("reset_timer #{inspect(state.timer)}")
+    Logger.debug("reset_timer #{inspect(state.timer)}")
 
     case state.timer do
       nil -> nil
@@ -157,7 +157,7 @@ defmodule RoboticaUi.RootManager do
 
   @impl true
   def handle_info(:screen_off, state) do
-    Logger.info("rx screen_off")
+    Logger.debug("rx screen_off")
 
     state =
       update_state(state, fn state ->

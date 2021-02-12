@@ -11,7 +11,8 @@ defmodule RoboticaPlugins.Buttons do
             location: String.t() | nil,
             device: String.t(),
             type: String.t(),
-            action: String.t()
+            action: String.t(),
+            params: map()
           }
     defstruct [
       :name,
@@ -19,7 +20,8 @@ defmodule RoboticaPlugins.Buttons do
       :location,
       :device,
       :type,
-      :action
+      :action,
+      :params
     ]
   end
 

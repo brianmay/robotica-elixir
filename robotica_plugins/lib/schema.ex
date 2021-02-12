@@ -54,9 +54,8 @@ defmodule RoboticaPlugins.Schema do
 
   def lights_action_schema do
     %{
-      stop_tasks: {{:list, :string}, false},
+      stop_scenes: {{:list, :string}, false},
       stop_priorities: {{:list, :integer}, false},
-      task: {:string, false},
       scene: {:string, false},
       priority: {:integer, false},
       action: {:string, false},
