@@ -710,8 +710,7 @@ defmodule Robotica.Plugins.LIFX do
           :ok
         end
 
-        # We old don't want base colors showing through.
-        %State{state | base_power: 0, base_colors: replicate(@black, number)}
+        state
         |> do_command_stop(command)
         |> remove_scene(scene)
         |> remove_all_scenes_with_priority(priority)
