@@ -623,6 +623,16 @@ defmodule Robotica.Plugins.LIFX do
     end
   end
 
+  @spec create_callback(String.t()) :: RLifx.callback()
+  def create_callback(scene) do
+    pid = self()
+
+    fn power, colors ->
+      GenServer.cast(pid, {:update, self(), scene, power, colors})
+      :ok
+    end
+  end
+
   @spec do_command_stop(State.t(), map()) :: State.t()
   defp do_command_stop(state, command) do
     state =
@@ -677,24 +687,18 @@ defmodule Robotica.Plugins.LIFX do
           replicate(@black_alpha, number)
       end
 
-    pid = self()
-
-    sender = fn power, colors ->
-      GenServer.cast(pid, {:update, self(), scene, power, colors})
-      :ok
-    end
+    callback = create_callback(scene)
 
     state
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
-    |> add_scene(scene, priority, fn -> FixedColor.go(sender, 65535, colors) end)
+    |> add_scene(scene, priority, fn -> FixedColor.go(callback, 65535, colors) end)
     |> publish_device_state()
   end
 
   defp do_command(%State{} = state, %{action: "animate"} = command) do
     Logger.debug("#{device_to_string(state, nil)}: animate")
-    pid = self()
     number = get_number(state)
     priority = get_priority(command, 100)
     scene = command.scene
@@ -705,17 +709,14 @@ defmodule Robotica.Plugins.LIFX do
         state
 
       animation ->
-        sender = fn power, hsbkas ->
-          GenServer.cast(pid, {:update, self(), scene, power, hsbkas})
-          :ok
-        end
+        callback = create_callback(scene)
 
         state
         |> do_command_stop(command)
         |> remove_scene(scene)
         |> remove_all_scenes_with_priority(priority)
         |> add_scene(scene, priority, fn ->
-          Animate.go(sender, number, animation)
+          Animate.go(callback, number, animation)
         end)
         |> publish_device_state()
     end
