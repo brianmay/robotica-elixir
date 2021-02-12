@@ -27,6 +27,7 @@ defmodule RoboticaPlugins do
       message_volume = get_in(action.message, [:volume])
       message_text = get_in(action.message, [:text])
       lights_action = get_in(action.lights, [:action])
+      lights_scene = get_in(action.lights, [:scene])
       device_action = get_in(action.device, [:action])
       hdmi_source = get_in(action.hdmi, [:source])
       music_playlist = get_in(action.music, [:play_list])
@@ -41,7 +42,8 @@ defmodule RoboticaPlugins do
 
       []
       |> add_list_if_cond(v(message_text), "Say #{message_text}#{volume}")
-      |> add_list_if_cond(v(lights_action), "Lights #{lights_action}")
+      |> add_list_if_cond(v(lights_action), "Lights #{lights_action} #{lights_scene}")
+      |> add_list_if_cond(v(lights_scene), "Lights #{lights_scene}")
       |> add_list_if_cond(v(device_action), "Device #{device_action}")
       |> add_list_if_cond(v(hdmi_source), "HDMI #{hdmi_source}")
       |> add_list_if_cond(v(music_stop) and music_stop, "Music Stop")
