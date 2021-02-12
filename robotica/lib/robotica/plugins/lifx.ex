@@ -588,7 +588,7 @@ defmodule Robotica.Plugins.LIFX do
 
     scenes =
       state.scenes
-      |> Enum.reject(fn {_, scene} -> scene.pid.pid == pid end)
+      |> Enum.reject(fn {_, scene} -> scene.task.pid == pid end)
       |> keyword_list_to_map()
 
     state = %State{
