@@ -557,7 +557,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec remove_scene(State.t(), String.t()) :: State.t()
   defp remove_scene(%State{} = state, scene_name) do
-    Logger.info("remove_scene #{scene_name}")
+    Logger.info("#{device_to_string(state, nil)}: remove_scene #{scene_name}")
 
     :ok = stop_scene(state, scene_name)
     scenes = Map.delete(state.scenes, scene_name)
