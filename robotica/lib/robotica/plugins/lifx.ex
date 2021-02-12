@@ -28,6 +28,14 @@ defmodule Robotica.Plugins.LIFX do
     alpha: 100
   }
 
+  @transparent_alpha %HSBKA{
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    kelvin: 3500,
+    alpha: 0
+  }
+
   defmodule Config do
     @type t :: %__MODULE__{
             label: String.t(),
@@ -122,13 +130,13 @@ defmodule Robotica.Plugins.LIFX do
     |> Map.put(:scene, scene)
   end
 
-  # @spec get_duration(map()) :: integer
-  # defp get_duration(command) do
-  #   case command.duration do
-  #     nil -> 0
-  #     duration -> duration * 1000
-  #   end
-  # end
+  @spec get_duration(map()) :: integer
+  defp get_duration(command) do
+    case command.duration do
+      nil -> 0
+      duration -> duration * 1000
+    end
+  end
 
   @spec get_priority(map(), integer) :: integer
   defp get_priority(command, default) do
@@ -623,6 +631,39 @@ defmodule Robotica.Plugins.LIFX do
     end
   end
 
+  @spec animate_fade(HSBKA.t(), HSBKA.t(), integer) :: list(HSBKA.t())
+  def animate_fade(base_color, color, n) do
+    for i <- 0..n, i > 0 do
+      alpha = i / n
+      base_alpha = (n - i) / n
+
+      %HSBKA{
+        hue: base_color.hue * base_alpha + color.hue * alpha,
+        saturation: base_color.saturation * base_alpha + color.saturation * alpha,
+        brightness: base_color.brightness * base_alpha + color.brightness * alpha,
+        kelvin: base_color.kelvin * base_alpha + color.kelvin * alpha,
+        alpha: base_color.alpha * base_alpha + color.alpha * alpha
+      }
+    end
+    |> IO.inspect()
+  end
+
+  @spec get_fade_animation(HSBKA.t(), HSBKA.t(), integer) :: map()
+  def get_fade_animation(base_color, color, duration) do
+    update_time = 1000
+    number = round(duration / update_time)
+
+    frames =
+      base_color
+      |> animate_fade(color, number)
+      |> Enum.map(fn color -> %{sleep: update_time, repeat: 1, color: color, colors: nil} end)
+
+    %{
+      repeat: 1,
+      frames: frames
+    }
+  end
+
   @spec create_callback(String.t()) :: RLifx.callback()
   def create_callback(scene) do
     pid = self()
@@ -675,6 +716,7 @@ defmodule Robotica.Plugins.LIFX do
     Logger.debug("#{device_to_string(state, nil)}: turn_on")
     number = get_number(state)
     priority = get_priority(command, 100)
+    duration = get_duration(command)
     scene = command.scene
 
     colors =
@@ -688,11 +730,14 @@ defmodule Robotica.Plugins.LIFX do
       end
 
     callback = create_callback(scene)
+    fade = get_fade_animation(@black_alpha, @transparent_alpha, duration)
+    fade_callback = create_callback("fade")
 
     state
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
+    |> add_scene("fade", 101, fn -> Animate.go(fade_callback, number, fade) end)
     |> add_scene(scene, priority, fn -> FixedColor.go(callback, 65535, colors) end)
     |> publish_device_state()
   end
