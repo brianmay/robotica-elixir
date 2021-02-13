@@ -11,9 +11,31 @@ defmodule Robotica.Devices.HDMI do
     end
   end
 
+  @spec add_checksum(list(integer)) :: list(integer)
+  defp add_checksum(cmd) do
+    cmd ++ [calc_checksum(cmd)]
+  end
+
+  @spec check_checksum(list(integer)) :: :ok | {:error, String.t()}
+  defp check_checksum(cmd) do
+    checksum = List.last(cmd)
+
+    calculated =
+      cmd
+      |> Enum.reverse()
+      |> tl()
+      |> Enum.reverse()
+      |> calc_checksum()
+
+    if calculated == checksum do
+      :ok
+    else
+      {:error, "Checksum wrong."}
+    end
+  end
+
   @spec cmd_to_url(String.t(), list(integer)) :: String.t()
   defp cmd_to_url(host, cmd) do
-    cmd = cmd ++ [calc_checksum(cmd)]
     cmd = Enum.map(cmd, fn v -> v |> Integer.to_string(16) |> String.pad_leading(2, "0") end)
     "http://#{host}/cgi-bin/submit?cmd=hex(" <> Enum.join(cmd, ",") <> ")"
   end
@@ -21,11 +43,13 @@ defmodule Robotica.Devices.HDMI do
   @spec get_cmd_switch(integer, integer) :: list(integer())
   def get_cmd_switch(input, output) do
     [0xA5, 0x5B, 0x02, 0x03, input, 0x00, output, 0x00, 0x00, 0x00, 0x00, 0x00]
+    |> add_checksum()
   end
 
   @spec get_cmd_input_for_output(integer) :: list(integer())
   def get_cmd_input_for_output(output) do
     [0xA5, 0x5B, 0x02, 0x01, output, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
+    |> add_checksum()
   end
 
   @spec send_command(String.t(), list(integer())) :: :ok | {:error, String.t()}
@@ -72,7 +96,7 @@ defmodule Robotica.Devices.HDMI do
   defp parse_postfix(string) do
     case String.split(string, ")", parts: 2) do
       [values, ""] -> parse_values(values)
-      _ -> {:error, "Illegal postfix #{string}"}
+      _ -> {:error, "Illegal postfix #{inspect(string)}"}
     end
   end
 
@@ -80,7 +104,7 @@ defmodule Robotica.Devices.HDMI do
   defp parse_result(string) do
     case String.split(string, "(", parts: 2) do
       ["hex", tail] -> parse_postfix(tail)
-      _ -> {:error, "Illegal response #{string}"}
+      _ -> {:error, "Illegal response #{inspect(string)}"}
     end
   end
 
@@ -96,11 +120,12 @@ defmodule Robotica.Devices.HDMI do
 
   @spec get_input_for_output(String.t(), integer) :: {:ok, integer} | {:error, String.t()}
   def get_input_for_output(host, output) do
-    cmd = get_cmd_input_for_output(output)
+    cmd = get_cmd_input_for_output(output) |> IO.inspect()
 
     with :ok <- send_command(host, cmd),
          {:ok, body} <- get_result(host),
-         {:ok, values} <- parse_result(body) do
+         {:ok, values} <- parse_result(body),
+         :ok <- check_checksum(values) do
       IO.inspect(values, charlists: :as_lists)
       {:ok, 99}
     else
