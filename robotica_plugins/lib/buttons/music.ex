@@ -1,6 +1,6 @@
 defmodule RoboticaPlugins.Buttons.Music do
-  @doc """
-  Implement Buttons for Lights
+  @moduledoc """
+  Music Buttons
   """
   use RoboticaPlugins.EventBus
   @behaviour RoboticaPlugins.Buttons

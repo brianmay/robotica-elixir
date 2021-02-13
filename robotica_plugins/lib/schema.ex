@@ -83,7 +83,8 @@ defmodule RoboticaPlugins.Schema do
 
   def hdmi_action_schema do
     %{
-      source: {:integer, true}
+      input: {:integer, true},
+      output: {:integer, true}
     }
   end
 

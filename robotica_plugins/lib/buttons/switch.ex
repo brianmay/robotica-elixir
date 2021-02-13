@@ -1,6 +1,6 @@
 defmodule RoboticaPlugins.Buttons.Switch do
-  @doc """
-  Implement Buttons for Lights
+  @moduledoc """
+  Switch Buttons
   """
   use RoboticaPlugins.EventBus
   @behaviour RoboticaPlugins.Buttons

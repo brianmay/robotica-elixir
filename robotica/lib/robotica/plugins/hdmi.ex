@@ -3,6 +3,8 @@ defmodule Robotica.Plugins.HDMI do
   use Robotica.Plugin
   require Logger
 
+  alias Robotica.Plugin
+
   defmodule Config do
     @type t :: %__MODULE__{}
     defstruct [:host, :destination]
@@ -17,33 +19,53 @@ defmodule Robotica.Plugins.HDMI do
   def config_schema do
     %{
       struct_type: Config,
-      host: {:string, true},
-      destination: {:integer, true}
+      host: {:string, true}
     }
   end
 
-  @spec publish_device_state(Robotica.Plugin.t(), String.t()) :: :ok
-  defp publish_device_state(state, device_state) do
-    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, device_state,
-           topic: "input"
-         ) do
-      :ok -> :ok
-      {:error, msg} -> Logger.error("publish_device_state() got #{msg}")
+  @spec publish_raw(Plugin.t(), String.t(), String.t()) :: :ok
+  defp publish_raw(%Plugin{} = state, topic, value) do
+    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic) do
+      :ok ->
+        :ok
+
+      {:error, msg} ->
+        Logger.error("HDMI #{state.config.host}: publish_raw() got #{msg}")
     end
+
+    :ok
+  end
+
+  @spec publish_device_output(Robotica.Plugin.t(), integer, integer) :: :ok
+  defp publish_device_output(state, input, output) do
+    topic = "output#{output}"
+    publish_raw(state, topic, Integer.to_string(input))
+  end
+
+  @spec publish_device_output_off(Robotica.Plugin.t(), integer) :: :ok
+  defp publish_device_output_off(state, output) do
+    topic = "output#{output}"
+    publish_raw(state, topic, "OFF")
+  end
+
+  @spec publish_device_output_error(Robotica.Plugin.t(), integer) :: :ok
+  defp publish_device_output_error(state, output) do
+    topic = "output#{output}"
+    publish_raw(state, topic, "ERROR")
   end
 
   def handle_command(state, command) do
-    Logger.info("HDMI #{state.config.host} #{command.source} #{state.config.destination}")
+    Logger.info("HDMI #{state.config.host}: #{command.input} #{command.output}")
 
-    publish_device_state(state, "OFF")
+    publish_device_output_off(state, command.output)
 
-    case Robotica.Devices.HDMI.switch(state.config.host, command.source, state.config.destination) do
+    case Robotica.Devices.HDMI.switch(state.config.host, command.input, command.output) do
       :ok ->
-        publish_device_state(state, Integer.to_string(command.source))
+        publish_device_output(state, command.input, command.output)
 
       {:error, error} ->
-        Logger.error("HDMI error: #{error}")
-        publish_device_state(state, "ERROR")
+        Logger.error("HDMI #{state.config.host}: error: #{error}")
+        publish_device_output_error(state, command.output)
     end
 
     {:noreply, state}
@@ -51,8 +73,13 @@ defmodule Robotica.Plugins.HDMI do
 
   def handle_cast({:mqtt, _, :command, command}, state) do
     case Robotica.Config.validate_hdmi_command(command) do
-      {:ok, command} -> handle_command(state, command)
-      {:error, error} -> Logger.error("Invalid hdmi command received: #{inspect(error)}.")
+      {:ok, command} ->
+        handle_command(state, command)
+
+      {:error, error} ->
+        Logger.error(
+          "HDMI #{state.config.host}: Invalid hdmi command received: #{inspect(error)}."
+        )
     end
 
     {:noreply, state}
