@@ -131,7 +131,7 @@ defmodule RoboticaUi.RootManager do
 
   @spec screen_off :: nil
   defp screen_off() do
-    Logger.info("screen_off")
+    Logger.debug("screen_off")
     File.write("/sys/class/backlight/rpi_backlight/bl_power", "1")
 
     try do
@@ -204,7 +204,7 @@ defmodule RoboticaUi.RootManager do
 
   @impl true
   def handle_cast({:reset_screensaver}, state) do
-    Logger.info("rx reset_screensaver")
+    Logger.debug("rx reset_screensaver")
 
     state =
       update_state(state, fn state ->

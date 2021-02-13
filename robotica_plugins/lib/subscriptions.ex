@@ -111,11 +111,11 @@ defmodule RoboticaPlugins.Subscriptions do
           # retry(fn -> Tortoise.Connection.subscribe_sync(client_id, topics) end, 1)
           # Logger.info("- Done subscription")
 
-          Logger.info("Adding pid #{inspect(pid)} to new subscription #{topic_str}.")
+          Logger.debug("Adding pid #{inspect(pid)} to new subscription #{topic_str}.")
           [{label, pid, format}]
 
         pids ->
-          Logger.info("Adding pid #{inspect(pid)} to old subscription #{topic_str}.")
+          Logger.debug("Adding pid #{inspect(pid)} to old subscription #{topic_str}.")
           [{label, pid, format} | pids]
       end
 
@@ -124,7 +124,7 @@ defmodule RoboticaPlugins.Subscriptions do
     # resend last message to new client
     case Map.fetch(state.last_message, topic) do
       {:ok, last_message} ->
-        Logger.info("Resending last message to #{inspect(pid)} from subscription #{topic_str}.")
+        Logger.debug("Resending last message to #{inspect(pid)} from subscription #{topic_str}.")
         :ok = send_to_client(topic, label, pid, format, last_message)
 
       :error ->
@@ -175,13 +175,13 @@ defmodule RoboticaPlugins.Subscriptions do
   end
 
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
-    Logger.info("Process #{inspect(pid)} died.")
+    Logger.debug("Process #{inspect(pid)} died.")
     new_state = handle_unsubscribe_all(pid, state)
     {:noreply, new_state}
   end
 
   defp handle_unsubscribe_all(pid, state) do
-    Logger.info("Removing pid #{inspect(pid)} from all subscriptions.")
+    Logger.debug("Removing pid #{inspect(pid)} from all subscriptions.")
 
     new_subscriptions =
       state.subscriptions
