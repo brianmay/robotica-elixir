@@ -35,6 +35,7 @@ defmodule RoboticaPlugins.Buttons.HDMI do
   end
 
   @spec get_display_state(Config.t(), state) :: Buttons.display_state()
+  def get_display_state(%Config{action: _}, "HARD_OFF"), do: :state_hard_off
   def get_display_state(%Config{action: _}, "ERROR"), do: :state_error
   def get_display_state(%Config{action: _}, nil), do: nil
 

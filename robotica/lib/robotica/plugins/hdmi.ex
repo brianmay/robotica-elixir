@@ -13,6 +13,8 @@ defmodule Robotica.Plugins.HDMI do
   ## Server Callbacks
 
   def init(plugin) do
+    {:ok, _timer} = :timer.send_interval(60_000, :poll)
+    Process.send_after(self(), :poll, 0)
     {:ok, plugin}
   end
 
@@ -37,24 +39,39 @@ defmodule Robotica.Plugins.HDMI do
   end
 
   @spec publish_device_output(Robotica.Plugin.t(), integer, integer) :: :ok
-  defp publish_device_output(state, input, output) do
+  defp publish_device_output(%Robotica.Plugin{} = state, input, output) do
     topic = "output#{output}"
     publish_raw(state, topic, Integer.to_string(input))
   end
 
   @spec publish_device_output_off(Robotica.Plugin.t(), integer) :: :ok
-  defp publish_device_output_off(state, output) do
+  defp publish_device_output_off(%Robotica.Plugin{} = state, output) do
     topic = "output#{output}"
     publish_raw(state, topic, "OFF")
   end
 
-  @spec publish_device_output_error(Robotica.Plugin.t(), integer) :: :ok
-  defp publish_device_output_error(state, output) do
+  @spec publish_device_output_hard_off(Robotica.Plugin.t(), integer) :: :ok
+  defp publish_device_output_hard_off(%Robotica.Plugin{} = state, output) do
     topic = "output#{output}"
     publish_raw(state, topic, "ERROR")
   end
 
-  def handle_command(state, command) do
+  def handle_info(:poll, %Robotica.Plugin{} = state) do
+    for output <- 0..4 do
+      case Robotica.Devices.HDMI.get_input_for_output(state.config.host, output) do
+        {:ok, input} ->
+          publish_device_output(state, input, output)
+
+        {:error, error} ->
+          Logger.error("HDMI #{state.config.host}: error: #{error}")
+          publish_device_output_hard_off(state, output)
+      end
+    end
+
+    {:noreply, state}
+  end
+
+  def handle_command(%Robotica.Plugin{} = state, command) do
     Logger.info("HDMI #{state.config.host}: #{command.input} #{command.output}")
 
     publish_device_output_off(state, command.output)
@@ -65,13 +82,13 @@ defmodule Robotica.Plugins.HDMI do
 
       {:error, error} ->
         Logger.error("HDMI #{state.config.host}: error: #{error}")
-        publish_device_output_error(state, command.output)
+        publish_device_output_hard_off(state, command.output)
     end
 
     {:noreply, state}
   end
 
-  def handle_cast({:mqtt, _, :command, command}, state) do
+  def handle_cast({:mqtt, _, :command, command}, %Robotica.Plugin{} = state) do
     case Robotica.Config.validate_hdmi_command(command) do
       {:ok, command} ->
         handle_command(state, command)
@@ -85,7 +102,7 @@ defmodule Robotica.Plugins.HDMI do
     {:noreply, state}
   end
 
-  def handle_cast({:execute, action}, state) do
+  def handle_cast({:execute, action}, %Robotica.Plugin{} = state) do
     case action.hdmi do
       nil ->
         nil

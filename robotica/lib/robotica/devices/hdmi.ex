@@ -34,6 +34,18 @@ defmodule Robotica.Devices.HDMI do
     end
   end
 
+  @spec check_response(list(integer), list(integer)) :: :ok | {:error, String.t()}
+  def check_response(cmd, response) do
+    a = Enum.take(cmd, 5)
+    b = Enum.take(response, 5)
+
+    if a == b do
+      :ok
+    else
+      {:error, "Wrong response."}
+    end
+  end
+
   @spec cmd_to_url(String.t(), list(integer)) :: String.t()
   defp cmd_to_url(host, cmd) do
     cmd = Enum.map(cmd, fn v -> v |> Integer.to_string(16) |> String.pad_leading(2, "0") end)
@@ -120,14 +132,15 @@ defmodule Robotica.Devices.HDMI do
 
   @spec get_input_for_output(String.t(), integer) :: {:ok, integer} | {:error, String.t()}
   def get_input_for_output(host, output) do
-    cmd = get_cmd_input_for_output(output) |> IO.inspect()
+    cmd = get_cmd_input_for_output(output)
 
     with :ok <- send_command(host, cmd),
+         Process.sleep(50),
          {:ok, body} <- get_result(host),
-         {:ok, values} <- parse_result(body),
-         :ok <- check_checksum(values) do
-      IO.inspect(values, charlists: :as_lists)
-      {:ok, 99}
+         {:ok, response} <- parse_result(body),
+         :ok <- check_checksum(response),
+         :ok <- check_response(cmd, response) do
+      {:ok, Enum.at(response, 6)}
     else
       {:error, msg} -> {:error, msg}
     end
