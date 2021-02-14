@@ -53,7 +53,7 @@ defmodule Robotica.Plugins.HDMI do
   @spec publish_device_output_hard_off(Robotica.Plugin.t(), integer) :: :ok
   defp publish_device_output_hard_off(%Robotica.Plugin{} = state, output) do
     topic = "output#{output}"
-    publish_raw(state, topic, "ERROR")
+    publish_raw(state, topic, "HARD_OFF")
   end
 
   def handle_info(:poll, %Robotica.Plugin{} = state) do
