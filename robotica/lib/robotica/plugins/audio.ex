@@ -41,7 +41,7 @@ defmodule Robotica.Plugins.Audio do
     @type t :: %__MODULE__{
             commands: Commands.t(),
             sounds: %{required(String.t()) => String.t()},
-            volumes: %{required(atom()) => String.t()}
+            volumes: %{required(atom()) => integer}
           }
     @enforce_keys [:commands, :sounds, :volumes]
     defstruct commands: %Commands{
@@ -63,7 +63,7 @@ defmodule Robotica.Plugins.Audio do
             location: String.t(),
             device: String.t(),
             config: Config.t(),
-            volumes: %{required(atom()) => String.t()}
+            volumes: %{required(atom()) => integer}
           }
     @enforce_keys [:location, :device, :config, :volumes]
     defstruct [:location, :device, :config, :volumes]
@@ -81,7 +81,11 @@ defmodule Robotica.Plugins.Audio do
     }
 
     run(state, :init, [])
+    music_stop(state)
+    publish_volume(state, "music", state.volumes.music)
+    publish_volume(state, "say", state.volumes.say)
     set_volume(state, state.volumes.music)
+
     {:ok, state}
   end
 
@@ -128,16 +132,28 @@ defmodule Robotica.Plugins.Audio do
     }
   end
 
+  @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
+  defp publish_raw(%State{} = state, topic, value) do
+    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic) do
+      :ok ->
+        :ok
+
+      {:error, msg} ->
+        Logger.error("HDMI #{state.config.host}: publish_raw() got #{msg}")
+    end
+
+    :ok
+  end
+
   @spec publish_play_list(State.t(), String.t() | nil) :: :ok
   defp publish_play_list(%State{} = state, play_list) do
     play_list = if play_list == nil, do: "STOP", else: play_list
+    publish_raw(state, "play_list", play_list)
+  end
 
-    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, play_list,
-           topic: "play_list"
-         ) do
-      :ok -> :ok
-      {:error, msg} -> Logger.error("publish_play_list() got #{msg}")
-    end
+  @spec publish_volume(State.t(), String.t(), integer) :: :ok
+  defp publish_volume(%State{} = state, volume, value) do
+    publish_raw(state, "volume/#{volume}", Integer.to_string(value))
   end
 
   @spec publish_error(State.t()) :: :ok
@@ -145,6 +161,8 @@ defmodule Robotica.Plugins.Audio do
     publish_play_list(state, "ERROR")
   end
 
+  @spec run_commands(State.t(), list(String.t()), map(), :error | :info) ::
+          :ok | {:error, String.t()} | {:rc, pos_integer}
   defp run_commands(%State{} = state, [cmd | tail], values, on_nonzero) do
     [cmd | args] = cmd
     args = Enum.map(args, &Strings.solve_string_combined(&1, values))
@@ -192,6 +210,8 @@ defmodule Robotica.Plugins.Audio do
     :ok
   end
 
+  @spec run(State.t(), atom(), keyword(), :error | :info) ::
+          :ok | {:error, String.t()} | {:rc, pos_integer}
   defp run(%State{} = state, cmd, values, on_nonzero \\ :error) do
     values = for {key, val} <- values, into: %{}, do: {Atom.to_string(key), val}
 
@@ -199,30 +219,39 @@ defmodule Robotica.Plugins.Audio do
     run_commands(state, cmds, values, on_nonzero)
   end
 
-  defp play_sound(%State{} = state, sound) do
+  @spec do_play_sound(State.t(), String.t()) :: :ok
+  defp do_play_sound(%State{} = state, sound) do
     case Map.get(state.config.sounds, sound) do
       nil -> nil
       sound_file -> run(state, :play, file: sound_file)
     end
+
+    :ok
   end
 
-  defp say(%State{} = state, text, volume) do
-    say_volume =
-      case volume do
-        nil -> state.volumes.say
-        volume -> volume
-      end
-
-    set_volume(state, say_volume)
-
-    play_sound(state, "prefix")
-    run(state, :say, text: text)
-    play_sound(state, "repeat")
-    run(state, :say, text: text)
-    play_sound(state, "postfix")
-    nil
+  @spec play_sound(State.t(), String.t()) :: :ok
+  defp play_sound(%State{} = state, sound) do
+    set_volume(state, state.volumes.say)
+    do_play_sound(state, sound)
+    set_volume(state, state.volumes.music)
+    :ok
   end
 
+  @spec say(State.t(), String.t()) :: :ok
+  defp say(%State{} = state, text) do
+    set_volume(state, state.volumes.say)
+
+    do_play_sound(state, "prefix")
+    run(state, :say, text: text)
+    do_play_sound(state, "repeat")
+    run(state, :say, text: text)
+    do_play_sound(state, "postfix")
+
+    set_volume(state, state.volumes.music)
+    :ok
+  end
+
+  @spec music_paused?(State.t()) :: boolean
   defp music_paused?(%State{} = state) do
     case run(state, :music_pause, [], :info) do
       :ok -> true
@@ -230,16 +259,20 @@ defmodule Robotica.Plugins.Audio do
     end
   end
 
+  @spec set_volume(State.t(), integer) :: :ok
   defp set_volume(%State{} = state, volume) do
     run(state, :volume, volume: volume)
+    :ok
   end
 
+  @spec music_resume(State.t()) :: :ok
   defp music_resume(%State{} = state) do
     set_volume(state, state.volumes.music)
     run(state, :music_resume, [])
-    nil
+    :ok
   end
 
+  @spec music_play(State.t(), String.t()) :: :ok
   defp music_play(%State{} = state, play_list) do
     set_volume(state, state.volumes.music)
 
@@ -248,18 +281,20 @@ defmodule Robotica.Plugins.Audio do
       _ -> publish_error(state)
     end
 
-    nil
+    :ok
   end
 
+  @spec music_stop(State.t()) :: :ok
   defp music_stop(%State{} = state) do
     case run(state, :music_stop, []) do
       :ok -> publish_play_list(state, nil)
       _ -> publish_error(state)
     end
 
-    nil
+    :ok
   end
 
+  @spec prepend_sound(list(tuple), map()) :: list(tuple)
   defp prepend_sound(sound_list, %{sound: nil}) do
     sound_list
   end
@@ -272,12 +307,8 @@ defmodule Robotica.Plugins.Audio do
     sound_list
   end
 
-  defp prepend_message(sound_list, %{message: %{text: text, volume: volume}}) do
-    [{:say, text, volume} | sound_list]
-  end
-
   defp prepend_message(sound_list, %{message: %{text: text}}) do
-    [{:say, text, nil} | sound_list]
+    [{:say, text} | sound_list]
   end
 
   defp prepend_message(sound_list, _), do: sound_list
@@ -294,6 +325,7 @@ defmodule Robotica.Plugins.Audio do
 
   defp prepend_music(sound_list, _), do: sound_list
 
+  @spec get_sound_list(map()) :: list(tuple)
   defp get_sound_list(action) do
     []
     |> prepend_sound(action)
@@ -302,15 +334,16 @@ defmodule Robotica.Plugins.Audio do
     |> Enum.reverse()
   end
 
-  defp process_sound_list(%State{}, []), do: nil
+  @spec process_sound_list(State.t(), list(tuple)) :: :ok
+  defp process_sound_list(%State{}, []), do: :ok
 
   defp process_sound_list(%State{} = state, [head | tail]) do
     case head do
       {:sound, sound} ->
         play_sound(state, sound)
 
-      {:say, text, volume} ->
-        say(state, text, volume)
+      {:say, text} ->
+        say(state, text)
 
       {:music, nil} ->
         music_stop(state)
@@ -320,21 +353,19 @@ defmodule Robotica.Plugins.Audio do
     end
 
     process_sound_list(state, tail)
-
-    nil
   end
 
+  @spec sound_list_has_music(list(tuple)) :: boolean
   defp sound_list_has_music([]), do: false
   defp sound_list_has_music([{:music, _} | _]), do: true
   defp sound_list_has_music([_ | tail]), do: sound_list_has_music(tail)
 
-  @spec handle_execute(state :: State.t(), action :: RoboticaPlugins.Action.t()) :: nil
+  @spec handle_execute(state :: State.t(), action :: map()) :: nil
   defp handle_execute(%State{} = state, action) do
     sound_list = get_sound_list(action)
 
     if length(sound_list) > 0 do
       paused = music_paused?(state)
-
       process_sound_list(state, sound_list)
 
       if not sound_list_has_music(sound_list) do
@@ -351,17 +382,32 @@ defmodule Robotica.Plugins.Audio do
     nil
   end
 
-  @spec handle_command(Robotica.Plugins.Audio.State.t(), RoboticaPlugins.Action.t()) ::
+  @spec handle_command(Robotica.Plugins.Audio.State.t(), map()) ::
           Robotica.Plugins.Audio.State.t()
   def handle_command(%State{} = state, command) do
     state =
-      case get_in(command.music, [:volume]) do
+      case command.volume do
         nil ->
           state
 
         volume ->
-          volumes = %{state.volumes | music: volume}
-          %State{state | volumes: volumes}
+          music_volume =
+            case volume.music do
+              nil -> state.volumes.music
+              value -> value
+            end
+
+          say_volume =
+            case volume.say do
+              nil -> state.volumes.say
+              value -> value
+            end
+
+          publish_volume(state, "music", music_volume)
+          publish_volume(state, "say", say_volume)
+
+          volume = %{state.volumes | music: music_volume, say: say_volume}
+          %State{state | volumes: volume}
       end
 
     handle_execute(state, command)
@@ -384,7 +430,13 @@ defmodule Robotica.Plugins.Audio do
   end
 
   def handle_cast({:execute, action}, state) do
-    state = handle_command(state, action)
+    command = %{
+      message: action.message,
+      music: action.music,
+      volume: action.volume
+    }
+
+    state = handle_command(state, command)
     {:noreply, state}
   end
 end

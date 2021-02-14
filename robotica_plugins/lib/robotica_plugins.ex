@@ -5,6 +5,7 @@ defmodule RoboticaPlugins do
             lights: map() | nil,
             sound: map() | nil,
             music: map() | nil,
+            volume: map() | nil,
             hdmi: map() | nil,
             device: map() | nil
           }
@@ -12,6 +13,7 @@ defmodule RoboticaPlugins do
               lights: nil,
               sound: nil,
               music: nil,
+              volume: nil,
               hdmi: nil,
               device: nil
 

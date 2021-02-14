@@ -6,15 +6,20 @@ defmodule RoboticaPlugins.Schema do
   def music_action_schema do
     %{
       play_list: {:string, false},
-      stop: {{:boolean, false}, false},
-      volume: {:integer, false}
+      stop: {{:boolean, false}, false}
     }
   end
 
   def message_action_schema do
     %{
-      text: {:string, true},
-      volume: {:integer, false}
+      text: {:string, true}
+    }
+  end
+
+  def volume_action_schema do
+    %{
+      music: {:integer, false},
+      say: {:integer, false}
     }
   end
 
@@ -98,7 +103,8 @@ defmodule RoboticaPlugins.Schema do
     %{
       sound: {sound_action_schema(), false},
       music: {music_action_schema(), false},
-      message: {message_action_schema(), false}
+      message: {message_action_schema(), false},
+      volume: {volume_action_schema(), false}
     }
   end
 
@@ -108,6 +114,7 @@ defmodule RoboticaPlugins.Schema do
       sound: {sound_action_schema(), false},
       music: {music_action_schema(), false},
       message: {message_action_schema(), false},
+      volume: {volume_action_schema(), false},
       lights: {lights_action_schema(), false},
       hdmi: {hdmi_action_schema(), false},
       device: {device_action_schema(), false}
