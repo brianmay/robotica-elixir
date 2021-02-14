@@ -56,16 +56,32 @@ defmodule Robotica.Plugins.HDMI do
     publish_raw(state, topic, "HARD_OFF")
   end
 
-  def handle_info(:poll, %Robotica.Plugin{} = state) do
-    for output <- 0..4 do
-      case Robotica.Devices.HDMI.get_input_for_output(state.config.host, output) do
-        {:ok, input} ->
-          publish_device_output(state, input, output)
+  @spec poll(Robotica.Plugin.t(), list(integer)) :: :ok | {:error, String.t()}
+  defp poll(%Robotica.Plugin{}, []), do: :ok
 
-        {:error, error} ->
-          Logger.error("HDMI #{state.config.host}: error: #{error}")
-          publish_device_output_hard_off(state, output)
-      end
+  defp poll(%Robotica.Plugin{} = state, [output | tail]) do
+    case Robotica.Devices.HDMI.get_input_for_output(state.config.host, output) do
+      {:ok, input} ->
+        publish_device_output(state, input, output)
+        poll(state, tail)
+
+      {:error, error} ->
+        Logger.error("HDMI #{state.config.host}: error: #{error}")
+        {:error, error}
+    end
+  end
+
+  def handle_info(:poll, %Robotica.Plugin{} = state) do
+    outputs = [1, 2, 3, 4]
+
+    case poll(state, outputs) do
+      :ok ->
+        :ok
+
+      {:error, _error} ->
+        Enum.each(outputs, fn remaining_output ->
+          publish_device_output_hard_off(state, remaining_output)
+        end)
     end
 
     {:noreply, state}
