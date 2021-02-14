@@ -59,6 +59,7 @@ defmodule Robotica.Supervisor do
          {"command/#", 0},
          # sonoff plugin
          {"stat/#", 0},
+         {"tele/#", 0},
          # robotica_ui and robotica_face
          {"state/#", 0}
        ]}

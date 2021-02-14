@@ -17,14 +17,37 @@ defmodule Robotica.Plugins.SonOff do
     defstruct [:config, :location, :device]
   end
 
-  @spec publish_device_state(State.t(), String.t()) :: :ok
-  defp publish_device_state(state, device_state) do
-    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, device_state,
-           topic: "power"
-         ) do
-      :ok -> :ok
-      {:error, msg} -> Logger.error("publish_device_state() got #{msg}")
+  @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
+  defp publish_raw(%State{} = state, topic, value) do
+    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic) do
+      :ok ->
+        :ok
+
+      {:error, msg} ->
+        Logger.error("Hs100 #{state.config.host}: publish_raw() got #{msg}")
     end
+
+    :ok
+  end
+
+  @spec publish_device_state(State.t(), String.t()) :: :ok
+  defp publish_device_state(%State{} = state, device_state) do
+    publish_raw(state, "power", device_state)
+  end
+
+  # @spec publish_device_error(State.t()) :: :ok
+  # defp publish_device_error(%State{} = state) do
+  #   publish_raw(state, "power", "ERROR")
+  # end
+
+  @spec publish_device_hard_off(State.t()) :: :ok
+  defp publish_device_hard_off(%State{} = state) do
+    publish_raw(state, "power", "HARD_OFF")
+  end
+
+  @spec publish_device_unknown(State.t()) :: :ok
+  defp publish_device_unknown(%State{} = state) do
+    publish_raw(state, "power", "")
   end
 
   ## Server Callbacks
@@ -32,9 +55,16 @@ defmodule Robotica.Plugins.SonOff do
   def init(plugin) do
     RoboticaPlugins.Subscriptions.subscribe(
       ["stat", plugin.config.topic, "RESULT"],
-      :state,
+      :result,
       self(),
       :json
+    )
+
+    RoboticaPlugins.Subscriptions.subscribe(
+      ["tele", plugin.config.topic, "LWT"],
+      :lwt,
+      self(),
+      :raw
     )
 
     {:ok,
@@ -80,9 +110,19 @@ defmodule Robotica.Plugins.SonOff do
     {:noreply, state}
   end
 
-  def handle_cast({:mqtt, _, :state, msg}, state) do
+  def handle_cast({:mqtt, _, :result, msg}, state) do
     power = Map.fetch!(msg, "POWER")
     publish_device_state(state, power)
+    {:noreply, state}
+  end
+
+  def handle_cast({:mqtt, _, :lwt, msg}, state) do
+    if msg != "Online" do
+      publish_device_hard_off(state)
+    else
+      publish_device_unknown(state)
+    end
+
     {:noreply, state}
   end
 
