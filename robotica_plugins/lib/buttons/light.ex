@@ -1,6 +1,6 @@
 defmodule RoboticaPlugins.Buttons.Light do
-  @doc """
-  Implement Buttons for Lights
+  @moduledoc """
+  LIFX Buttons
   """
   use RoboticaPlugins.EventBus
   @behaviour RoboticaPlugins.Buttons
