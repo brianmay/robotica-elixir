@@ -247,7 +247,6 @@ defmodule Robotica.Plugins.LIFX do
     devices = Enum.filter(Lifx.Client.devices(), &(&1.label == state.config.label))
 
     if length(devices) == 0 do
-      publish_device_error(state, nil, "Device is offline")
       {:error, "Device is offline"}
     else
       devices
