@@ -12,10 +12,9 @@ defmodule Robotica.Plugins.SonOff do
     @type t :: %__MODULE__{
             config: Config.t(),
             location: String.t(),
-            device: String.t(),
-            last_power: String.t() | nil
+            device: String.t()
           }
-    defstruct [:config, :location, :device, :last_power]
+    defstruct [:config, :location, :device]
   end
 
   @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
@@ -72,8 +71,7 @@ defmodule Robotica.Plugins.SonOff do
      %State{
        config: plugin.config,
        location: plugin.location,
-       device: plugin.device,
-       last_power: nil
+       device: plugin.device
      }}
   end
 
@@ -115,15 +113,14 @@ defmodule Robotica.Plugins.SonOff do
   def handle_cast({:mqtt, _, :result, msg}, state) do
     power = Map.fetch!(msg, "POWER")
     publish_device_state(state, power)
-    state = %State{state | last_power: msg}
     {:noreply, state}
   end
 
   def handle_cast({:mqtt, _, :lwt, msg}, state) do
-    cond do
-      msg != "Online" -> publish_device_hard_off(state)
-      state.last_power == nil -> publish_device_state(state, state.last_power)
-      true -> publish_device_unknown(state)
+    if msg != "Online" do
+      publish_device_hard_off(state)
+    else
+      publish_device_unknown(state)
     end
 
     {:noreply, state}
