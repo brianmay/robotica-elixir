@@ -111,7 +111,7 @@ defmodule Robotica.Plugins.Hs100 do
     duration = DateTime.diff(DateTime.utc_now(), state.last_seen)
 
     state =
-      if duration >= 20 do
+      if duration >= 30 do
         publish_device_hard_off(state)
         %State{state | last_dead: true}
       else
