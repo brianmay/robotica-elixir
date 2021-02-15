@@ -54,10 +54,10 @@ defmodule Robotica.Plugins.SonOff do
 
   def init(plugin) do
     RoboticaPlugins.Subscriptions.subscribe(
-      ["stat", plugin.config.topic, "RESULT"],
-      :result,
+      ["stat", plugin.config.topic, "POWER"],
+      :power,
       self(),
-      :json
+      :raw
     )
 
     RoboticaPlugins.Subscriptions.subscribe(
@@ -110,8 +110,7 @@ defmodule Robotica.Plugins.SonOff do
     {:noreply, state}
   end
 
-  def handle_cast({:mqtt, _, :result, msg}, state) do
-    power = Map.fetch!(msg, "POWER")
+  def handle_cast({:mqtt, _, :power, power}, state) do
     publish_device_state(state, power)
     {:noreply, state}
   end
