@@ -19,7 +19,7 @@ defmodule RoboticaPlugins.Schema do
   def volume_action_schema do
     %{
       music: {:integer, false},
-      say: {:integer, false}
+      message: {:integer, false}
     }
   end
 

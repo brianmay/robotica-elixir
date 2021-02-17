@@ -83,7 +83,7 @@ defmodule Robotica.Plugins.Audio do
     run(state, :init, [])
     music_stop(state)
     publish_volume(state, "music", state.volumes.music)
-    publish_volume(state, "say", state.volumes.say)
+    publish_volume(state, "message", state.volumes.message)
     set_volume(state, state.volumes.music)
 
     {:ok, state}
@@ -118,7 +118,7 @@ defmodule Robotica.Plugins.Audio do
 
   defp volumes do
     %{
-      say: {:integer, true},
+      message: {:integer, true},
       music: {:integer, true}
     }
   end
@@ -231,7 +231,7 @@ defmodule Robotica.Plugins.Audio do
 
   @spec play_sound(State.t(), String.t()) :: :ok
   defp play_sound(%State{} = state, sound) do
-    set_volume(state, state.volumes.say)
+    set_volume(state, state.volumes.message)
     do_play_sound(state, sound)
     set_volume(state, state.volumes.music)
     :ok
@@ -239,7 +239,7 @@ defmodule Robotica.Plugins.Audio do
 
   @spec say(State.t(), String.t()) :: :ok
   defp say(%State{} = state, text) do
-    set_volume(state, state.volumes.say)
+    set_volume(state, state.volumes.message)
 
     do_play_sound(state, "prefix")
     run(state, :say, text: text)
@@ -397,16 +397,16 @@ defmodule Robotica.Plugins.Audio do
               value -> value
             end
 
-          say_volume =
-            case volume.say do
-              nil -> state.volumes.say
+          msg_volume =
+            case volume.message do
+              nil -> state.volumes.message
               value -> value
             end
 
           publish_volume(state, "music", music_volume)
-          publish_volume(state, "say", say_volume)
+          publish_volume(state, "message", msg_volume)
 
-          volume = %{state.volumes | music: music_volume, say: say_volume}
+          volume = %{state.volumes | music: music_volume, message: msg_volume}
           %State{state | volumes: volume}
       end
 
