@@ -96,6 +96,10 @@ defmodule Robotica.Plugins.HDMI do
     end)
   end
 
+def handle_info({_, :ok}, %Robotica.Plugin{} = state) do
+  Logger.error("HDMI #{state.config.host}: Got unhandled OK message.")
+end
+
   def handle_command(%Robotica.Plugin{} = state, command) do
     Logger.info("HDMI #{state.config.host}: #{command.input} #{command.output}")
 
