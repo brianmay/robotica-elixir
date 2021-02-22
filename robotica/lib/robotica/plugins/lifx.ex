@@ -83,6 +83,8 @@ defmodule Robotica.Plugins.LIFX do
       base_colors: replicate(@black, number)
     }
 
+    publish_device_hard_off(state)
+
     state = poll_device(state)
     state = publish_device_state(state)
 
