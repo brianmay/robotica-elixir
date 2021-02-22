@@ -12,11 +12,9 @@ defmodule Robotica.Plugins.Hs100 do
     @type t :: %__MODULE__{
             config: Config.t(),
             location: String.t(),
-            device: String.t(),
-            last_seen: DateTime.t(),
-            last_dead: boolean()
+            device: String.t()
           }
-    defstruct [:config, :location, :device, :last_seen, :last_dead]
+    defstruct [:config, :location, :device]
   end
 
   ## Server Callbacks
@@ -25,24 +23,17 @@ defmodule Robotica.Plugins.Hs100 do
     state = %State{
       config: plugin.config,
       location: plugin.location,
-      device: plugin.device,
-      last_seen: DateTime.utc_now(),
-      last_dead: false
+      device: plugin.device
     }
 
-    state =
-      case TpLinkHs100.Client.get_device(state.config.id) do
-        :error ->
-          publish_device_hard_off(state)
-          %State{state | last_dead: true}
+    case TpLinkHs100.Client.get_device(state.config.id) do
+      :error ->
+        publish_device_hard_off(state)
 
-        {:ok, device} ->
-          device_state = if device.sysinfo["relay_state"] == 0, do: "OFF", else: "ON"
-          publish_device_state(state, device_state)
-          %State{state | last_dead: true}
-      end
-
-    {:ok, _} = :timer.send_interval(10_000, :refresh)
+      {:ok, device} ->
+        device_state = if device.sysinfo["relay_state"] == 0, do: "OFF", else: "ON"
+        publish_device_state(state, device_state)
+    end
 
     TpLinkHs100.Client.add_handler(self())
 
@@ -107,24 +98,6 @@ defmodule Robotica.Plugins.Hs100 do
     end
   end
 
-  def handle_info(:refresh, %State{last_dead: false} = state) do
-    duration = DateTime.diff(DateTime.utc_now(), state.last_seen)
-
-    state =
-      if duration >= 30 do
-        publish_device_hard_off(state)
-        %State{state | last_dead: true}
-      else
-        state
-      end
-
-    {:noreply, state}
-  end
-
-  def handle_info(:refresh, %State{last_dead: true} = state) do
-    {:noreply, state}
-  end
-
   def handle_cast({:mqtt, _, :command, command}, %State{} = state) do
     case Robotica.Config.validate_device_command(command) do
       {:ok, command} ->
@@ -138,39 +111,27 @@ defmodule Robotica.Plugins.Hs100 do
   end
 
   def handle_cast({:added, %TpLinkHs100.Device{} = device}, %State{} = state) do
-    state =
-      if device.id == state.config.id do
-        device_state = if device.sysinfo["relay_state"] == 0, do: "OFF", else: "ON"
-        :ok = publish_device_state(state, device_state)
-        %State{state | last_seen: DateTime.utc_now(), last_dead: false}
-      else
-        state
-      end
+    if device.id == state.config.id do
+      device_state = if device.sysinfo["relay_state"] == 0, do: "OFF", else: "ON"
+      :ok = publish_device_state(state, device_state)
+    end
 
     {:noreply, state}
   end
 
   def handle_cast({:updated, %TpLinkHs100.Device{} = device}, %State{} = state) do
-    state =
-      if device.id == state.config.id do
-        device_state = if device.sysinfo["relay_state"] == 0, do: "OFF", else: "ON"
-        :ok = publish_device_state(state, device_state)
-        %State{state | last_seen: DateTime.utc_now(), last_dead: false}
-      else
-        state
-      end
+    if device.id == state.config.id do
+      device_state = if device.sysinfo["relay_state"] == 0, do: "OFF", else: "ON"
+      :ok = publish_device_state(state, device_state)
+    end
 
     {:noreply, state}
   end
 
   def handle_cast({:deleted, %TpLinkHs100.Device{} = device}, %State{} = state) do
-    state =
-      if device.id == state.config.id do
-        :ok = publish_device_hard_off(state)
-        %State{state | last_dead: true}
-      else
-        state
-      end
+    if device.id == state.config.id do
+      :ok = publish_device_hard_off(state)
+    end
 
     {:noreply, state}
   end

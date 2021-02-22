@@ -35,6 +35,12 @@ config :lifx,
   wait_between_retry: 500,
   udp: Lifx.Udp
 
+config :tp_link_hs100,
+  multicast: "192.168.5.255",
+  dead_time: 25 * 1000,
+  poll_discover_time: 10 * 1000,
+  wait_time: 1 * 1000
+
 # Customize non-Elixir parts of the firmware.  See
 # https://hexdocs.pm/nerves/advanced-configuration.html for details.
 config :nerves, :firmware, rootfs_overlay: "rootfs_overlay"
