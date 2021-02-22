@@ -13,8 +13,8 @@ defmodule Robotica.Plugins.HDMI do
   ## Server Callbacks
 
   def init(plugin) do
-    {:ok, _timer} = :timer.send_interval(60_000, :poll)
-    Process.send_after(self(), :poll, 0)
+    # {:ok, _timer} = :timer.send_interval(60_000, :poll)
+    # Process.send_after(self(), :poll, 0)
     {:ok, plugin}
   end
 
