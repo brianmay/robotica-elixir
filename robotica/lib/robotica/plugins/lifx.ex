@@ -455,7 +455,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec handle_update(State.t()) :: State.t()
   defp handle_update(%State{} = state) do
-    Logger.info("#{prefix(state)} update")
+    Logger.debug("#{prefix(state)} update")
 
     base_power = state.base_power
     base_colors = state.base_colors
@@ -484,7 +484,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec update_scene_state(State.t(), pid(), String.t(), integer(), list(HSBKA)) :: State.t()
   defp update_scene_state(state, pid, scene_name, power, hsbkas) do
-    Logger.info("#{prefix(state)} update_scene_state #{scene_name}")
+    Logger.debug("#{prefix(state)} update_scene_state #{scene_name}")
     number = get_number(state)
     length = length(hsbkas)
 
