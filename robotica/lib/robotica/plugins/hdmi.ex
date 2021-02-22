@@ -87,18 +87,8 @@ defmodule Robotica.Plugins.HDMI do
     {:noreply, state}
   end
 
-  def handle_info({:mojito_response, nil, {:error, :closed}}, %Robotica.Plugin{} = state) do
-    outputs = [1, 2, 3, 4]
-
-    Logger.error("HDMI #{state.config.host}: Got connection closed.")
-
-    Enum.each(outputs, fn remaining_output ->
-      publish_device_output_hard_off(state, remaining_output)
-    end)
-  end
-
-  def handle_info({_, :ok}, %Robotica.Plugin{} = state) do
-    Logger.error("HDMI #{state.config.host}: Got unhandled OK message.")
+  def handle_info(message, %Robotica.Plugin{} = state) do
+    Logger.error("HDMI #{state.config.host}: Got unhandled message #{inspect(message)}.")
   end
 
   def handle_command(%Robotica.Plugin{} = state, command) do
