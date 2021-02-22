@@ -30,16 +30,16 @@ defmodule Robotica.Plugins.LIFX do
 
   defmodule Config do
     @type t :: %__MODULE__{
-            label: String.t(),
+            id: integer(),
             number: integer()
           }
-    defstruct label: nil, number: 1
+    defstruct id: 0, number: 1
   end
 
   def config_schema do
     %{
       struct_type: Robotica.Plugins.LIFX.Config,
-      label: {:string, true},
+      id: {:integer, true},
       number: {{:integer, 1}, false}
     }
   end
@@ -87,7 +87,6 @@ defmodule Robotica.Plugins.LIFX do
     state = publish_device_state(state)
 
     :ok = Lifx.Client.add_handler(self())
-    :ok = Lifx.Poller.add_handler(self())
     {:ok, state}
   end
 
@@ -138,13 +137,9 @@ defmodule Robotica.Plugins.LIFX do
     end
   end
 
-  @spec device_to_string(State.t(), Lifx.Device.t() | nil) :: String.t()
-  defp device_to_string(%State{} = state, nil) do
-    "Lifx #{state.config.label}"
-  end
-
-  defp device_to_string(%State{} = state, %Lifx.Device{} = device) do
-    "Lifx #{state.config.label} / Device #{device.id}/#{device.label}"
+  @spec prefix(State.t()) :: String.t()
+  defp prefix(%State{} = state) do
+    "Lifx #{state.config.id}:"
   end
 
   @spec replicate(any(), integer()) :: list(any())
@@ -167,27 +162,27 @@ defmodule Robotica.Plugins.LIFX do
 
   # Publish state to MQTT
 
-  @spec publish_raw(State.t(), Lifx.Device.t() | nil, String.t(), String.t()) :: :ok
-  defp publish_raw(%State{} = state, device, topic, value) do
+  @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
+  defp publish_raw(%State{} = state, topic, value) do
     case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic) do
       :ok ->
         :ok
 
       {:error, msg} ->
-        Logger.error("#{device_to_string(state, device)}: publish_raw() got #{msg}")
+        Logger.error("#{prefix(state)} publish_raw() got #{msg}")
     end
 
     :ok
   end
 
-  @spec publish_json(State.t(), Lifx.Device.t() | nil, String.t(), map() | list()) :: :ok
-  defp publish_json(%State{} = state, device, topic, value) do
+  @spec publish_json(State.t(), String.t(), map() | list()) :: :ok
+  defp publish_json(%State{} = state, topic, value) do
     case RoboticaPlugins.Mqtt.publish_state_json(state.location, state.device, value, topic: topic) do
       :ok ->
         :ok
 
       {:error, msg} ->
-        Logger.error("#{device_to_string(state, device)}: publish_raw() got #{msg}")
+        Logger.error("#{prefix(state)} publish_raw() got #{msg}")
     end
 
     :ok
@@ -196,12 +191,12 @@ defmodule Robotica.Plugins.LIFX do
   @spec publish_device_scenes(State.t(), %{required(String.t()) => SceneState.t()}) :: :ok
   defp publish_device_scenes(%State{} = state, scenes) do
     scene_list = Enum.map(scenes, fn {scene_name, _} -> scene_name end)
-    :ok = publish_json(state, nil, "scenes", scene_list)
+    :ok = publish_json(state, "scenes", scene_list)
 
     priority_list =
       Enum.map(scenes, fn {_, %SceneState{priority: priority}} -> priority end) |> Enum.uniq()
 
-    :ok = publish_json(state, nil, "priorities", priority_list)
+    :ok = publish_json(state, "priorities", priority_list)
 
     :ok
   end
@@ -212,31 +207,31 @@ defmodule Robotica.Plugins.LIFX do
     state
   end
 
-  @spec publish_device_colors(State.t(), Lifx.Device.t(), list(HSBK.t())) :: :ok
-  defp publish_device_colors(%State{} = state, %Lifx.Device{} = device, colors) do
-    :ok = publish_json(state, device, "colors", colors)
+  @spec publish_device_colors(State.t(), list(HSBK.t())) :: :ok
+  defp publish_device_colors(%State{} = state, colors) do
+    :ok = publish_json(state, "colors", colors)
     :ok
   end
 
-  @spec publish_device_power(State.t(), Lifx.Device.t(), integer()) :: :ok
-  defp publish_device_power(%State{} = state, %Lifx.Device{} = device, power) do
+  @spec publish_device_power(State.t(), integer()) :: :ok
+  defp publish_device_power(%State{} = state, power) do
     power = if power != 0, do: "ON", else: "OFF"
-    :ok = publish_raw(state, device, "power", power)
-    :ok = publish_raw(state, device, "error", "")
+    :ok = publish_raw(state, "power", power)
+    :ok = publish_raw(state, "error", "")
     :ok
   end
 
-  @spec publish_device_hard_off(State.t(), Lifx.Device.t() | nil) :: :ok
-  defp publish_device_hard_off(%State{} = state, device) do
+  @spec publish_device_hard_off(State.t()) :: :ok
+  defp publish_device_hard_off(%State{} = state) do
     power = "HARD_OFF"
-    :ok = publish_raw(state, device, "power", power)
-    :ok = publish_raw(state, device, "error", "")
+    :ok = publish_raw(state, "power", power)
+    :ok = publish_raw(state, "error", "")
     :ok
   end
 
-  @spec publish_device_error(State.t(), Lifx.Device.t() | nil, String.t()) :: :ok
-  defp publish_device_error(%State{} = state, device, error) do
-    :ok = publish_raw(state, device, "error", error)
+  @spec publish_device_error(State.t(), String.t()) :: :ok
+  defp publish_device_error(%State{} = state, error) do
+    :ok = publish_raw(state, "error", error)
     :ok
   end
 
@@ -244,7 +239,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec get_device(State.t(), (Lifx.Device.t() -> any())) :: any() | {:error, String.t()}
   defp get_device(state, callback) do
-    devices = Enum.filter(Lifx.Client.devices(), &(&1.label == state.config.label))
+    devices = Enum.filter(Lifx.Client.devices(), &(&1.id == state.config.id))
 
     if length(devices) == 0 do
       {:error, "Device is offline"}
@@ -263,8 +258,8 @@ defmodule Robotica.Plugins.LIFX do
       rc = Lifx.Device.get_power(device)
 
       case rc do
-        {:ok, power} -> publish_device_power(state, device, power)
-        {:error, error} -> publish_device_error(state, device, error)
+        {:ok, power} -> publish_device_power(state, power)
+        {:error, error} -> publish_device_error(state, error)
       end
 
       rc
@@ -294,8 +289,8 @@ defmodule Robotica.Plugins.LIFX do
         end
 
       case rc do
-        {:ok, colors} -> publish_device_colors(state, device, colors)
-        {:error, error} -> publish_device_error(state, device, error)
+        {:ok, colors} -> publish_device_colors(state, colors)
+        {:error, error} -> publish_device_error(state, error)
       end
 
       rc
@@ -310,8 +305,8 @@ defmodule Robotica.Plugins.LIFX do
       rc = Lifx.Device.set_color_wait(device, color, duration)
 
       case rc do
-        {:ok, _} -> publish_device_colors(state, device, [color])
-        {:error, error} -> publish_device_error(state, device, error)
+        {:ok, _} -> publish_device_colors(state, [color])
+        {:error, error} -> publish_device_error(state, error)
       end
     end)
 
@@ -324,8 +319,8 @@ defmodule Robotica.Plugins.LIFX do
       rc = Lifx.Device.set_power_wait(device, power)
 
       case rc do
-        {:ok, _} -> publish_device_power(state, device, power)
-        {:error, error} -> publish_device_error(state, device, error)
+        {:ok, _} -> publish_device_power(state, power)
+        {:error, error} -> publish_device_error(state, error)
       end
     end)
 
@@ -349,8 +344,8 @@ defmodule Robotica.Plugins.LIFX do
       rc = Lifx.Device.set_extended_color_zones_wait(device, colors, duration)
 
       case rc do
-        {:ok, _} -> :ok = publish_device_colors(state, device, colors.list)
-        {:error, error} -> :ok = publish_device_error(state, device, error)
+        {:ok, _} -> :ok = publish_device_colors(state, colors.list)
+        {:error, error} -> :ok = publish_device_error(state, error)
       end
     end)
 
@@ -458,14 +453,12 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec handle_update(State.t()) :: State.t()
   defp handle_update(%State{} = state) do
-    Logger.info("#{device_to_string(state, nil)}: update")
+    Logger.info("#{prefix(state)} update")
 
     base_power = state.base_power
     base_colors = state.base_colors
 
-    Logger.debug(
-      "#{device_to_string(state, nil)}: base #{inspect(base_power)} #{inspect(base_colors)}"
-    )
+    Logger.debug("#{prefix(state)} base #{inspect(base_power)} #{inspect(base_colors)}")
 
     list_scenes =
       state.scenes
@@ -482,14 +475,14 @@ defmodule Robotica.Plugins.LIFX do
       |> Enum.map(fn scene -> scene.power end)
       |> merge_power(base_power)
 
-    Logger.debug("#{device_to_string(state, nil)}: GOT #{inspect(power)} #{inspect(colors)}")
+    Logger.debug("#{prefix(state)} GOT #{inspect(power)} #{inspect(colors)}")
     restore_device(state, {power, colors})
     state
   end
 
   @spec update_scene_state(State.t(), pid(), String.t(), integer(), list(HSBKA)) :: State.t()
   defp update_scene_state(state, pid, scene_name, power, hsbkas) do
-    Logger.info("#{device_to_string(state, nil)}: update_scene_state #{scene_name}")
+    Logger.info("#{prefix(state)} update_scene_state #{scene_name}")
     number = get_number(state)
     length = length(hsbkas)
 
@@ -512,7 +505,7 @@ defmodule Robotica.Plugins.LIFX do
       state = %State{state | scenes: scenes}
       handle_update(state)
     else
-      Logger.info("#{device_to_string(state, nil)}: update_scene_state #{scene_name} wrong pid")
+      Logger.info("#{prefix(state)} update_scene_state #{scene_name} wrong pid")
       state
     end
   end
@@ -536,7 +529,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec add_scene(State.t(), String.t(), integer(), (() -> :ok)) :: State.t()
   defp add_scene(%State{} = state, scene_name, priority, function) do
-    Logger.info("#{device_to_string(state, nil)}: add_scene #{scene_name}")
+    Logger.info("#{prefix(state)} add_scene #{scene_name}")
     already_exists = scene_exists?(state, scene_name)
 
     if already_exists do
@@ -556,7 +549,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec remove_scene(State.t(), String.t()) :: State.t()
   defp remove_scene(%State{} = state, scene_name) do
-    Logger.info("#{device_to_string(state, nil)}: remove_scene #{scene_name}")
+    Logger.info("#{prefix(state)} remove_scene #{scene_name}")
 
     :ok = stop_scene(state, scene_name)
     scenes = Map.delete(state.scenes, scene_name)
@@ -583,7 +576,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec handle_scene_has_died(State.t(), pid()) :: State.t()
   defp handle_scene_has_died(%State{} = state, pid) do
-    Logger.info("#{device_to_string(state, nil)}: handle_scene_has_died #{inspect(pid)}")
+    Logger.info("#{prefix(state)} handle_scene_has_died #{inspect(pid)}")
 
     scenes =
       state.scenes
@@ -656,7 +649,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp do_command(%State{} = state, %{action: "turn_off"} = command) do
-    Logger.debug("#{device_to_string(state, nil)}: turn_off")
+    Logger.debug("#{prefix(state)} turn_off")
     number = get_number(state)
     priority = get_priority(command, 100)
     scene = command.scene
@@ -671,7 +664,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp do_command(%State{} = state, %{action: "turn_on"} = command) do
-    Logger.debug("#{device_to_string(state, nil)}: turn_on")
+    Logger.debug("#{prefix(state)} turn_on")
     number = get_number(state)
     priority = get_priority(command, 100)
     scene = command.scene
@@ -697,7 +690,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp do_command(%State{} = state, %{action: "animate"} = command) do
-    Logger.debug("#{device_to_string(state, nil)}: animate")
+    Logger.debug("#{prefix(state)} animate")
     number = get_number(state)
     priority = get_priority(command, 100)
     scene = command.scene
@@ -722,13 +715,13 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defp do_command(%State{} = state, command) do
-    Logger.info("#{device_to_string(state, nil)}: Unknown command #{command.action}")
+    Logger.info("#{prefix(state)} Unknown command #{command.action}")
     state
   end
 
   @spec handle_command(state :: State.t(), command :: map()) :: State.t()
-  defp handle_command(%State{}, %{scene: nil} = command) do
-    Logger.error("Cannot handle LIFX command #{inspect(command)} without scene")
+  defp handle_command(%State{} = state, %{scene: nil} = command) do
+    Logger.error("#{prefix(state)} Cannot handle LIFX command #{inspect(command)} without scene")
   end
 
   defp handle_command(%State{} = state, command) do
@@ -743,9 +736,7 @@ defmodule Robotica.Plugins.LIFX do
           handle_command(state, command)
 
         {:error, error} ->
-          Logger.error(
-            "#{device_to_string(state, nil)}: Invalid lifx command received: #{inspect(error)}."
-          )
+          Logger.error("#{prefix(state)} Invalid lifx command received: #{inspect(error)}.")
 
           state
       end
@@ -758,32 +749,33 @@ defmodule Robotica.Plugins.LIFX do
     {:noreply, state}
   end
 
-  def handle_cast({:added, %Lifx.Device{}}, %State{} = state) do
-    # Note device.label will not be set yet
-    {:noreply, state}
-  end
-
-  def handle_cast({:updated, %Lifx.Device{}}, %State{} = state) do
-    {:noreply, state}
-  end
-
-  def handle_cast({:deleted, %Lifx.Device{} = device}, %State{} = state) do
-    if device.label == state.config.label do
-      Logger.info("#{device_to_string(state, nil)}: got deleted #{inspect(device)}")
-      publish_device_hard_off(state, nil)
+  def handle_cast({:added, %Lifx.Device{} = device}, %State{} = state) do
+    if device.id == state.config.id do
+      Logger.info("#{prefix(state)} got added")
+      poll_device(state)
+    else
+      state
     end
 
     {:noreply, state}
   end
 
-  def handle_cast({:polled, %Lifx.Device{} = device}, %State{} = state) do
-    state =
-      if device.label == state.config.label do
-        Logger.debug("#{device_to_string(state, nil)}: got polled")
-        poll_device(state)
-      else
-        state
-      end
+  def handle_cast({:updated, %Lifx.Device{} = device}, %State{} = state) do
+    if device.id == state.config.id do
+      Logger.info("#{prefix(state)} got updated")
+      poll_device(state)
+    else
+      state
+    end
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:deleted, %Lifx.Device{} = device}, %State{} = state) do
+    if device.id == state.config.id do
+      Logger.info("#{prefix(state)} got deleted #{inspect(device)}")
+      publish_device_hard_off(state)
+    end
 
     {:noreply, state}
   end
