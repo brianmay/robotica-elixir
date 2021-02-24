@@ -12,12 +12,12 @@ defmodule RoboticaPlugins.Buttons.HDMI do
   defp get_topic_for_output(n), do: "output#{n}"
 
   @type state :: integer() | String.t() | nil
-  @spec get_topics(Config.t()) :: list({list(String.t()), atom(), {atom(), atom()}})
+  @spec get_topics(Config.t()) :: list({list(String.t()), atom(), atom()})
   def get_topics(%Config{} = config) do
     topic = get_topic_for_output(config.params["output"])
 
     [
-      {["state", config.location, config.device, topic], :raw, {config.id, :output}}
+      {["state", config.location, config.device, topic], :raw, :output}
     ]
   end
 

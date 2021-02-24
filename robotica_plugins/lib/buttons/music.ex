@@ -10,10 +10,10 @@ defmodule RoboticaPlugins.Buttons.Music do
 
   @type state :: String.t() | nil | :stop
 
-  @spec get_topics(Config.t()) :: list({list(String.t()), atom(), {atom(), atom()}})
+  @spec get_topics(Config.t()) :: list({list(String.t()), atom(), atom()})
   def get_topics(%Config{} = config) do
     [
-      {["state", config.location, config.device, "play_list"], :raw, {config.id, :play_list}}
+      {["state", config.location, config.device, "play_list"], :raw, :play_list}
     ]
   end
 
