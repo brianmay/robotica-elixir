@@ -141,7 +141,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec prefix(State.t()) :: String.t()
   defp prefix(%State{} = state) do
-    "Lifx #{state.config.id}:"
+    "Lifx #{state.location}/#{state.device} (#{state.config.id}):"
   end
 
   @spec replicate(any(), integer()) :: list(any())
