@@ -763,12 +763,13 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   def handle_cast({:updated, %Lifx.Device{} = device}, %State{} = state) do
-    if device.id == state.config.id do
-      Logger.debug("#{prefix(state)} got updated")
-      poll_device(state)
-    else
-      state
-    end
+    state =
+      if device.id == state.config.id do
+        Logger.debug("#{prefix(state)} got updated")
+        poll_device(state)
+      else
+        state
+      end
 
     {:noreply, state}
   end
