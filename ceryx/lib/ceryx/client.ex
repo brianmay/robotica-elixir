@@ -93,15 +93,7 @@ defmodule Ceryx.Client do
 
   def handle_message(topic, publish, state) do
     Logger.debug("handle message #{inspect(topic)} #{inspect(publish)}")
-
-    case RoboticaPlugins.Subscriptions.message(topic, publish) do
-      :ignored ->
-        Logger.debug("Received unknown topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
-
-      :processed ->
-        Logger.debug("Processed topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
-    end
-
+    :ok = RoboticaPlugins.Subscriptions.message(topic, publish)
     {:ok, state}
   end
 

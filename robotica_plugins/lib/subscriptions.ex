@@ -27,9 +27,9 @@ defmodule RoboticaPlugins.Subscriptions do
     GenServer.call(__MODULE__, {:unsubscribe_all, pid}, 40000)
   end
 
-  @spec message(topic :: list(String.t()), message :: String.t()) :: :ignored | :processed
+  @spec message(topic :: list(String.t()), message :: String.t()) :: :ok
   def message(topic, message) do
-    GenServer.call(__MODULE__, {:message, topic, message}, 40000)
+    GenServer.cast(__MODULE__, {:message, topic, message})
   end
 
   ## private
@@ -144,20 +144,18 @@ defmodule RoboticaPlugins.Subscriptions do
     {:reply, :ok, new_state}
   end
 
-  def handle_call({:message, topic, message}, _from, state) do
+  def handle_cast({:message, topic, message}, state) do
     Logger.debug("Got message #{inspect(topic)} #{inspect(message)}.")
 
     last_message = Map.put(state.last_message, topic, message)
     state = %State{state | last_message: last_message}
 
-    processed =
-      Map.get(state.subscriptions, topic, [])
-      |> Enum.reduce(:ignored, fn {label, pid, format}, _ ->
-        :ok = send_to_client(topic, label, pid, format, message)
-        :processed
-      end)
+    Map.get(state.subscriptions, topic, [])
+    |> Enum.each(fn {label, pid, format} ->
+      :ok = send_to_client(topic, label, pid, format, message)
+    end)
 
-    {:reply, processed, state}
+    {:noreply, state}
   end
 
   @spec keyword_list_to_map(values :: list) :: map
