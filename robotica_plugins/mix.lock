@@ -14,6 +14,6 @@
   "tortoise": {:hex, :tortoise, "0.9.8", "fb936f1eae5b22a2c4a176ddc34a52e420952fc4b7cfd166b8f47748754f4cf0", [:mix], [{:gen_state_machine, "~> 2.0 or ~> 3.0", [hex: :gen_state_machine, repo: "hexpm", optional: false]}], "hexpm", "1d6c494303b5605a19cc4a7b87663019f348691e5ddb8c58696e5adc464433eb"},
   "tzdata": {:hex, :tzdata, "1.1.0", "72f5babaa9390d0f131465c8702fa76da0919e37ba32baa90d93c583301a8359", [:mix], [{:hackney, "~> 1.17", [hex: :hackney, repo: "hexpm", optional: false]}], "hexpm", "18f453739b48d3dc5bcf0e8906d2dc112bb40baafe2c707596d89f3c8dd14034"},
   "unicode_util_compat": {:hex, :unicode_util_compat, "0.7.0", "bc84380c9ab48177092f43ac89e4dfa2c6d62b40b8bd132b1059ecc7232f9a78", [:rebar3], [], "hexpm", "25eee6d67df61960cf6a794239566599b09e17e668d3700247bc498638152521"},
-  "yamerl": {:hex, :yamerl, "0.8.0", "8214cfe16bbabe5d1d6c14a14aea11c784b9a21903dd6a7c74f8ce180adae5c7", [:rebar3], [], "hexpm", "010634477bf9c208a0767dcca89116c2442cf0b5e87f9c870f85cd1c3e0c2aab"},
-  "yaml_elixir": {:hex, :yaml_elixir, "2.5.0", "45de762be6d75fa5a8b5f44ddff8c30f64c26526eab5b1d72e36d616007b7796", [:mix], [{:yamerl, "~> 0.7", [hex: :yamerl, repo: "hexpm", optional: false]}], "hexpm", "80fe4e43f05582f2a90f2dcd73fc6171fbd65f2e6836f71fe4ce2154ef358c36"},
+  "yamerl": {:hex, :yamerl, "0.8.1", "07da13ffa1d8e13948943789665c62ccd679dfa7b324a4a2ed3149df17f453a4", [:rebar3], [], "hexpm", "96cb30f9d64344fed0ef8a92e9f16f207de6c04dfff4f366752ca79f5bceb23f"},
+  "yaml_elixir": {:hex, :yaml_elixir, "2.6.0", "1f469e4e7b006df44539685feb0a9d0d58c98230cef4ecd264ea116eb18e5d09", [:mix], [{:yamerl, "~> 0.8", [hex: :yamerl, repo: "hexpm", optional: false]}], "hexpm", "e40abb99a65e98020929d3e9b310c9f0f62aa76c3be7c0ada2aa440e12b258d9"},
 }
