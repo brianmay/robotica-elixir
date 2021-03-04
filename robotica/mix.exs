@@ -29,7 +29,7 @@ defmodule Robotica.MixProject do
       {:lifx, git: "https://github.com/brianmay/lifx.git"},
       {:tp_link_hs100, git: "https://github.com/brianmay/tp_link_hs100.git"},
       {:calendar, "~> 1.0.0"},
-      {:yaml_elixir, "~> 2.5.0"},
+      {:yaml_elixir, "~> 2.6.0"},
       {:event_bus, "~> 1.6.0"},
       {:mojito, "~> 0.7.1"},
       {:mint, "~> 1.0", override: true},

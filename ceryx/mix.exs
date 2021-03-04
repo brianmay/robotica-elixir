@@ -27,7 +27,7 @@ defmodule Ceryx.MixProject do
       {:dialyxir, "~> 1.0.0-rc.2", only: [:dev], runtime: false},
       {:credo, "~> 1.2.0", only: [:dev, :test], runtime: false},
       {:calendar, "~> 1.0.0"},
-      {:yaml_elixir, "~> 2.5.0"},
+      {:yaml_elixir, "~> 2.6.0"},
       {:event_bus, "~> 1.6.0"},
       {:robotica_plugins, path: "../robotica_plugins"}
     ]

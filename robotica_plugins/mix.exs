@@ -26,7 +26,7 @@ defmodule RoboticaPlugins.MixProject do
       {:tortoise, "~> 0.9.2"},
       {:tzdata, "~> 1.1.0"},
       {:event_bus, "~> 1.6.0"},
-      {:yaml_elixir, "~> 2.5.0"},
+      {:yaml_elixir, "~> 2.6.0"},
       {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false}
     ]
   end
