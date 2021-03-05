@@ -32,6 +32,12 @@ config :lifx,
   wait_between_retry: 500,
   udp: Lifx.Udp
 
+config :tp_link_hs100,
+  multicast: "192.168.5.255",
+  dead_time: 35 * 1000,
+  poll_discover_time: 10 * 1000,
+  wait_time: 1 * 1000
+
 config :logger,
   backends: [:console],
   compile_time_purge_matching: [
