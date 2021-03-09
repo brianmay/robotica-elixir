@@ -21,7 +21,7 @@ config :robotica_hello, RoboticaHelloWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: RoboticaHelloWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: RoboticaHello.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub_server: RoboticaHello.PubSub
 
 config :robotica_plugins,
   location: nil,

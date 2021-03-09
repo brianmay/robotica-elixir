@@ -11,6 +11,7 @@ defmodule RoboticaFace.Application do
       # Start the endpoint when the application starts
       RoboticaFaceWeb.Endpoint,
       RoboticaFaceWeb.Strategy,
+      {Phoenix.PubSub, [name: RoboticaFace.PubSub, adapter: Phoenix.PubSub.PG2]},
       RoboticaFace.Schedule,
       RoboticaFace.Execute
     ]
