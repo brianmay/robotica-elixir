@@ -11,7 +11,7 @@ config :robotica_ui, :viewport, %{
     %{
       module: Scenic.Driver.Nerves.Touch,
       opts: [
-        device: "FT5406 memory based driver",
+        device: "raspberrypi-ts",
         calibration: {{1, 0, 0}, {1, 0, 0}}
       ]
     }

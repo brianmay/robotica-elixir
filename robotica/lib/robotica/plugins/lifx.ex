@@ -114,7 +114,7 @@ defmodule Robotica.Plugins.LIFX do
       got_device? = scene.devices == nil or Enum.member?(scene.devices, state.device)
 
       if got_location? and got_device? do
-        merge_maps(command, scene.lights())
+        merge_maps(command, scene.lights)
       else
         command
       end
