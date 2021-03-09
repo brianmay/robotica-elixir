@@ -22,7 +22,7 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
   url: [host: {:system, "HOST"}],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: RoboticaFaceWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: RoboticaFace.PubSub, adapter: Phoenix.PubSub.PG2],
+  pubsub_server: RoboticaFace.PubSub,
   live_view: [
     signing_salt: System.get_env("SIGNING_SALT")
   ],

@@ -34,8 +34,8 @@ defmodule RoboticaFace.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.0"},
-      {:phoenix_pubsub, "~> 1.1"},
+      {:phoenix, "~> 1.5.4"},
+      {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_view, "~> 0.14.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},

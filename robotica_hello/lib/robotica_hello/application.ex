@@ -11,7 +11,8 @@ defmodule RoboticaHello.Application do
       # Start the Ecto repository
       RoboticaHello.Repo,
       # Start the endpoint when the application starts
-      RoboticaHelloWeb.Endpoint
+      RoboticaHelloWeb.Endpoint,
+      {Phoenix.PubSub, [name: RoboticaHello.PubSub, adapter: Phoenix.PubSub.PG2]}
       # Starts a worker by calling: RoboticaHello.Worker.start_link(arg)
       # {RoboticaHello.Worker, arg},
     ]
