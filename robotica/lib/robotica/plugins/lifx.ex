@@ -499,15 +499,26 @@ defmodule Robotica.Plugins.LIFX do
       length(hsbkas) == number -> nil
     end
 
-    scene = Map.fetch!(state.scenes, scene_name)
+    scene =
+      case Map.fetch(state.scenes, scene_name) do
+        {:ok, scene} -> scene
+        :error -> nil
+      end
 
-    if scene.task.pid == pid do
+    scene =
+      if scene != nil and scene.task.pid == pid do
+        scene
+      else
+        nil
+      end
+
+    if scene != nil do
       scene = %SceneState{scene | colors: hsbkas, power: power}
       scenes = Map.put(state.scenes, scene_name, scene)
       state = %State{state | scenes: scenes}
       handle_update(state)
     else
-      Logger.info("#{prefix(state)} update_scene_state #{scene_name} wrong pid")
+      Logger.info("#{prefix(state)} update_scene_state #{scene_name} scene not found")
       state
     end
   end
