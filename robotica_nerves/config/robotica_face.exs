@@ -28,6 +28,7 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
     # OPTIONAL Key for intermediate certificates
     cacertfile: "priv/cacert.pem"
   ],
+  url: [host: {:system, "HTTP_HOST"}],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: RoboticaFaceWeb.ErrorView, accepts: ~w(html json)],
   pubsub_server: RoboticaFace.PubSub,

@@ -52,6 +52,7 @@ defmodule Robotica.Config do
 
     defp host_schema do
       %{
+        http_host: {:string, true},
         plugins: {{:list, plugin_schema()}, true}
       }
     end
@@ -119,8 +120,14 @@ defmodule Robotica.Config do
     end
   end
 
+  @spec http_host :: String.t()
+  def http_host do
+    hosts = get_hosts()
+    Map.fetch!(hosts, hostname()).http_host
+  end
+
   @spec plugins :: list(Robotica.Plugin.t())
-  defp plugins do
+  def plugins do
     hosts = get_hosts()
     Map.fetch!(hosts, hostname()).plugins
   end
