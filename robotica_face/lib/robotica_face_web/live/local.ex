@@ -70,6 +70,8 @@ defmodule RoboticaFaceWeb.Live.Local do
   @impl true
   def handle_event("activate", %{"button" => button_id}, socket) do
     button = get_button(socket, button_id)
+    Logger.info("robotica_face: Got button press #{button.name}")
+
     case button do
       nil ->
         Logger.error("Unknown button #{button_id}")

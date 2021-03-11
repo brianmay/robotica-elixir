@@ -147,6 +147,7 @@ defmodule RoboticaUi.Scene.Local do
 
   def handle_command_press(button_id, state) do
     button = Map.get(state.buttons, button_id)
+    Logger.info("robotica_ui: Got button press #{button.name}")
 
     case button do
       nil ->
