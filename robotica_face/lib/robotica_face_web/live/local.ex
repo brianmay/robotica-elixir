@@ -43,6 +43,7 @@ defmodule RoboticaFaceWeb.Live.Local do
     {:ok, socket}
   end
 
+  @impl true
   def handle_cast({:mqtt, _, {button_id, label}, data}, socket) do
     socket =
       case get_button(socket, button_id) do
