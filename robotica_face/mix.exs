@@ -37,7 +37,7 @@ defmodule RoboticaFace.MixProject do
       {:phoenix, "~> 1.5.4"},
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_html, "~> 2.11"},
-      {:phoenix_live_view, "~> 0.14.0"},
+      {:phoenix_live_view, "~> 0.15.4"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
