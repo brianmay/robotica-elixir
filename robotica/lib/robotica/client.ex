@@ -13,8 +13,15 @@ defmodule Robotica.Client do
     {:ok, %State{}}
   end
 
+  defp resubscribe() do
+    client_id = RoboticaPlugins.Mqtt.get_tortoise_client_id()
+    meta_data = Tortoise.Connection.subscriptions(client_id)
+    Tortoise.Connection.subscribe(client_id, meta_data.topics)
+  end
+
   def connection(:up, state) do
     Logger.info("Connection has been established")
+    resubscribe()
     Robotica.Scheduler.Executor.publish_schedule(Robotica.Scheduler.Executor)
     {:ok, state}
   end
