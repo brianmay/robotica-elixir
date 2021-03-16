@@ -26,7 +26,8 @@ defmodule Robotica.Plugin do
             ["command", plugin.location, plugin.device],
             :command,
             pid,
-            :json
+            :json,
+            :no_resend
           )
 
           {:ok, pid}

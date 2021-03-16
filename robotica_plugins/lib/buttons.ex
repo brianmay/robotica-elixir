@@ -80,7 +80,8 @@ defmodule RoboticaPlugins.Buttons do
         topic: topic,
         label: {config.id, label},
         pid: self(),
-        format: format
+        format: format,
+        resend: :resend
       })
     end)
   end

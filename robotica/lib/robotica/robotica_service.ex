@@ -35,7 +35,7 @@ defmodule Robotica.RoboticaService do
 
   def process({:subscribe = topic, id}) do
     data = EventBus.fetch_event_data({topic, id})
-    RoboticaPlugins.Subscriptions.subscribe(data.topic, data.label, data.pid, data.format)
+    RoboticaPlugins.Subscriptions.subscribe(data.topic, data.label, data.pid, data.format, data.resend)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 

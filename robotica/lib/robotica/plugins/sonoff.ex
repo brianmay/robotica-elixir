@@ -58,14 +58,16 @@ defmodule Robotica.Plugins.SonOff do
       ["stat", plugin.config.topic, "POWER"],
       :power,
       self(),
-      :raw
+      :raw,
+      :resend
     )
 
     RoboticaPlugins.Subscriptions.subscribe(
       ["tele", plugin.config.topic, "LWT"],
       :lwt,
       self(),
-      :raw
+      :raw,
+      :resend
     )
 
     {:ok,

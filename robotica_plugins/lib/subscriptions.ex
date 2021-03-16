@@ -4,7 +4,7 @@ defmodule RoboticaPlugins.Subscriptions do
 
   defmodule State do
     @type t :: %__MODULE__{
-            subscriptions: %{required(list({atom(), String.t(), atom()})) => list(pid)},
+            subscriptions: %{required(list({atom(), String.t(), :json | :raw})) => list(pid)},
             last_message: %{required(list(String.t())) => any()}
           }
     defstruct subscriptions: %{}, last_message: %{}
@@ -17,9 +17,9 @@ defmodule RoboticaPlugins.Subscriptions do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  @spec subscribe(topic :: list(String.t()), label :: atom(), pid :: pid, format :: atom()) :: :ok
-  def subscribe(topic, label, pid, format) do
-    GenServer.call(__MODULE__, {:subscribe, topic, label, pid, format}, 40000)
+  @spec subscribe(topic :: list(String.t()), label :: atom(), pid :: pid, format :: :json | :raw, resend :: :resend | :no_resend) :: :ok
+  def subscribe(topic, label, pid, format, resend) do
+    GenServer.call(__MODULE__, {:subscribe, topic, label, pid, format, resend}, 40000)
   end
 
   @spec unsubscribe_all(pid :: pid) :: :ok
@@ -34,7 +34,7 @@ defmodule RoboticaPlugins.Subscriptions do
 
   ## private
 
-  @spec get_message_format(String.t(), atom()) :: {:ok, any()} | {:error, String.t()}
+  @spec get_message_format(String.t(), :json | :raw) :: {:ok, any()} | {:error, String.t()}
   def get_message_format(message, :json) do
     case Poison.decode(message) do
       {:ok, message} -> {:ok, message}
@@ -88,10 +88,11 @@ defmodule RoboticaPlugins.Subscriptions do
           topic :: list(String.t()),
           label :: any(),
           pid :: pid,
-          format :: atom()
+          format :: :json | :raw,
+          resend :: :resend | :no_resend
         ) ::
           State.t()
-  defp handle_add(state, topic, label, pid, format) do
+  defp handle_add(state, topic, label, pid, format, resend) do
     _ref = Process.monitor(pid)
     topic_str = Enum.join(topic, "/")
 
@@ -122,20 +123,20 @@ defmodule RoboticaPlugins.Subscriptions do
     subscriptions = Map.put(state.subscriptions, topic, pids)
 
     # resend last message to new client
-    case Map.fetch(state.last_message, topic) do
-      {:ok, last_message} ->
+    case {resend, Map.fetch(state.last_message, topic)} do
+      {:resend, {:ok, last_message}} ->
         Logger.debug("Resending last message to #{inspect(pid)} from subscription #{topic_str}.")
         :ok = send_to_client(topic, label, pid, format, last_message)
 
-      :error ->
+      _ ->
         nil
     end
 
     %State{state | subscriptions: subscriptions}
   end
 
-  def handle_call({:subscribe, topic, label, pid, format}, _from, state) do
-    new_state = handle_add(state, topic, label, pid, format)
+  def handle_call({:subscribe, topic, label, pid, format, resend}, _from, state) do
+    new_state = handle_add(state, topic, label, pid, format, resend)
     {:reply, :ok, new_state}
   end
 
