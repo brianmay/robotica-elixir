@@ -735,6 +735,7 @@ defmodule Robotica.Plugins.LIFX do
   @spec handle_command(state :: State.t(), command :: map()) :: State.t()
   defp handle_command(%State{} = state, %{scene: nil} = command) do
     Logger.error("#{prefix(state)} Cannot handle LIFX command #{inspect(command)} without scene")
+    state
   end
 
   defp handle_command(%State{} = state, command) do
