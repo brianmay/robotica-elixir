@@ -54,7 +54,7 @@ defmodule Robotica.Plugins.Hs100 do
         :ok
 
       {:error, msg} ->
-        Logger.error("Hs100 #{state.config.host}: publish_raw() got #{msg}")
+        Logger.error("Hs100 #{state.config.id}: publish_raw() failed sending #{msg}")
     end
 
     :ok
