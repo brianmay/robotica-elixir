@@ -349,7 +349,7 @@ workflows:
   version: 2
   build-deploy:
     jobs:
-      - build-plugins:
+      - build-common:
           filters:
             tags:
               only: /.*/
