@@ -35,7 +35,10 @@ defmodule RoboticaPlugins.Buttons.Music do
   def get_display_state(%Config{action: _}, "ERROR"), do: :state_error
   def get_display_state(%Config{action: _}, nil), do: nil
   def get_display_state(%Config{action: "stop"}, :stop), do: :state_on
-  def get_display_state(%Config{action: "play", params: %{"play_list" => play_list}}, play_list), do: :state_on
+
+  def get_display_state(%Config{action: "play", params: %{"play_list" => play_list}}, play_list),
+    do: :state_on
+
   def get_display_state(%Config{action: "play_green"}, "green"), do: :state_on
   def get_display_state(%Config{action: "play_blue"}, "blue"), do: :state_on
   def get_display_state(%Config{action: "play_wake_up"}, "wake_up"), do: :state_on

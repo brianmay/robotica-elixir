@@ -56,21 +56,6 @@ defmodule Ceryx.Client do
     {:ok, state}
   end
 
-  def handle_message(["execute"] = topic, publish, state) do
-    Logger.info("Received mqtt topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
-
-    with {:ok, message} <- Poison.decode(publish),
-         {:ok, task} <- Validation.validate_task(message) do
-      EventSource.notify %{topic: :execute} do
-        task
-      end
-    else
-      {:error, error} -> Logger.error("Invalid execute message received: #{inspect(error)}.")
-    end
-
-    {:ok, state}
-  end
-
   def handle_message(["mark"] = topic, publish, state) do
     Logger.info("Received mqtt topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
     {:ok, state}

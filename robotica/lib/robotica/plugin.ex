@@ -15,6 +15,7 @@ defmodule Robotica.Plugin do
   defmacro __using__(_opts) do
     quote do
       @behaviour Robotica.Plugin
+      import Robotica.Plugins.Private
 
       @spec start_link(plugin :: Robotica.Plugin.t()) ::
               {:ok, pid} | {:error, String.t()}

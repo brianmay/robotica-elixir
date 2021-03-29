@@ -17,7 +17,7 @@ defmodule RoboticaUi do
       RoboticaUi.RootManager
     ]
 
-    EventBus.subscribe({RoboticaUi.RoboticaService, ["^schedule", "^execute"]})
+    EventBus.subscribe({RoboticaUi.RoboticaService, ["^schedule", "^command_task"]})
     Supervisor.start_link(children, strategy: :one_for_one)
   end
 end

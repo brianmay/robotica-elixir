@@ -16,7 +16,7 @@ defmodule RoboticaFace.Application do
       RoboticaFace.Execute
     ]
 
-    EventBus.subscribe({RoboticaFace.RoboticaService, ["^schedule", "^execute"]})
+    EventBus.subscribe({RoboticaFace.RoboticaService, ["^schedule", "^command_task"]})
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

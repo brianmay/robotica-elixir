@@ -42,11 +42,11 @@ defmodule RoboticaFaceWeb.Live.Messages do
     |> assign(:timer, timer)
   end
 
-  def handle_cast({:execute, task}, socket) do
+  def handle_cast({:command_task, task}, socket) do
     location = socket.assigns.location
 
-    good_location = Enum.any?(task.locations, fn l -> l == location end)
-    message = RoboticaPlugins.Action.action_to_message(task.action)
+    good_location = task.location == location
+    message = get_in(task.command.message, [:text])
 
     socket =
       case {good_location, message} do

@@ -47,10 +47,6 @@ defmodule Robotica.Executor do
 
     plugins = get_required_plugins(state, locations, devices)
 
-    if task.devices == nil or Enum.member?(task.devices, "Robotica") do
-      RoboticaPlugins.EventBus.notify(:execute, task)
-    end
-
     Enum.each(plugins, fn pid ->
       Robotica.Plugin.execute(pid, action)
     end)

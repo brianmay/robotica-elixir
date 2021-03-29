@@ -54,19 +54,6 @@ defmodule Robotica.Client do
     {:ok, state}
   end
 
-  def handle_message(["execute"] = topic, publish, state) do
-    Logger.info("Received mqtt topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
-
-    with {:ok, message} <- Poison.decode(publish),
-         {:ok, task} <- Robotica.Config.validate_task(message) do
-      Robotica.Executor.execute(Robotica.Executor, task)
-    else
-      {:error, error} -> Logger.error("Invalid execute message received: #{inspect(error)}.")
-    end
-
-    {:ok, state}
-  end
-
   def handle_message(["mark"] = topic, publish, state) do
     Logger.info("Received mqtt topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
 

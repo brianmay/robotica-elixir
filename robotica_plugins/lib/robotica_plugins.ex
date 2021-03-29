@@ -109,6 +109,16 @@ defmodule RoboticaPlugins do
     end
   end
 
+  defmodule CommandTask do
+    @type t :: %__MODULE__{
+            location: String.t(),
+            device: String.t(),
+            command: map()
+          }
+    @enforce_keys [:location, :device, :command]
+    defstruct location: [], device: [], command: {}
+  end
+
   defmodule SourceStep do
     @type t :: %__MODULE__{
             required_time: integer,

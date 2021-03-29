@@ -7,9 +7,9 @@ defmodule RoboticaUi.RoboticaService do
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 
-  def process({:execute = topic, id}) do
+  def process({:command_task = topic, id}) do
     task = EventBus.fetch_event_data({topic, id})
-    RoboticaUi.Execute.execute(task)
+    RoboticaUi.Execute.command_task(task)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 end

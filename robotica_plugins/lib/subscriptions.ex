@@ -17,7 +17,13 @@ defmodule RoboticaPlugins.Subscriptions do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  @spec subscribe(topic :: list(String.t()), label :: atom(), pid :: pid, format :: :json | :raw, resend :: :resend | :no_resend) :: :ok
+  @spec subscribe(
+          topic :: list(String.t()),
+          label :: atom(),
+          pid :: pid,
+          format :: :json | :raw,
+          resend :: :resend | :no_resend
+        ) :: :ok
   def subscribe(topic, label, pid, format, resend) do
     GenServer.call(__MODULE__, {:subscribe, topic, label, pid, format, resend}, 40000)
   end

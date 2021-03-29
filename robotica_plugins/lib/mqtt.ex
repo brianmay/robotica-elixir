@@ -25,10 +25,10 @@ defmodule RoboticaPlugins.Mqtt do
     end
   end
 
-  @spec publish_action(String.t(), RoboticaPlugins.Action.t()) :: :ok | {:error, String.t()}
-  def publish_action(location, action) do
-    topic = "action/#{location}"
-    publish_json(topic, action)
+  @spec publish_command_task(RoboticaPlugins.CommandTask.t()) :: :ok | {:error, String.t()}
+  def publish_command_task(%RoboticaPlugins.CommandTask{} = task) do
+    topic = "action/#{task.location}/#{task.device}"
+    publish_json(topic, task.command)
   end
 
   @spec get_state_topic(String.t(), String.t(), String.t() | nil) :: String.t()

@@ -21,7 +21,7 @@ defmodule Robotica.Supervisor do
 
     EventBus.register_topic(:schedule)
     EventBus.register_topic(:request_schedule)
-    EventBus.register_topic(:execute)
+    EventBus.register_topic(:command_task)
     EventBus.register_topic(:command)
     EventBus.register_topic(:mark)
     EventBus.register_topic(:subscribe)

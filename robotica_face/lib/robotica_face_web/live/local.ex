@@ -53,7 +53,10 @@ defmodule RoboticaFaceWeb.Live.Local do
 
         button ->
           button_state = get_button_state(socket.assigns.button_states, button_id)
-          button_state = RoboticaPlugins.Buttons.process_message(button, label, data, button_state)
+
+          button_state =
+            RoboticaPlugins.Buttons.process_message(button, label, data, button_state)
+
           button_states = Map.put(socket.assigns.button_states, button_id, button_state)
           assign(socket, :button_states, button_states)
       end
@@ -85,11 +88,12 @@ defmodule RoboticaFaceWeb.Live.Local do
   end
 
   defp search_row(row, button_id) do
-    Enum.find(row, nil, fn button -> button.id==button_id end)
+    Enum.find(row, nil, fn button -> button.id == button_id end)
   end
 
   defp search_button([], _), do: nil
-  defp search_button([head|tail], button_id) do
+
+  defp search_button([head | tail], button_id) do
     case search_row(head.buttons, button_id) do
       nil -> search_button(tail, button_id)
       button -> button
@@ -104,7 +108,7 @@ defmodule RoboticaFaceWeb.Live.Local do
     Map.get(button_states, id)
   end
 
-  @spec display_state_to_class(RoboticaPlugins.Buttons.display_state) :: String.t()
+  @spec display_state_to_class(RoboticaPlugins.Buttons.display_state()) :: String.t()
   defp display_state_to_class(:state_on), do: "btn-success"
   defp display_state_to_class(:state_off), do: "btn-primary"
   defp display_state_to_class(:state_hard_off), do: "btn-light"
@@ -126,12 +130,13 @@ defmodule RoboticaFaceWeb.Live.Local do
 
     RoboticaPlugins.Buttons.unsubscribe_all()
 
-    button_states = Enum.reduce(buttons, %{}, fn row, button_states ->
-      Enum.reduce(row.buttons, button_states, fn button, button_states ->
-        RoboticaPlugins.Buttons.subscribe_topics(button)
-        Map.put(button_states, button.id, RoboticaPlugins.Buttons.get_initial_state(button))
+    button_states =
+      Enum.reduce(buttons, %{}, fn row, button_states ->
+        Enum.reduce(row.buttons, button_states, fn button, button_states ->
+          RoboticaPlugins.Buttons.subscribe_topics(button)
+          Map.put(button_states, button.id, RoboticaPlugins.Buttons.get_initial_state(button))
+        end)
       end)
-    end)
 
     socket
     |> assign(:buttons, buttons)

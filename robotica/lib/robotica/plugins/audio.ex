@@ -1,6 +1,7 @@
 defmodule Robotica.Plugins.Audio do
   use GenServer
   use Robotica.Plugin
+  use RoboticaPlugins.EventBus
   require Logger
 
   import Robotica.Types
@@ -362,6 +363,8 @@ defmodule Robotica.Plugins.Audio do
 
   @spec handle_execute(state :: State.t(), action :: map()) :: nil
   defp handle_execute(%State{} = state, action) do
+    publish(state.location, state.device, action)
+
     sound_list = get_sound_list(action)
 
     if length(sound_list) > 0 do
