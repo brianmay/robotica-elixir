@@ -33,7 +33,7 @@ defmodule Robotica.MixProject do
       {:event_bus, "~> 1.6.0"},
       {:mojito, "~> 0.7.1"},
       {:mint, "~> 1.0", override: true},
-      {:robotica_plugins, path: "../robotica_plugins"}
+      {:robotica_common, path: "../robotica_common"}
     ]
   end
 

@@ -27,12 +27,12 @@ RUN apk update && \
   mix local.hex --force
 
 # This builds the dependancies
-COPY robotica_plugins/mix.exs robotica_plugins/mix.lock /opt/robotica_plugins/
+COPY robotica_common/mix.exs robotica_common/mix.lock /opt/robotica_common/
 COPY robotica_hello/mix.exs robotica_hello/mix.lock /opt/app/
 RUN mix deps.get --only prod
 
-COPY robotica_plugins/lib /opt/robotica_plugins/lib/
-COPY robotica_plugins/dummy.yaml /opt/robotica_plugins/
+COPY robotica_common/lib /opt/robotica_common/lib/
+COPY robotica_common/dummy.yaml /opt/robotica_common/
 COPY robotica_hello/config /opt/app/config/
 RUN mix deps.compile
 

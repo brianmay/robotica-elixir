@@ -9,7 +9,7 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
 config :ceryx,
   config_file: "../config/ceryx.yaml.sample"
 
-config :robotica_plugins,
+config :robotica_common,
   config_common_file: "../config/common.yaml.sample"
 
 # Print only warnings and errors during test

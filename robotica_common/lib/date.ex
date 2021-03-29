@@ -4,7 +4,7 @@ defmodule RoboticaPlugins.Date do
   """
 
   @spec get_timezone :: String.t()
-  def get_timezone(), do: Application.get_env(:robotica_plugins, :timezone)
+  def get_timezone(), do: Application.get_env(:robotica_common, :timezone)
 
   @doc """
   Converts an UTC date time to a local Date for today.

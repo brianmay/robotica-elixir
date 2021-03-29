@@ -23,7 +23,7 @@ defmodule CeryxDocker.MixProject do
   defp deps do
     [
       {:ceryx, path: "../ceryx"},
-      {:robotica_plugins, path: "../robotica_plugins"},
+      {:robotica_common, path: "../robotica_common"},
       {:robotica_face, path: "../robotica_face"}
     ]
   end

@@ -12,7 +12,7 @@ config :robotica,
   scenes_file: "../../local/config/scenes.yaml",
   timezone: "Australia/Melbourne"
 
-config :robotica_plugins,
+config :robotica_common,
   location: nil,
   config_common_file: "../../local/config/common.yaml",
   map_types: [

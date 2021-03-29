@@ -47,7 +47,7 @@ defmodule RoboticaFace.MixProject do
       {:calendar, "~> 1.0.0"},
       {:timex, "~> 3.6"},
       {:event_bus, "~> 1.6.1"},
-      {:robotica_plugins, path: "../robotica_plugins"}
+      {:robotica_common, path: "../robotica_common"}
     ]
   end
 

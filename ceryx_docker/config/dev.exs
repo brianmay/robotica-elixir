@@ -3,7 +3,7 @@ use Mix.Config
 config :ceryx,
   config_file: "../../local/config/ceryx.yaml"
 
-config :robotica_plugins,
+config :robotica_common,
   config_common_file: "../../local/config/common.yaml"
 
 # For development, we disable any cache and enable

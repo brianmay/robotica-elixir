@@ -47,7 +47,7 @@ defmodule RoboticaHello.MixProject do
       {:guardian, "~> 2.0"},
       {:bcrypt_elixir, "~> 2.0"},
       {:joken, "~> 2.3.0"},
-      {:robotica_plugins, path: "../robotica_plugins"}
+      {:robotica_common, path: "../robotica_common"}
     ]
   end
 

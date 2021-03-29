@@ -10,7 +10,7 @@ cd ../
 mix phx.digest
 cd "$OLD_PWD"
 
-for i in robotica_plugins robotica robotica_face robotica_hello robotica_ui ceryx ceryx_docker; do
+for i in robotica_common robotica robotica_face robotica_hello robotica_ui ceryx ceryx_docker; do
     cd "$i"
     mix deps.get
     mix deps.clean --unlock --unused

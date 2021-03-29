@@ -24,7 +24,7 @@ RUN apk update && \
   mix local.hex --force
 
 # This builds the dependancies
-COPY robotica_plugins/mix.exs robotica_plugins/mix.lock /opt/robotica_plugins/
+COPY robotica_common/mix.exs robotica_common/mix.lock /opt/robotica_common/
 COPY robotica_face/mix.exs robotica_face/mix.lock /opt/robotica_face/
 COPY ceryx/mix.exs ceryx/mix.lock /opt/ceryx/
 COPY ceryx_docker/mix.exs ceryx_docker/mix.lock /opt/ceryx_docker/
@@ -33,8 +33,8 @@ RUN cd /opt/ceryx_docker && mix deps.get --only prod
 
 # Build phoenix stuff
 COPY config/*.sample /opt/config/
-COPY robotica_plugins/lib /opt/robotica_plugins/lib/
-COPY robotica_plugins/dummy.yaml /opt/robotica_plugins/
+COPY robotica_common/lib /opt/robotica_common/lib/
+COPY robotica_common/dummy.yaml /opt/robotica_common/
 COPY robotica_face/lib /opt/robotica_face/lib/
 COPY robotica_face/config /opt/robotica_face/config/
 RUN cd /opt/robotica_face && mix compile

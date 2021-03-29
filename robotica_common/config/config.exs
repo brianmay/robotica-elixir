@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure your application as:
 #
-#     config :robotica_plugins, key: :value
+#     config :robotica_common, key: :value
 #
 # and access this configuration in your application as:
 #
-#     Application.get_env(:robotica_plugins, :key)
+#     Application.get_env(:robotica_common, :key)
 #
 # You can also configure a third-party app:
 #
@@ -22,7 +22,7 @@ use Mix.Config
 #
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
-config :robotica_plugins,
+config :robotica_common,
   location: nil,
   config_common_file: "../config/common.yaml.sample",
   timezone: "Australia/Melbourne",

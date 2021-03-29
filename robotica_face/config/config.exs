@@ -29,7 +29,7 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
     signing_salt: System.get_env("SIGNING_SALT")
   ]
 
-config :robotica_plugins,
+config :robotica_common,
   location: nil,
   config_common_file: "../config/common.yaml.sample",
   timezone: "Australia/Melbourne",

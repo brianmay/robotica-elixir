@@ -27,7 +27,7 @@ defmodule RoboticaUi.MixProject do
       {:scenic, "~> 0.10"},
       {:event_bus, "~> 1.6.1"},
       {:timex, "~> 3.6"},
-      {:robotica_plugins, path: "../robotica_plugins"}
+      {:robotica_common, path: "../robotica_common"}
     ]
   end
 end

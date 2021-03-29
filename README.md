@@ -7,7 +7,7 @@ automatic schedule.
 
 * config: configuration files.
 * LICENSE README.html README.md: documentation.
-* robotica_plugins: common shared code.
+* robotica_common: common shared code.
 * robotica base library for scheduling and interacting with devices.
 * robotica_face: Web based interface.
 * robotica_hello: Authentication for web based interface.

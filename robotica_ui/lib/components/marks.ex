@@ -13,7 +13,7 @@ defmodule RoboticaUi.Components.Marks do
   def verify(step), do: {:ok, step}
 
   @graph Graph.build(styles: %{}, font_size: 20)
-  @timezone Application.get_env(:robotica_plugins, :timezone)
+  @timezone Application.get_env(:robotica_common, :timezone)
 
   defp date_time_to_local(dt) do
     {:ok, local_dt} = DateTime.shift_zone(dt, @timezone)

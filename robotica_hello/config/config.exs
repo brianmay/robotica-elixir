@@ -23,7 +23,7 @@ config :robotica_hello, RoboticaHelloWeb.Endpoint,
   render_errors: [view: RoboticaHelloWeb.ErrorView, accepts: ~w(html json)],
   pubsub_server: RoboticaHello.PubSub
 
-config :robotica_plugins,
+config :robotica_common,
   location: nil,
   config_common_file: "dummy.yaml",
   timezone: "Australia/Melbourne",

@@ -15,7 +15,7 @@ config :robotica,
   scenes_file: "../../local/config/scenes.yaml",
   timezone: "Australia/Melbourne"
 
-config :robotica_plugins,
+config :robotica_common,
   location: nil,
   config_common_file: "../../local/config/common.yaml",
   timezone: "Australia/Melbourne",
@@ -56,7 +56,7 @@ config :shoehorn,
     :nerves_init_gadget,
     :lifx,
     {RoboticaNerves.Application, :config, []},
-    :robotica_plugins,
+    :robotica_common,
     :robotica_face,
     :robotica_ui,
     :robotica

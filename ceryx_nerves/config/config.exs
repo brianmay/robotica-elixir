@@ -10,7 +10,7 @@ config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 config :ceryx,
   config_file: "../../local/config/ceryx.yaml"
 
-config :robotica_plugins,
+config :robotica_common,
   config_common_file: "../../local/config/common.yaml",
   timezone: "Australia/Melbourne",
   map_types: [

@@ -10,5 +10,5 @@ config :robotica,
   scenes_file: "test/scenes.yaml",
   timezone: "Australia/Melbourne"
 
-config :robotica_plugins,
+config :robotica_common,
   config_common_file: "../config/common.yaml.sample"

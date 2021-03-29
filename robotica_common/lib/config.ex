@@ -41,14 +41,14 @@ defmodule RoboticaPlugins.Config do
     end
   end
 
-  if Application.get_env(:robotica_plugins, :config_common_file) do
-    @filename Application.get_env(:robotica_plugins, :config_common_file)
+  if Application.get_env(:robotica_common, :config_common_file) do
+    @filename Application.get_env(:robotica_common, :config_common_file)
     @external_resource @filename
     @common_config Loader.ui_common_configuration(@filename)
     defp common_config(), do: @common_config
   else
     defp common_config() do
-      filename = Application.get_env(:robotica_plugins, :config_common_file)
+      filename = Application.get_env(:robotica_common, :config_common_file)
       Loader.ui_common_configuration(filename)
     end
   end
@@ -59,7 +59,7 @@ defmodule RoboticaPlugins.Config do
   end
 
   def ui_default_location do
-    case Application.get_env(:robotica_plugins, :location) do
+    case Application.get_env(:robotica_common, :location) do
       nil ->
         Map.fetch!(common_config().hosts, hostname())
 

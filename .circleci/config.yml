@@ -16,32 +16,32 @@ jobs:
       - run:
           name: Install hex and rebar
           command: |
-            cd robotica_plugins
+            cd robotica_common
             mix local.hex --force
             mix local.rebar --force
 
       - run:
           name: Install dependencies
           command: |
-            cd robotica_plugins
+            cd robotica_common
             export MIX_ENV=test
             mix deps.get
 
       - run:
           name: Compile
           command: |
-            cd robotica_plugins
+            cd robotica_common
             export MIX_ENV=test
             mix compile
 
       - run:
           name: Run tests
           command: |
-            cd robotica_plugins
+            cd robotica_common
             mix test
 
       - store_test_results:
-          path: robotica_plugins/_build/test/lib/robotica_plugins
+          path: robotica_common/_build/test/lib/robotica_common
 
   build-robotica:
     docker:
