@@ -48,9 +48,9 @@ defmodule Robotica.Plugins.Dummy do
       {:ok, command} ->
         if command.type == "device" or command.type == nil do
           handle_command(state, command)
-          state
         else
           Logger.info("Wrong type #{command.type}, expected device")
+          state
         end
 
       {:error, error} ->
