@@ -115,6 +115,7 @@ defmodule Robotica.Plugins.HDMI do
           handle_command(state, command)
         else
           Logger.info("Wrong type #{command.type}, expected hdmi")
+          state
         end
 
       {:error, error} ->

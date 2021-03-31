@@ -749,6 +749,7 @@ defmodule Robotica.Plugins.LIFX do
         {:ok, command} ->
           if command.type == "light" or command.type == nil do
             handle_command(state, command)
+            state
           else
             Logger.info("Wrong type #{command.type}, expected light")
           end

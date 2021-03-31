@@ -426,6 +426,7 @@ defmodule Robotica.Plugins.Audio do
             handle_command(state, command)
           else
             Logger.info("Wrong type #{command.type}, expected audio")
+            state
           end
 
         {:error, error} ->
