@@ -28,7 +28,7 @@ defmodule Ceryx.Supervisor do
 
     EventBus.subscribe(
       {Ceryx.CeryxService,
-       ["^request_schedule$", "^command_task$", "^mark$", "^subscribe$", "^unsubscribe_all$"]}
+       ["^request_schedule$", "^command$", "^mark$", "^subscribe$", "^unsubscribe_all$"]}
     )
 
     children = [
