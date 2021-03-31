@@ -43,10 +43,10 @@ defmodule RoboticaPlugins.Buttons.Switch do
   @spec turn_on(Config.t()) :: list(RoboticaPlugins.Command.t())
   defp turn_on(%Config{} = config) do
     [
-      %RoboticaPlugins.Command{
+      %RoboticaPlugins.CommandTask{
         location: config.location,
         device: config.device,
-        msg: %{
+        command: %{
           "action" => "turn_on"
         }
       }
@@ -56,10 +56,10 @@ defmodule RoboticaPlugins.Buttons.Switch do
   @spec turn_off(Config.t()) :: list(RoboticaPlugins.Command.t())
   defp turn_off(%Config{} = config) do
     [
-      %RoboticaPlugins.Command{
+      %RoboticaPlugins.CommandTask{
         location: config.location,
         device: config.device,
-        msg: %{
+        command: %{
           "action" => "turn_off"
         }
       }

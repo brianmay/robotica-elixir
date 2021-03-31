@@ -10,9 +10,9 @@ defmodule Ceryx.CeryxService do
   end
 
   def process({:command = topic, id}) do
-    command = EventBus.fetch_event_data({topic, id})
-    Logger.info("got command #{inspect(command)}")
-    RoboticaPlugins.Mqtt.publish_command(command.location, command.device, command.msg)
+    task = EventBus.fetch_event_data({topic, id})
+    Logger.info("got command #{inspect(task)}")
+    RoboticaPlugins.Mqtt.publish_command(task.location, task.device, task.command)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 

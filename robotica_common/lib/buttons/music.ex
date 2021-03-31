@@ -47,10 +47,10 @@ defmodule RoboticaPlugins.Buttons.Music do
   @spec play(Config.t(), String.t()) :: list(RoboticaPlugins.Command.t())
   defp play(%Config{} = config, play_list) do
     [
-      %RoboticaPlugins.Command{
+      %RoboticaPlugins.CommandTask{
         location: config.location,
         device: config.device,
-        msg: %{
+        command: %{
           "music" => %{"play_list" => play_list}
         }
       }
@@ -60,10 +60,10 @@ defmodule RoboticaPlugins.Buttons.Music do
   @spec stop(Config.t()) :: list(RoboticaPlugins.Command.t())
   defp stop(%Config{} = config) do
     [
-      %RoboticaPlugins.Command{
+      %RoboticaPlugins.CommandTask{
         location: config.location,
         device: config.device,
-        msg: %{
+        command: %{
           "music" => %{
             "stop" => true
           }

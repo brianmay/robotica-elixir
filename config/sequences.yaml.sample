@@ -2,31 +2,41 @@
     - required_time: "00:10:00"
       tasks:
         - locations: ["Adult"]
-          action:
-            lights:
-              action: turn_on
-              color: { hue: 0, saturation: 0, brightness: 1, kelvin: 3500 }
+          devices: ["Light"]
+          command:
+            action: turn_on
+            color: { hue: 0, saturation: 0, brightness: 1, kelvin: 3500 }
 
     - required_time: "00:05:00"
       tasks:
         - locations: ["Adult"]
-          action:
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Adult 5 minutes.
-            lights:
-              action: turn_on
-              color: { hue: 0, saturation: 0, brightness: 10, kelvin: 3500 }
-              duration: 30
+        - locations: ["Adult"]
+          devices: ["Light"]
+          command:
+            type: "lights"
+            action: turn_on
+            color: { hue: 0, saturation: 0, brightness: 10, kelvin: 3500 }
+            duration: 30
 
     - required_time: "00:10:00"
       zero_time: true
       tasks:
         - locations: ["Adult"]
-          action:
-            lights:
-              action: turn_on
-              color: { hue: 0, saturation: 0, brightness: 100, kelvin: 3500 }
-              duration: 30
+          devices: ["Light"]
+          command:
+            type: "lights"
+            action: turn_on
+            color: { hue: 0, saturation: 0, brightness: 100, kelvin: 3500 }
+            duration: 30
+        - locations: ["Adult"]
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Adult wake up.
             music:
@@ -35,7 +45,9 @@
     - required_time: "00:10:00"
       tasks:
         - locations: ["Adult"]
-          action:
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Adult breakfast.
             music:
@@ -44,14 +56,18 @@
     - required_time: "00:10:00"
       tasks:
         - locations: ["Adult"]
-          action:
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Adult teeth.
 
     - required_time: "00:05:00"
       tasks:
         - locations: ["Adult"]
-          action:
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Adult lunch and unplug car.
 
@@ -60,11 +76,16 @@
       zero_time: true
       tasks:
         - locations: ["Kids"]
-          action:
-            lights:
-              action: turn_on
-              color: { hue: 0, saturation: 0, brightness: 100, kelvin: 3500 }
-              duration: 10
+          devices: ["Light"]
+          command:
+            type: "lights"
+            action: turn_on
+            color: { hue: 0, saturation: 0, brightness: 100, kelvin: 3500 }
+            duration: 10
+        - locations: ["Kids"]
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Kids wake up.
             music:
@@ -73,38 +94,49 @@
     - required_time: "00:05:00"
       tasks:
         - locations: ["Kids", "Dining"]
-          action:
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Kids eat breakfast.
 
     - required_time: "00:10:00"
       tasks:
         - locations: ["Kids"]
-          action:
+          devices: ["Robotica"]
+          command:
             music:
               stop: true
 
     - required_time: "00:05:00"
       tasks:
         - locations: ["Kids", "Dining"]
-          action:
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Kids clean teeth.
 
     - required_time: "00:03:00"
       tasks:
         - locations: ["Kids", "Dining"]
-          action:
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Kids put shoes on.
 
     - required_time: "00:02:00"
       tasks:
         - locations: ["Kids", "Dining"]
-          action:
-            lights:
-              action: flash
-              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+          command:
+            type: "lights"
+            action: flash
+            color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Kids", "Dining"]
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Kids time to go.
 
@@ -112,115 +144,146 @@
     - required_time: "00:30:00"
       zero_time: true
       tasks:
+        - locations: ["Dining"]
+          devices: ["Light"]
+          command:
+            type: "lights"
+            action: flash
+            color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
         - locations:
+          devices: ["Robotica"]
           - Dining
-          action:
-            lights:
-              action: flash
-              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+          command:
+            type: "audio"
             message:
               text: Time for lunch
 
 "tea_time":
     - required_time: "00:30:00"
       tasks:
-        - locations:
-          - Dining
-          action:
-            lights:
-              action: flash
-              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Dining"]
+          devices: ["Light"]
+          command:
+            type: "lights"
+            action: flash
+            color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Dining"]
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Adult make tea.
     - required_time: "00:30:00"
       zero_time: true
       tasks:
-        - locations:
-          - Dining
-          action:
-            lights:
-              action: flash
-              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Dining"]
+          devices: ["Light"]
+          command:
+            type: "lights"
+            action: flash
+            color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Dining"]
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Time for tea.
 
 "adults:sleep":
     - required_time: "01:00:00"
       tasks:
-        - locations:
-          - Adult
-          action:
-            lights:
-              action: flash
-              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Adult"]
+          devices: ["Light"]
+          command:
+            type: "lights"
+            action: flash
+            color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Adult"]
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Adult get ready for bed.
     - required_time: "03:00:00"
       zero_time: true
       tasks:
-        - locations:
-          - Adult
-          action:
-            lights:
-              action: flash
-              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Adult"]
+          devices: ["Light"]
+          command:
+            type: "lights"
+            action: flash
+            color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Adult"]
+          devices: ["Robotica"]
+          command:
             message:
               text: Adult get into bed.
             music:
               play_list: red
     - required_time: "00:00:00"
       tasks:
-        - locations:
-          - Adult
-          action:
+        - locations: ["Adult"]
+          devices: ["Robotica"]
+          command:
             music:
               stop: true
 
 "kids:sleep":
     - required_time: "00:15:00"
       tasks:
-        - locations:
-          - Kids
-          - Dining
-          action:
-            lights:
-              action: flash
-              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Kids", "Dining"]
+          devices: ["Light"]
+          command:
+            type: "lights"
+            action: flash
+            color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Kids", "Dining"]
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Kids clean your teeth.
 
     - required_time: "00:15:00"
       tasks:
-        - locations:
-          - Kids
-          - Dining
-          action:
-            lights:
-              action: flash
-              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Kids", "Dining"]
+          devices: ["Light"]
+          command:
+            type: "lights"
+            action: flash
+            color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Kids", "Dining"]
+          devices: ["Robotica"]
+          command:
             message:
               text: Kids book time. 30 minutes to bed time.
 
     - required_time: "00:15:00"
       tasks:
-        - locations:
-          - Kids
-          - Dining
-          action:
-            lights:
-              action: flash
+        - locations: ["Kids", "Dining"]
+          devices: ["Light"]
+          command:
+            type: "lights"
+            action: flash
+        - locations: ["Kids", "Dining"]
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Kids talk time. 15 minutes to bed time.
 
     - required_time: "00:05:00"
       zero_time: true
       tasks:
-        - locations:
-          - Kids
-          - Dining
-          action:
-            lights:
-              action: flash
-              color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Kids", "Dining"]
+          devices: ["Light"]
+          command:
+            type: "lights"
+            action: flash
+            color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
+        - locations: ["Kids", "Dining"]
+          devices: ["Robotica"]
+          command:
+            type: "audio"
             message:
               text: Kids get into bed and sleep and stop talking.

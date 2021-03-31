@@ -15,10 +15,9 @@ defmodule Robotica.Executor do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  @spec execute(server :: pid | atom, task :: RoboticaPlugins.Task.t()) :: nil
-  def execute(server, %RoboticaPlugins.Task{} = task) do
-    GenServer.cast(server, {:execute, task})
-    nil
+  @spec execute_tasks(tasks :: list(RoboticaPlugins.Task.t())) :: :ok
+  def execute_tasks(tasks) do
+    GenServer.cast(Robotica.Executor, {:execute_tasks, tasks})
   end
 
   ## Server Callbacks
@@ -27,39 +26,37 @@ defmodule Robotica.Executor do
     {:ok, %State{}}
   end
 
-  @spec get_required_plugins(
-          state :: State.t(),
-          locations :: list(String.t()),
-          devices :: list(String.t())
-        ) :: list(pid)
-  defp get_required_plugins(_state, locations, devices) do
-    Robotica.PluginRegistry.lookup(locations, devices)
-  end
+  @spec handle_execute_tasks(tasks :: list(RoboticaPlugins.Task.t())) :: :ok
+  defp handle_execute_tasks(tasks) do
+    Enum.each(tasks, fn scheduled_task ->
+      Enum.each(scheduled_task.locations, fn location ->
+        Enum.each(scheduled_task.devices, fn device ->
+          command = %RoboticaPlugins.CommandTask{
+            location: location,
+            device: device,
+            command: scheduled_task.command
+          }
 
-  @spec handle_execute(
-          state :: State.t(),
-          task :: RoboticaPlugins.Task.t()
-        ) :: nil
-  defp handle_execute(state, task) do
-    locations = task.locations
-    devices = task.devices
-    action = task.action
-
-    plugins = get_required_plugins(state, locations, devices)
-
-    Enum.each(plugins, fn pid ->
-      Robotica.Plugin.execute(pid, action)
+          Robotica.PluginRegistry.execute_command_task(command, remote: false)
+        end)
+      end)
     end)
 
-    Enum.each(plugins, fn pid ->
-      Robotica.Plugin.wait(pid)
-    end)
+    # Hack: Wait for messages to complete
+    has_msg? =
+      Enum.any?(tasks, fn scheduled_task ->
+        scheduled_task.command["type"] == "audio" and scheduled_task.command["message"] != nil
+      end)
 
-    nil
+    if has_msg? do
+      Process.sleep(20_000)
+    end
+
+    :ok
   end
 
-  def handle_cast({:execute, task}, state) do
-    handle_execute(state, task)
+  def handle_cast({:execute_tasks, tasks}, state) do
+    :ok = handle_execute_tasks(tasks)
     {:noreply, state}
   end
 end

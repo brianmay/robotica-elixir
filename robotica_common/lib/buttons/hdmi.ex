@@ -45,10 +45,10 @@ defmodule RoboticaPlugins.Buttons.HDMI do
   @spec switch(Config.t()) :: list(RoboticaPlugins.Command.t())
   defp switch(%Config{} = config) do
     [
-      %RoboticaPlugins.Command{
+      %RoboticaPlugins.CommandTask{
         location: config.location,
         device: config.device,
-        msg: %{
+        command: %{
           "input" => config.params["input"],
           "output" => config.params["output"]
         }

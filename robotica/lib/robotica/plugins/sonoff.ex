@@ -105,7 +105,11 @@ defmodule Robotica.Plugins.SonOff do
   def handle_cast({:mqtt, _, :command, command}, state) do
     case Robotica.Config.validate_device_command(command) do
       {:ok, command} ->
-        handle_command(state, command)
+        if command.type == "device" or command.type == nil do
+          handle_command(state, command)
+        else
+          Logger.info("Wrong type #{command.type}, expected device")
+        end
 
       {:error, error} ->
         Logger.error("Invalid sonoff command received: #{inspect(error)}.")
@@ -125,18 +129,6 @@ defmodule Robotica.Plugins.SonOff do
       msg != "Online" -> publish_device_hard_off(state)
       state.last_power != nil -> publish_device_state(state, state.last_power)
       true -> publish_device_unknown(state)
-    end
-
-    {:noreply, state}
-  end
-
-  def handle_cast({:execute, action}, state) do
-    case action.device do
-      nil ->
-        nil
-
-      command ->
-        handle_command(state, command)
     end
 
     {:noreply, state}

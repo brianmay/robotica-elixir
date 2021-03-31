@@ -747,7 +747,11 @@ defmodule Robotica.Plugins.LIFX do
     state =
       case Robotica.Config.validate_lights_command(command) do
         {:ok, command} ->
-          handle_command(state, command)
+          if command.type == "light" or command.type == nil do
+            handle_command(state, command)
+          else
+            Logger.info("Wrong type #{command.type}, expected light")
+          end
 
         {:error, error} ->
           Logger.error("#{prefix(state)} Invalid lifx command received: #{inspect(error)}.")
@@ -791,16 +795,6 @@ defmodule Robotica.Plugins.LIFX do
       Logger.info("#{prefix(state)} got deleted #{inspect(device)}")
       publish_device_hard_off(state)
     end
-
-    {:noreply, state}
-  end
-
-  def handle_cast({:execute, action}, %State{} = state) do
-    state =
-      case action.lights do
-        nil -> state
-        command -> handle_command(state, command)
-      end
 
     {:noreply, state}
   end

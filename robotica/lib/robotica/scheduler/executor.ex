@@ -138,14 +138,16 @@ defmodule Robotica.Scheduler.Executor do
     end)
   end
 
+  @spec execute_tasks(list(RoboticaPlugins.Task.t())) :: :ok
+  defp execute_tasks(tasks) do
+    :ok = Robotica.Executor.execute_tasks(tasks)
+  end
+
   defp do_step(%RoboticaPlugins.ScheduledStep{id: id, mark: mark, tasks: tasks}) do
     cond do
       is_nil(mark) ->
         Logger.info("Executing step #{id}.")
-
-        Enum.each(tasks, fn scheduled_task ->
-          Robotica.Executor.execute(Robotica.Executor, scheduled_task)
-        end)
+        execute_tasks(tasks)
 
       mark == :done ->
         Logger.info("Skipping done step #{id}.")
@@ -155,10 +157,7 @@ defmodule Robotica.Scheduler.Executor do
 
       true ->
         Logger.info("Executing marked task #{id}.")
-
-        Enum.each(tasks, fn scheduled_task ->
-          Robotica.Executor.execute(Robotica.Executor, scheduled_task)
-        end)
+        execute_tasks(tasks)
     end
   end
 

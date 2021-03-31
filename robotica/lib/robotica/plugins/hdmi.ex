@@ -111,24 +111,16 @@ defmodule Robotica.Plugins.HDMI do
   def handle_cast({:mqtt, _, :command, command}, %Robotica.Plugin{} = state) do
     case Robotica.Config.validate_hdmi_command(command) do
       {:ok, command} ->
-        handle_command(state, command)
+        if command.type == "hdmi" or command.type == nil do
+          handle_command(state, command)
+        else
+          Logger.info("Wrong type #{command.type}, expected hdmi")
+        end
 
       {:error, error} ->
         Logger.error(
           "HDMI #{state.config.host}: Invalid hdmi command received: #{inspect(error)}."
         )
-    end
-
-    {:noreply, state}
-  end
-
-  def handle_cast({:execute, action}, %Robotica.Plugin{} = state) do
-    case action.hdmi do
-      nil ->
-        nil
-
-      command ->
-        handle_command(state, command)
     end
 
     {:noreply, state}

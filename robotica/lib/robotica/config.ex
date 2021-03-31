@@ -152,9 +152,9 @@ defmodule Robotica.Config do
     end
   end
 
-  @spec validate_task(map) :: {:error, any} | {:ok, RoboticaPlugins.Task.t()}
-  def validate_task(%{} = data) do
-    Validation.validate_schema(data, Schema.task_schema())
+  @spec validate_tasks(map) :: {:error, any} | {:ok, list(RoboticaPlugins.Task.t())}
+  def validate_tasks(data) do
+    Validation.validate_schema(data, {:list, Schema.task_schema()})
   end
 
   @spec validate_audio_command(map) :: {:error, any} | {:ok, any}

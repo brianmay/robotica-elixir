@@ -59,6 +59,7 @@ defmodule RoboticaPlugins.Schema do
 
   def lights_action_schema do
     %{
+      type: {:string, false},
       stop_scenes: {{:list, :string}, false},
       stop_priorities: {{:list, :integer}, false},
       scene: {:string, false},
@@ -88,6 +89,7 @@ defmodule RoboticaPlugins.Schema do
 
   def hdmi_action_schema do
     %{
+      type: {:string, false},
       input: {:integer, true},
       output: {:integer, true}
     }
@@ -95,12 +97,14 @@ defmodule RoboticaPlugins.Schema do
 
   def device_action_schema do
     %{
+      type: {:string, false},
       action: {:string, true}
     }
   end
 
   def audio_action_schema do
     %{
+      type: {:string, false},
       sound: {sound_action_schema(), false},
       music: {music_action_schema(), false},
       message: {message_action_schema(), false},
@@ -108,25 +112,12 @@ defmodule RoboticaPlugins.Schema do
     }
   end
 
-  def action_schema do
-    %{
-      struct_type: RoboticaPlugins.Action,
-      sound: {sound_action_schema(), false},
-      music: {music_action_schema(), false},
-      message: {message_action_schema(), false},
-      volume: {volume_action_schema(), false},
-      lights: {lights_action_schema(), false},
-      hdmi: {hdmi_action_schema(), false},
-      device: {device_action_schema(), false}
-    }
-  end
-
   def task_schema do
     %{
       struct_type: RoboticaPlugins.Task,
-      action: {action_schema(), true},
+      command: {{:map, :string, :any}, true},
       locations: {{:list, :string}, true},
-      devices: {{:list, :string}, false}
+      devices: {{:list, :string}, true}
     }
   end
 

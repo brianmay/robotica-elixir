@@ -101,7 +101,11 @@ defmodule Robotica.Plugins.Hs100 do
   def handle_cast({:mqtt, _, :command, command}, %State{} = state) do
     case Robotica.Config.validate_device_command(command) do
       {:ok, command} ->
-        handle_command(state, command)
+        if command.type == "device" or command.type == nil do
+          handle_command(state, command)
+        else
+          Logger.info("Wrong type #{command.type}, expected device")
+        end
 
       {:error, error} ->
         Logger.error("Invalid hs100 command received: #{inspect(error)}.")
@@ -131,18 +135,6 @@ defmodule Robotica.Plugins.Hs100 do
   def handle_cast({:deleted, %TpLinkHs100.Device{} = device}, %State{} = state) do
     if device.id == state.config.id do
       :ok = publish_device_hard_off(state)
-    end
-
-    {:noreply, state}
-  end
-
-  def handle_cast({:execute, action}, %State{} = state) do
-    case action.device do
-      nil ->
-        nil
-
-      command ->
-        handle_command(state, command)
     end
 
     {:noreply, state}

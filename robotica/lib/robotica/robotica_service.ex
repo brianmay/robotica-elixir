@@ -11,18 +11,8 @@ defmodule Robotica.RoboticaService do
   end
 
   def process({:command = topic, id}) do
-    command = EventBus.fetch_event_data({topic, id})
-
-    case Robotica.PluginRegistry.lookup_single(command.location, command.device) do
-      nil ->
-        Logger.info("got command #{inspect(command)} - remote")
-        RoboticaPlugins.Mqtt.publish_command(command.location, command.device, command.msg)
-
-      pid ->
-        Logger.info("got command #{inspect(command)} - local")
-        :ok = GenServer.cast(pid, {:mqtt, [], :command, command.msg})
-    end
-
+    task = EventBus.fetch_event_data({topic, id})
+    Robotica.PluginRegistry.execute_command_task(task, remote: true)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 

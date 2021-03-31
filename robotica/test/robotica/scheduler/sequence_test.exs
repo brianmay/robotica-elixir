@@ -14,7 +14,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
 
   def assert_tasks(tasks, message) do
     task = hd(tasks)
-    assert task.action.message.text == message
+    assert task.command["message"]["text"] == message
   end
 
   test "expand_schedule" do
@@ -74,7 +74,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
           %RoboticaPlugins.Task{
             locations: ["here"],
             devices: ["here"],
-            action: %RoboticaPlugins.Action{}
+            command: %{}
           }
         ]
       },
@@ -86,7 +86,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
           %RoboticaPlugins.Task{
             locations: ["here"],
             devices: ["here"],
-            action: %RoboticaPlugins.Action{}
+            command: %{}
           }
         ]
       },
@@ -98,7 +98,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
           %RoboticaPlugins.Task{
             locations: ["here"],
             devices: ["here"],
-            action: %RoboticaPlugins.Action{}
+            command: %{}
           }
         ]
       }

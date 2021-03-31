@@ -40,7 +40,7 @@ defmodule RoboticaPlugins.Validation do
 
     case {required, sub_data} do
       {true, nil} ->
-        {:error, "Value #{key} is not provided"}
+        {:error, "Value #{key} is not provided in #{inspect(data)}"}
 
       {_, sub_data} ->
         with {:ok, new_head} <- validate_schema(sub_data, sub_schema),

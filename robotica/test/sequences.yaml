@@ -1,54 +1,60 @@
 "open_presents":
     - required_time: "00:05:00"
       tasks:
-        - locations:
-          - kids
-          action:
+        - locations: ["kids"]
+          devices: ["robotica"]
+          command:
+            type: "audio"
             message:
               text: Time to wakeup. It is am emergency!
             music:
               play_list: wake_up
     - required_time: "00:05:00"
       tasks:
-        - locations:
-          - kids
-          action:
+        - locations: ["kids"]
+          devices: ["robotica"]
+          command:
+            type: "audio"
             message:
               text: Time to wakeup the adults.
             music:
               play_list: wake_up
     - required_time: "00:05:00"
       tasks:
-        - locations:
-          - kids
-          action:
+        - locations: ["kids"]
+          devices: ["robotica"]
+          command:
+            type: "audio"
             message:
               text: Time to wakeup the adults.
             music:
               play_list: wake_up
     - required_time: "00:05:00"
       tasks:
-        - locations:
-          - kids
-          action:
+        - locations: ["kids"]
+          devices: ["robotica"]
+          command:
+            type: "audio"
             message:
               text: Time to wakeup the adults.
             music:
               play_list: wake_up
     - required_time: "00:05:00"
       tasks:
-        - locations:
-          - kids
-          action:
+        - locations: ["kids"]
+          devices: ["robotica"]
+          command:
+            type: "audio"
             message:
               text: Time to wakeup the adults.
             music:
               play_list: wake_up
     - required_time: "00:05:00"
       tasks:
-        - locations:
-          - kids
-          action:
+        - locations: ["kids"]
+          devices: ["robotica"]
+          command:
+            type: "audio"
             message:
               text: Time to wakeup the adults.
             music:
@@ -57,8 +63,9 @@
       latest_time: "01:00:00"
       zero_time: true
       tasks:
-        - locations:
-          - kids
-          action:
+        - locations: ["kids"]
+          devices: ["robotica"]
+          command:
+            type: "audio"
             message:
               text: Time to open presents.

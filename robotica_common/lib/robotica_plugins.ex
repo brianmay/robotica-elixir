@@ -1,22 +1,5 @@
 defmodule RoboticaPlugins do
-  defmodule Action do
-    @type t :: %__MODULE__{
-            message: map() | nil,
-            lights: map() | nil,
-            sound: map() | nil,
-            music: map() | nil,
-            volume: map() | nil,
-            hdmi: map() | nil,
-            device: map() | nil
-          }
-    defstruct message: nil,
-              lights: nil,
-              sound: nil,
-              music: nil,
-              volume: nil,
-              hdmi: nil,
-              device: nil
-
+  defmodule Command do
     defp v(value), do: not is_nil(value)
 
     defp add_list_if_cond(list, true, item), do: [item | list]
@@ -25,69 +8,83 @@ defmodule RoboticaPlugins do
     defp add_list_if_empty([], item), do: [item]
     defp add_list_if_empty(list, _), do: list
 
-    def action_to_text(%Action{} = action) do
-      message_volume = get_in(action.message, [:volume])
-      message_text = get_in(action.message, [:text])
-      lights_action = get_in(action.lights, [:action])
-      lights_scene = get_in(action.lights, [:scene])
-      device_action = get_in(action.device, [:action])
-      hdmi_source = get_in(action.hdmi, [:source])
-      music_playlist = get_in(action.music, [:play_list])
-      music_stop = get_in(action.music, [:stop])
-      music_volume = get_in(action.music, [:volume])
+    def command_to_text(%{"type" => "audio"} = command) do
+      message_text = get_in(command, ["message", "text"])
+      music_playlist = get_in(command, ["music", "play_list"])
+      music_stop = get_in(command, ["music", "stop"])
 
-      volume =
-        case message_volume do
-          nil -> ""
-          volume -> " at volume #{volume}%"
-        end
+      message_volume = get_in(command, ["volume", "message"])
+      music_volume = get_in(command, ["volume", "music"])
 
       []
-      |> add_list_if_cond(v(message_text), "Say #{message_text}#{volume}")
-      |> add_list_if_cond(v(lights_action), "Lights #{lights_action} #{lights_scene}")
-      |> add_list_if_cond(v(lights_scene), "Lights #{lights_scene}")
-      |> add_list_if_cond(v(device_action), "Device #{device_action}")
-      |> add_list_if_cond(v(hdmi_source), "HDMI #{hdmi_source}")
+      |> add_list_if_cond(v(message_volume), "Message #{message_volume}%")
+      |> add_list_if_cond(v(message_text), "Message #{message_text}")
       |> add_list_if_cond(v(music_stop) and music_stop, "Music Stop")
+      |> add_list_if_cond(v(music_volume), "Music #{music_volume}%")
       |> add_list_if_cond(v(music_playlist), "Music #{music_playlist}")
-      |> add_list_if_cond(v(music_volume), "Volume #{music_volume}%")
       |> add_list_if_empty("N/A")
       |> Enum.join(", ")
     end
 
-    def action_to_message(%Action{} = action) do
+    def command_to_text(%{"type" => "lights"} = command) do
+      lights_action = get_in(command, ["action"])
+      lights_scene = get_in(command, ["scene"])
+
+      []
+      |> add_list_if_cond(v(lights_action), "Lights #{lights_action} #{lights_scene}")
+      |> add_list_if_cond(v(lights_scene), "Lights #{lights_scene}")
+      |> add_list_if_empty("N/A")
+      |> Enum.join(", ")
+    end
+
+    def command_to_text(%{"type" => "device"} = command) do
+      device_action = get_in(command, ["action"])
+
+      []
+      |> add_list_if_cond(v(device_action), "Device #{device_action}")
+      |> add_list_if_empty("N/A")
+      |> Enum.join(", ")
+    end
+
+    def command_to_text(%{"type" => "hdmi"} = command) do
+      hdmi_source = get_in(command, ["source"])
+
+      []
+      |> add_list_if_cond(v(hdmi_source), "HDMI #{hdmi_source}")
+      |> add_list_if_empty("N/A")
+      |> Enum.join(", ")
+    end
+
+    def command_to_text(command) do
+      inspect(command)
+    end
+
+    def command_to_message(%{type: "audio"} = action) do
       get_in(action.message, [:text])
     end
-  end
 
-  defmodule Command do
-    @type t :: %__MODULE__{
-            location: String.t(),
-            device: String.t(),
-            msg: map()
-          }
-    @enforce_keys [:location, :device, :msg]
-    defstruct location: nil, device: nil, msg: nil
+    def command_to_message(%{}) do
+      ""
+    end
   end
 
   defmodule Task do
     @type t :: %__MODULE__{
             locations: list(String.t()),
             devices: list(String.t()),
-            action: Action.t()
+            command: map()
           }
-    @enforce_keys [:locations, :devices, :action]
-    defstruct locations: [], devices: [], action: nil
+    @enforce_keys [:locations, :devices, :command]
+    defstruct locations: [], devices: [], command: nil
 
     def task_to_text(%Task{} = task, opts \\ []) do
       list = []
 
-      action_str = Action.action_to_text(task.action)
+      action_str = Command.command_to_text(task.command)
       list = [action_str | list]
 
       list =
         case task.devices do
-          nil -> list
           [] -> ["Nowhere:" | list]
           devices -> [Enum.join(devices, ", ") <> ":" | list]
         end
@@ -96,7 +93,6 @@ defmodule RoboticaPlugins do
         case opts[:include_locations] do
           true ->
             case task.locations do
-              nil -> list
               [] -> ["Nowhere:" | list]
               locations -> [Enum.join(locations, ", ") <> ":" | list]
             end
@@ -147,7 +143,7 @@ defmodule RoboticaPlugins do
     @type t :: %__MODULE__{
             required_time: %DateTime{},
             latest_time: %DateTime{},
-            tasks: list(Task.t()),
+            tasks: list(CommandTask.t()),
             id: String.t(),
             mark: :done | :cancelled | nil,
             repeat_number: integer | nil

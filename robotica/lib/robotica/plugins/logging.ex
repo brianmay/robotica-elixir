@@ -24,9 +24,4 @@ defmodule Robotica.Plugins.Logging do
     Logger.info(inspect(command))
     {:noreply, state}
   end
-
-  def handle_cast({:execute, action}, state) do
-    Logger.info(inspect(action))
-    {:noreply, state}
-  end
 end
