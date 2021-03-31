@@ -45,7 +45,8 @@ defmodule Robotica.Executor do
     # Hack: Wait for messages to complete
     has_msg? =
       Enum.any?(tasks, fn scheduled_task ->
-        scheduled_task.command["type"] == "audio" and scheduled_task.command["message"] != nil
+        correct_type = scheduled_task.command["type"] == "audio" or scheduled_task.command["type"] == nil
+        correct_type and scheduled_task.command["message"] != nil
       end)
 
     if has_msg? do
