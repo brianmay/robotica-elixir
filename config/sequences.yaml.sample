@@ -18,7 +18,7 @@
         - locations: ["Adult"]
           devices: ["Light"]
           command:
-            type: "lights"
+            type: "light"
             action: turn_on
             color: { hue: 0, saturation: 0, brightness: 10, kelvin: 3500 }
             duration: 30
@@ -29,7 +29,7 @@
         - locations: ["Adult"]
           devices: ["Light"]
           command:
-            type: "lights"
+            type: "light"
             action: turn_on
             color: { hue: 0, saturation: 0, brightness: 100, kelvin: 3500 }
             duration: 30
@@ -78,7 +78,7 @@
         - locations: ["Kids"]
           devices: ["Light"]
           command:
-            type: "lights"
+            type: "light"
             action: turn_on
             color: { hue: 0, saturation: 0, brightness: 100, kelvin: 3500 }
             duration: 10
@@ -130,7 +130,7 @@
       tasks:
         - locations: ["Kids", "Dining"]
           command:
-            type: "lights"
+            type: "light"
             action: flash
             color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
         - locations: ["Kids", "Dining"]
@@ -147,7 +147,7 @@
         - locations: ["Dining"]
           devices: ["Light"]
           command:
-            type: "lights"
+            type: "light"
             action: flash
             color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
         - locations:
@@ -164,7 +164,7 @@
         - locations: ["Dining"]
           devices: ["Light"]
           command:
-            type: "lights"
+            type: "light"
             action: flash
             color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
         - locations: ["Dining"]
@@ -179,7 +179,7 @@
         - locations: ["Dining"]
           devices: ["Light"]
           command:
-            type: "lights"
+            type: "light"
             action: flash
             color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
         - locations: ["Dining"]
@@ -195,7 +195,7 @@
         - locations: ["Adult"]
           devices: ["Light"]
           command:
-            type: "lights"
+            type: "light"
             action: flash
             color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
         - locations: ["Adult"]
@@ -210,7 +210,7 @@
         - locations: ["Adult"]
           devices: ["Light"]
           command:
-            type: "lights"
+            type: "light"
             action: flash
             color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
         - locations: ["Adult"]
@@ -234,7 +234,7 @@
         - locations: ["Kids", "Dining"]
           devices: ["Light"]
           command:
-            type: "lights"
+            type: "light"
             action: flash
             color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
         - locations: ["Kids", "Dining"]
@@ -249,7 +249,7 @@
         - locations: ["Kids", "Dining"]
           devices: ["Light"]
           command:
-            type: "lights"
+            type: "light"
             action: flash
             color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
         - locations: ["Kids", "Dining"]
@@ -263,7 +263,7 @@
         - locations: ["Kids", "Dining"]
           devices: ["Light"]
           command:
-            type: "lights"
+            type: "light"
             action: flash
         - locations: ["Kids", "Dining"]
           devices: ["Robotica"]
@@ -278,7 +278,7 @@
         - locations: ["Kids", "Dining"]
           devices: ["Light"]
           command:
-            type: "lights"
+            type: "light"
             action: flash
             color: { hue: 240, saturation: 50, brightness: 100, kelvin: 2500 }
         - locations: ["Kids", "Dining"]

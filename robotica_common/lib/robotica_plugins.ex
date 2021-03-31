@@ -26,7 +26,7 @@ defmodule RoboticaPlugins do
       |> Enum.join(", ")
     end
 
-    def command_to_text(%{"type" => "lights"} = command) do
+    def command_to_text(%{"type" => "light"} = command) do
       lights_action = get_in(command, ["action"])
       lights_scene = get_in(command, ["scene"])
 
