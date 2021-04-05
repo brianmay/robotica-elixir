@@ -20,10 +20,10 @@ defmodule RoboticaUi.Scene.Clock do
     viewport = opts[:viewport]
     {:ok, %ViewPort.Status{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
 
-    ul_margin_x = 150
-    ul_margin_y = 75
+    ul_margin_x = 110
+    ul_margin_y = 10
 
-    lr_margin_x = 10
+    lr_margin_x = 250
     lr_margin_y = 10
 
     width = vp_width - ul_margin_x - lr_margin_x
@@ -37,7 +37,7 @@ defmodule RoboticaUi.Scene.Clock do
     graph =
       @graph
       |> Layout.add_background(vp_width, vp_height)
-      |> digital_clock(translate: {ul_margin_x, 50}, timezone: @timezone)
+      |> digital_clock(translate: {vp_width-lr_margin_x, 50}, timezone: @timezone)
       |> analog_clock(
         radius: radius,
         translate: {centre_x, centre_y},

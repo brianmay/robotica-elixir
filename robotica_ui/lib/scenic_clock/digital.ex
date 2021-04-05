@@ -17,9 +17,6 @@ defmodule Scenic.Clock.Digital do
   alias Scenic.Primitive.Style.Theme
   import Scenic.Primitives, only: [{:text, 2}, {:text, 3}]
 
-  # formats setup
-  @default_format "%a %k:%M:%S %z"
-
   @default_theme :dark
 
   # --------------------------------------------------------
@@ -37,24 +34,18 @@ defmodule Scenic.Clock.Digital do
       (styles[:theme] || Theme.preset(@default_theme))
       |> Theme.normalize()
 
-    format =
-      case styles[:format] do
-        nil -> @default_format
-        format -> format
-      end
-
     timezone = styles[:timezone]
 
     # set up the requested graph
     graph =
       Graph.build(styles: styles)
-      |> text("", id: :time, fill: theme.text, font_size: 64)
+      |> text("", id: :date, fill: theme.text, font_size: 32)
+      |> text("", id: :time, fill: theme.text, translate: {0, 64}, font_size: 32)
 
     {state, graph} =
       %{
         graph: graph,
         timezone: timezone,
-        format: format,
         timer: nil,
         last: nil,
         seconds: !!styles[:seconds]
@@ -95,7 +86,6 @@ defmodule Scenic.Clock.Digital do
   # --------------------------------------------------------
   defp update_time(
          %{
-           format: format,
            timezone: timezone,
            graph: graph,
            last: last
@@ -105,8 +95,12 @@ defmodule Scenic.Clock.Digital do
 
     case time != last do
       true ->
-        {:ok, time_str} = time |> Timex.format(format, :strftime)
+        {:ok, date_str} = time |> Timex.format("%F %A", :strftime)
+        graph = Graph.modify(graph, :date, &text(&1, date_str))
+
+        {:ok, time_str} = time |> Timex.format("%k:%M:%S %z", :strftime)
         graph = Graph.modify(graph, :time, &text(&1, time_str))
+
         {%{state | last: time}, graph}
 
       _ ->
