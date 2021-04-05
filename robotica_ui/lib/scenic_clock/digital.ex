@@ -18,7 +18,7 @@ defmodule Scenic.Clock.Digital do
   import Scenic.Primitives, only: [{:text, 2}, {:text, 3}]
 
   # formats setup
-  @default_format "%a %l:%M %p"
+  @default_format "%A %k:%M:%S %z"
 
   @default_theme :dark
 
@@ -48,7 +48,7 @@ defmodule Scenic.Clock.Digital do
     # set up the requested graph
     graph =
       Graph.build(styles: styles)
-      |> text("", id: :time, fill: theme.text)
+      |> text("", id: :time, fill: theme.text, font_size: 64)
 
     {state, graph} =
       %{
