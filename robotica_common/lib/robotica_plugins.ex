@@ -77,28 +77,35 @@ defmodule RoboticaPlugins do
     @enforce_keys [:locations, :devices, :command]
     defstruct locations: [], devices: [], command: nil
 
+    @spec location_device_to_text(String.t(), String.t(), keyword()) :: String.t()
+    defp location_device_to_text(location, device, opts) do
+      case opts[:include_locations] do
+        true ->
+          "/#{location}/#{device}"
+
+        _ ->
+          "#{device}"
+      end
+    end
+
+    @spec task_to_text(RoboticaPlugins.Task.t(), keyword()) :: String.t()
     def task_to_text(%Task{} = task, opts \\ []) do
       list = []
 
       action_str = Command.command_to_text(task.command)
       list = [action_str | list]
 
+      location_list =
+        Enum.reduce(task.locations, [], fn location, list ->
+          Enum.reduce(task.devices, list, fn device, list ->
+            [location_device_to_text(location, device, opts) | list]
+          end)
+        end)
+
       list =
-        case task.devices do
+        case location_list do
           [] -> ["Nowhere:" | list]
-          devices -> [Enum.join(devices, ", ") <> ":" | list]
-        end
-
-      list =
-        case opts[:include_locations] do
-          true ->
-            case task.locations do
-              [] -> ["Nowhere:" | list]
-              locations -> [Enum.join(locations, ", ") <> ":" | list]
-            end
-
-          _ ->
-            list
+          location_list -> [Enum.join(location_list, ", ") <> ":" | list]
         end
 
       Enum.join(list, " ")

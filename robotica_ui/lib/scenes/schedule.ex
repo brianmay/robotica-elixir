@@ -58,8 +58,12 @@ defmodule RoboticaUi.Scene.Schedule do
       steps
       |> Enum.map(fn step ->
         tasks =
-          Enum.filter(step.tasks, fn task ->
+          step.tasks
+          |> Enum.filter(fn task ->
             Enum.any?(task.locations, &(&1 == local_location))
+          end)
+          |> Enum.map(fn task ->
+            %{task | locations: [local_location]}
           end)
 
         %RoboticaPlugins.ScheduledStep{step | tasks: tasks}
