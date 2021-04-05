@@ -33,7 +33,7 @@ defmodule Robotica.Scheduler.Sequence do
       if step.zero_time do
         {:halt, acc}
       else
-        time = Calendar.DateTime.subtract!(acc, step.required_time)
+        time = DateTime.add(acc, -step.required_time, :second)
         {:cont, time}
       end
     end)
@@ -50,7 +50,7 @@ defmodule Robotica.Scheduler.Sequence do
         latest_time -> latest_time
       end
 
-    latest_time = Calendar.DateTime.add!(required_time, latest_time)
+    latest_time = DateTime.add(required_time, latest_time, :second)
 
     scheduled_step = %RoboticaPlugins.ScheduledStep{
       required_time: required_time,
@@ -60,7 +60,7 @@ defmodule Robotica.Scheduler.Sequence do
       repeat_number: step.repeat_number
     }
 
-    next_start_time = Calendar.DateTime.add!(start_time, step.required_time)
+    next_start_time = DateTime.add(start_time, step.required_time, :second)
     [scheduled_step | schedule_steps(tail, next_start_time)]
   end
 
@@ -132,6 +132,6 @@ defmodule Robotica.Scheduler.Sequence do
 
   def sort_schedule(scheduled_steps) do
     scheduled_steps
-    |> Enum.sort(fn x, y -> Calendar.DateTime.before?(x.required_time, y.required_time) end)
+    |> Enum.sort(fn x, y -> DateTime.compare(x.required_time, y.required_time) == :lt end)
   end
 end

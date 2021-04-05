@@ -4,8 +4,8 @@ defmodule Robotica.Scheduler.Schedule.Test do
   import Robotica.Scheduler.Schedule
 
   def local_datetime(dt) do
-    {:ok, dt} = Calendar.DateTime.from_naive(dt, "Australia/Melbourne")
-    Calendar.DateTime.shift_zone!(dt, "UTC")
+    dt = DateTime.from_naive!(dt, "Australia/Melbourne")
+    DateTime.shift_zone!(dt, "UTC")
   end
 
   def assert_datetime(dt1, dt2) do

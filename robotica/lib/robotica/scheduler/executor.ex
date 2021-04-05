@@ -59,9 +59,9 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   def init(:ok) do
-    today = Calendar.Date.today!(@timezone)
-    yesterday = Calendar.Date.add!(today, -1)
-    tomorrow = Calendar.Date.add!(today, 1)
+    today = DateTime.now!(@timezone) |> DateTime.to_date()
+    yesterday = Date.add(today, -1)
+    tomorrow = Date.add(today, 1)
 
     steps =
       []
@@ -70,7 +70,7 @@ defmodule Robotica.Scheduler.Executor do
       |> add_expanded_steps_for_date(tomorrow)
       |> Sequence.sort_schedule()
 
-    now = Calendar.DateTime.now_utc()
+    now = DateTime.utc_now()
     state = set_timer(now, {today, nil, steps})
     {:ok, state}
   end
@@ -89,8 +89,8 @@ defmodule Robotica.Scheduler.Executor do
     required_time = step.required_time
 
     cond do
-      Calendar.DateTime.before?(now, required_time) ->
-        updated_now = Calendar.DateTime.now_utc()
+      DateTime.compare(now, required_time) == :lt ->
+        updated_now = DateTime.utc_now()
         milliseconds = DateTime.diff(required_time, updated_now, :millisecond)
         # Ensure we wake up regularly so we can cope with system time changes.
         milliseconds = maximum(milliseconds, 60 * 1000)
@@ -191,22 +191,22 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   def timer(old_list, {date, _, [] = new_list}) do
-    now = Calendar.DateTime.now_utc()
+    now = DateTime.utc_now()
     Logger.debug("Got timer at time #{inspect(now)} and no schedule.")
     finalize(now, date, old_list, new_list)
   end
 
   def timer(old_list, {date, timer, [step | tail] = new_list}) do
-    now = Calendar.DateTime.now_utc()
+    now = DateTime.utc_now()
     Logger.debug("Got timer at time #{inspect(now)}.")
 
     {new_list, too_early} =
       cond do
-        Calendar.DateTime.before?(now, step.required_time) ->
+        DateTime.compare(now, step.required_time) == :lt ->
           Logger.debug("Timer received too early for #{inspect(step)}.")
           {new_list, true}
 
-        Calendar.DateTime.before?(now, step.latest_time) ->
+        DateTime.compare(now, step.latest_time) == :lt ->
           Logger.debug("Timer received for #{inspect(step)}.")
           do_step(step)
           {tail, false}
@@ -235,15 +235,15 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   defp check_time_travel({date, list}) do
-    today = Calendar.Date.today!(@timezone)
-    yesterday = Calendar.Date.add!(today, -1)
-    tomorrow = Calendar.Date.add!(today, 1)
+    today = DateTime.now!(@timezone) |> DateTime.to_date()
+    yesterday = Date.add(today, -1)
+    tomorrow = Date.add(today, 1)
 
     new_list =
       cond do
         # If we have travelled back in time, we should drop the list entirely
         # to avoid duplicating future events.
-        Calendar.Date.before?(today, date) ->
+        Date.compare(today, date) == :lt ->
           []
           |> add_expanded_steps_for_date(yesterday)
           |> add_expanded_steps_for_date(today)
@@ -253,7 +253,7 @@ defmodule Robotica.Scheduler.Executor do
 
         # If we have travelled forward in time by one day, we only need to
         # add events for tomorrow.
-        Calendar.Date.same_date?(yesterday, date) ->
+        Date.compare(yesterday, date) == :eq ->
           list
           |> add_expanded_steps_for_date(tomorrow)
           |> add_marks_to_schedule()
@@ -261,7 +261,7 @@ defmodule Robotica.Scheduler.Executor do
 
         # If we have travelled forward in time more then one day, regenerate
         # entire events list.
-        Calendar.Date.after?(today, date) ->
+        Date.compare(today, date) == :gt ->
           []
           |> add_expanded_steps_for_date(yesterday)
           |> add_expanded_steps_for_date(today)

@@ -15,7 +15,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
       </thead>
       <tbody>
         <%= for step <- @schedule do %>
-          <% iso_time = Calendar.DateTime.Format.iso8601(step.required_time) %>
+          <% iso_time = DateTime.to_iso8601(step.required_time) %>
             <tr class="<%= step.mark %>">
               <td><%= date_time_to_local(step.required_time) %></td>
               <td>
@@ -49,7 +49,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
 
   defp date_time_to_local(dt) do
     dt
-    |> Calendar.DateTime.shift_zone!("Australia/Melbourne")
+    |> DateTime.shift_zone!("Australia/Melbourne")
     |> Timex.format!("%F %T", :strftime)
   end
 
@@ -79,7 +79,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
   end
 
   def handle_event("mark", %{"mark" => status, "step_time" => step_time, "step_id" => id}, socket) do
-    step_time = Timex.parse!(step_time, "{ISO:Extended}")
+    {:ok, step_time, 0} = DateTime.from_iso8601(step_time)
 
     status =
       case status do

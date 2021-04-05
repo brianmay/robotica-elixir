@@ -4,7 +4,7 @@ defmodule RoboticaFaceWeb.ApiController do
   alias RoboticaFaceWeb.Token
 
   defp delta_to_string(scheduled, now) do
-    {:ok, seconds, _microseconds, _} = Calendar.DateTime.diff(scheduled, now)
+    seconds = DateTime.diff(scheduled, now, :second)
 
     hours = div(seconds, 3600)
     seconds = rem(seconds, 3600)
@@ -48,7 +48,7 @@ defmodule RoboticaFaceWeb.ApiController do
   defp filter_steps_before_time(steps, threshold) do
     steps
     |> Enum.filter(fn step ->
-      Calendar.DateTime.before?(step["required_time"], threshold)
+      DateTime.compare(step["required_time"], threshold) == :lt
     end)
   end
 
@@ -200,11 +200,11 @@ defmodule RoboticaFaceWeb.ApiController do
     query = Map.get(params, "queryResult", %{})
     intent = get_in(query, ["intent", "name"])
     parameters = Map.get(query, "parameters", %{})
+    now = DateTime.utc_now()
 
     case intent do
       "projects/robotica-3746c/agent/intents/c2b9befe-126f-4452-bc18-018f126f6beb" ->
         {:ok, steps} = RoboticaFace.Schedule.get_schedule()
-        now = Calendar.DateTime.now_utc()
 
         messages =
           steps
@@ -218,7 +218,6 @@ defmodule RoboticaFaceWeb.ApiController do
         }
 
       "projects/robotica-3746c/agent/intents/8059af23-6a9f-46a4-ab7f-7ea713a86d79" ->
-        now = Calendar.DateTime.now_utc()
         steps = get_filtered_steps(params, now)
         message = steps_to_message(steps, now)
         count = count_tasks(steps)
@@ -228,7 +227,6 @@ defmodule RoboticaFaceWeb.ApiController do
         }
 
       "projects/robotica-3746c/agent/intents/472a3b36-0901-4da9-9afa-09156f718f46" ->
-        now = Calendar.DateTime.now_utc()
         steps = get_filtered_steps(params, now)
         total_count = count_tasks(steps)
         status = parameters["TaskStatus"]

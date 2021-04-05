@@ -24,7 +24,7 @@ defmodule Robotica.Scheduler.Marks do
     # Add several minutes margin before deleting due to late tasks.
     now =
       DateTime.utc_now()
-      |> Calendar.DateTime.subtract!(600)
+      |> DateTime.add(-600, :second)
 
     marks =
       state.marks

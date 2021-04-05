@@ -52,7 +52,7 @@ defmodule Robotica.Scheduler.Schedule do
         Map.update(acc, datetime, [action], &[action | &1])
       end)
       |> Map.to_list()
-      |> Enum.sort(fn x, y -> Calendar.DateTime.before?(elem(x, 0), elem(y, 0)) end)
+      |> Enum.sort(fn x, y -> DateTime.compare(elem(x, 0), elem(y, 0)) == :lt end)
 
     expanded_schedule
   end

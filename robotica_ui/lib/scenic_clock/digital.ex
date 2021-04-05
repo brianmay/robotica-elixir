@@ -101,11 +101,12 @@ defmodule Scenic.Clock.Digital do
            last: last
          } = state
        ) do
-    {:ok, time} = Timex.now(timezone) |> Timex.format(format, :strftime)
+    {:ok, time} = DateTime.now(timezone)
 
     case time != last do
       true ->
-        graph = Graph.modify(graph, :time, &text(&1, time))
+        {:ok, time_str} = time |> Timex.format(format, :strftime)
+        graph = Graph.modify(graph, :time, &text(&1, time_str))
         {%{state | last: time}, graph}
 
       _ ->

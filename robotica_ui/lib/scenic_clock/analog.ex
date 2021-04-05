@@ -55,7 +55,7 @@ defmodule Scenic.Clock.Analog do
 
     timezone = styles[:timezone]
 
-    # get and calc the sizes 
+    # get and calc the sizes
     radius = styles[:radius] || @default_radius
     back_size = radius * @back_size_ratio
     hour_size = radius * @hour_size_ratio
@@ -179,7 +179,7 @@ defmodule Scenic.Clock.Analog do
            last: last
          } = state
        ) do
-    %{hour: h, minute: m, second: s} = time = Timex.now(timezone)
+    {:ok, %{hour: h, minute: m, second: s} = time} = DateTime.now(timezone)
 
     case time != last do
       true ->
