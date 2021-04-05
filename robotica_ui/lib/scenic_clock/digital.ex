@@ -18,7 +18,7 @@ defmodule Scenic.Clock.Digital do
   import Scenic.Primitives, only: [{:text, 2}, {:text, 3}]
 
   # formats setup
-  @default_format "%A %k:%M:%S %z"
+  @default_format "%a %k:%M:%S %z"
 
   @default_theme :dark
 
