@@ -24,7 +24,7 @@ defmodule Ceryx.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:dialyxir, "~> 1.0.0-rc.2", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
       {:credo, "~> 1.2.0", only: [:dev, :test], runtime: false},
       {:yaml_elixir, "~> 2.6.0"},
       {:event_bus, "~> 1.6.0"},
