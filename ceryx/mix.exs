@@ -25,7 +25,7 @@ defmodule Ceryx.MixProject do
   defp deps do
     [
       {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
-      {:credo, "~> 1.2.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
       {:yaml_elixir, "~> 2.6.0"},
       {:event_bus, "~> 1.6.0"},
       {:robotica_common, path: "../robotica_common"}
