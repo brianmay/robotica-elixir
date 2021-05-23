@@ -75,9 +75,9 @@ defmodule RoboticaPlugins.Buttons.Light do
 
   @spec get_display_state(Config.t(), state) :: Buttons.display_state()
   def get_display_state(%Config{action: "turn_on"} = config, {power, scenes, _}) do
-    has_default? = has_scene?(scenes, config.params["scene"])
+    has_scene? = has_scene?(scenes, config.params["scene"])
 
-    case {power, scenes, has_default?} do
+    case {power, scenes, has_scene?} do
       {"HARD_OFF", _, _} -> :state_hard_off
       {_, _, nil} -> nil
       {_, _, true} -> :state_on
@@ -99,9 +99,9 @@ defmodule RoboticaPlugins.Buttons.Light do
   end
 
   def get_display_state(%Config{action: "toggle"} = config, {power, scenes, _priorities}) do
-    has_default? = has_scene?(scenes, config.params["scene"])
+    has_scene? = has_scene?(scenes, config.params["scene"])
 
-    case {power, scenes, has_default?} do
+    case {power, scenes, has_scene?} do
       {"HARD_OFF", _, _} -> :state_hard_off
       {_, _, nil} -> nil
       {_, _, true} -> :state_on
