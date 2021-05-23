@@ -79,8 +79,6 @@ defmodule RoboticaPlugins.Buttons.Light do
 
     case {power, scenes, has_default?} do
       {"HARD_OFF", _, _} -> :state_hard_off
-      {"ON", [], _} -> :state_on
-      {"OFF", [], _} -> :state_off
       {_, _, nil} -> nil
       {_, _, true} -> :state_on
       {_, _, false} -> :state_off
@@ -105,8 +103,6 @@ defmodule RoboticaPlugins.Buttons.Light do
 
     case {power, scenes, has_default?} do
       {"HARD_OFF", _, _} -> :state_hard_off
-      {"ON", [], _} -> :state_on
-      {"OFF", [], _} -> :state_off
       {_, _, nil} -> nil
       {_, _, true} -> :state_on
       {_, _, false} -> :state_off
