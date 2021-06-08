@@ -1,15 +1,17 @@
 <h1><%= gettext "Welcome to %{name}!", name: "Robotica" %></h1>
 
-<p>A system for controlling IOT schedules that does not compromise speed and maintainability.</p>
-
+<p>
+  A system for controlling IOT schedules that does not compromise speed and
+  maintainability.
+</p>
 
 <%= if RoboticaFace.Auth.user_signed_in?(@conn) do %>
-    <%= live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
+  <%= live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
 
-    <ul>
-        <li><%= link("Local", to: Routes.page_path(@conn, :local)) %></li>
-        <li><%= link("Schedule", to: Routes.page_path(@conn, :schedule)) %></li>
-    </ul>
+  <ul>
+    <li><%= link("Local", to: Routes.page_path(@conn, :local)) %></li>
+    <li><%= link("Schedule", to: Routes.page_path(@conn, :schedule)) %></li>
+  </ul>
 <% else %>
-    Please <%= link("Login", to: Routes.session_path(@conn, :index)) %>.
+  Please <%= link("Login", to: Routes.session_path(@conn, :index)) %>.
 <% end %>
