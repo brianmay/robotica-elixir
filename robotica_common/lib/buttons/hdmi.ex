@@ -5,8 +5,8 @@ defmodule RoboticaPlugins.Buttons.HDMI do
   use RoboticaPlugins.EventBus
   @behaviour RoboticaPlugins.Buttons
 
-  alias RoboticaPlugins.Buttons.Config
   alias RoboticaPlugins.Buttons
+  alias RoboticaPlugins.Buttons.Config
 
   @spec get_topic_for_output(integer()) :: String.t()
   defp get_topic_for_output(n), do: "output#{n}"
@@ -42,7 +42,7 @@ defmodule RoboticaPlugins.Buttons.HDMI do
   def get_display_state(%Config{action: "switch", params: %{"input" => n}}, n), do: :state_on
   def get_display_state(%Config{action: _}, _), do: :state_off
 
-  @spec switch(Config.t()) :: list(RoboticaPlugins.Command.t())
+  @spec switch(Config.t()) :: list(RoboticaPlugins.CommandTask.t())
   defp switch(%Config{} = config) do
     [
       %RoboticaPlugins.CommandTask{
@@ -56,6 +56,6 @@ defmodule RoboticaPlugins.Buttons.HDMI do
     ]
   end
 
-  @spec get_press_commands(Config.t(), state) :: list(RoboticaPlugins.Command.t())
+  @spec get_press_commands(Config.t(), state) :: list(RoboticaPlugins.CommandTask.t())
   def get_press_commands(%Config{action: "switch"} = config, _state), do: switch(config)
 end

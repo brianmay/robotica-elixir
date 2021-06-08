@@ -70,7 +70,7 @@ config :nerves_network, :default,
   wlan0: [
     ssid: System.get_env("NERVES_NETWORK_SSID"),
     psk: System.get_env("NERVES_NETWORK_PSK"),
-    key_mgmt: String.to_atom(System.get_env("NERVES_NETWORK_MGMT"))
+    key_mgmt: String.to_atom(System.get_env("NERVES_NETWORK_MGMT") || "WPA-PSK")
   ],
   eth0: [
     ipv4_address_method: :dhcp
@@ -108,4 +108,5 @@ import_config "robotica_face.exs"
 # of this file so it overrides the configuration defined above.
 # Uncomment to use target specific configurations
 
+import_config "#{Mix.env()}.exs"
 import_config "#{Mix.Project.config()[:target]}.exs"

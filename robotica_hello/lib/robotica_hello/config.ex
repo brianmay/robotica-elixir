@@ -1,4 +1,8 @@
 defmodule RoboticaHello.Config do
+  @moduledoc """
+  Configuration for RoboticaHello
+  """
+
   defp instance do
     %{
       name: {:string, true},

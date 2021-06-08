@@ -1,5 +1,12 @@
 defmodule RoboticaPlugins do
+  @moduledoc """
+  Common stuff
+  """
   defmodule Command do
+    @moduledoc """
+    Private stuff for common stuff
+    """
+
     defp v(value), do: not is_nil(value)
 
     defp add_list_if_cond(list, true, item), do: [item | list]
@@ -69,6 +76,9 @@ defmodule RoboticaPlugins do
   end
 
   defmodule Task do
+    @moduledoc """
+    Defines a list of locations, list of devices, and a command to execute
+    """
     @type t :: %__MODULE__{
             locations: list(String.t()),
             devices: list(String.t()),
@@ -113,6 +123,9 @@ defmodule RoboticaPlugins do
   end
 
   defmodule CommandTask do
+    @moduledoc """
+    Defines a location, device, and a command to execute
+    """
     @type t :: %__MODULE__{
             location: String.t(),
             device: String.t(),
@@ -123,6 +136,9 @@ defmodule RoboticaPlugins do
   end
 
   defmodule SourceStep do
+    @moduledoc """
+    Defines a step in the source schedule
+    """
     @type t :: %__MODULE__{
             required_time: integer,
             latest_time: integer | nil,
@@ -147,6 +163,9 @@ defmodule RoboticaPlugins do
   end
 
   defmodule ScheduledStep do
+    @moduledoc """
+    Defines a step in the scheduler process
+    """
     @type t :: %__MODULE__{
             required_time: %DateTime{},
             latest_time: %DateTime{},

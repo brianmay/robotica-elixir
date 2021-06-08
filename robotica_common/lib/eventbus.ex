@@ -1,4 +1,8 @@
 defmodule RoboticaPlugins.EventBus do
+  @moduledoc """
+  Defines helper functions from EventBus
+  """
+
   alias EventBus.Model.Event
   alias EventBus.Util.Base62
   alias EventBus.Util.MonotonicTime

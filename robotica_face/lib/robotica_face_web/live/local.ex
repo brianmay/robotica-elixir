@@ -1,4 +1,5 @@
 defmodule RoboticaFaceWeb.Live.Local do
+  @moduledoc false
   use Phoenix.LiveView
   use RoboticaPlugins.EventBus
 

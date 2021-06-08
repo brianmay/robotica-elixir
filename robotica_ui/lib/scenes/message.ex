@@ -1,4 +1,6 @@
 defmodule RoboticaUi.Scene.Message do
+  @moduledoc false
+
   use Scenic.Scene
 
   alias Scenic.Graph

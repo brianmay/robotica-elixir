@@ -9,7 +9,9 @@ defmodule Robotica.MixProject do
       elixirc_options: [warnings_as_errors: true],
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      elixirc_options: [warnings_as_errors: true],
+      dialyzer: dialyzer()
     ]
   end
 
@@ -24,20 +26,28 @@ defmodule Robotica.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
-      {:credo, "~> 1.5.0", only: [:dev, :test], runtime: false},
       {:lifx, git: "https://github.com/brianmay/lifx.git"},
       {:tp_link_hs100, git: "https://github.com/brianmay/tp_link_hs100.git"},
       {:event_bus, "~> 1.6.0"},
       {:mojito, "~> 0.7.1"},
       {:mint, "~> 1.0", override: true},
-      {:robotica_common, path: "../robotica_common"}
+      {:robotica_common, path: "../robotica_common"},
+      {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, ">= 0.0.0", only: [:dev, :test], runtime: false}
     ]
   end
 
   defp aliases do
     [
       test: "test --no-start"
+    ]
+  end
+
+  defp dialyzer do
+    [
+      plt_core_path: "priv/plts",
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+      plt_add_apps: [:ex_unit]
     ]
   end
 end

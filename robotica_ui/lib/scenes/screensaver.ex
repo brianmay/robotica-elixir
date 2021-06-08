@@ -1,4 +1,6 @@
 defmodule RoboticaUi.Scene.Screensaver do
+  @moduledoc false
+
   use Scenic.Scene
 
   alias Scenic.Graph

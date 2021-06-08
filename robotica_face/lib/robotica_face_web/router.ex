@@ -1,8 +1,8 @@
 defmodule RoboticaFaceWeb.Router do
   use RoboticaFaceWeb, :router
 
-  @api_username Application.get_env(:robotica_face, :api_username)
-  @api_password Application.get_env(:robotica_face, :api_password)
+  @api_username Application.compile_env(:robotica_face, :api_username)
+  @api_password Application.compile_env(:robotica_face, :api_password)
 
   pipeline :browser do
     plug :accepts, ["html"]

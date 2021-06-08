@@ -1,5 +1,8 @@
 defmodule RoboticaUi.RootManager do
-  @moduledoc false
+  @moduledoc """
+  Manage active scene and tabs
+  """
+
   require Logger
 
   use GenServer
@@ -7,6 +10,7 @@ defmodule RoboticaUi.RootManager do
   alias Scenic.ViewPort
 
   defmodule Scenes do
+    @moduledoc false
     @type t :: %__MODULE__{
             message: atom() | {atom(), any()} | nil
           }
@@ -14,6 +18,7 @@ defmodule RoboticaUi.RootManager do
   end
 
   defmodule Tabs do
+    @moduledoc false
     @type t :: %__MODULE__{
             clock: atom() | {atom(), any()} | nil,
             schedule: atom() | {atom(), any()} | nil,
@@ -23,6 +28,7 @@ defmodule RoboticaUi.RootManager do
   end
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{
             scenes: Scenes.t(),
             tabs: Tabs.t(),
@@ -67,7 +73,7 @@ defmodule RoboticaUi.RootManager do
   end
 
   @spec reset_screensaver :: :ok
-  def reset_screensaver() do
+  def reset_screensaver do
     GenServer.cast(__MODULE__, {:reset_screensaver})
   end
 
@@ -123,14 +129,14 @@ defmodule RoboticaUi.RootManager do
       timer -> Process.cancel_timer(timer)
     end
 
-    timer = Process.send_after(__MODULE__, :screen_off, 30000, [])
+    timer = Process.send_after(__MODULE__, :screen_off, 30_000, [])
     %State{state | timer: timer}
   end
 
   # Screen Control
 
   @spec screen_off :: nil
-  defp screen_off() do
+  defp screen_off do
     Logger.debug("screen_off")
     File.write("/sys/class/backlight/rpi_backlight/bl_power", "1")
 
@@ -142,7 +148,7 @@ defmodule RoboticaUi.RootManager do
   end
 
   @spec screen_on :: nil
-  defp screen_on() do
+  defp screen_on do
     Logger.info("screen_on")
     File.write("/sys/class/backlight/rpi_backlight/bl_power", "0")
 

@@ -17,10 +17,13 @@ defmodule RoboticaHelloWeb.ConnCase do
 
   use ExUnit.CaseTemplate
 
+  alias Ecto.Adapters.SQL.Sandbox
+
   using do
     quote do
       # Import conveniences for testing with connections
-      use Phoenix.ConnTest
+      import Plug.Conn
+      import Phoenix.ConnTest
       alias RoboticaHelloWeb.Router.Helpers, as: Routes
 
       # The default endpoint for testing
@@ -29,10 +32,10 @@ defmodule RoboticaHelloWeb.ConnCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(RoboticaHello.Repo)
+    :ok = Sandbox.checkout(RoboticaHello.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(RoboticaHello.Repo, {:shared, self()})
+      Sandbox.mode(RoboticaHello.Repo, {:shared, self()})
     end
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}

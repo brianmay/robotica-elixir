@@ -8,7 +8,9 @@ defmodule RoboticaPlugins.MixProject do
       elixir: "~> 1.8",
       elixirc_options: [warnings_as_errors: true],
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      elixirc_options: [warnings_as_errors: true],
+      dialyzer: dialyzer()
     ]
   end
 
@@ -27,7 +29,16 @@ defmodule RoboticaPlugins.MixProject do
       {:tzdata, "~> 1.1.0"},
       {:event_bus, "~> 1.6.0"},
       {:yaml_elixir, "~> 2.7.0"},
-      {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false}
+      {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}
+    ]
+  end
+
+  defp dialyzer do
+    [
+      plt_core_path: "priv/plts",
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+      plt_add_apps: [:ex_unit]
     ]
   end
 end

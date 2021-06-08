@@ -1,10 +1,13 @@
 defmodule RoboticaUi.Execute do
-  @moduledoc false
+  @moduledoc """
+  Receive and distribute execute events
+  """
 
   use GenServer
   require Logger
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{
             timer: pid()
           }

@@ -1,14 +1,19 @@
 defmodule Robotica.Plugins.SonOff do
+  @moduledoc """
+  Sonoff plugin
+  """
   use GenServer
   use Robotica.Plugin
   require Logger
 
   defmodule Config do
+    @moduledoc false
     @type t :: %__MODULE__{topic: String.t()}
     defstruct [:topic]
   end
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{
             config: Config.t(),
             location: String.t(),

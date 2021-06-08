@@ -1,4 +1,8 @@
 defmodule RoboticaUi.Scene.Utils do
+  @moduledoc """
+  Helper functions for scenes
+  """
+
   import Scenic.Components
   import Scenic.Primitives
 

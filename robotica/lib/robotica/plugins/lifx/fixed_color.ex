@@ -1,4 +1,8 @@
 defmodule Robotica.Plugins.Lifx.FixedColor do
+  @moduledoc """
+  LIFX Animation that displays a fixed color
+  """
+
   alias Robotica.Devices.Lifx, as: RLifx
   alias Robotica.Devices.Lifx.HSBKA
 

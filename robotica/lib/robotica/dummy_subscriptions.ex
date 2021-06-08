@@ -1,4 +1,8 @@
 defmodule Robotica.DummySubscriptions do
+  @moduledoc """
+  Dummy module registry for testing
+  """
+
   use GenServer
   require Logger
 

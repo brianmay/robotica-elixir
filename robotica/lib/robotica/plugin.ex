@@ -1,4 +1,8 @@
 defmodule Robotica.Plugin do
+  @moduledoc """
+  Common stuff for plugins
+  """
+
   require Logger
 
   @type t :: %__MODULE__{
@@ -20,20 +24,22 @@ defmodule Robotica.Plugin do
       @spec start_link(plugin :: Robotica.Plugin.t()) ::
               {:ok, pid} | {:error, String.t()}
       def start_link(plugin) do
-        with {:ok, pid} <- GenServer.start_link(__MODULE__, plugin, []) do
-          Robotica.PluginRegistry.add(plugin.location, plugin.device, pid)
+        case GenServer.start_link(__MODULE__, plugin, []) do
+          {:ok, pid} ->
+            Robotica.PluginRegistry.add(plugin.location, plugin.device, pid)
 
-          RoboticaPlugins.Subscriptions.subscribe(
-            ["command", plugin.location, plugin.device],
-            :command,
-            pid,
-            :json,
-            :no_resend
-          )
+            RoboticaPlugins.Subscriptions.subscribe(
+              ["command", plugin.location, plugin.device],
+              :command,
+              pid,
+              :json,
+              :no_resend
+            )
 
-          {:ok, pid}
-        else
-          err -> err
+            {:ok, pid}
+
+          err ->
+            err
         end
       end
     end

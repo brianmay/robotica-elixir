@@ -1,14 +1,16 @@
 defmodule RoboticaUi.Scene.Clock do
+  @moduledoc false
+
   use Scenic.Scene
 
   alias Scenic.Graph
   alias Scenic.ViewPort
   import Scenic.Clock.Components
 
-  alias RoboticaUi.Layout
   alias RoboticaUi.Components.Nav
+  alias RoboticaUi.Layout
 
-  @timezone Application.get_env(:robotica_common, :timezone)
+  @timezone Application.compile_env(:robotica_common, :timezone)
 
   @graph Graph.build(font: :roboto, font_size: 24)
 

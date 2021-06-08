@@ -6,9 +6,10 @@ defmodule RoboticaUi.Components.Step do
   alias Scenic.Graph
   import Scenic.Primitives
 
-  def verify(step), do: {:ok, step}
+  def verify(%RoboticaPlugins.ScheduledStep{} = step), do: {:ok, step}
+  def verify(_), do: :invalid_data
 
-  @timezone Application.get_env(:robotica_common, :timezone)
+  @timezone Application.compile_env(:robotica_common, :timezone)
   @graph Graph.build(styles: %{}, font_size: 20)
 
   defp date_time_to_local(dt) do
@@ -39,7 +40,7 @@ defmodule RoboticaUi.Components.Step do
     @graph
     |> rect({width, 40}, fill: background_color, translate: {0, 0})
     |> text(date_time_to_local(step.required_time), translate: {10, 30}, fill: foreground_color)
-    |> text(text || "N/A", translate: {110, 30}, fill: foreground_color)
+    |> text(text, translate: {110, 30}, fill: foreground_color)
   end
 
   def init(step, opts) do

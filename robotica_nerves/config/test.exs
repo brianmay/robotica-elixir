@@ -9,6 +9,14 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
-config :robotica_face, RoboticaFace.Repo,
-  pool: Ecto.Adapters.SQL.Sandbox,
-  url: System.get_env("DATABASE_URL_TEST")
+config :robotica,
+  config_file: "test/config.yaml",
+  classifications_file: "test/classifications.yaml",
+  schedule_file: "test/schedule.yaml",
+  sequences_file: "test/sequences.yaml",
+  scenes_file: "test/scenes.yaml",
+  timezone: "Australia/Melbourne",
+  hostname: "test-host"
+
+config :robotica_common,
+  config_common_file: "../config/common.yaml.sample"

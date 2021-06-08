@@ -11,7 +11,9 @@ defmodule RoboticaFace.MixProject do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      elixirc_options: [warnings_as_errors: true],
+      dialyzer: dialyzer()
     ]
   end
 
@@ -46,7 +48,9 @@ defmodule RoboticaFace.MixProject do
       {:joken_jwks, "~> 1.4.1"},
       {:timex, "~> 3.6"},
       {:event_bus, "~> 1.6.1"},
-      {:robotica_common, path: "../robotica_common"}
+      {:robotica_common, path: "../robotica_common"},
+      {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, ">= 0.0.0", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -58,7 +62,16 @@ defmodule RoboticaFace.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      test: ["test --no-start"]
+      test: ["test --no-start"],
+      prettier: "cmd ./assets/node_modules/.bin/prettier --check . --color"
+    ]
+  end
+
+  defp dialyzer do
+    [
+      plt_core_path: "priv/plts",
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+      plt_add_apps: [:ex_unit]
     ]
   end
 end

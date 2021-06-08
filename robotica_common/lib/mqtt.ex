@@ -1,4 +1,7 @@
 defmodule RoboticaPlugins.Mqtt do
+  @moduledoc """
+  Common MQTT functions
+  """
   @spec get_tortoise_client_id() :: String.t()
   def get_tortoise_client_id do
     {:ok, hostname} = :inet.gethostname()

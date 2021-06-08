@@ -1,4 +1,5 @@
 defmodule RoboticaFaceWeb.Live.Schedule do
+  @moduledoc false
   use Phoenix.LiveView
 
   def render(assigns) do
@@ -53,7 +54,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
     |> Timex.format!("%F %T", :strftime)
   end
 
-  defp get_schedule() do
+  defp get_schedule do
     case RoboticaFace.Schedule.get_schedule() do
       {:ok, schedule} -> schedule
       :error -> []

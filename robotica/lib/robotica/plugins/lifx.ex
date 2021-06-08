@@ -1,4 +1,7 @@
 defmodule Robotica.Plugins.LIFX do
+  @moduledoc """
+  Lifx plugin
+  """
   use GenServer
   use Robotica.Plugin
 
@@ -7,8 +10,8 @@ defmodule Robotica.Plugins.LIFX do
   import Robotica.Types
   alias Lifx.Protocol.HSBK
   alias Lifx.Protocol.HSBKS
-  alias Robotica.Devices.Lifx.HSBKA
   alias Robotica.Devices.Lifx, as: RLifx
+  alias Robotica.Devices.Lifx.HSBKA
 
   alias Robotica.Plugins.Lifx.Animate
   alias Robotica.Plugins.Lifx.FixedColor
@@ -29,6 +32,7 @@ defmodule Robotica.Plugins.LIFX do
   }
 
   defmodule Config do
+    @moduledoc false
     @type t :: %__MODULE__{
             id: integer(),
             number: integer()
@@ -45,6 +49,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defmodule SceneState do
+    @moduledoc false
     @type t :: %__MODULE__{
             priority: integer(),
             power: integer() | nil,
@@ -56,6 +61,7 @@ defmodule Robotica.Plugins.LIFX do
   end
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{
             location: String.t(),
             device: String.t(),
@@ -243,7 +249,7 @@ defmodule Robotica.Plugins.LIFX do
   defp get_device(state, callback) do
     devices = Enum.filter(Lifx.Client.devices(), &(&1.id == state.config.id))
 
-    if length(devices) == 0 do
+    if devices == [] do
       {:error, "Device is offline"}
     else
       devices
@@ -331,7 +337,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec on_wait(Robotica.Plugins.LIFX.State.t()) :: :ok
   def on_wait(%State{} = state) do
-    set_power_wait(state, 65535)
+    set_power_wait(state, 65_535)
   end
 
   @spec off_wait(Robotica.Plugins.LIFX.State.t()) :: :ok
@@ -698,7 +704,7 @@ defmodule Robotica.Plugins.LIFX do
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
-    |> add_scene(scene, priority, fn -> FixedColor.go(callback, 65535, colors) end)
+    |> add_scene(scene, priority, fn -> FixedColor.go(callback, 65_535, colors) end)
     |> publish_device_state()
   end
 

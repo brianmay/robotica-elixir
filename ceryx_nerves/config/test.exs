@@ -8,3 +8,9 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :ceryx,
+  config_file: "test/config.yaml"
+
+config :robotica_common,
+  config_common_file: "../config/common.yaml.sample"

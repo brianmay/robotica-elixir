@@ -1,10 +1,18 @@
 defmodule Robotica.Config do
+  @moduledoc """
+  Handle loading of Robotica specific configuration
+  """
+
   alias RoboticaPlugins.Schema
   alias RoboticaPlugins.Validation
 
   require Logger
 
   defmodule Loader do
+    @moduledoc """
+    Internal loader for Robotica config
+    """
+
     defp classification_schema do
       %{
         struct_type: Robotica.Types.Classification,
@@ -95,16 +103,16 @@ defmodule Robotica.Config do
     end
   end
 
-  @filename Application.get_env(:robotica, :config_file)
+  @filename Application.compile_env(:robotica, :config_file)
   @external_resource @filename
   @config Loader.configuration(@filename)
 
-  @scenes_filename Application.get_env(:robotica, :scenes_file)
+  @scenes_filename Application.compile_env(:robotica, :scenes_file)
   @external_resource @scenes_filename
   @scenes Loader.scenes(@scenes_filename)
 
   @spec get_hosts :: %{required(String.t()) => map()}
-  def get_hosts() do
+  def get_hosts do
     @config.hosts
   end
 

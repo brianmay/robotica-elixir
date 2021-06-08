@@ -1,4 +1,8 @@
 defmodule RoboticaHello.Accounts.ErrorHandler do
+  @moduledoc """
+  Error handler for authentication errors
+  """
+
   import Plug.Conn
   use RoboticaHelloWeb, :controller
 

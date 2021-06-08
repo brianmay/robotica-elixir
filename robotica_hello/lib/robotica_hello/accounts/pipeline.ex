@@ -1,4 +1,8 @@
 defmodule RoboticaHello.Accounts.Pipeline do
+  @moduledoc """
+  Guardian pipeline for authentication
+  """
+
   use Guardian.Plug.Pipeline,
     otp_app: :robotica_hello,
     error_handler: RoboticaHello.Accounts.ErrorHandler,

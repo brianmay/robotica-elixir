@@ -1,4 +1,8 @@
 defmodule Robotica do
+  @moduledoc """
+  Top level entry point
+  """
+
   use Application
   require Robotica.Config
 

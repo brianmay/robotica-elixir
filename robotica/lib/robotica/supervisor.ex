@@ -1,7 +1,13 @@
 defmodule Robotica.Supervisor do
+  @moduledoc """
+  The top robotica supervisor
+  """
   use Supervisor
 
   defmodule State do
+    @moduledoc """
+    The top level robotica configuration
+    """
     @type t :: %__MODULE__{
             plugins: list(Robotica.Plugin.t()),
             mqtt: map()

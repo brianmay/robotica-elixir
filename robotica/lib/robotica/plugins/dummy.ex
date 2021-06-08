@@ -1,9 +1,14 @@
 defmodule Robotica.Plugins.Dummy do
+  @moduledoc """
+  Dummy switch plugin
+  """
+
   use GenServer
   use Robotica.Plugin
   require Logger
 
   defmodule Config do
+    @moduledoc false
     @type t :: %__MODULE__{}
     defstruct []
   end

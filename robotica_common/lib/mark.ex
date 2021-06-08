@@ -1,4 +1,8 @@
 defmodule RoboticaPlugins.Mark do
+  @moduledoc """
+  Defines functions for marks
+  """
+
   use RoboticaPlugins.EventBus
   alias RoboticaPlugins.Date
 
