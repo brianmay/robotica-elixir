@@ -1,4 +1,8 @@
 defmodule RoboticaFace.Auth do
+  @moduledoc """
+  Helper functions for authorization
+  """
+
   import Plug.Conn
 
   def authenticate_user(token) do
@@ -29,6 +33,9 @@ defmodule RoboticaFace.Auth do
   end
 
   defmodule CheckLoginToken do
+    @moduledoc """
+    Check the users login token
+    """
     import Plug.Conn
 
     def init(default), do: default
@@ -48,6 +55,9 @@ defmodule RoboticaFace.Auth do
   end
 
   defmodule EnsureAuth do
+    @moduledoc """
+    Ensure user is logged in
+    """
     def init(default), do: default
 
     def call(conn, _default) do

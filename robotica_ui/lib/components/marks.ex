@@ -10,10 +10,11 @@ defmodule RoboticaUi.Components.Marks do
 
   alias RoboticaPlugins.Mark
 
-  def verify(step), do: {:ok, step}
+  def verify(%RoboticaPlugins.ScheduledStep{} = step), do: {:ok, step}
+  def verify(_), do: :invalid_data
 
   @graph Graph.build(styles: %{}, font_size: 20)
-  @timezone Application.get_env(:robotica_common, :timezone)
+  @timezone Application.compile_env(:robotica_common, :timezone)
 
   defp date_time_to_local(dt) do
     {:ok, local_dt} = DateTime.shift_zone(dt, @timezone)
@@ -33,7 +34,7 @@ defmodule RoboticaUi.Components.Marks do
       |> rect({width - 10, height - 10}, fill: :black, stroke: {1, :green}, translate: {5, 5})
       |> text("Time: #{date_time_to_local(step.required_time)}", translate: {10, 30})
       |> text("Locations: #{Enum.join(locations, ", ")}", translate: {10, 70})
-      |> text("Command: #{text || "N/A"}", translate: {10, 110})
+      |> text("Command: #{text}", translate: {10, 110})
       |> text("Mark: #{step.mark || "N/A"}", translate: {10, 150})
       |> button("Done",
         width: width / 2 - 15,

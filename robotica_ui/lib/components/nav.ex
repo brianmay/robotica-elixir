@@ -3,6 +3,7 @@ defmodule RoboticaUi.Components.Nav do
 
   use Scenic.Component
 
+  alias Scenic.Cache.Static.Texture
   alias Scenic.Graph
 
   import Scenic.Primitives
@@ -12,7 +13,7 @@ defmodule RoboticaUi.Components.Nav do
   def verify(_), do: :invalid_data
 
   # build the path to the static asset file (compile time)
-  @timezone Application.get_env(:robotica_common, :timezone)
+  @timezone Application.compile_env(:robotica_common, :timezone)
   @schedule_path :code.priv_dir(:robotica_ui) |> Path.join("/static/images/schedule.png")
   @local_path :code.priv_dir(:robotica_ui) |> Path.join("/static/images/local.png")
 
@@ -42,8 +43,8 @@ defmodule RoboticaUi.Components.Nav do
     schedule_path = :code.priv_dir(:robotica_ui) |> Path.join("/static/images/schedule.png")
     local_path = :code.priv_dir(:robotica_ui) |> Path.join("/static/images/local.png")
 
-    Scenic.Cache.Static.Texture.load(schedule_path, @schedule_hash, scope: :global)
-    Scenic.Cache.Static.Texture.load(local_path, @local_hash, scope: :global)
+    Texture.load(schedule_path, @schedule_hash, scope: :global)
+    Texture.load(local_path, @local_hash, scope: :global)
 
     scenes = Enum.filter(@scenes, fn {scene_tab, _} -> scene_tab == tab end)
 

@@ -1,7 +1,7 @@
 defmodule RoboticaHelloWeb.SessionController do
   use RoboticaHelloWeb, :controller
 
-  alias RoboticaHello.{Accounts, Accounts.User, Accounts.Guardian}
+  alias RoboticaHello.{Accounts, Accounts.Guardian, Accounts.User}
   alias RoboticaHelloWeb.Router.Helpers, as: Routes
 
   def new(conn, _) do

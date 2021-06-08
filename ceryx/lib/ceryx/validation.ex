@@ -1,6 +1,10 @@
 defmodule Ceryx.Validation do
-  alias RoboticaPlugins.Validation
+  @moduledoc """
+  Json validation functions for ceryx
+  """
+
   alias RoboticaPlugins.Schema
+  alias RoboticaPlugins.Validation
 
   def validate_task(%{} = data) do
     Validation.validate_schema(data, Schema.task_schema())

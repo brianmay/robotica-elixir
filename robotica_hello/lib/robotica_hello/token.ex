@@ -1,4 +1,7 @@
 defmodule RoboticaHello.Token do
+  @moduledoc """
+  Define tokens for robotica logins
+  """
   use Joken.Config, default_signer: :login_secret
 
   @impl true

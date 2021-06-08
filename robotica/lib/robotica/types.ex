@@ -1,5 +1,13 @@
 defmodule Robotica.Types do
+  @moduledoc """
+  Robotica Types
+  """
+
   defmodule Classification do
+    @moduledoc """
+    A classification entry
+    """
+
     @enforce_keys [:day_type]
     defstruct start: nil,
               stop: nil,

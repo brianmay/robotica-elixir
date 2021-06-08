@@ -1,7 +1,10 @@
 defmodule Robotica.Scheduler.Sequence do
+  @moduledoc """
+  Load and process a schedule sequence
+  """
   require Logger
 
-  @filename Application.get_env(:robotica, :sequences_file)
+  @filename Application.compile_env(:robotica, :sequences_file)
   @external_resource @filename
   @data Robotica.Config.Loader.sequences(@filename)
 

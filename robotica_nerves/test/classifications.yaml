@@ -1,0 +1,24 @@
+- day_type: "weekday"
+  week_day: true
+
+- day_type: "not_weekday"
+  week_day: false
+
+- day_of_week: Saturday
+  day_type: "saturday"
+
+- day_of_week: Sunday
+  day_type: "sunday"
+
+- date: "2018-12-25"
+  day_type: "christmas"
+
+- exclude:
+  - "christmas"
+  day_type: "bad_day"
+
+- start: "2018-12-25"
+  day_type: "after_christmas"
+
+- stop: "2018-12-25"
+  day_type: "before_christmas"

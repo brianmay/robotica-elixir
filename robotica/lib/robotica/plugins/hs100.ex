@@ -1,14 +1,20 @@
 defmodule Robotica.Plugins.Hs100 do
+  @moduledoc """
+  hs100 switch plugin
+  """
+
   use GenServer
   use Robotica.Plugin
   require Logger
 
   defmodule Config do
+    @moduledoc false
     @type t :: %__MODULE__{id: String.t()}
     defstruct [:id]
   end
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{
             config: Config.t(),
             location: String.t(),

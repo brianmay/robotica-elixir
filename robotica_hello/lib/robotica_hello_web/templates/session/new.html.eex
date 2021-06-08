@@ -1,7 +1,6 @@
 <h2>Login Page</h2>
 
 <%= form_for @changeset, @action, fn f -> %>
-
   <div class="form-group">
     <%= label f, :email, class: "control-label" %>
     <%= text_input f, :email, class: "form-control" %>

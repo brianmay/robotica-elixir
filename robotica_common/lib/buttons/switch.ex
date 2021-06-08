@@ -5,8 +5,8 @@ defmodule RoboticaPlugins.Buttons.Switch do
   use RoboticaPlugins.EventBus
   @behaviour RoboticaPlugins.Buttons
 
-  alias RoboticaPlugins.Buttons.Config
   alias RoboticaPlugins.Buttons
+  alias RoboticaPlugins.Buttons.Config
 
   @type state :: String.t() | nil
 
@@ -40,7 +40,7 @@ defmodule RoboticaPlugins.Buttons.Switch do
   def get_display_state(%Config{action: "input_4"}, "4"), do: :state_on
   def get_display_state(%Config{action: _}, _), do: nil
 
-  @spec turn_on(Config.t()) :: list(RoboticaPlugins.Command.t())
+  @spec turn_on(Config.t()) :: list(RoboticaPlugins.CommandTask.t())
   defp turn_on(%Config{} = config) do
     [
       %RoboticaPlugins.CommandTask{
@@ -53,7 +53,7 @@ defmodule RoboticaPlugins.Buttons.Switch do
     ]
   end
 
-  @spec turn_off(Config.t()) :: list(RoboticaPlugins.Command.t())
+  @spec turn_off(Config.t()) :: list(RoboticaPlugins.CommandTask.t())
   defp turn_off(%Config{} = config) do
     [
       %RoboticaPlugins.CommandTask{
@@ -66,7 +66,7 @@ defmodule RoboticaPlugins.Buttons.Switch do
     ]
   end
 
-  @spec get_press_commands(Config.t(), state) :: list(RoboticaPlugins.Command.t())
+  @spec get_press_commands(Config.t(), state) :: list(RoboticaPlugins.CommandTask.t())
   def get_press_commands(%Config{action: "turn_on"} = config, _state),
     do: turn_on(config)
 

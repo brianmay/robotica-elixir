@@ -4,6 +4,7 @@ defmodule Robotica.Plugins.Logging do
   require Logger
 
   defmodule Config do
+    @moduledoc false
     @type t :: %__MODULE__{}
     defstruct []
   end

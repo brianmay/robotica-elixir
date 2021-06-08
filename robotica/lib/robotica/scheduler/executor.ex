@@ -1,15 +1,18 @@
 defmodule Robotica.Scheduler.Executor do
+  @moduledoc """
+  Execute scheduled tasks
+  """
   use GenServer
   use EventBus.EventSource
 
   require Logger
 
-  alias Robotica.Scheduler.Sequence
   alias Robotica.Scheduler.Classifier
   alias Robotica.Scheduler.Marks
   alias Robotica.Scheduler.Schedule
+  alias Robotica.Scheduler.Sequence
 
-  @timezone Application.get_env(:robotica, :timezone)
+  @timezone Application.compile_env(:robotica, :timezone)
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, opts)

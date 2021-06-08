@@ -1,9 +1,14 @@
 defmodule Robotica.Executor do
+  @moduledoc """
+  Execute Robotica tasks in a pseudo synchronised manner
+  """
+
   use RoboticaPlugins.EventBus
   use GenServer
   use EventBus.EventSource
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{}
     defstruct []
   end

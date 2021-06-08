@@ -1,4 +1,6 @@
 defmodule RoboticaUi.Scene.Local do
+  @moduledoc false
+
   use Scenic.Scene
   use EventBus.EventSource
 

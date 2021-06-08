@@ -1,4 +1,7 @@
 defmodule BasicAuth do
+  @moduledoc """
+  Implement HTTP basic auth
+  """
   import Plug.Conn
   @realm "Basic realm=\"Robotica\""
 

@@ -15,6 +15,8 @@ defmodule RoboticaHelloWeb.ChannelCase do
 
   use ExUnit.CaseTemplate
 
+  alias Ecto.Adapters.SQL.Sandbox
+
   using do
     quote do
       # Import conveniences for testing with channels
@@ -26,10 +28,10 @@ defmodule RoboticaHelloWeb.ChannelCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(RoboticaHello.Repo)
+    :ok = Sandbox.checkout(RoboticaHello.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(RoboticaHello.Repo, {:shared, self()})
+      Sandbox.mode(RoboticaHello.Repo, {:shared, self()})
     end
 
     :ok

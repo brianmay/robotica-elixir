@@ -1,10 +1,13 @@
 defmodule RoboticaPlugins.Buttons do
-  @doc """
-  Functions to operate on buttons.
+  @moduledoc """
+  Functions to determine button state
   """
   use RoboticaPlugins.EventBus
 
   defmodule Config do
+    @moduledoc """
+    Defines config for a button to determine its state
+    """
     @type t :: %__MODULE__{
             name: String.t(),
             id: String.t(),
@@ -33,7 +36,7 @@ defmodule RoboticaPlugins.Buttons do
 
   @callback process_message(Config.t(), atom(), any(), state) :: state
   @callback get_display_state(Config.t(), state) :: display_state
-  @callback get_press_commands(Config.t(), state) :: list(RoboticaPlugins.Command.t())
+  @callback get_press_commands(Config.t(), state) :: list(RoboticaPlugins.CommandTask.t())
 
   @spec get_button_controller(Config.t()) :: module()
   def get_button_controller(%Config{type: "light"}), do: RoboticaPlugins.Buttons.Light
@@ -65,7 +68,7 @@ defmodule RoboticaPlugins.Buttons do
     controller.get_display_state(config, state)
   end
 
-  @spec get_press_commands(Config.t(), state) :: list(RoboticaPlugins.Command.t())
+  @spec get_press_commands(Config.t(), state) :: list(RoboticaPlugins.CommandTask.t())
   def get_press_commands(%Config{} = config, state) do
     controller = get_button_controller(config)
     controller.get_press_commands(config, state)
@@ -86,8 +89,8 @@ defmodule RoboticaPlugins.Buttons do
     end)
   end
 
-  @spec unsubscribe_all() :: :ok
-  def unsubscribe_all() do
+  @spec unsubscribe_all :: :ok
+  def unsubscribe_all do
     RoboticaPlugins.EventBus.notify(:unsubscribe_all, %{
       pid: self()
     })

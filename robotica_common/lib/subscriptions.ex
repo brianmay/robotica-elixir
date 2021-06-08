@@ -1,8 +1,14 @@
 defmodule RoboticaPlugins.Subscriptions do
+  @moduledoc """
+  Implement per process MQTT subscriptions
+  """
   use GenServer
   require Logger
 
   defmodule State do
+    @moduledoc """
+    Define current state of Subscriptions.
+    """
     @type t :: %__MODULE__{
             subscriptions: %{required(list({atom(), String.t(), :json | :raw})) => list(pid)},
             last_message: %{required(list(String.t())) => any()}
@@ -25,12 +31,12 @@ defmodule RoboticaPlugins.Subscriptions do
           resend :: :resend | :no_resend
         ) :: :ok
   def subscribe(topic, label, pid, format, resend) do
-    GenServer.call(__MODULE__, {:subscribe, topic, label, pid, format, resend}, 40000)
+    GenServer.call(__MODULE__, {:subscribe, topic, label, pid, format, resend}, 40_000)
   end
 
   @spec unsubscribe_all(pid :: pid) :: :ok
   def unsubscribe_all(pid) do
-    GenServer.call(__MODULE__, {:unsubscribe_all, pid}, 40000)
+    GenServer.call(__MODULE__, {:unsubscribe_all, pid}, 40_000)
   end
 
   @spec message(topic :: list(String.t()), message :: String.t()) :: :ok
@@ -208,7 +214,7 @@ defmodule RoboticaPlugins.Subscriptions do
 
     new_subscriptions =
       new_subscriptions
-      |> Enum.reject(fn {_, l} -> length(l) == 0 end)
+      |> Enum.reject(fn {_, []} -> true end)
       |> keyword_list_to_map()
 
     %State{state | subscriptions: new_subscriptions}

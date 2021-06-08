@@ -158,8 +158,6 @@ defmodule RoboticaFaceWeb.ApiController do
   end
 
   def index(conn, params) do
-    IO.inspect(params)
-
     token = get_in(params, ["originalDetectIntentRequest", "payload", "user", "idToken"])
 
     result =
@@ -192,7 +190,6 @@ defmodule RoboticaFaceWeb.ApiController do
           process_intent(params)
       end
 
-    IO.inspect(assigns)
     render(conn, "index.json", assigns)
   end
 

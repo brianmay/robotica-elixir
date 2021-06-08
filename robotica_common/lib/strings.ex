@@ -63,6 +63,7 @@ defmodule RoboticaPlugins.Strings do
           :error ->
             map =
               values
+              # credo:disable-for-next-line Credo.Check.Refactor.Nesting
               |> Enum.map(fn {a, b} -> "#{a}=#{b}" end)
               |> Enum.join(", ")
 
