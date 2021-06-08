@@ -11,7 +11,9 @@ defmodule RoboticaHello.MixProject do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      elixirc_options: [warnings_as_errors: true],
+      dialyzer: dialyzer()
     ]
   end
 
@@ -47,7 +49,9 @@ defmodule RoboticaHello.MixProject do
       {:guardian, "~> 2.0"},
       {:bcrypt_elixir, "~> 2.0"},
       {:joken, "~> 2.3.0"},
-      {:robotica_common, path: "../robotica_common"}
+      {:robotica_common, path: "../robotica_common"},
+      {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, ">= 0.0.0", only: [:dev], runtime: false}
     ]
   end
 
@@ -61,7 +65,15 @@ defmodule RoboticaHello.MixProject do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["ecto.create --quiet", "ecto.migrate", "test"],
+      prettier: "cmd ./assets/node_modules/.bin/prettier --check . --color"
+    ]
+  end
+
+  defp dialyzer do
+    [
+      plt_core_path: "priv/plts",
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
     ]
   end
 end

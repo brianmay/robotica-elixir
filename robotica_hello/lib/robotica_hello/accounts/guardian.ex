@@ -1,4 +1,8 @@
 defmodule RoboticaHello.Accounts.Guardian do
+  @moduledoc """
+  Guardian resource claims module
+  """
+
   use Guardian, otp_app: :robotica_hello
 
   alias RoboticaHello.Accounts

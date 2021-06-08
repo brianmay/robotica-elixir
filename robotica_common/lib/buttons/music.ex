@@ -5,8 +5,8 @@ defmodule RoboticaPlugins.Buttons.Music do
   use RoboticaPlugins.EventBus
   @behaviour RoboticaPlugins.Buttons
 
-  alias RoboticaPlugins.Buttons.Config
   alias RoboticaPlugins.Buttons
+  alias RoboticaPlugins.Buttons.Config
 
   @type state :: String.t() | nil | :stop
 
@@ -44,7 +44,7 @@ defmodule RoboticaPlugins.Buttons.Music do
   def get_display_state(%Config{action: "play_wake_up"}, "wake_up"), do: :state_on
   def get_display_state(%Config{action: _}, _), do: :state_off
 
-  @spec play(Config.t(), String.t()) :: list(RoboticaPlugins.Command.t())
+  @spec play(Config.t(), String.t()) :: list(RoboticaPlugins.CommandTask.t())
   defp play(%Config{} = config, play_list) do
     [
       %RoboticaPlugins.CommandTask{
@@ -57,7 +57,7 @@ defmodule RoboticaPlugins.Buttons.Music do
     ]
   end
 
-  @spec stop(Config.t()) :: list(RoboticaPlugins.Command.t())
+  @spec stop(Config.t()) :: list(RoboticaPlugins.CommandTask.t())
   defp stop(%Config{} = config) do
     [
       %RoboticaPlugins.CommandTask{
@@ -72,7 +72,7 @@ defmodule RoboticaPlugins.Buttons.Music do
     ]
   end
 
-  @spec get_press_commands(Config.t(), state) :: list(RoboticaPlugins.Command.t())
+  @spec get_press_commands(Config.t(), state) :: list(RoboticaPlugins.CommandTask.t())
   def get_press_commands(%Config{action: "play"} = config, _state),
     do: play(config, config.params["play_list"])
 

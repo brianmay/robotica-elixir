@@ -1,4 +1,8 @@
 defmodule Robotica.Validation do
+  @moduledoc """
+  Robotica specific json validation stuff
+  """
+
   import RoboticaPlugins.Validation
 
   defp module_to_schema(module), do: {:ok, apply(module, :config_schema, [])}

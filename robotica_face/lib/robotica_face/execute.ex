@@ -5,6 +5,7 @@ defmodule RoboticaFace.Execute do
   require Logger
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{
             scenes: list(GenServer.server())
           }

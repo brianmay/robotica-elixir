@@ -1,5 +1,8 @@
 defmodule RoboticaPlugins.Validation do
-  @map_types Application.get_env(:robotica_common, :map_types)
+  @moduledoc """
+  Validate untrusted json fields
+  """
+  @map_types Application.compile_env(:robotica_common, :map_types)
 
   defp module_compiled?(module) do
     case Code.ensure_compiled(module) do
@@ -55,16 +58,18 @@ defmodule RoboticaPlugins.Validation do
   defp validate_kwlist(%{}, [], _), do: {:ok, %{}}
 
   defp validate_kwlist(%{} = raw_data, [_head | _tail] = schema, struct_type) do
-    with {:ok, data} <- validate_kwlist_any(raw_data, schema) do
-      case Keyword.get(@map_types, struct_type) do
-        nil ->
-          {:ok, data}
+    case validate_kwlist_any(raw_data, schema) do
+      {:ok, data} ->
+        case Keyword.get(@map_types, struct_type) do
+          nil ->
+            {:ok, data}
 
-        {module, name} ->
-          apply(module, name, [raw_data, data])
-      end
-    else
-      {:error, err} -> {:error, err}
+          {module, name} ->
+            apply(module, name, [raw_data, data])
+        end
+
+      {:error, err} ->
+        {:error, err}
     end
   end
 
@@ -277,6 +282,7 @@ defmodule RoboticaPlugins.Validation do
   def validate_schema(nil, :day_of_week), do: {:ok, nil}
   def validate_schema(_, :day_of_week), do: {:error, "Non-string day of week detected"}
 
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def validate_schema(boolean, {:boolean, _}) when is_binary(boolean) do
     value = String.downcase(boolean)
 

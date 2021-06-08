@@ -1,16 +1,16 @@
 <section class="row">
-    <article class="column">
-        <h2>Resources</h2>
-        <ul>
-            <% user = Guardian.Plug.current_resource(@conn) %>
+  <article class="column">
+    <h2>Resources</h2>
+    <ul>
+      <% user = Guardian.Plug.current_resource(@conn) %>
 
-            <%= for instance <- @instances do %>
-                <% token = create_token(user) %>
-                <form method="post" action="<%= instance.url %>/login">
-                    <input type="hidden" name="token" value="<%= token %>">
-                    <input type="submit" value="<%= instance.name %>">
-                </form>
-            <% end %>
-        </ul>
-    </article>
+      <%= for instance <- @instances do %>
+        <% token = create_token(user) %>
+        <form method="post" action="<%= instance.url %>/login">
+          <input type="hidden" name="token" value="<%= token %>" />
+          <input type="submit" value="<%= instance.name %>" />
+        </form>
+      <% end %>
+    </ul>
+  </article>
 </section>

@@ -1,11 +1,16 @@
 defmodule RoboticaUi.Schedule do
+  @moduledoc """
+  Track and distribute the robotica schedule
+  """
+
   use GenServer
   use RoboticaPlugins.EventBus
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{
             scenes: list(GenServer.server()),
-            schedule: list(Robotica.Types.ScheduledStep.t())
+            schedule: list(RoboticaPlugins.ScheduledStep.t())
           }
     defstruct scenes: [], schedule: []
   end
@@ -28,7 +33,7 @@ defmodule RoboticaUi.Schedule do
     GenServer.call(__MODULE__, {:set_schedule, schedule})
   end
 
-  def get_schedule() do
+  def get_schedule do
     GenServer.call(__MODULE__, {:get_schedule})
   end
 

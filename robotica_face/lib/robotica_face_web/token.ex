@@ -1,4 +1,8 @@
 defmodule RoboticaFaceWeb.Token do
+  @moduledoc """
+  Token stuff for Google API
+  """
+
   use Joken.Config
 
   add_hook(JokenJwks, strategy: RoboticaFaceWeb.Strategy)

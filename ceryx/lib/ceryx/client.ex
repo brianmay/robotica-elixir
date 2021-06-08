@@ -1,4 +1,8 @@
 defmodule Ceryx.Client do
+  @moduledoc """
+  MQTT client functions
+  """
+
   use Tortoise.Handler
   use EventBus.EventSource
 
@@ -7,6 +11,7 @@ defmodule Ceryx.Client do
   require Logger
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{}
     defstruct []
   end

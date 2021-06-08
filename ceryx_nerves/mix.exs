@@ -20,7 +20,9 @@ defmodule CeryxNerves.MixProject do
       aliases: [loadconfig: [&bootstrap/1]],
       deps: deps(),
       releases: [{@app, release()}],
-      preferred_cli_target: [run: :host, test: :host]
+      preferred_cli_target: [run: :host, test: :host],
+      elixirc_options: [warnings_as_errors: true],
+      dialyzer: dialyzer()
     ]
   end
 
@@ -59,7 +61,9 @@ defmodule CeryxNerves.MixProject do
       {:robotica_ui, path: "../robotica_ui"},
       {:robotica_face, path: "../robotica_face"},
       {:ring_logger, "~> 0.6"},
-      {:toolshed, "~> 0.2"}
+      {:toolshed, "~> 0.2"},
+      {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, ">= 0.0.0", only: [:dev], runtime: false}
     ] ++ deps(@target)
   end
 
@@ -102,4 +106,11 @@ defmodule CeryxNerves.MixProject do
   defp system("qemu_arm"), do: [{:nerves_system_qemu_arm, "~> 1.8", runtime: false}]
   defp system("x86_64"), do: [{:nerves_system_x86_64, "~> 1.8", runtime: false}]
   defp system(target), do: Mix.raise("Unknown MIX_TARGET: #{target}")
+
+  defp dialyzer do
+    [
+      plt_core_path: "priv/plts",
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+    ]
+  end
 end

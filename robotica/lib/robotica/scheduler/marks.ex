@@ -1,7 +1,11 @@
 defmodule Robotica.Scheduler.Marks do
+  @moduledoc """
+  Process marks in the schedule
+  """
   use GenServer
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{
             marks: %{required(String.t()) => list(RoboticaPlugins.Mark)}
           }

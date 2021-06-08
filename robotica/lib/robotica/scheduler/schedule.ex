@@ -1,7 +1,11 @@
 defmodule Robotica.Scheduler.Schedule do
-  @timezone Application.get_env(:robotica, :timezone)
+  @moduledoc """
+  Process a schedule entry
+  """
 
-  @filename Application.get_env(:robotica, :schedule_file)
+  @timezone Application.compile_env(:robotica, :timezone)
+
+  @filename Application.compile_env(:robotica, :schedule_file)
   @external_resource @filename
   @data Robotica.Config.Loader.schedule(@filename)
 

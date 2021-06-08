@@ -1,8 +1,13 @@
 defmodule Robotica.PluginRegistry do
+  @moduledoc """
+  A registry of all plugins
+  """
+
   use GenServer
   require Logger
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{
             plugins: %{required(String.t()) => list({String.t(), pid})}
           }

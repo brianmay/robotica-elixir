@@ -1,11 +1,17 @@
 defmodule Robotica.Plugins.HDMI do
+  @moduledoc """
+  HDMI matrix plugin
+  """
+
   use GenServer
   use Robotica.Plugin
   require Logger
 
+  alias Robotica.Devices.HDMI
   alias Robotica.Plugin
 
   defmodule Config do
+    @moduledoc false
     @type t :: %__MODULE__{}
     defstruct [:host, :destination]
   end
@@ -60,7 +66,7 @@ defmodule Robotica.Plugins.HDMI do
   defp poll(%Robotica.Plugin{}, []), do: :ok
 
   defp poll(%Robotica.Plugin{} = state, [output | tail]) do
-    case Robotica.Devices.HDMI.get_input_for_output(state.config.host, output) do
+    case HDMI.get_input_for_output(state.config.host, output) do
       {:ok, input} ->
         publish_device_output(state, input, output)
         poll(state, tail)
@@ -96,7 +102,7 @@ defmodule Robotica.Plugins.HDMI do
 
     publish_device_output_off(state, command.output)
 
-    case Robotica.Devices.HDMI.switch(state.config.host, command.input, command.output) do
+    case HDMI.switch(state.config.host, command.input, command.output) do
       :ok ->
         publish_device_output(state, command.input, command.output)
 

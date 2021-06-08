@@ -1,4 +1,8 @@
 defmodule Robotica.Plugins.Audio do
+  @moduledoc """
+  Audio plugin
+  """
+
   use GenServer
   use Robotica.Plugin
   use RoboticaPlugins.EventBus
@@ -8,6 +12,7 @@ defmodule Robotica.Plugins.Audio do
   alias RoboticaPlugins.Strings
 
   defmodule Commands do
+    @moduledoc false
     @type t :: %__MODULE__{
             init: list(String.t()),
             volume: list(String.t()),
@@ -39,6 +44,7 @@ defmodule Robotica.Plugins.Audio do
   end
 
   defmodule Config do
+    @moduledoc false
     @type t :: %__MODULE__{
             commands: Commands.t(),
             sounds: %{required(String.t()) => String.t()},
@@ -60,6 +66,7 @@ defmodule Robotica.Plugins.Audio do
   end
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{
             location: String.t(),
             device: String.t(),

@@ -8,7 +8,9 @@ defmodule CeryxDocker.MixProject do
       elixir: "~> 1.10",
       elixirc_options: [warnings_as_errors: true],
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      elixirc_options: [warnings_as_errors: true],
+      dialyzer: dialyzer()
     ]
   end
 
@@ -24,7 +26,16 @@ defmodule CeryxDocker.MixProject do
     [
       {:ceryx, path: "../ceryx"},
       {:robotica_common, path: "../robotica_common"},
-      {:robotica_face, path: "../robotica_face"}
+      {:robotica_face, path: "../robotica_face"},
+      {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, ">= 0.0.0", only: [:dev], runtime: false}
+    ]
+  end
+
+  defp dialyzer do
+    [
+      plt_core_path: "priv/plts",
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
     ]
   end
 end

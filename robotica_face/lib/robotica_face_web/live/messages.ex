@@ -1,4 +1,5 @@
 defmodule RoboticaFaceWeb.Live.Messages do
+  @moduledoc false
   use Phoenix.LiveView
 
   alias RoboticaPlugins.Config

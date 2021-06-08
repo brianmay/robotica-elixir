@@ -1,7 +1,14 @@
 defmodule Ceryx.Supervisor do
+  @moduledoc """
+  Top level supervisor for Ceryx
+  """
+
   use Supervisor
 
   defmodule State do
+    @moduledoc """
+    Top level config for Ceryx
+    """
     @type t :: %__MODULE__{
             mqtt: map()
           }

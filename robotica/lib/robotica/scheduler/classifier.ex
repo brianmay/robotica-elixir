@@ -1,4 +1,7 @@
 defmodule Robotica.Scheduler.Classifier do
+  @moduledoc """
+  Process schedule classifier days
+  """
   alias Robotica.Types
 
   defp is_week_day?(date) do
@@ -8,7 +11,7 @@ defmodule Robotica.Scheduler.Classifier do
     end
   end
 
-  @filename Application.get_env(:robotica, :classifications_file)
+  @filename Application.compile_env(:robotica, :classifications_file)
   @external_resource @filename
   @data Robotica.Config.Loader.classifications(@filename)
 

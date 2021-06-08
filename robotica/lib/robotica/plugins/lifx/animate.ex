@@ -1,4 +1,7 @@
 defmodule Robotica.Plugins.Lifx.Animate do
+  @moduledoc """
+  Lifx animation
+  """
   alias Robotica.Devices.Lifx, as: RLifx
   require Logger
 
@@ -34,7 +37,7 @@ defmodule Robotica.Plugins.Lifx.Animate do
   defp animate_frame_repeat(frame, number, frame_count, frame_n) do
     case RLifx.get_colors_from_command(number, frame, frame_n) do
       {:ok, colors} ->
-        hsbks = {65535, colors, frame.sleep}
+        hsbks = {65_535, colors, frame.sleep}
         [hsbks | animate_frame_repeat(frame, number, frame_count, frame_n + 1)]
 
       {:error, error} ->

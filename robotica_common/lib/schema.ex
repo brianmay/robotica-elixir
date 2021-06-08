@@ -1,4 +1,7 @@
 defmodule RoboticaPlugins.Schema do
+  @moduledoc """
+  Common json schemas
+  """
   defp sound_action_schema do
     :string
   end

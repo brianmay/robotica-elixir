@@ -1,4 +1,5 @@
 defmodule RoboticaUi.Scene.Schedule do
+  @moduledoc false
   use Scenic.Scene
   use EventBus.EventSource
   require Logger
@@ -8,10 +9,10 @@ defmodule RoboticaUi.Scene.Schedule do
   import Scenic.Primitives
 
   alias RoboticaPlugins.Config
-  alias RoboticaUi.Layout
+  alias RoboticaUi.Components.Marks
   alias RoboticaUi.Components.Nav
   alias RoboticaUi.Components.Step
-  alias RoboticaUi.Components.Marks
+  alias RoboticaUi.Layout
 
   @graph Graph.build(font: :roboto, font_size: 24)
 

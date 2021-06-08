@@ -1,9 +1,17 @@
 defmodule Robotica.Client do
+  @moduledoc """
+  Robotica MQTT client
+  """
+
   use Tortoise.Handler
+
+  alias Robotica.Scheduler.Executor
+  alias Robotica.Scheduler.Marks
 
   require Logger
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{}
     defstruct []
   end
@@ -15,7 +23,7 @@ defmodule Robotica.Client do
 
   def connection(:up, state) do
     Logger.info("Connection has been established")
-    Robotica.Scheduler.Executor.publish_schedule(Robotica.Scheduler.Executor)
+    Executor.publish_schedule(Executor)
     {:ok, state}
   end
 
@@ -72,8 +80,8 @@ defmodule Robotica.Client do
 
     with {:ok, message} <- Poison.decode(publish),
          {:ok, mark} <- Robotica.Config.validate_mark(message) do
-      Robotica.Scheduler.Marks.put_mark(Robotica.Scheduler.Marks, mark)
-      Robotica.Scheduler.Executor.reload_marks(Robotica.Scheduler.Executor)
+      Marks.put_mark(Marks, mark)
+      Executor.reload_marks(Executor)
     else
       {:error, error} -> Logger.error("Invalid mark message received: #{inspect(error)}.")
     end

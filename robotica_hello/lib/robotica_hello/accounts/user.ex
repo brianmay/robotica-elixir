@@ -1,7 +1,21 @@
 defmodule RoboticaHello.Accounts.User do
+  @moduledoc """
+  Actions for users
+  """
   use Ecto.Schema
   import Ecto.Changeset
   @timestamps_opts [type: :utc_datetime, usec: true]
+
+  @type t :: %__MODULE__{
+          email: String.t() | nil,
+          is_admin: boolean() | nil,
+          name: String.t() | nil,
+          password: String.t() | nil,
+          password_confirmation: String.t() | nil,
+          password_hash: String.t() | nil,
+          inserted_at: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil
+        }
 
   schema "users" do
     field :email, :string

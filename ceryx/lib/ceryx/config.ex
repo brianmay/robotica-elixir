@@ -1,7 +1,13 @@
 defmodule Ceryx.Config do
+  @moduledoc """
+  Load ceryx config
+  """
+
   alias RoboticaPlugins.Validation
 
   defmodule Loader do
+    @moduledoc false
+
     defp mqtt_config_schema do
       %{
         host: {:string, true},
@@ -26,10 +32,10 @@ defmodule Ceryx.Config do
   end
 
   if Application.get_env(:ceryx, :config_file) do
-    @filename Application.get_env(:ceryx, :config_file)
+    @filename Application.compile_env(:ceryx, :config_file)
     @external_resource @filename
     @config Loader.configuration(@filename)
-    def configuration(), do: @config
+    def configuration, do: @config
   else
     def configuration do
       %Ceryx.Supervisor.State{

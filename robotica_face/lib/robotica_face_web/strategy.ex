@@ -1,4 +1,8 @@
 defmodule RoboticaFaceWeb.Strategy do
+  @moduledoc """
+  Token stuff for Google API
+  """
+
   use JokenJwks.DefaultStrategyTemplate
 
   def init_opts(opts) do

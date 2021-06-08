@@ -1,4 +1,8 @@
 defmodule Robotica.Plugins.Private do
+  @moduledoc """
+  Shared functions for plugins
+  """
+
   require Logger
   use RoboticaPlugins.EventBus
 

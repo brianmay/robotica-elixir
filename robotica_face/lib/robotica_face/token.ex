@@ -1,4 +1,8 @@
 defmodule RoboticaFace.Token do
+  @moduledoc """
+  Token stuff authenticating users
+  """
+
   use Joken.Config, default_signer: :login_secret
 
   @impl true
