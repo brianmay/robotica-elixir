@@ -62,8 +62,8 @@ defmodule CeryxNerves.MixProject do
       {:robotica_face, path: "../robotica_face"},
       {:ring_logger, "~> 0.6"},
       {:toolshed, "~> 0.2"},
-      {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, ">= 0.0.0", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ] ++ deps(@target)
   end
 

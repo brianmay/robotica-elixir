@@ -27,8 +27,9 @@ defmodule CeryxDocker.MixProject do
       {:ceryx, path: "../ceryx"},
       {:robotica_common, path: "../robotica_common"},
       {:robotica_face, path: "../robotica_face"},
-      {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, ">= 0.0.0", only: [:dev, :test], runtime: false}
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ]
   end
 
