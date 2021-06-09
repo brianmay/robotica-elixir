@@ -189,6 +189,7 @@ jobs:
     if: ${{ github.repository_owner == 'brianmay' }}
     needs:
       - test
+      - test_web
 
     strategy:
       matrix:
