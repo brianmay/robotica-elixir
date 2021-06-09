@@ -130,55 +130,55 @@ jobs:
         run: mix test
 
 
-  dialyzer:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        elixir: [1.11.3]
-        otp: [23.2.7]
-        dir: ["robotica_common", "robotica", "robotica_ui", "robotica_hello", "robotica_face", "ceryx", "ceryx_docker"]
-
-    env:
-      MIX_ENV: test
-
-    steps:
-      - uses: actions/checkout@v2.3.4
-      - name: Setup elixir
-        uses: erlef/setup-elixir@v1.7
-        with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
-      - name: Retrieve Mix Dependencies Cache
-        uses: actions/cache@v2.1.6
-        id: mix-cache # id to use in retrieve action
-        with:
-          path: ${{ matrix.dir }}/deps
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-${{ hashFiles(format('{0}/{1}/{2}', github.workspace,  matrix.dir, 'mix.lock')) }}-4
-      - name: Install Mix Dependencies
-        working-directory: ${{ matrix.dir }}
-        if: steps.mix-cache.outputs.cache-hit != 'true'
-        run: |
-          mix local.rebar --force
-          mix local.hex --force
-          # mix archive.install --force hex nerves_bootstrap
-          mix deps.get
-      - name: Retrieve PLT Cache
-        uses: actions/cache@v2.1.6
-        id: plt-cache
-        with:
-          path: ${{ matrix.dir }}/priv/plts
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-plts-${{ hashFiles(format('{0}/{1}/{2}', github.workspace, matrix.dir, 'mix.lock')) }}
-      - name: Build
-        working-directory: ${{ matrix.dir }}
-        run: |
-          mix compile
-      - name: Create PLTs
-        working-directory: ${{ matrix.dir }}
-        if: steps.plt-cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p priv/plts
-          mix dialyzer --plt
-      - name: Run dialyzer
-        working-directory: ${{ matrix.dir }}
-        run: mix dialyzer --no-check
+ #  dialyzer:
+ #    runs-on: ubuntu-latest
+ #
+ #    strategy:
+ #      matrix:
+ #        elixir: [1.11.3]
+ #        otp: [23.2.7]
+ #        dir: ["robotica_common", "robotica", "robotica_ui", "robotica_hello", "robotica_face", "ceryx", "ceryx_docker"]
+ #
+ #    env:
+ #      MIX_ENV: test
+ #
+ #    steps:
+ #      - uses: actions/checkout@v2.3.4
+ #      - name: Setup elixir
+ #        uses: erlef/setup-elixir@v1.7
+ #        with:
+ #          elixir-version: ${{ matrix.elixir }}
+ #          otp-version: ${{ matrix.otp }}
+ #      - name: Retrieve Mix Dependencies Cache
+ #        uses: actions/cache@v2.1.6
+ #        id: mix-cache # id to use in retrieve action
+ #        with:
+ #          path: ${{ matrix.dir }}/deps
+ #          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-${{ hashFiles(format('{0}/{1}/{2}', github.workspace,  matrix.dir, 'mix.lock')) }}-4
+ #      - name: Install Mix Dependencies
+ #        working-directory: ${{ matrix.dir }}
+ #        if: steps.mix-cache.outputs.cache-hit != 'true'
+ #        run: |
+ #          mix local.rebar --force
+ #          mix local.hex --force
+ #          # mix archive.install --force hex nerves_bootstrap
+ #          mix deps.get
+ #      - name: Retrieve PLT Cache
+ #        uses: actions/cache@v2.1.6
+ #        id: plt-cache
+ #        with:
+ #          path: ${{ matrix.dir }}/priv/plts
+ #          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-plts-${{ hashFiles(format('{0}/{1}/{2}', github.workspace, matrix.dir, 'mix.lock')) }}
+ #      - name: Build
+ #        working-directory: ${{ matrix.dir }}
+ #        run: |
+ #          mix compile
+ #      - name: Create PLTs
+ #        working-directory: ${{ matrix.dir }}
+ #        if: steps.plt-cache.outputs.cache-hit != 'true'
+ #        run: |
+ #          mkdir -p priv/plts
+ #          mix dialyzer --plt
+ #      - name: Run dialyzer
+ #        working-directory: ${{ matrix.dir }}
+ #        run: mix dialyzer --no-check
