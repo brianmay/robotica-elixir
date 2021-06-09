@@ -190,6 +190,7 @@ jobs:
     needs:
       - test
       - test_web
+      - dialyzer
 
     strategy:
       matrix:
