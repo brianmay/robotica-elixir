@@ -182,3 +182,60 @@ jobs:
  #      - name: Run dialyzer
  #        working-directory: ${{ matrix.dir }}
  #        run: mix dialyzer --no-check
+
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'brianmay' }}
+    needs:
+      - test
+
+    strategy:
+      matrix:
+        dir: ["robotica_hello", "ceryx_docker"]
+
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      - name: Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v3.3.0
+        if: ${{env.DOCKERHUB_USERNAME != 0}}
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.dir }}
+          tag-semver: |
+            {{version}}
+            {{major}}.{{minor}}
+      - name: Docker meta
+        id: meta
+        uses: brianmay/docker-meta@main
+        if: ${{env.DOCKERHUB_USERNAME != 0}}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1.2.0
+        if: ${{env.DOCKERHUB_USERNAME != 0}}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1.3.0
+        if: ${{env.DOCKERHUB_USERNAME != 0}}
+      - name: Login to DockerHub
+        uses: docker/login-action@v1.9.0
+        if: ${{env.DOCKERHUB_USERNAME != 0}}
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2.5.0
+        if: ${{env.DOCKERHUB_USERNAME != 0}}
+        with:
+          context: .
+          file: ./${{ matrix.dir }}/Dockerfile
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.dir }} :master
+          cache-to: type=inline
+          build-args: ${{ steps.meta.outputs.build-args }}
