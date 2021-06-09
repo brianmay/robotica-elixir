@@ -68,4 +68,11 @@
       src="<%= Routes.static_path(@conn, "/js/app.js") %>"
     ></script>
   </body>
+
+  <footer class="text-muted small">
+    <div class="container">
+      Version <%= Application.get_env(:robotica_common, :vcs_ref) %> built on
+      <%= Application.get_env(:robotica_common, :build_date) %>
+    </div>
+  </footer>
 </html>

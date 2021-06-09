@@ -24,6 +24,8 @@ config :robotica_hello, RoboticaHelloWeb.Endpoint,
   pubsub_server: RoboticaHello.PubSub
 
 config :robotica_common,
+  build_date: System.get_env("BUILD_DATE"),
+  vcs_ref: System.get_env("VCS_REF"),
   location: nil,
   config_common_file: "dummy.yaml",
   timezone: "Australia/Melbourne",

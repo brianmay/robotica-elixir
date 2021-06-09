@@ -12,6 +12,9 @@ ARG MIX_ENV=prod
 ENV APP_VSN=${APP_VSN} \
     MIX_ENV=${MIX_ENV}
 
+# By convention, /opt is typically used for applications
+WORKDIR /opt/app
+
 # This step installs all the build tools we'll need
 RUN apk update && \
   apk upgrade --no-cache && \
@@ -45,6 +48,12 @@ RUN \
   npm run deploy && \
   cd .. && \
   mix phx.digest;
+
+# Setup access to version information
+ARG BUILD_DATE=date
+ARG VCS_REF=vcs
+ENV BUILD_DATE=${BUILD_DATE}
+ENV VCS_REF=${VCS_REF}
 
 # Build other dependencies
 COPY ceryx/lib /opt/ceryx/lib/
