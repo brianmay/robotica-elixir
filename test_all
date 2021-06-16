@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+set -x
+
+cd "$(dirname "$0")"
+export MIX_ENV=test
+
+. ./.envrc.test
+
+for i in robotica_common robotica robotica_face robotica_hello robotica_ui ceryx ceryx_docker robotica_nerves ceryx_nerves; do
+    (
+        echo "----- $i -----"
+        cd $i
+        mix deps.get
+        mix format --check-formatted
+        mix credo --strict
+        mix compile
+        mix test
+        mkdir -p priv/plts
+        mix dialyzer
+    )
+done
+
+for i in robotica_face robotica_hello; do
+    (
+        echo "----- $i -----"
+        cd $i
+        npm install --prefix assets
+        mix prettier
+    )
+done

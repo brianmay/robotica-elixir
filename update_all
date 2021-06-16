@@ -1,33 +1,43 @@
-#!/bin/sh -ex
-OLD_PWD="$PWD"
+#!/bin/sh
+set -e
+set -x
 
-cd robotica_face
-mix deps.get
-cd assets
-npm install
-npm run deploy
-cd ../
-mix phx.digest
-cd "$OLD_PWD"
+cd "$(dirname "$0")"
+export MIX_ENV=test
 
 for i in robotica_common robotica robotica_face robotica_hello robotica_ui ceryx ceryx_docker; do
-    cd "$i"
-    mix deps.get
-    mix deps.clean --unlock --unused
-    mix compile
-    cd "$OLD_PWD"
+    (
+        echo "----- $i -----"
+        cd $i
+        # test -f .envrc && . ./.envrc
+        mix deps.get
+        mix deps.clean --unlock --unused
+        # rm -rf _build
+        mix compile
+    )
 done
 
 for i in robotica_nerves ceryx_nerves; do
-    cd "$i"
-    for j in host rpi3; do
-        export MIX_TARGET="$j"
-        export NERVES_NETWORK_MGMT="WPA-PSK"
-
-        mix deps.get
-        mix deps.clean --unlock --unused
-        mix compile
-        unset MIX_TARGET
+    for target in host rpi3; do
+        export MIX_TARGET="$target"
+        (
+            echo "----- $i $target -----"
+            cd $i
+            # test -f .envrc && . ./.envrc
+            mix deps.get
+            mix deps.clean --unlock --unused
+            # rm -rf _build
+            mix compile
+        )
     done
-    cd "$OLD_PWD"
+done
+
+for i in robotica_face robotica_hello; do
+    (
+        echo "----- $i -----"
+        cd $i
+        npm install --prefix assets
+        npm run deploy --prefix assets
+        mix phx.digest
+    )
 done
