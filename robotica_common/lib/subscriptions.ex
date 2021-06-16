@@ -214,7 +214,10 @@ defmodule RoboticaPlugins.Subscriptions do
 
     new_subscriptions =
       new_subscriptions
-      |> Enum.reject(fn {_, []} -> true end)
+      |> Enum.reject(fn
+        {_, []} -> true
+        {_, _} -> false
+      end)
       |> keyword_list_to_map()
 
     %State{state | subscriptions: new_subscriptions}
