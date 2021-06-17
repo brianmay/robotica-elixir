@@ -12,5 +12,14 @@ config :logger, level: :warn
 config :ceryx,
   config_file: "test/config.yaml"
 
+config :robotica_face,
+  api_username: "google_username",
+  api_password: "google_password",
+  mqtt_host: "mqtt.example.org",
+  mqtt_port: 8883,
+  ca_cert_file: "certificate",
+  mqtt_user_name: "mqtt_user_name",
+  mqtt_password: "mqtt_password"
+
 config :robotica_common,
   config_common_file: "../config/common.yaml.sample"
