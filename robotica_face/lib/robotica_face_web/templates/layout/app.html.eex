@@ -40,6 +40,8 @@
                 class="nav-link dropdown-toggle"
                 href="#"
                 data-toggle="dropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
               >
                 <%= RoboticaFace.Auth.current_user(@conn)["name"] %>
               </a>
