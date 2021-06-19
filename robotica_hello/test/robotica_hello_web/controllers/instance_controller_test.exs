@@ -12,7 +12,7 @@ defmodule RoboticaHelloWeb.InstanceControllerTest do
         is_admin: false,
         password: "some password",
         password_confirmation: "some password",
-        email: "user"
+        username: "user"
       })
 
     user

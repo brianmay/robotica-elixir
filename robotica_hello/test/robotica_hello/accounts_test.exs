@@ -7,7 +7,7 @@ defmodule RoboticaHello.AccountsTest do
     alias RoboticaHello.Accounts.User
 
     @valid_attrs %{
-      email: "some email",
+      username: "some username",
       location: "some location",
       is_admin: true,
       name: "some name",
@@ -15,12 +15,12 @@ defmodule RoboticaHello.AccountsTest do
       password_confirmation: "some password"
     }
     @update_attrs %{
-      email: "some updated email",
+      username: "some updated username",
       location: "some updated location",
       is_admin: false,
       name: "some updated name"
     }
-    @invalid_attrs %{email: nil, location: nil, is_admin: nil, name: nil, password: nil}
+    @invalid_attrs %{username: nil, location: nil, is_admin: nil, name: nil, password: nil}
     @password_attrs %{
       password: "some other password",
       password_confirmation: "some other password"
@@ -51,7 +51,7 @@ defmodule RoboticaHello.AccountsTest do
 
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
-      assert user.email == "some email"
+      assert user.username == "some username"
       assert user.location == "some location"
       assert user.is_admin == true
       assert user.name == "some name"
@@ -65,7 +65,7 @@ defmodule RoboticaHello.AccountsTest do
     test "update_user/2 with valid data updates the user" do
       user = user_fixture()
       assert {:ok, %User{} = user} = Accounts.update_user(user, @update_attrs)
-      assert user.email == "some updated email"
+      assert user.username == "some updated username"
       assert user.location == "some updated location"
       assert user.is_admin == false
       assert user.name == "some updated name"
@@ -109,19 +109,22 @@ defmodule RoboticaHello.AccountsTest do
 
     test "authenticate_user/2 returns success" do
       user = user_fixture()
-      {:ok, got_user} = Accounts.authenticate_user("some email", "some password")
+      {:ok, got_user} = Accounts.authenticate_user("some username", "some password")
       assert user == got_user
     end
 
     test "authenticate_user/2 with invalid username" do
       user_fixture()
 
-      {:error, :invalid_credentials} = Accounts.authenticate_user("other email", "some password")
+      {:error, :invalid_credentials} =
+        Accounts.authenticate_user("other username", "some password")
     end
 
     test "authenticate_user/2 with invalid password" do
       user_fixture()
-      {:error, :invalid_credentials} = Accounts.authenticate_user("some email", "other password")
+
+      {:error, :invalid_credentials} =
+        Accounts.authenticate_user("some username", "other password")
     end
   end
 end

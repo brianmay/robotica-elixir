@@ -7,7 +7,7 @@ defmodule RoboticaHello.Accounts.User do
   @timestamps_opts [type: :utc_datetime, usec: true]
 
   @type t :: %__MODULE__{
-          email: String.t() | nil,
+          username: String.t() | nil,
           is_admin: boolean() | nil,
           name: String.t() | nil,
           password: String.t() | nil,
@@ -18,7 +18,7 @@ defmodule RoboticaHello.Accounts.User do
         }
 
   schema "users" do
-    field :email, :string
+    field :username, :string
     field :is_admin, :boolean, default: false
     field :location, :string
     field :name, :string
@@ -32,8 +32,8 @@ defmodule RoboticaHello.Accounts.User do
   @doc false
   def create_changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :email, :is_admin, :location, :password, :password_confirmation])
-    |> validate_required([:name, :email, :location, :password, :password_confirmation])
+    |> cast(attrs, [:name, :username, :is_admin, :location, :password, :password_confirmation])
+    |> validate_required([:name, :username, :location, :password, :password_confirmation])
     |> validate_length(:password, min: 8)
     |> validate_confirmation(:password)
     |> put_password_hash
@@ -43,8 +43,8 @@ defmodule RoboticaHello.Accounts.User do
   @doc false
   def update_changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :email, :is_admin, :location])
-    |> validate_required([:name, :email, :location])
+    |> cast(attrs, [:name, :username, :is_admin, :location])
+    |> validate_required([:name, :username, :location])
   end
 
   @doc false

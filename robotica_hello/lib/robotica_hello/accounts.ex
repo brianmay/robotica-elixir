@@ -142,8 +142,8 @@ defmodule RoboticaHello.Accounts do
       {:ok, %Ecto.Changeset{source: %User{}}}
 
   """
-  def authenticate_user(email, plain_text_password) do
-    query = from u in User, where: u.email == ^email
+  def authenticate_user(username, plain_text_password) do
+    query = from u in User, where: u.username == ^username
 
     case Repo.one(query) do
       nil ->

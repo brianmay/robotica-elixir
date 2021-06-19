@@ -5,7 +5,7 @@ defmodule RoboticaHelloWeb.UserControllerTest do
   alias RoboticaHello.Accounts.Guardian
 
   @create_attrs %{
-    email: "some email",
+    username: "some username",
     location: "some location",
     is_admin: true,
     name: "some name",
@@ -13,12 +13,12 @@ defmodule RoboticaHelloWeb.UserControllerTest do
     password_confirmation: "some password"
   }
   @update_attrs %{
-    email: "some updated email",
+    username: "some updated username",
     location: "some updated location",
     is_admin: false,
     name: "some updated name"
   }
-  @invalid_attrs %{email: nil, location: nil, name: nil, is_admin: nil, password: nil}
+  @invalid_attrs %{username: nil, location: nil, name: nil, is_admin: nil, password: nil}
   @password_attrs %{
     password: "some password",
     password_confirmation: "some password"
@@ -36,7 +36,7 @@ defmodule RoboticaHelloWeb.UserControllerTest do
         is_admin: false,
         password: "some password",
         password_confirmation: "some password",
-        email: "user"
+        username: "user"
       })
 
     {:ok, token, _} = Guardian.encode_and_sign(user, %{}, token_type: :access)
@@ -51,7 +51,7 @@ defmodule RoboticaHelloWeb.UserControllerTest do
         is_admin: true,
         password: "some password",
         password_confirmation: "some password",
-        email: "admin"
+        username: "admin"
       })
 
     {:ok, token, _} = Guardian.encode_and_sign(user, %{}, token_type: :access)
@@ -196,7 +196,7 @@ defmodule RoboticaHelloWeb.UserControllerTest do
       assert redirected_to(conn) == Routes.user_path(conn, :show, user)
 
       conn = get(conn, Routes.user_path(conn, :show, user))
-      assert html_response(conn, 200) =~ "some updated email"
+      assert html_response(conn, 200) =~ "some updated username"
     end
 
     test "renders errors when data is invalid", %{conn: conn, user: user} do

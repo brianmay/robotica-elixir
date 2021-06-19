@@ -12,7 +12,7 @@ defmodule RoboticaHelloWeb.SessionControllerTest do
         is_admin: false,
         password: "some password",
         password_confirmation: "some password",
-        email: "user"
+        username: "user"
       })
 
     user
@@ -84,7 +84,7 @@ defmodule RoboticaHelloWeb.SessionControllerTest do
 
       conn =
         post(conn, Routes.session_path(conn, :new),
-          user: %{"email" => "user", "password" => "some password"}
+          user: %{"username" => "user", "password" => "some password"}
         )
 
       assert redirected_to(conn) == Routes.page_path(conn, :index)
