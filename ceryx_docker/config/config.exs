@@ -10,6 +10,15 @@ config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 config :ceryx,
   config_file: nil
 
+config :robotica_face,
+  api_username: "google_username",
+  api_password: "google_password",
+  mqtt_host: "mqtt.example.org",
+  mqtt_port: 8883,
+  ca_cert_file: "certificate",
+  mqtt_user_name: "mqtt_user_name",
+  mqtt_password: "mqtt_password"
+
 config :robotica_common,
   build_date: System.get_env("BUILD_DATE"),
   vcs_ref: System.get_env("VCS_REF"),
