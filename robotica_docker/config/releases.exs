@@ -4,6 +4,7 @@ config :robotica_common,
   config_common_file: System.get_env("ROBOTICA_COMMON_CONFIG")
 
 config :robotica,
+  hostname: System.get_env("HTTP_HOST"),
   config_file: System.get_env("ROBOTICA_CONFIG"),
   classifications_file: System.get_env("ROBOTICA_CLASSIFICATIONS"),
   schedule_file: System.get_env("ROBOTICA_SCHEDULE"),
