@@ -39,6 +39,7 @@ config :tp_link_hs100,
 case Mix.env() do
   :test ->
     config :robotica,
+      hostname: "test-host",
       config_file: "../test/config.yaml",
       classifications_file: "../test/classifications.yaml",
       schedule_file: "../test/schedule.yaml",
