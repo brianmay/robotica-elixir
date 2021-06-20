@@ -3,11 +3,21 @@ defmodule Robotica.Scheduler.Schedule do
   Process a schedule entry
   """
 
+  alias Robotica.Config.Loader
+
   @timezone Application.compile_env(:robotica, :timezone)
 
-  @filename Application.compile_env(:robotica, :schedule_file)
-  @external_resource @filename
-  @data Robotica.Config.Loader.schedule(@filename)
+  if Application.compile_env(:robotica_common, :compile_config_files) do
+    @filename Application.compile_env(:robotica, :schedule_file)
+    @external_resource @filename
+    @data Loader.schedule(@filename)
+    defp get_data, do: @data
+  else
+    defp get_data do
+      filename = Application.get_env(:robotica, :schedule_file)
+      Loader.schedule(filename)
+    end
+  end
 
   defp convert_time_to_utc(date, time) do
     {:ok, naive_date_time} = NaiveDateTime.new(date, time)
@@ -44,7 +54,7 @@ defmodule Robotica.Scheduler.Schedule do
   end
 
   def get_schedule(classifications, date) do
-    s = @data
+    s = get_data()
 
     expanded_schedule = add_schedule(%{}, date, s, "*")
 

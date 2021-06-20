@@ -27,6 +27,7 @@ config :robotica_common,
   build_date: System.get_env("BUILD_DATE"),
   vcs_ref: System.get_env("VCS_REF"),
   location: nil,
+  compile_config_files: true,
   config_common_file: "../../local/config/common.yaml",
   map_types: []
 

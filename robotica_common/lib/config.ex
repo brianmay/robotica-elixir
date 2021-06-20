@@ -49,7 +49,7 @@ defmodule RoboticaCommon.Config do
     end
   end
 
-  if Application.get_env(:robotica_common, :config_common_file) do
+  if Application.compile_env(:robotica_common, :compile_config_files) do
     @filename Application.compile_env(:robotica_common, :config_common_file)
     @external_resource @filename
     @common_config Loader.ui_common_configuration(@filename)

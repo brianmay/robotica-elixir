@@ -2,6 +2,7 @@ defmodule Robotica.Scheduler.Classifier do
   @moduledoc """
   Process schedule classifier days
   """
+  alias Robotica.Config.Loader
   alias Robotica.Types
 
   defp is_week_day?(date) do
@@ -11,9 +12,17 @@ defmodule Robotica.Scheduler.Classifier do
     end
   end
 
-  @filename Application.compile_env(:robotica, :classifications_file)
-  @external_resource @filename
-  @data Robotica.Config.Loader.classifications(@filename)
+  if Application.compile_env(:robotica_common, :compile_config_files) do
+    @filename Application.compile_env(:robotica, :classifications_file)
+    @external_resource @filename
+    @data Loader.classifications(@filename)
+    defp get_data, do: @data
+  else
+    defp get_data do
+      filename = Application.get_env(:robotica, :classifications_file)
+      Loader.classifications(filename)
+    end
+  end
 
   defp is_date_in_classification?(%Types.Classification{} = classification, date) do
     cond do
@@ -116,7 +125,7 @@ defmodule Robotica.Scheduler.Classifier do
   end
 
   def classify_date(date) do
-    @data
+    get_data()
     |> Enum.filter(fn classification -> is_in_classification?(classification, date) end)
     |> reject_excluded()
     |> Enum.map(fn classification -> classification.day_type end)

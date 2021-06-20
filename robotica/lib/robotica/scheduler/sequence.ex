@@ -4,9 +4,19 @@ defmodule Robotica.Scheduler.Sequence do
   """
   require Logger
 
-  @filename Application.compile_env(:robotica, :sequences_file)
-  @external_resource @filename
-  @data Robotica.Config.Loader.sequences(@filename)
+  alias Robotica.Config.Loader
+
+  if Application.compile_env(:robotica_common, :compile_config_files) do
+    @filename Application.compile_env(:robotica, :sequences_file)
+    @external_resource @filename
+    @data Loader.sequences(@filename)
+    defp get_data, do: @data
+  else
+    defp get_data do
+      filename = Application.get_env(:robotica, :sequences_file)
+      Loader.sequences(filename)
+    end
+  end
 
   defp add_id_to_steps([], _, _), do: []
 
@@ -26,7 +36,7 @@ defmodule Robotica.Scheduler.Sequence do
   end
 
   defp get_sequence(sequence_name, options) do
-    Map.fetch!(@data, sequence_name)
+    Map.fetch!(get_data(), sequence_name)
     |> add_id_to_steps(sequence_name, 0)
     |> filter_options(options)
   end

@@ -3,12 +3,10 @@ defmodule Robotica.RoboticaService do
 
   require Logger
 
-  alias Robotica.Scheduler.Executor
-
   def process({:request_schedule = topic, id}) do
     Logger.info("got request_schedule")
     EventBus.fetch_event_data({topic, id})
-    Executor.request_schedule(Executor)
+    # Does nothing, check this is still required.
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 

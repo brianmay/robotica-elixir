@@ -47,7 +47,14 @@ defmodule RoboticaNerves.MixProject do
   def application do
     [
       mod: {RoboticaNerves.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [
+        :logger,
+        :runtime_tools,
+        :robotica_common,
+        :robotica_face,
+        :robotica_ui,
+        :robotica
+      ]
     ]
   end
 

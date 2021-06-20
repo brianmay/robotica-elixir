@@ -4,21 +4,25 @@ defmodule Robotica.Client do
   """
 
   use Tortoise.Handler
+  use EventBus.EventSource
 
   alias Robotica.Scheduler.Executor
   alias Robotica.Scheduler.Marks
+  alias Robotica.Validation
 
   require Logger
 
   defmodule State do
     @moduledoc false
-    @type t :: %__MODULE__{}
-    defstruct []
+    @type t :: %__MODULE__{
+            remote_scheduler: String.t() | nil
+          }
+    defstruct [:remote_scheduler]
   end
 
   @spec init(opts :: list) :: {:ok, State.t()}
-  def init(_opts) do
-    {:ok, %State{}}
+  def init(opts) do
+    {:ok, %State{remote_scheduler: Keyword.fetch!(opts, :remote_scheduler)}}
   end
 
   def connection(:up, state) do
@@ -78,12 +82,30 @@ defmodule Robotica.Client do
   def handle_message(["mark"] = topic, publish, state) do
     Logger.info("Received mqtt topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
 
+    # We do not need to process mark unless we have a scheduler running
+    if state.remote_scheduler == nil do
+      with {:ok, message} <- Poison.decode(publish),
+           {:ok, mark} <- Robotica.Config.validate_mark(message) do
+        Marks.put_mark(Marks, mark)
+        Executor.reload_marks(Executor)
+      else
+        {:error, error} -> Logger.error("Invalid mark message received: #{inspect(error)}.")
+      end
+    end
+
+    {:ok, state}
+  end
+
+  def handle_message(["schedule", _] = topic, publish, state) do
+    Logger.info("Received mqtt topic: #{Enum.join(topic, "/")} #{inspect(publish)}")
+
     with {:ok, message} <- Poison.decode(publish),
-         {:ok, mark} <- Robotica.Config.validate_mark(message) do
-      Marks.put_mark(Marks, mark)
-      Executor.reload_marks(Executor)
+         {:ok, steps} <- Validation.validate_scheduled_steps(message) do
+      EventSource.notify %{topic: :schedule} do
+        steps
+      end
     else
-      {:error, error} -> Logger.error("Invalid mark message received: #{inspect(error)}.")
+      {:error, error} -> Logger.error("Invalid schedule message received: #{inspect(error)}.")
     end
 
     {:ok, state}

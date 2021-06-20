@@ -9,20 +9,21 @@ defmodule Robotica.Supervisor do
     The top level robotica configuration
     """
     @type t :: %__MODULE__{
+            remote_scheduler: String.t() | nil,
             plugins: list(Robotica.Plugin.t()),
             mqtt: map()
           }
-    @enforce_keys [:plugins, :mqtt]
-    defstruct plugins: [], mqtt: nil
+    @enforce_keys [:remote_scheduler, :plugins, :mqtt]
+    defstruct remote_scheduler: nil, plugins: [], mqtt: nil
   end
 
   @spec start_link(opts :: State.t()) :: {:ok, pid} | {:error, String.t()}
-  def start_link(opts) do
+  def start_link(%State{} = opts) do
     {:ok, _pid} = Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
   @impl true
-  def init(opts) do
+  def init(%State{} = opts) do
     client_id = RoboticaCommon.Mqtt.get_tortoise_client_id()
 
     EventBus.register_topic(:schedule)
@@ -38,38 +39,55 @@ defmodule Robotica.Supervisor do
        ["^request_schedule$", "^command$", "^mark$", "^subscribe$", "^unsubscribe_all$"]}
     )
 
+    subscriptions = [
+      {"execute", 0},
+      {"mark", 0},
+      {"request/all/#", 0},
+      {"request/#{client_id}/#", 0},
+
+      # Dynamic subscriptions,
+      # Here because of https://github.com/gausby/tortoise/issues/130
+      # Should be done in subscriptions.ex
+      # All plugins
+      {"command/#", 0},
+      # sonoff plugin
+      {"stat/#", 0},
+      {"tele/#", 0},
+      # robotica_ui and robotica_face
+      {"state/#", 0}
+    ]
+
+    subscriptions =
+      if opts.remote_scheduler do
+        [{"schedule/#{opts.remote_scheduler}", 0} | subscriptions]
+      else
+        subscriptions
+      end
+
     children = [
       {Robotica.PluginRegistry, name: Robotica.PluginRegistry},
       {RoboticaCommon.Subscriptions, name: RoboticaCommon.Subscriptions},
       {Robotica.Executor, name: Robotica.Executor},
-      {Robotica.Scheduler.Marks, name: Robotica.Scheduler.Marks},
-      {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor},
       {Tortoise.Connection,
        client_id: client_id,
-       handler: {Robotica.Client, []},
+       handler: {Robotica.Client, [remote_scheduler: opts.remote_scheduler]},
        user_name: opts.mqtt.user_name,
        password: opts.mqtt.password,
        server:
          {Tortoise.Transport.SSL,
           host: opts.mqtt.host, port: opts.mqtt.port, cacertfile: opts.mqtt.ca_cert_file},
-       subscriptions: [
-         {"execute", 0},
-         {"mark", 0},
-         {"request/all/#", 0},
-         {"request/#{client_id}/#", 0},
-
-         # Dynamic subscriptions,
-         # Here because of https://github.com/gausby/tortoise/issues/130
-         # Should be done in subscriptions.ex
-         # All plugins
-         {"command/#", 0},
-         # sonoff plugin
-         {"stat/#", 0},
-         {"tele/#", 0},
-         # robotica_ui and robotica_face
-         {"state/#", 0}
-       ]}
+       subscriptions: subscriptions}
     ]
+
+    children =
+      if opts.remote_scheduler do
+        children
+      else
+        [
+          {Robotica.Scheduler.Marks, name: Robotica.Scheduler.Marks},
+          {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor} | children
+        ]
+      end
 
     extra_children =
       opts.plugins

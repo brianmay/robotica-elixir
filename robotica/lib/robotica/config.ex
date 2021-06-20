@@ -67,6 +67,7 @@ defmodule Robotica.Config do
 
     defp config_schema do
       %{
+        remote_scheduler: {:string, false},
         hosts: {{:map, :string, host_schema()}, true},
         mqtt: {mqtt_config_schema(), true}
       }
@@ -103,17 +104,31 @@ defmodule Robotica.Config do
     end
   end
 
-  @filename Application.compile_env(:robotica, :config_file)
-  @external_resource @filename
-  @config Loader.configuration(@filename)
+  if Application.compile_env(:robotica_common, :compile_config_files) do
+    @filename Application.compile_env(:robotica, :config_file)
+    @external_resource @filename
+    @config Loader.configuration(@filename)
+    defp get_config, do: @config
 
-  @scenes_filename Application.compile_env(:robotica, :scenes_file)
-  @external_resource @scenes_filename
-  @scenes Loader.scenes(@scenes_filename)
+    @scenes_filename Application.compile_env(:robotica, :scenes_file)
+    @external_resource @scenes_filename
+    @scenes Loader.scenes(@scenes_filename)
+    defp get_scenes, do: @scenes
+  else
+    defp get_config do
+      filename = Application.get_env(:robotica, :config_file)
+      Loader.configuration(filename)
+    end
+
+    defp get_scenes do
+      filename = Application.get_env(:robotica, :scenes_file)
+      Loader.configuration(filename)
+    end
+  end
 
   @spec get_hosts :: %{required(String.t()) => map()}
   def get_hosts do
-    @config.hosts
+    get_config().hosts
   end
 
   @spec hostname :: String.t()
@@ -143,14 +158,15 @@ defmodule Robotica.Config do
   @spec configuration :: Robotica.Supervisor.State.t()
   def configuration do
     %Robotica.Supervisor.State{
-      mqtt: @config.mqtt,
+      remote_scheduler: get_config().remote_scheduler,
+      mqtt: get_config().mqtt,
       plugins: plugins()
     }
   end
 
   @spec get_scene(String.t()) :: list()
   def get_scene(scene_name) do
-    case Map.get(@scenes.scenes, scene_name) do
+    case Map.get(get_scenes().scenes, scene_name) do
       nil ->
         Logger.error("Unknown scene name #{scene_name}")
         []
