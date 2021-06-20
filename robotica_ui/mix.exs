@@ -39,8 +39,7 @@ defmodule RoboticaUi.MixProject do
   # Specify target specific dependencies
   defp deps("host") do
     [
-      {:scenic_driver_glfw, "~> 0.10"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev}
+      {:scenic_driver_glfw, "~> 0.10", only: [:dev, :prod]}
     ]
   end
 
