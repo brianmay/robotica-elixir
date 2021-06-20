@@ -6,3 +6,15 @@ import_config "../../robotica_common/config/config.exs"
 
 config :ceryx,
   config_file: "../../local/config/ceryx.yaml"
+
+case Mix.env() do
+  :test ->
+    config :ceryx,
+      config_file: "../test/ceryx.yaml"
+
+  :dev ->
+    nil
+
+  :prod ->
+    nil
+end
