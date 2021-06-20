@@ -61,13 +61,13 @@ defmodule Robotica.Config do
     defp host_schema do
       %{
         http_host: {:string, true},
+        remote_scheduler: {:string, false},
         plugins: {{:list, plugin_schema()}, true}
       }
     end
 
     defp config_schema do
       %{
-        remote_scheduler: {:string, false},
         hosts: {{:map, :string, host_schema()}, true},
         mqtt: {mqtt_config_schema(), true}
       }
@@ -131,6 +131,11 @@ defmodule Robotica.Config do
     get_config().hosts
   end
 
+  @spec get_host_config :: %{required(atom()) => any()}
+  def get_host_config do
+    Map.fetch!(get_hosts(), hostname())
+  end
+
   @spec hostname :: String.t()
   defp hostname do
     case Application.get_env(:robotica, :hostname) do
@@ -145,20 +150,18 @@ defmodule Robotica.Config do
 
   @spec http_host :: String.t()
   def http_host do
-    hosts = get_hosts()
-    Map.fetch!(hosts, hostname()).http_host
+    get_host_config().http_host
   end
 
   @spec plugins :: list(Robotica.Plugin.t())
   def plugins do
-    hosts = get_hosts()
-    Map.fetch!(hosts, hostname()).plugins
+    get_host_config().plugins
   end
 
-  @spec configuration :: Robotica.Supervisor.State.t()
+  @spec configuration :: Robotica.Supervisor.Config.t()
   def configuration do
-    %Robotica.Supervisor.State{
-      remote_scheduler: get_config().remote_scheduler,
+    %Robotica.Supervisor.Config{
+      remote_scheduler: get_host_config().remote_scheduler,
       mqtt: get_config().mqtt,
       plugins: plugins()
     }

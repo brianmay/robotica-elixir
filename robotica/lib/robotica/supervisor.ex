@@ -4,7 +4,7 @@ defmodule Robotica.Supervisor do
   """
   use Supervisor
 
-  defmodule State do
+  defmodule Config do
     @moduledoc """
     The top level robotica configuration
     """
@@ -17,13 +17,13 @@ defmodule Robotica.Supervisor do
     defstruct remote_scheduler: nil, plugins: [], mqtt: nil
   end
 
-  @spec start_link(opts :: State.t()) :: {:ok, pid} | {:error, String.t()}
-  def start_link(%State{} = opts) do
+  @spec start_link(opts :: Config.t()) :: {:ok, pid} | {:error, String.t()}
+  def start_link(%Config{} = opts) do
     {:ok, _pid} = Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
   @impl true
-  def init(%State{} = opts) do
+  def init(%Config{} = opts) do
     client_id = RoboticaCommon.Mqtt.get_tortoise_client_id()
 
     EventBus.register_topic(:schedule)
