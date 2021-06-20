@@ -5,11 +5,11 @@ defmodule Robotica.Plugins.Audio do
 
   use GenServer
   use Robotica.Plugin
-  use RoboticaPlugins.EventBus
+  use RoboticaCommon.EventBus
   require Logger
 
   import Robotica.Types
-  alias RoboticaPlugins.Strings
+  alias RoboticaCommon.Strings
 
   defmodule Commands do
     @moduledoc false
@@ -142,7 +142,7 @@ defmodule Robotica.Plugins.Audio do
 
   @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
   defp publish_raw(%State{} = state, topic, value) do
-    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic) do
+    case RoboticaCommon.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic) do
       :ok ->
         :ok
 

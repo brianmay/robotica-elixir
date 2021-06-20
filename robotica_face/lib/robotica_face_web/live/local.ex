@@ -1,9 +1,9 @@
 defmodule RoboticaFaceWeb.Live.Local do
   @moduledoc false
   use Phoenix.LiveView
-  use RoboticaPlugins.EventBus
+  use RoboticaCommon.EventBus
 
-  alias RoboticaPlugins.Config
+  alias RoboticaCommon.Config
 
   require Logger
 
@@ -55,8 +55,7 @@ defmodule RoboticaFaceWeb.Live.Local do
         button ->
           button_state = get_button_state(socket.assigns.button_states, button_id)
 
-          button_state =
-            RoboticaPlugins.Buttons.process_message(button, label, data, button_state)
+          button_state = RoboticaCommon.Buttons.process_message(button, label, data, button_state)
 
           button_states = Map.put(socket.assigns.button_states, button_id, button_state)
           assign(socket, :button_states, button_states)
@@ -82,7 +81,7 @@ defmodule RoboticaFaceWeb.Live.Local do
 
       button ->
         button_state = get_button_state(socket.assigns.button_states, button_id)
-        RoboticaPlugins.Buttons.execute_press_commands(button, button_state)
+        RoboticaCommon.Buttons.execute_press_commands(button, button_state)
     end
 
     {:noreply, socket}
@@ -109,7 +108,7 @@ defmodule RoboticaFaceWeb.Live.Local do
     Map.get(button_states, id)
   end
 
-  @spec display_state_to_class(RoboticaPlugins.Buttons.display_state()) :: String.t()
+  @spec display_state_to_class(RoboticaCommon.Buttons.display_state()) :: String.t()
   defp display_state_to_class(:state_on), do: "btn-success"
   defp display_state_to_class(:state_off), do: "btn-primary"
   defp display_state_to_class(:state_hard_off), do: "btn-light"
@@ -117,7 +116,7 @@ defmodule RoboticaFaceWeb.Live.Local do
   defp display_state_to_class(nil), do: "btn-secondary"
 
   defp button_state_to_class(button_state, button) do
-    RoboticaPlugins.Buttons.get_display_state(button, button_state) |> display_state_to_class()
+    RoboticaCommon.Buttons.get_display_state(button, button_state) |> display_state_to_class()
   end
 
   defp set_location(socket, location) do
@@ -129,13 +128,13 @@ defmodule RoboticaFaceWeb.Live.Local do
         false -> []
       end
 
-    RoboticaPlugins.Buttons.unsubscribe_all()
+    RoboticaCommon.Buttons.unsubscribe_all()
 
     button_states =
       Enum.reduce(buttons, %{}, fn row, button_states ->
         Enum.reduce(row.buttons, button_states, fn button, button_states ->
-          RoboticaPlugins.Buttons.subscribe_topics(button)
-          Map.put(button_states, button.id, RoboticaPlugins.Buttons.get_initial_state(button))
+          RoboticaCommon.Buttons.subscribe_topics(button)
+          Map.put(button_states, button.id, RoboticaCommon.Buttons.get_initial_state(button))
         end)
       end)
 

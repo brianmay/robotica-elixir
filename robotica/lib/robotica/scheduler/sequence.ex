@@ -55,7 +55,7 @@ defmodule Robotica.Scheduler.Sequence do
 
     latest_time = DateTime.add(required_time, latest_time, :second)
 
-    scheduled_step = %RoboticaPlugins.ScheduledStep{
+    scheduled_step = %RoboticaCommon.ScheduledStep{
       required_time: required_time,
       latest_time: latest_time,
       tasks: step.tasks,
@@ -95,7 +95,7 @@ defmodule Robotica.Scheduler.Sequence do
           end)
 
         Enum.map(list, fn {i, required_time} ->
-          %RoboticaPlugins.SourceStep{
+          %RoboticaCommon.SourceStep{
             step
             | required_time: required_time,
               repeat_number: i

@@ -62,7 +62,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
   end
 
   defp get_step_message(step) do
-    RoboticaPlugins.ScheduledStep.step_to_text(step, include_locations: true)
+    RoboticaCommon.ScheduledStep.step_to_text(step, include_locations: true)
   end
 
   defp head_or_nil([]), do: nil
@@ -76,7 +76,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
   end
 
   defp do_mark(task, status) do
-    RoboticaPlugins.Mark.mark_task(task, status)
+    RoboticaCommon.Mark.mark_task(task, status)
   end
 
   def handle_event("mark", %{"mark" => status, "step_time" => step_time, "step_id" => id}, socket) do

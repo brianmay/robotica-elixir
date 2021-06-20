@@ -1,6 +1,6 @@
-defmodule RoboticaPluginsTest do
+defmodule RoboticaCommonTest do
   use ExUnit.Case
-  doctest RoboticaPlugins
+  doctest RoboticaCommon
 
   test "greets the world" do
     assert :world == :world

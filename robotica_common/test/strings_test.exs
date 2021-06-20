@@ -1,4 +1,4 @@
-defmodule RoboticaPlugins.StringsTest do
+defmodule RoboticaCommon.StringsTest do
   use ExUnit.Case
-  doctest RoboticaPlugins.Strings
+  doctest RoboticaCommon.Strings
 end

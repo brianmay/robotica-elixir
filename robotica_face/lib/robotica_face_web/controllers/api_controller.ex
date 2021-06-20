@@ -91,7 +91,7 @@ defmodule RoboticaFaceWeb.ApiController do
 
         msgs =
           Enum.map(step["tasks"], fn task ->
-            RoboticaPlugins.Task.task_to_text(task)
+            RoboticaCommon.Task.task_to_text(task)
           end)
           |> Enum.filter(fn msg -> not is_nil(msg) end)
 
@@ -148,8 +148,8 @@ defmodule RoboticaFaceWeb.ApiController do
     {:ok, steps} = RoboticaFace.Schedule.get_schedule()
 
     midnight =
-      RoboticaPlugins.Date.tomorrow(now)
-      |> RoboticaPlugins.Date.midnight_utc()
+      RoboticaCommon.Date.tomorrow(now)
+      |> RoboticaCommon.Date.midnight_utc()
 
     steps
     |> parse_steps()
@@ -230,7 +230,7 @@ defmodule RoboticaFaceWeb.ApiController do
 
         count =
           reduce_task(steps, 0, fn _time, task, acc ->
-            result = RoboticaPlugins.Mark.mark_task(task, status)
+            result = RoboticaCommon.Mark.mark_task(task, status)
 
             case result do
               :error -> acc

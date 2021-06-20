@@ -1,4 +1,4 @@
-defmodule RoboticaPlugins.DateTest do
+defmodule RoboticaCommon.DateTest do
   use ExUnit.Case
-  doctest RoboticaPlugins.Date
+  doctest RoboticaCommon.Date
 end

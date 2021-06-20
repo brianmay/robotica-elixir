@@ -1,8 +1,8 @@
-defmodule RoboticaPlugins.Buttons do
+defmodule RoboticaCommon.Buttons do
   @moduledoc """
   Functions to determine button state
   """
-  use RoboticaPlugins.EventBus
+  use RoboticaCommon.EventBus
 
   defmodule Config do
     @moduledoc """
@@ -36,13 +36,13 @@ defmodule RoboticaPlugins.Buttons do
 
   @callback process_message(Config.t(), atom(), any(), state) :: state
   @callback get_display_state(Config.t(), state) :: display_state
-  @callback get_press_commands(Config.t(), state) :: list(RoboticaPlugins.CommandTask.t())
+  @callback get_press_commands(Config.t(), state) :: list(RoboticaCommon.CommandTask.t())
 
   @spec get_button_controller(Config.t()) :: module()
-  def get_button_controller(%Config{type: "light"}), do: RoboticaPlugins.Buttons.Light
-  def get_button_controller(%Config{type: "music"}), do: RoboticaPlugins.Buttons.Music
-  def get_button_controller(%Config{type: "hdmi"}), do: RoboticaPlugins.Buttons.HDMI
-  def get_button_controller(%Config{type: "switch"}), do: RoboticaPlugins.Buttons.Switch
+  def get_button_controller(%Config{type: "light"}), do: RoboticaCommon.Buttons.Light
+  def get_button_controller(%Config{type: "music"}), do: RoboticaCommon.Buttons.Music
+  def get_button_controller(%Config{type: "hdmi"}), do: RoboticaCommon.Buttons.HDMI
+  def get_button_controller(%Config{type: "switch"}), do: RoboticaCommon.Buttons.Switch
 
   @spec get_initial_state(Config.t()) :: state
   def get_initial_state(%Config{} = config) do
@@ -68,7 +68,7 @@ defmodule RoboticaPlugins.Buttons do
     controller.get_display_state(config, state)
   end
 
-  @spec get_press_commands(Config.t(), state) :: list(RoboticaPlugins.CommandTask.t())
+  @spec get_press_commands(Config.t(), state) :: list(RoboticaCommon.CommandTask.t())
   def get_press_commands(%Config{} = config, state) do
     controller = get_button_controller(config)
     controller.get_press_commands(config, state)
@@ -79,7 +79,7 @@ defmodule RoboticaPlugins.Buttons do
     config
     |> get_topics()
     |> Enum.each(fn {topic, format, label} ->
-      RoboticaPlugins.EventBus.notify(:subscribe, %{
+      RoboticaCommon.EventBus.notify(:subscribe, %{
         topic: topic,
         label: {config.id, label},
         pid: self(),
@@ -91,7 +91,7 @@ defmodule RoboticaPlugins.Buttons do
 
   @spec unsubscribe_all :: :ok
   def unsubscribe_all do
-    RoboticaPlugins.EventBus.notify(:unsubscribe_all, %{
+    RoboticaCommon.EventBus.notify(:unsubscribe_all, %{
       pid: self()
     })
   end
@@ -101,7 +101,7 @@ defmodule RoboticaPlugins.Buttons do
     commands = get_press_commands(config, state)
 
     Enum.each(commands, fn command ->
-      RoboticaPlugins.EventBus.notify(:command, command)
+      RoboticaCommon.EventBus.notify(:command, command)
     end)
   end
 end

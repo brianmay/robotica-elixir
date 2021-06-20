@@ -3,7 +3,7 @@ defmodule Robotica.Executor do
   Execute Robotica tasks in a pseudo synchronised manner
   """
 
-  use RoboticaPlugins.EventBus
+  use RoboticaCommon.EventBus
   use GenServer
   use EventBus.EventSource
 
@@ -20,7 +20,7 @@ defmodule Robotica.Executor do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  @spec execute_tasks(tasks :: list(RoboticaPlugins.Task.t())) :: :ok
+  @spec execute_tasks(tasks :: list(RoboticaCommon.Task.t())) :: :ok
   def execute_tasks(tasks) do
     GenServer.cast(Robotica.Executor, {:execute_tasks, tasks})
   end
@@ -31,12 +31,12 @@ defmodule Robotica.Executor do
     {:ok, %State{}}
   end
 
-  @spec handle_execute_tasks(tasks :: list(RoboticaPlugins.Task.t())) :: :ok
+  @spec handle_execute_tasks(tasks :: list(RoboticaCommon.Task.t())) :: :ok
   defp handle_execute_tasks(tasks) do
     Enum.each(tasks, fn scheduled_task ->
       Enum.each(scheduled_task.locations, fn location ->
         Enum.each(scheduled_task.devices, fn device ->
-          command = %RoboticaPlugins.CommandTask{
+          command = %RoboticaCommon.CommandTask{
             location: location,
             device: device,
             command: scheduled_task.command

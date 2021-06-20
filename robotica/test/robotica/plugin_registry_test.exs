@@ -2,7 +2,7 @@ defmodule Robotica.PluginRegistry.Test do
   use ExUnit.Case, async: true
 
   setup do
-    start_supervised!({Robotica.DummySubscriptions, name: RoboticaPlugins.Subscriptions})
+    start_supervised!({Robotica.DummySubscriptions, name: RoboticaCommon.Subscriptions})
     registry = start_supervised!({Robotica.PluginRegistry, name: Robotica.PluginRegistry})
     %{registry: registry}
   end

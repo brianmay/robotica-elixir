@@ -1,4 +1,4 @@
-defmodule RoboticaPlugins.Date do
+defmodule RoboticaCommon.Date do
   @moduledoc """
   Provides data/time functions for Robotica.
   """
@@ -11,11 +11,11 @@ defmodule RoboticaPlugins.Date do
 
   Note: 13:00 UTC is midnight in Australia/Melbourne timezone at this date.
 
-  iex> import RoboticaPlugins.Date
+  iex> import RoboticaCommon.Date
   iex> today(~U[2019-11-09 12:00:00Z])
   ~D[2019-11-09]
 
-  iex> import RoboticaPlugins.Date
+  iex> import RoboticaCommon.Date
   iex> today(~U[2019-11-09 13:00:00Z])
   ~D[2019-11-10]
   """
@@ -30,11 +30,11 @@ defmodule RoboticaPlugins.Date do
 
   Note: 13:00 UTC is midnight in Australia/Melbourne timezone at this date.
 
-  iex> import RoboticaPlugins.Date
+  iex> import RoboticaCommon.Date
   iex> tomorrow(~U[2019-11-09 12:00:00Z])
   ~D[2019-11-10]
 
-  iex> import RoboticaPlugins.Date
+  iex> import RoboticaCommon.Date
   iex> tomorrow(~U[2019-11-09 13:00:00Z])
   ~D[2019-11-11]
   """
@@ -49,11 +49,11 @@ defmodule RoboticaPlugins.Date do
 
   If it is Monday, return the next Monday.
 
-  iex> import RoboticaPlugins.Date
+  iex> import RoboticaCommon.Date
   iex> next_monday(~U[2019-11-10 12:00:00Z])
   ~D[2019-11-11]
 
-  iex> import RoboticaPlugins.Date
+  iex> import RoboticaCommon.Date
   iex> next_monday(~U[2019-11-10 13:00:00Z])
   ~D[2019-11-18]
   """
@@ -76,7 +76,7 @@ defmodule RoboticaPlugins.Date do
   @doc """
   Find the UTC date time at midnight for the specified local date.
 
-  iex> import RoboticaPlugins.Date
+  iex> import RoboticaCommon.Date
   iex> midnight_utc(~D[2019-11-10])
   ~U[2019-11-09 13:00:00+00:00]
   """

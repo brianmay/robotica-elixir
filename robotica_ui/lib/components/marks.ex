@@ -8,9 +8,9 @@ defmodule RoboticaUi.Components.Marks do
   import Scenic.Components
   import Scenic.Primitives
 
-  alias RoboticaPlugins.Mark
+  alias RoboticaCommon.Mark
 
-  def verify(%RoboticaPlugins.ScheduledStep{} = step), do: {:ok, step}
+  def verify(%RoboticaCommon.ScheduledStep{} = step), do: {:ok, step}
   def verify(_), do: :invalid_data
 
   @graph Graph.build(styles: %{}, font_size: 20)
@@ -25,8 +25,8 @@ defmodule RoboticaUi.Components.Marks do
     width = opts[:styles][:width]
     height = opts[:styles][:height]
 
-    text = RoboticaPlugins.ScheduledStep.step_to_text(step) |> Enum.join(", ")
-    locations = RoboticaPlugins.ScheduledStep.step_to_locations(step)
+    text = RoboticaCommon.ScheduledStep.step_to_text(step) |> Enum.join(", ")
+    locations = RoboticaCommon.ScheduledStep.step_to_locations(step)
 
     graph =
       @graph

@@ -8,7 +8,7 @@ defmodule RoboticaUi.Scene.Local do
   alias Scenic.ViewPort
   import Scenic.Primitives
 
-  alias RoboticaPlugins.Config
+  alias RoboticaCommon.Config
   alias RoboticaUi.Layout
   import RoboticaUi.Scene.Utils
   alias RoboticaUi.Components.Nav
@@ -76,15 +76,15 @@ defmodule RoboticaUi.Scene.Local do
     buttons =
       Enum.reduce(buttons, %{}, fn row, buttons ->
         Enum.reduce(row.buttons, buttons, fn button, buttons ->
-          RoboticaPlugins.Buttons.subscribe_topics(button)
+          RoboticaCommon.Buttons.subscribe_topics(button)
           Map.put(buttons, button.id, button)
         end)
       end)
 
     button_states =
       Enum.reduce(buttons, %{}, fn {id, button}, button_states ->
-        RoboticaPlugins.Buttons.subscribe_topics(button)
-        Map.put(button_states, id, RoboticaPlugins.Buttons.get_initial_state(button))
+        RoboticaCommon.Buttons.subscribe_topics(button)
+        Map.put(button_states, id, RoboticaCommon.Buttons.get_initial_state(button))
       end)
 
     graph = Nav.add_to_graph(graph, :local)
@@ -103,12 +103,11 @@ defmodule RoboticaUi.Scene.Local do
         button ->
           button_state = Map.get(state.button_states, button_id)
 
-          button_state =
-            RoboticaPlugins.Buttons.process_message(button, label, data, button_state)
+          button_state = RoboticaCommon.Buttons.process_message(button, label, data, button_state)
 
           button_states = Map.put(state.button_states, button_id, button_state)
 
-          display_state = RoboticaPlugins.Buttons.get_display_state(button, button_state)
+          display_state = RoboticaCommon.Buttons.get_display_state(button, button_state)
 
           controls = [:state_on, :state_off, :state_hard_off, :state_error, nil]
 
@@ -157,7 +156,7 @@ defmodule RoboticaUi.Scene.Local do
 
       button ->
         button_state = Map.get(state.button_states, button_id)
-        RoboticaPlugins.Buttons.execute_press_commands(button, button_state)
+        RoboticaCommon.Buttons.execute_press_commands(button, button_state)
     end
 
     state

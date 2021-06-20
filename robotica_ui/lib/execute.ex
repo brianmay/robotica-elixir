@@ -50,7 +50,7 @@ defmodule RoboticaUi.Execute do
   end
 
   def handle_cast({:command_task, task}, state) do
-    location = RoboticaPlugins.Config.ui_default_location()
+    location = RoboticaCommon.Config.ui_default_location()
 
     good_location = task.location == location
     message = get_in(task.command.message, [:text])

@@ -18,7 +18,7 @@ defmodule RoboticaHello.Config do
 
   def configuration do
     filename = Application.get_env(:robotica_hello, :config_file)
-    {:ok, data} = RoboticaPlugins.Validation.load_and_validate(filename, config_schema())
+    {:ok, data} = RoboticaCommon.Validation.load_and_validate(filename, config_schema())
     data
   end
 end

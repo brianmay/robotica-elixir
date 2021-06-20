@@ -3,8 +3,8 @@ defmodule Ceryx.Validation do
   Json validation functions for ceryx
   """
 
-  alias RoboticaPlugins.Schema
-  alias RoboticaPlugins.Validation
+  alias RoboticaCommon.Schema
+  alias RoboticaCommon.Validation
 
   def validate_task(%{} = data) do
     Validation.validate_schema(data, Schema.task_schema())

@@ -1,4 +1,4 @@
-defmodule RoboticaPlugins.Mqtt do
+defmodule RoboticaCommon.Mqtt do
   @moduledoc """
   Common MQTT functions
   """
@@ -28,8 +28,8 @@ defmodule RoboticaPlugins.Mqtt do
     end
   end
 
-  @spec publish_command_task(RoboticaPlugins.CommandTask.t()) :: :ok | {:error, String.t()}
-  def publish_command_task(%RoboticaPlugins.CommandTask{} = task) do
+  @spec publish_command_task(RoboticaCommon.CommandTask.t()) :: :ok | {:error, String.t()}
+  def publish_command_task(%RoboticaCommon.CommandTask{} = task) do
     topic = "action/#{task.location}/#{task.device}"
     publish_json(topic, task.command)
   end
@@ -61,7 +61,7 @@ defmodule RoboticaPlugins.Mqtt do
     publish_json(topic, state, opts)
   end
 
-  @spec publish_schedule(list(RoboticaPlugins.ScheduledStep.t())) :: :ok | {:error, String.t()}
+  @spec publish_schedule(list(RoboticaCommon.ScheduledStep.t())) :: :ok | {:error, String.t()}
   def publish_schedule(steps) do
     client_id = get_tortoise_client_id()
     topic = "schedule/#{client_id}"
@@ -81,7 +81,7 @@ defmodule RoboticaPlugins.Mqtt do
     publish_json(topic, action)
   end
 
-  @spec publish_execute(RoboticaPlugins.Task.t()) :: :ok | {:error, String.t()}
+  @spec publish_execute(RoboticaCommon.Task.t()) :: :ok | {:error, String.t()}
   def publish_execute(task) do
     topic = "execute"
     publish_json(topic, task)

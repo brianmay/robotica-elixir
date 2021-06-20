@@ -1,4 +1,4 @@
-defmodule RoboticaPlugins do
+defmodule RoboticaCommon do
   @moduledoc """
   Common stuff
   """
@@ -98,7 +98,7 @@ defmodule RoboticaPlugins do
       end
     end
 
-    @spec task_to_text(RoboticaPlugins.Task.t(), keyword()) :: String.t()
+    @spec task_to_text(RoboticaCommon.Task.t(), keyword()) :: String.t()
     def task_to_text(%Task{} = task, opts \\ []) do
       list = []
 

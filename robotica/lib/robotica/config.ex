@@ -3,8 +3,8 @@ defmodule Robotica.Config do
   Handle loading of Robotica specific configuration
   """
 
-  alias RoboticaPlugins.Schema
-  alias RoboticaPlugins.Validation
+  alias RoboticaCommon.Schema
+  alias RoboticaCommon.Validation
 
   require Logger
 
@@ -160,7 +160,7 @@ defmodule Robotica.Config do
     end
   end
 
-  @spec validate_tasks(map) :: {:error, any} | {:ok, list(RoboticaPlugins.Task.t())}
+  @spec validate_tasks(map) :: {:error, any} | {:ok, list(RoboticaCommon.Task.t())}
   def validate_tasks(data) do
     Validation.validate_schema(data, {:list, Schema.task_schema()})
   end
@@ -185,7 +185,7 @@ defmodule Robotica.Config do
     Validation.validate_schema(data, Schema.lights_action_schema())
   end
 
-  @spec validate_mark(map) :: {:error, any} | {:ok, RoboticaPlugins.Mark.t()}
+  @spec validate_mark(map) :: {:error, any} | {:ok, RoboticaCommon.Mark.t()}
   def validate_mark(%{} = data) do
     Validation.validate_schema(data, Schema.mark_schema())
   end

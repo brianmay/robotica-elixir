@@ -1,4 +1,4 @@
-defmodule RoboticaPlugins.EventBus do
+defmodule RoboticaCommon.EventBus do
   @moduledoc """
   Defines helper functions from EventBus
   """
@@ -9,7 +9,7 @@ defmodule RoboticaPlugins.EventBus do
 
   defmacro __using__(_) do
     quote do
-      require RoboticaPlugins.EventBus
+      require RoboticaCommon.EventBus
       @eb_source String.replace("#{__MODULE__}", "Elixir.", "")
     end
   end
@@ -33,7 +33,7 @@ defmodule RoboticaPlugins.EventBus do
 
   defmacro notify(topic, data) do
     quote do
-      RoboticaPlugins.EventBus.notify_with_source(@eb_source, unquote(topic), unquote(data))
+      RoboticaCommon.EventBus.notify_with_source(@eb_source, unquote(topic), unquote(data))
     end
   end
 end

@@ -1,4 +1,4 @@
-defmodule RoboticaPlugins.Validation do
+defmodule RoboticaCommon.Validation do
   @moduledoc """
   Validate untrusted json fields
   """

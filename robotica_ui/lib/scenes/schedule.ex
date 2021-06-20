@@ -8,7 +8,7 @@ defmodule RoboticaUi.Scene.Schedule do
   alias Scenic.ViewPort
   import Scenic.Primitives
 
-  alias RoboticaPlugins.Config
+  alias RoboticaCommon.Config
   alias RoboticaUi.Components.Marks
   alias RoboticaUi.Components.Nav
   alias RoboticaUi.Components.Step
@@ -67,7 +67,7 @@ defmodule RoboticaUi.Scene.Schedule do
             %{task | locations: [local_location]}
           end)
 
-        %RoboticaPlugins.ScheduledStep{step | tasks: tasks}
+        %RoboticaCommon.ScheduledStep{step | tasks: tasks}
       end)
       |> Enum.reject(fn step -> Enum.empty?(step.tasks) end)
       |> Enum.take(20)

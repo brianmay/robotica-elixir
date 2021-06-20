@@ -83,7 +83,7 @@ defmodule Ceryx.Client do
 
   def handle_message(topic, publish, state) do
     Logger.debug("handle message #{inspect(topic)} #{inspect(publish)}")
-    :ok = RoboticaPlugins.Subscriptions.message(topic, publish)
+    :ok = RoboticaCommon.Subscriptions.message(topic, publish)
     {:ok, state}
   end
 

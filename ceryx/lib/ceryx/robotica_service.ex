@@ -12,21 +12,21 @@ defmodule Ceryx.CeryxService do
   def process({:command = topic, id}) do
     task = EventBus.fetch_event_data({topic, id})
     Logger.info("got command #{inspect(task)}")
-    RoboticaPlugins.Mqtt.publish_command(task.location, task.device, task.command)
+    RoboticaCommon.Mqtt.publish_command(task.location, task.device, task.command)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 
   def process({:mark = topic, id}) do
     Logger.info("got mark")
     mark = EventBus.fetch_event_data({topic, id})
-    RoboticaPlugins.Mqtt.publish_mark(mark)
+    RoboticaCommon.Mqtt.publish_mark(mark)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 
   def process({:subscribe = topic, id}) do
     data = EventBus.fetch_event_data({topic, id})
 
-    RoboticaPlugins.Subscriptions.subscribe(
+    RoboticaCommon.Subscriptions.subscribe(
       data.topic,
       data.label,
       data.pid,
@@ -39,7 +39,7 @@ defmodule Ceryx.CeryxService do
 
   def process({:unsubscribe_all = topic, id}) do
     data = EventBus.fetch_event_data({topic, id})
-    RoboticaPlugins.Subscriptions.unsubscribe_all(data.pid)
+    RoboticaCommon.Subscriptions.unsubscribe_all(data.pid)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 end

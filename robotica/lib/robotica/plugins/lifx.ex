@@ -172,7 +172,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
   defp publish_raw(%State{} = state, topic, value) do
-    case RoboticaPlugins.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic) do
+    case RoboticaCommon.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic) do
       :ok ->
         :ok
 
@@ -185,7 +185,7 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec publish_json(State.t(), String.t(), map() | list()) :: :ok
   defp publish_json(%State{} = state, topic, value) do
-    case RoboticaPlugins.Mqtt.publish_state_json(state.location, state.device, value, topic: topic) do
+    case RoboticaCommon.Mqtt.publish_state_json(state.location, state.device, value, topic: topic) do
       :ok ->
         :ok
 

@@ -1,10 +1,10 @@
-defmodule RoboticaPlugins.Mark do
+defmodule RoboticaCommon.Mark do
   @moduledoc """
   Defines functions for marks
   """
 
-  use RoboticaPlugins.EventBus
-  alias RoboticaPlugins.Date
+  use RoboticaCommon.EventBus
+  alias RoboticaCommon.Date
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -18,13 +18,13 @@ defmodule RoboticaPlugins.Mark do
             start_time: nil,
             stop_time: nil
 
-  @spec publish_mark(RoboticaPlugins.Mark.t()) :: :ok
-  def publish_mark(%RoboticaPlugins.Mark{} = mark) do
-    RoboticaPlugins.EventBus.notify(:mark, mark)
+  @spec publish_mark(RoboticaCommon.Mark.t()) :: :ok
+  def publish_mark(%RoboticaCommon.Mark{} = mark) do
+    RoboticaCommon.EventBus.notify(:mark, mark)
   end
 
-  @spec mark_task(RoboticaPlugins.ScheduledStep.t(), :done | :cancelled | :clear) :: :error | :ok
-  def mark_task(%RoboticaPlugins.ScheduledStep{} = step, status) do
+  @spec mark_task(RoboticaCommon.ScheduledStep.t(), :done | :cancelled | :clear) :: :error | :ok
+  def mark_task(%RoboticaCommon.ScheduledStep{} = step, status) do
     id = step.id
     now = DateTime.utc_now()
     prev_midnight = Date.today(step.required_time) |> Date.midnight_utc()
@@ -33,7 +33,7 @@ defmodule RoboticaPlugins.Mark do
     mark =
       case status do
         :done ->
-          %RoboticaPlugins.Mark{
+          %RoboticaCommon.Mark{
             id: id,
             status: :done,
             start_time: prev_midnight,
@@ -41,7 +41,7 @@ defmodule RoboticaPlugins.Mark do
           }
 
         :cancelled ->
-          %RoboticaPlugins.Mark{
+          %RoboticaCommon.Mark{
             id: id,
             status: :cancelled,
             start_time: prev_midnight,
@@ -49,7 +49,7 @@ defmodule RoboticaPlugins.Mark do
           }
 
         :clear ->
-          %RoboticaPlugins.Mark{
+          %RoboticaCommon.Mark{
             id: id,
             status: :done,
             start_time: now,

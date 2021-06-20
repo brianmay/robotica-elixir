@@ -1,4 +1,4 @@
-defmodule RoboticaPlugins.Subscriptions do
+defmodule RoboticaCommon.Subscriptions do
   @moduledoc """
   Implement per process MQTT subscriptions
   """
@@ -112,7 +112,7 @@ defmodule RoboticaPlugins.Subscriptions do
       case Map.get(state.subscriptions, topic, nil) do
         nil ->
           # Broken: See https://github.com/gausby/tortoise/issues/130
-          # client_id = RoboticaPlugins.Mqtt.get_tortoise_client_id()
+          # client_id = RoboticaCommon.Mqtt.get_tortoise_client_id()
 
           # topics = [
           #   {topic_str, 0}
@@ -202,7 +202,7 @@ defmodule RoboticaPlugins.Subscriptions do
     # Broken: See https://github.com/gausby/tortoise/issues/130
     # Enum.each(new_subscriptions, fn
     #   {topic, []} ->
-    #     client_id = RoboticaPlugins.Mqtt.get_tortoise_client_id()
+    #     client_id = RoboticaCommon.Mqtt.get_tortoise_client_id()
     #     topic_str = Enum.join(topic, "/")
     #     Logger.info("+ Unsubscribing from #{topic_str}.")
     #     Tortoise.Connection.unsubscribe_sync(client_id, [topic_str])

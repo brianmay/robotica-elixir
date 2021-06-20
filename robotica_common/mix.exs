@@ -1,4 +1,4 @@
-defmodule RoboticaPlugins.MixProject do
+defmodule RoboticaCommon.MixProject do
   use Mix.Project
 
   def project do

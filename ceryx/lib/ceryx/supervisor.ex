@@ -23,7 +23,7 @@ defmodule Ceryx.Supervisor do
 
   @impl true
   def init(opts) do
-    client_id = RoboticaPlugins.Mqtt.get_tortoise_client_id()
+    client_id = RoboticaCommon.Mqtt.get_tortoise_client_id()
 
     EventBus.register_topic(:schedule)
     EventBus.register_topic(:request_schedule)
@@ -39,7 +39,7 @@ defmodule Ceryx.Supervisor do
     )
 
     children = [
-      {RoboticaPlugins.Subscriptions, name: RoboticaPlugins.Subscriptions},
+      {RoboticaCommon.Subscriptions, name: RoboticaCommon.Subscriptions},
       {Tortoise.Connection,
        client_id: client_id,
        handler: {Ceryx.Client, []},

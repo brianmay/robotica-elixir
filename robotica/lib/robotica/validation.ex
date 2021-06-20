@@ -3,7 +3,7 @@ defmodule Robotica.Validation do
   Robotica specific json validation stuff
   """
 
-  import RoboticaPlugins.Validation
+  import RoboticaCommon.Validation
 
   defp module_to_schema(module), do: {:ok, apply(module, :config_schema, [])}
 

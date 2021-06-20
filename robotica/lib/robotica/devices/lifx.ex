@@ -3,7 +3,7 @@ defmodule Robotica.Devices.Lifx do
   Provides LIFX support functions.
   """
 
-  alias RoboticaPlugins.Strings
+  alias RoboticaCommon.Strings
 
   defmodule HSBKA do
     @moduledoc "A color with alpha channel"

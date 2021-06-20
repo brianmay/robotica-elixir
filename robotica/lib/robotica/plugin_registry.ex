@@ -35,13 +35,13 @@ defmodule Robotica.PluginRegistry do
     end
   end
 
-  @spec execute_command_task(task :: RoboticaPlugins.CommandTask.t(), opts :: keyword()) :: :ok
-  def execute_command_task(%RoboticaPlugins.CommandTask{} = task, opts \\ []) do
+  @spec execute_command_task(task :: RoboticaCommon.CommandTask.t(), opts :: keyword()) :: :ok
+  def execute_command_task(%RoboticaCommon.CommandTask{} = task, opts \\ []) do
     case Robotica.PluginRegistry.lookup_single(task.location, task.device) do
       nil ->
         if Keyword.get(opts, :remote, false) do
           Logger.info("got command task #{inspect(task)} - remote")
-          RoboticaPlugins.Mqtt.publish_command(task.location, task.device, task.command)
+          RoboticaCommon.Mqtt.publish_command(task.location, task.device, task.command)
         end
 
       pid ->

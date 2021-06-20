@@ -3,7 +3,7 @@ defmodule Ceryx.Config do
   Load ceryx config
   """
 
-  alias RoboticaPlugins.Validation
+  alias RoboticaCommon.Validation
 
   defmodule Loader do
     @moduledoc false

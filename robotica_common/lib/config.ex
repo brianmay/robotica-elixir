@@ -1,4 +1,4 @@
-defmodule RoboticaPlugins.Config do
+defmodule RoboticaCommon.Config do
   @moduledoc """
   Common config functions
   """
@@ -12,7 +12,7 @@ defmodule RoboticaPlugins.Config do
 
     defp button do
       %{
-        struct_type: RoboticaPlugins.Buttons.Config,
+        struct_type: RoboticaCommon.Buttons.Config,
         name: {:string, true},
         id: {:string, false},
         location: {:string, false},
@@ -44,7 +44,7 @@ defmodule RoboticaPlugins.Config do
     end
 
     def ui_common_configuration(filename) do
-      {:ok, data} = RoboticaPlugins.Validation.load_and_validate(filename, config_common_schema())
+      {:ok, data} = RoboticaCommon.Validation.load_and_validate(filename, config_common_schema())
       data
     end
   end
@@ -90,7 +90,7 @@ defmodule RoboticaPlugins.Config do
   defp update_row(row, location) do
     buttons =
       Enum.map(row.buttons, fn
-        %RoboticaPlugins.Buttons.Config{} = config ->
+        %RoboticaCommon.Buttons.Config{} = config ->
           config
           |> update_if_nil(:location, fn -> location end)
           |> update_if_nil(:id, fn -> Base62.unique_id() end)

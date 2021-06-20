@@ -35,22 +35,22 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   @spec publish_steps(
-          list(RoboticaPlugins.ScheduledStep.t()),
-          list(RoboticaPlugins.ScheduledStep.t())
+          list(RoboticaCommon.ScheduledStep.t()),
+          list(RoboticaCommon.ScheduledStep.t())
         ) :: nil
 
   defp publish_steps(steps, steps), do: nil
 
   defp publish_steps(_old_steps, steps) do
-    case RoboticaPlugins.Mqtt.publish_schedule(steps) do
+    case RoboticaCommon.Mqtt.publish_schedule(steps) do
       :ok -> nil
       {:error, _} -> Logger.debug("Cannot send current steps.")
     end
   end
 
   @spec notify_steps(
-          list(RoboticaPlugins.ScheduledStep.t()),
-          list(RoboticaPlugins.ScheduledStep.t())
+          list(RoboticaCommon.ScheduledStep.t()),
+          list(RoboticaCommon.ScheduledStep.t())
         ) :: nil
 
   defp notify_steps(steps, steps), do: nil
@@ -120,7 +120,7 @@ defmodule Robotica.Scheduler.Executor do
     list ++ get_expanded_steps_for_date(date)
   end
 
-  defp add_mark_to_step(%RoboticaPlugins.ScheduledStep{} = step) do
+  defp add_mark_to_step(%RoboticaCommon.ScheduledStep{} = step) do
     required_time = step.required_time
     mark = Marks.get_mark(Robotica.Scheduler.Marks, step.id)
 
@@ -141,12 +141,12 @@ defmodule Robotica.Scheduler.Executor do
     end)
   end
 
-  @spec execute_tasks(list(RoboticaPlugins.Task.t())) :: :ok
+  @spec execute_tasks(list(RoboticaCommon.Task.t())) :: :ok
   defp execute_tasks(tasks) do
     :ok = Robotica.Executor.execute_tasks(tasks)
   end
 
-  defp do_step(%RoboticaPlugins.ScheduledStep{id: id, mark: mark, tasks: tasks}) do
+  defp do_step(%RoboticaCommon.ScheduledStep{id: id, mark: mark, tasks: tasks}) do
     cond do
       is_nil(mark) ->
         Logger.info("Executing step #{id}.")

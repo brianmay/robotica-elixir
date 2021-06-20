@@ -4,13 +4,13 @@ defmodule RoboticaFace.Schedule do
   """
 
   use GenServer
-  use RoboticaPlugins.EventBus
+  use RoboticaCommon.EventBus
 
   defmodule State do
     @moduledoc false
     @type t :: %__MODULE__{
             scenes: list(GenServer.server()),
-            schedule: list(RoboticaPlugins.ScheduledStep.t())
+            schedule: list(RoboticaCommon.ScheduledStep.t())
           }
     defstruct scenes: [], schedule: []
   end
@@ -20,7 +20,7 @@ defmodule RoboticaFace.Schedule do
   end
 
   def init(_) do
-    RoboticaPlugins.EventBus.notify(:request_schedule, nil)
+    RoboticaCommon.EventBus.notify(:request_schedule, nil)
     {:ok, %State{}}
   end
 

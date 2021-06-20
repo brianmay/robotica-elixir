@@ -1,4 +1,4 @@
-defmodule RoboticaPlugins.Strings do
+defmodule RoboticaCommon.Strings do
   @moduledoc """
   Provides String parsing and evaluation functions.
   """
@@ -6,27 +6,27 @@ defmodule RoboticaPlugins.Strings do
   @doc """
   Substitute {xyz} values from a dictionary in a string.
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> replace_values("{i}-{j}", %{"i" => "hello", "j" => "world"})
   {:ok, "hello-world"}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> replace_values("!{i}-{j}$", %{"i" => "hello", "j" => "world"})
   {:ok, "!hello-world$"}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> replace_values("!{i-{j}$", %{"i" => "hello", "j" => "world"})
   {:error, "Missing closing bracket on 'i-'."}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> replace_values("!{i}-}-{j}$", %{"i" => "hello", "j" => "world"})
   {:ok, "!hello-}-world$"}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> replace_values("goodbye", %{"i" => "hello", "j" => "world"})
   {:ok, "goodbye"}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> replace_values("{x}-{y}", %{"i" => "hello", "j" => "world"})
   {:error, "Cannot find x in lookup table of i=hello, j=world."}
   """
@@ -75,53 +75,53 @@ defmodule RoboticaPlugins.Strings do
   @doc """
   Solve (simple) maths in a string.
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("1")
   {:ok, 1}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("1+2")
   {:ok, 3}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("1+-2")
   {:ok, -1}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("-1+2")
   {:ok, 1}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("2*3")
   {:ok, 6}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("2*1.5")
   {:ok, 3}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("1+2*3")
   {:ok, 7}
   iex> solve_string("2*3+1")
   {:ok, 7}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("2*3+1*2*1")
   {:ok, 8}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("1+")
   {:error, "Cannot parse '' as float."}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("1*")
   {:error, "Cannot parse '' as float."}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("n")
   {:error, "Cannot parse 'n' as float."}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("10n")
   {:error, "Cannot parse '10n' as float."}
   """
@@ -194,19 +194,19 @@ defmodule RoboticaPlugins.Strings do
   @doc """
   Substitute values in string and solve simple maths.
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> eval_string(10, %{"i" => "10", "j" => "20"})
   {:ok, 10}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> eval_string("{i}+{j}", %{"i" => "10", "j" => "20"})
   {:ok, 30}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> eval_string("{x}+{y}", %{"i" => "10", "j" => "20"})
   {:error, "Cannot find x in lookup table of i=10, j=20."}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> eval_string("{i}+{j}", %{"i" => "10a", "j" => "20b"})
   {:error, "Cannot parse '10a' as float."}
   """
@@ -234,19 +234,19 @@ defmodule RoboticaPlugins.Strings do
   @doc """
   Substitute values in string. Solve simple maths if prefixed with =.
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("{i}+{j}", %{"i" => "10", "j" => "20"})
   {:ok, "10+20"}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("={i}+{j}", %{"i" => "10", "j" => "20"})
   {:ok, "30"}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("={x}+{y}", %{"i" => "10", "j" => "20"})
   {:error, "Cannot find x in lookup table of i=10, j=20."}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string("={i}+{j}", %{"i" => "10a", "j" => "20"})
   {:error, "Cannot parse '10a' as float."}
   """
@@ -282,19 +282,19 @@ defmodule RoboticaPlugins.Strings do
   @doc """
   Substitute values in string with ++ to separate items.
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string_combined("{i}+{j}++1+2", %{"i" => "10", "j" => "20"})
   {:ok, "10+201+2"}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string_combined("={i}+{j}++1+2", %{"i" => "10", "j" => "20"})
   {:ok, "301+2"}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string_combined("={x}+{y}++1+2", %{"i" => "10", "j" => "20"})
   {:error, "Cannot find x in lookup table of i=10, j=20."}
 
-  iex> import RoboticaPlugins.Strings
+  iex> import RoboticaCommon.Strings
   iex> solve_string_combined("={i}+{j}++1+2", %{"i" => "10a", "j" => "20"})
   {:error, "Cannot parse '10a' as float."}
   """

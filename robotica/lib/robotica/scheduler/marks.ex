@@ -7,7 +7,7 @@ defmodule Robotica.Scheduler.Marks do
   defmodule State do
     @moduledoc false
     @type t :: %__MODULE__{
-            marks: %{required(String.t()) => list(RoboticaPlugins.Mark)}
+            marks: %{required(String.t()) => list(RoboticaCommon.Mark)}
           }
     defstruct marks: %{}
   end
