@@ -23,10 +23,16 @@ use Mix.Config
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :robotica_common,
-  location: nil,
-  config_common_file: "../config/common.yaml.sample",
   timezone: "Australia/Melbourne",
+  build_date: System.get_env("BUILD_DATE"),
+  vcs_ref: System.get_env("VCS_REF"),
+  location: nil,
+  config_common_file: "../../local/config/common.yaml",
   map_types: []
+
+config :logger, :console,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id]
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
@@ -34,4 +40,4 @@ config :robotica_common,
 # Configuration from the imported file will override the ones defined
 # here (which is why it is important to import them last).
 #
-#     import_config "#{Mix.env()}.exs"
+import_config "#{Mix.env()}.exs"

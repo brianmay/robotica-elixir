@@ -1,8 +1,0 @@
-mqtt:
-  host: localhost
-  port: 1883
-  ca_cert_file: nil
-hosts:
-  test-host:
-    http_host: "localhost"
-    plugins: []

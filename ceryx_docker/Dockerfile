@@ -13,7 +13,7 @@ ENV APP_VSN=${APP_VSN} \
     MIX_ENV=${MIX_ENV}
 
 # By convention, /opt is typically used for applications
-WORKDIR /opt/app
+WORKDIR /opt/ceryx_docker
 
 # This step installs all the build tools we'll need
 RUN apk update && \
@@ -26,28 +26,37 @@ RUN apk update && \
   mix local.rebar --force && \
   mix local.hex --force
 
-# This builds the dependancies
+# This installs the dependancies
 COPY robotica_common/mix.exs robotica_common/mix.lock /opt/robotica_common/
 COPY robotica_face/mix.exs robotica_face/mix.lock /opt/robotica_face/
 COPY ceryx/mix.exs ceryx/mix.lock /opt/ceryx/
 COPY ceryx_docker/mix.exs ceryx_docker/mix.lock /opt/ceryx_docker/
-RUN cd /opt/robotica_face && mix deps.get --only prod
-RUN cd /opt/ceryx_docker && mix deps.get --only prod
+RUN mix deps.get --only prod
+
+# This builds the dependancies
+COPY robotica_common/config /opt/robotica_common/config/
+COPY robotica_common/lib /opt/robotica_common/lib/
+COPY robotica_face/config /opt/robotica_face/config/
+COPY robotica_face/lib /opt/robotica_face/lib/
+COPY ceryx/config /opt/ceryx/config/
+COPY ceryx/lib /opt/ceryx/lib/
+COPY ceryx_docker/config /opt/ceryx_docker/config/
+COPY ceryx_docker/lib /opt/ceryx_docker/lib/
+RUN mix deps.compile
 
 # Build phoenix stuff
+# Note mix phx.digest won't work unless app is compiled.
+# We compile in test to reduce the external dependancies required.
 COPY config/*.sample /opt/config/
-COPY robotica_common/lib /opt/robotica_common/lib/
-COPY robotica_common/dummy.yaml /opt/robotica_common/
-COPY robotica_face/lib /opt/robotica_face/lib/
-COPY robotica_face/config /opt/robotica_face/config/
-RUN cd /opt/robotica_face && mix compile
+RUN cd /opt/robotica_face && MIX_ENV=test mix deps.get
+RUN cd /opt/robotica_face && MIX_ENV=test mix compile
 COPY robotica_face/assets /opt/robotica_face/assets/
 RUN \
   cd /opt/robotica_face/assets && \
   npm install && \
   npm run deploy && \
   cd .. && \
-  mix phx.digest;
+  MIX_ENV=test mix phx.digest;
 
 # Setup access to version information
 ARG BUILD_DATE=date
@@ -55,14 +64,8 @@ ARG VCS_REF=vcs
 ENV BUILD_DATE=${BUILD_DATE}
 ENV VCS_REF=${VCS_REF}
 
-# Build other dependencies
-COPY ceryx/lib /opt/ceryx/lib/
-COPY ceryx_docker/config /opt/ceryx_docker/config/
-RUN cd /opt/ceryx_docker && mix deps.compile
-
-COPY ceryx_docker/lib /opt/ceryx_docker/lib/
-RUN cd /opt/ceryx_docker && mix compile
-RUN cd /opt/ceryx_docker && mix release
+RUN mix compile
+RUN mix release
 
 # From this line onwards, we're in a new image, which will be the image used in production
 FROM alpine:${ALPINE_VERSION}

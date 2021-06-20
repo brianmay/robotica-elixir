@@ -7,6 +7,9 @@
 # General application configuration
 use Mix.Config
 
+import_config "../../robotica_common/config/config.exs"
+import_config "../../robotica_common/config/docker.exs"
+
 config :robotica_hello,
   ecto_repos: [RoboticaHello.Repo],
   config_file: "../../local/config/hello.yaml"
@@ -22,14 +25,6 @@ config :robotica_hello, RoboticaHelloWeb.Endpoint,
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: RoboticaHelloWeb.ErrorView, accepts: ~w(html json)],
   pubsub_server: RoboticaHello.PubSub
-
-config :robotica_common,
-  build_date: System.get_env("BUILD_DATE"),
-  vcs_ref: System.get_env("VCS_REF"),
-  location: nil,
-  config_common_file: "dummy.yaml",
-  timezone: "Australia/Melbourne",
-  map_types: []
 
 # Configures Elixir's Logger
 config :logger, :console,

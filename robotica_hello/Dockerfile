@@ -31,8 +31,8 @@ COPY robotica_common/mix.exs robotica_common/mix.lock /opt/robotica_common/
 COPY robotica_hello/mix.exs robotica_hello/mix.lock /opt/app/
 RUN mix deps.get --only prod
 
+COPY robotica_common/config /opt/robotica_common/config/
 COPY robotica_common/lib /opt/robotica_common/lib/
-COPY robotica_common/dummy.yaml /opt/robotica_common/
 COPY robotica_hello/config /opt/app/config/
 RUN mix deps.compile
 

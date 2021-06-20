@@ -1,5 +1,8 @@
 import Config
 
+config :robotica_common,
+  config_common_file: nil
+
 port = String.to_integer(System.get_env("PORT") || "4000")
 
 config :robotica_hello,
@@ -11,7 +14,7 @@ config :robotica_hello, RoboticaHello.Repo,
 
 config :robotica_hello, RoboticaHelloWeb.Endpoint,
   http: [:inet6, port: port],
-  url: [host: System.get_env("HOST"), port: port],
+  url: [host: System.get_env("HTTP_HOST")],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 config :robotica_hello, RoboticaHello.Accounts.Guardian,

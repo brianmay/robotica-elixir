@@ -7,6 +7,8 @@
 # General application configuration
 use Mix.Config
 
+port = String.to_integer(System.get_env("PORT") || "4000")
+
 config :robotica_face,
   api_username: System.get_env("GOOGLE_USERNAME"),
   api_password: System.get_env("GOOGLE_PASSWORD"),
@@ -18,16 +20,7 @@ config :robotica_face,
 
 # Configures the endpoint
 config :robotica_face, RoboticaFaceWeb.Endpoint,
-  http: [port: 80, ip: {0, 0, 0, 0, 0, 0, 0, 0}],
-  https: [
-    port: 443,
-    ip: {0, 0, 0, 0, 0, 0, 0, 0},
-    otp_app: :robotica_nerves,
-    keyfile: "priv/key.pem",
-    certfile: "priv/cert.pem",
-    # OPTIONAL Key for intermediate certificates
-    cacertfile: "priv/cacert.pem"
-  ],
+  http: [port: port, ip: {0, 0, 0, 0, 0, 0, 0, 0}],
   url: [host: {:system, "HTTP_HOST"}],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: RoboticaFaceWeb.ErrorView, accepts: ~w(html json)],
@@ -37,12 +30,6 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
   ],
   code_reloader: false,
   server: true
-
-if Mix.Project.config()[:target] == "host" do
-  config :robotica_face, RoboticaFaceWeb.Endpoint,
-    http: [port: 4000, ip: {0, 0, 0, 0, 0, 0, 0, 0}],
-    https: [port: 4443, ip: {0, 0, 0, 0, 0, 0, 0, 0}]
-end
 
 config :joken,
   login_secret: System.get_env("LOGIN_SECRET")
@@ -57,44 +44,61 @@ end
 
 case Mix.env() do
   :dev ->
-    if Mix.Project.config()[:target] == "host" do
-      config :robotica_face, RoboticaFaceWeb.Endpoint,
-        debug_errors: true,
-        code_reloader: true,
-        check_origin: false,
-        watchers: [
-          node: [
-            "node_modules/webpack/bin/webpack.js",
-            "--mode",
-            "development",
-            "--watch",
-            cd: Path.expand("../../robotica_face/assets", __DIR__)
-          ]
-        ],
-        live_reload: [
-          patterns: [
-            ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
-            ~r{priv/gettext/.*(po)$},
-            ~r{lib/robotica_face_web/views/[a-z].*(ex)$},
-            ~r{lib/robotica_face_web/templates/[a-z].*(eex)$},
-            ~r{lib/robotica_face_web/live/[a-z].*(ex)$}
-          ]
+    config :robotica_face, RoboticaFaceWeb.Endpoint,
+      debug_errors: true,
+      code_reloader: true,
+      check_origin: false,
+      watchers: [
+        node: [
+          "node_modules/webpack/bin/webpack.js",
+          "--mode",
+          "development",
+          "--watch",
+          cd: Path.expand("../../robotica_face/assets", __DIR__)
         ]
+      ],
+      live_reload: [
+        patterns: [
+          ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
+          ~r{priv/gettext/.*(po)$},
+          ~r{lib/robotica_face_web/views/[a-z].*(ex)$},
+          ~r{lib/robotica_face_web/templates/[a-z].*(eex)$},
+          ~r{lib/robotica_face_web/live/[a-z].*(ex)$}
+        ]
+      ]
 
-      config :phoenix_live_reload,
-        dirs: ["../robotica_face"]
-    end
+    config :phoenix_live_reload,
+      dirs: ["../robotica_face"]
+
+    config :phoenix, :stacktrace_depth, 20
+    config :phoenix, :plug_init_mode, :runtime
 
   :test ->
     config :robotica_face, RoboticaFaceWeb.Endpoint,
       http: [port: 4002],
+      url: [host: "localhost"],
+      secret_key_base: "dumL2k9lDFzSg+OuQrpbQqkYZ22NnlmRLS/IEpGtu8d+3mofjYRjTjkyUg/r9hf1",
+      live_view: [
+        signing_salt: "dumL2k9lDFzSg+OuQrpbQqkYZ22NnlmRLS/IEpGtu8d+3mofjYRjTjkyUg/r9hf1"
+      ],
       server: false
+
+    config :robotica_face,
+      api_username: "google username",
+      api_password: "google pqassword",
+      mqtt_host: "mqtt.example.org",
+      mqtt_port: 8883,
+      ca_cert_file: "cacert_dummy.pem",
+      mqtt_user_name: "mqtt_username",
+      mqtt_password: "mqtt_password"
+
+    config :joken,
+      login_secret: "lXI0Bt7DrB968JJ9Vc+q14JD1vK3S1VrmKXLNVJJ7rObkGEULZLdfwqo/NSyb8ez"
 
   :prod ->
     config :robotica_face, RoboticaFaceWeb.Endpoint,
       cache_static_manifest: "priv/static/cache_manifest.json",
       server: true,
       root: ".",
-      version: Application.spec(:robotica_face, :vsn),
-      force_ssl: [hsts: true]
+      version: Application.spec(:robotica_face, :vsn)
 end

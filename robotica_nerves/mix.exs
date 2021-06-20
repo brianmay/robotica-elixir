@@ -62,6 +62,7 @@ defmodule RoboticaNerves.MixProject do
       {:robotica_face, path: "../robotica_face"},
       {:ring_logger, "~> 0.6"},
       {:toolshed, "~> 0.2"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ] ++ deps(@target)
@@ -69,18 +70,11 @@ defmodule RoboticaNerves.MixProject do
 
   # Specify target specific dependencies
   defp deps("host") do
-    [
-      {:scenic_driver_glfw, "~> 0.10"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev}
-    ]
+    []
   end
 
   defp deps("rpi3" = target) do
-    deps_nerves() ++
-      [
-        {:scenic_driver_nerves_rpi, "~> 0.10"},
-        {:scenic_driver_nerves_touch, "~> 0.10"}
-      ] ++ system(target)
+    deps_nerves() ++ system(target)
   end
 
   defp deps("rpi2" = target) do
