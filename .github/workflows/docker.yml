@@ -12,7 +12,7 @@ jobs:
       matrix:
         elixir: [1.11.3]
         otp: [23.2.7]
-        dir: ["robotica_common", "robotica", "robotica_ui", "ceryx", "ceryx_docker", "robotica_docker"]
+        dir: ["robotica_common", "robotica", "robotica_ui", "robotica_docker"]
 
     env:
       MIX_ENV: test
@@ -137,7 +137,7 @@ jobs:
       matrix:
         elixir: [1.11.3]
         otp: [23.2.7]
-        dir: ["robotica_common", "robotica", "robotica_ui", "robotica_hello", "robotica_face", "ceryx", "ceryx_docker", "robotica_docker"]
+        dir: ["robotica_common", "robotica", "robotica_ui", "robotica_hello", "robotica_face", "robotica_docker"]
 
     env:
       MIX_ENV: test
@@ -194,7 +194,7 @@ jobs:
 
     strategy:
       matrix:
-        dir: ["robotica_hello", "ceryx_docker", "robotica_docker"]
+        dir: ["robotica_hello", "robotica_docker"]
 
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}

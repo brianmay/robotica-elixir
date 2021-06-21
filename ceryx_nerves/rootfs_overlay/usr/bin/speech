@@ -1,5 +1,0 @@
-#!/bin/sh
-set -e
-espeak -ven+f5 -k5 -w /tmp/out.wav "$*"
-aplay -q /tmp/out.wav
-#espeak -ven+f5 -k5 -w /dev/stdout "$*" | aplay -q -;

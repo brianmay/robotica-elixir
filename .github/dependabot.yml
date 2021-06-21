@@ -102,23 +102,7 @@ updates:
     time: "19:00"
   open-pull-requests-limit: 10
 - package-ecosystem: mix
-  directory: "/ceryx"
-  schedule:
-    interval: daily
-    time: "19:00"
-  open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: yaml_elixir
-    versions:
-    - 2.7.0
-- package-ecosystem: mix
-  directory: "/ceryx_docker"
-  schedule:
-    interval: daily
-    time: "19:00"
-  open-pull-requests-limit: 10
-- package-ecosystem: mix
-  directory: "/ceryx_nerves"
+  directory: "/robotica_docker"
   schedule:
     interval: daily
     time: "19:00"
