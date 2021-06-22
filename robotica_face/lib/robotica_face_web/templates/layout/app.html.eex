@@ -16,8 +16,8 @@
       <button
         class="navbar-toggler"
         type="button"
-        data-toggle="collapse"
-        data-target="#navbarsExampleDefault"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarsExampleDefault"
         aria-controls="navbarsExampleDefault"
         aria-expanded="false"
         aria-label="Toggle navigation"
@@ -39,7 +39,6 @@
               <a
                 class="nav-link dropdown-toggle"
                 href="#"
-                data-toggle="dropdown"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
