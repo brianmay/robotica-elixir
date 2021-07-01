@@ -65,6 +65,7 @@ ENV BUILD_DATE=${BUILD_DATE}
 ENV VCS_REF=${VCS_REF}
 
 RUN mix compile
+COPY robotica_docker/rel /opt/robotica_docker/rel/
 RUN mix release
 
 # From this line onwards, we're in a new image, which will be the image used in production

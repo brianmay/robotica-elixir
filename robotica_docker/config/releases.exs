@@ -23,3 +23,17 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
 
 config :joken,
   login_secret: System.get_env("LOGIN_SECRET")
+
+config :libcluster,
+  topologies: [
+    k8s: [
+      strategy: Elixir.Cluster.Strategy.Kubernetes,
+      config: [
+        mode: :dns,
+        kubernetes_node_basename: "robotica_docker",
+        kubernetes_selector: System.get_env("KUBERNETES_SELECTOR"),
+        kubernetes_namespace: System.get_env("NAMESPACE"),
+        polling_interval: 10_000
+      ]
+    ]
+  ]

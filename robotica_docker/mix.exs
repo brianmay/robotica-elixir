@@ -18,6 +18,7 @@ defmodule RoboticaDocker.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
+      mod: {RoboticaDocker.Application, []},
       extra_applications: [:logger]
     ]
   end
@@ -28,6 +29,7 @@ defmodule RoboticaDocker.MixProject do
       {:robotica, path: "../robotica"},
       {:robotica_common, path: "../robotica_common"},
       {:robotica_face, path: "../robotica_face"},
+      {:libcluster, "~> 3.3"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}

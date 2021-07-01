@@ -10,3 +10,6 @@ import_config "../../robotica/config/config.exs"
 import_config "../../robotica_face/config/common.exs"
 
 import_config "../../robotica_common/config/docker.exs"
+
+config :libcluster,
+  topologies: []
