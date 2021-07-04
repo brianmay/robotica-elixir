@@ -147,7 +147,7 @@ defmodule Robotica.Plugins.Audio do
         :ok
 
       {:error, msg} ->
-        Logger.error("HDMI #{state.config.host}: publish_raw() got #{msg}")
+        Logger.error("Audio #{state.location}/#{state.device}: publish_raw() got #{msg}")
     end
 
     :ok
