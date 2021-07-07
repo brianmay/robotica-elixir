@@ -94,7 +94,7 @@ defmodule RoboticaNerves.MixProject do
       {:nerves_network, "~> 0.3"},
       {:nerves_time, "~> 0.3"},
       {:nerves_init_gadget, "~> 0.4"},
-      {:dns, "~> 2.2.0"}
+      {:dns, "~> 2.3.0"}
     ]
   end
 
