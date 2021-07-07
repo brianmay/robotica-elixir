@@ -83,9 +83,7 @@ defmodule RoboticaCommon.Subscriptions do
     case get_message_format(raw_message, format) do
       {:ok, message} ->
         Logger.debug(
-          "Dispatching #{inspect(topic)} #{inspect(raw_message)} #{inspect(format)} #{
-            inspect(message)
-          }."
+          "Dispatching #{inspect(topic)} #{inspect(raw_message)} #{inspect(format)} #{inspect(message)}."
         )
 
         :ok = GenServer.cast(pid, {:mqtt, topic, label, message})
