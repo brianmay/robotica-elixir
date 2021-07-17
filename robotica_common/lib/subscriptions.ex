@@ -162,13 +162,8 @@ defmodule RoboticaCommon.Subscriptions do
   def handle_cast({:message, topic, message, retain}, state) do
     Logger.debug("Got message #{inspect(topic)} #{inspect(message)}.")
 
-    state =
-      if retain do
-        last_message = Map.put(state.last_message, topic, message)
-        %State{state | last_message: last_message}
-      else
-        state
-      end
+    last_message = Map.put(state.last_message, topic, message)
+    state = %State{state | last_message: last_message}
 
     Map.get(state.subscriptions, topic, [])
     |> Enum.each(fn {label, pid, format} ->
