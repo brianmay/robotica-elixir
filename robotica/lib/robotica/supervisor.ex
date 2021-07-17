@@ -25,6 +25,7 @@ defmodule Robotica.Supervisor do
   @impl true
   def init(%Config{} = opts) do
     client_id = RoboticaCommon.Mqtt.get_tortoise_client_id()
+    client_name = RoboticaCommon.Mqtt.get_tortoise_client_name()
 
     EventBus.register_topic(:schedule)
     EventBus.register_topic(:request_schedule)
@@ -43,18 +44,7 @@ defmodule Robotica.Supervisor do
       {"execute", 0},
       {"mark", 0},
       {"request/all/#", 0},
-      {"request/#{client_id}/#", 0},
-
-      # Dynamic subscriptions,
-      # Here because of https://github.com/gausby/tortoise/issues/130
-      # Should be done in subscriptions.ex
-      # All plugins
-      {"command/#", 0},
-      # sonoff plugin
-      {"stat/#", 0},
-      {"tele/#", 0},
-      # robotica_ui and robotica_face
-      {"state/#", 0}
+      {"request/#{client_id}/#", 0}
     ]
 
     subscriptions =
@@ -68,14 +58,24 @@ defmodule Robotica.Supervisor do
       {Robotica.PluginRegistry, name: Robotica.PluginRegistry},
       {RoboticaCommon.Subscriptions, name: RoboticaCommon.Subscriptions},
       {Robotica.Executor, name: Robotica.Executor},
-      {Tortoise.Connection,
+      {Robotica.Client, [remote_scheduler: opts.remote_scheduler]},
+      {MqttPotion,
+       name: client_name,
+       host: opts.mqtt.host,
+       port: opts.mqtt.port,
+       ssl: true,
+       protocol_version: 5,
        client_id: client_id,
-       handler: {Robotica.Client, [remote_scheduler: opts.remote_scheduler]},
-       user_name: opts.mqtt.user_name,
+       username: opts.mqtt.user_name,
        password: opts.mqtt.password,
-       server:
-         {Tortoise.Transport.SSL,
-          host: opts.mqtt.host, port: opts.mqtt.port, cacertfile: opts.mqtt.ca_cert_file},
+       tcp_opts: [
+         :inet6
+       ],
+       ssl_opts: [
+         verify: :verify_peer,
+         cacertfile: opts.mqtt.ca_cert_file
+       ],
+       handler: Robotica.Client,
        subscriptions: subscriptions}
     ]
 

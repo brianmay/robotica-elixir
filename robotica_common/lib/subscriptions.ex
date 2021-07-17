@@ -11,9 +11,10 @@ defmodule RoboticaCommon.Subscriptions do
     """
     @type t :: %__MODULE__{
             subscriptions: %{required(list({atom(), String.t(), :json | :raw})) => list(pid)},
-            last_message: %{required(list(String.t())) => any()}
+            last_message: %{required(list(String.t())) => any()},
+            monitor: %{required(pid) => reference()}
           }
-    defstruct subscriptions: %{}, last_message: %{}
+    defstruct subscriptions: %{}, last_message: %{}, monitor: %{}
   end
 
   ## Client API
@@ -39,9 +40,9 @@ defmodule RoboticaCommon.Subscriptions do
     GenServer.call(__MODULE__, {:unsubscribe_all, pid}, 40_000)
   end
 
-  @spec message(topic :: list(String.t()), message :: String.t()) :: :ok
-  def message(topic, message) do
-    GenServer.cast(__MODULE__, {:message, topic, message})
+  @spec message(topic :: list(String.t()), message :: String.t(), retain :: boolean()) :: :ok
+  def message(topic, message, retain) do
+    GenServer.cast(__MODULE__, {:message, topic, message, retain})
   end
 
   ## private
@@ -83,9 +84,7 @@ defmodule RoboticaCommon.Subscriptions do
     case get_message_format(raw_message, format) do
       {:ok, message} ->
         Logger.debug(
-          "Dispatching #{inspect(topic)} #{inspect(raw_message)} #{inspect(format)} #{
-            inspect(message)
-          }."
+          "Dispatching #{inspect(topic)} #{inspect(raw_message)} #{inspect(format)} #{inspect(message)}."
         )
 
         :ok = GenServer.cast(pid, {:mqtt, topic, label, message})
@@ -105,24 +104,27 @@ defmodule RoboticaCommon.Subscriptions do
         ) ::
           State.t()
   defp handle_add(state, topic, label, pid, format, resend) do
-    _ref = Process.monitor(pid)
+    state =
+      if Map.has_key?(state.monitor, pid) do
+        ref = Process.monitor(pid)
+        monitor = Map.put(state.monitor, pid, ref)
+        %State{state | monitor: monitor}
+      else
+        state
+      end
+
     topic_str = Enum.join(topic, "/")
 
     pids =
       case Map.get(state.subscriptions, topic, nil) do
         nil ->
-          # Broken: See https://github.com/gausby/tortoise/issues/130
-          # client_id = RoboticaCommon.Mqtt.get_tortoise_client_id()
-
-          # topics = [
-          #   {topic_str, 0}
-          # ]
+          subscription = {topic_str, 0}
+          client_name = RoboticaCommon.Mqtt.get_tortoise_client_name()
 
           # Logger.info("- Unsubscribing to #{topic_str} pid #{inspect(pid)}.")
-          # Tortoise.Connection.unsubscribe_sync(client_id, [topic_str])
-          # Logger.info("- Subscribing to #{topic_str} pid #{inspect(pid)}.")
-          # retry(fn -> Tortoise.Connection.subscribe_sync(client_id, topics) end, 1)
-          # Logger.info("- Done subscription")
+          # MqttPotion.unsubscribe(client_name, topic_str)
+          Logger.info("- Subscribing to #{topic_str} pid #{inspect(pid)}.")
+          MqttPotion.subscribe(client_name, subscription)
 
           Logger.debug("Adding pid #{inspect(pid)} to new subscription #{topic_str}.")
           [{label, pid, format}]
@@ -157,11 +159,16 @@ defmodule RoboticaCommon.Subscriptions do
     {:reply, :ok, new_state}
   end
 
-  def handle_cast({:message, topic, message}, state) do
+  def handle_cast({:message, topic, message, retain}, state) do
     Logger.debug("Got message #{inspect(topic)} #{inspect(message)}.")
 
-    last_message = Map.put(state.last_message, topic, message)
-    state = %State{state | last_message: last_message}
+    state =
+      if retain do
+        last_message = Map.put(state.last_message, topic, message)
+        %State{state | last_message: last_message}
+      else
+        state
+      end
 
     Map.get(state.subscriptions, topic, [])
     |> Enum.each(fn {label, pid, format} ->
@@ -185,32 +192,31 @@ defmodule RoboticaCommon.Subscriptions do
     {:noreply, state}
   end
 
-  def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
-    Logger.debug("Process #{inspect(pid)} died.")
+  def handle_info({:DOWN, ref, :process, pid, reason}, state) do
+    Logger.debug("Process #{inspect(pid)} #{inspect(ref)} died reason #{inspect(reason)}.")
     new_state = handle_unsubscribe_all(pid, state)
     {:noreply, new_state}
   end
 
   defp handle_unsubscribe_all(pid, state) do
-    Logger.debug("Removing pid #{inspect(pid)} from all subscriptions.")
+    Logger.info("Removing pid #{inspect(pid)} from all subscriptions.")
+    monitor = Map.delete(state.monitor, pid)
 
     new_subscriptions =
       state.subscriptions
       |> Enum.map(fn {topic, l} -> {topic, delete_pid_from_list(l, pid)} end)
       |> keyword_list_to_map()
 
-    # Broken: See https://github.com/gausby/tortoise/issues/130
-    # Enum.each(new_subscriptions, fn
-    #   {topic, []} ->
-    #     client_id = RoboticaCommon.Mqtt.get_tortoise_client_id()
-    #     topic_str = Enum.join(topic, "/")
-    #     Logger.info("+ Unsubscribing from #{topic_str}.")
-    #     Tortoise.Connection.unsubscribe_sync(client_id, [topic_str])
-    #     Logger.info("+ Done unsubscribing from #{topic_str}.")
+    Enum.each(new_subscriptions, fn
+      {topic, []} ->
+        client_name = RoboticaCommon.Mqtt.get_tortoise_client_name()
+        topic_str = Enum.join(topic, "/")
+        Logger.info("+ Unsubscribing from #{topic_str}.")
+        MqttPotion.unsubscribe(client_name, topic_str)
 
-    #   {_, _} ->
-    #     nil
-    # end)
+      {_, _} ->
+        nil
+    end)
 
     new_subscriptions =
       new_subscriptions
@@ -220,6 +226,6 @@ defmodule RoboticaCommon.Subscriptions do
       end)
       |> keyword_list_to_map()
 
-    %State{state | subscriptions: new_subscriptions}
+    %State{state | subscriptions: new_subscriptions, monitor: monitor}
   end
 end

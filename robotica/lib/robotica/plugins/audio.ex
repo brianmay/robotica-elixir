@@ -142,15 +142,7 @@ defmodule Robotica.Plugins.Audio do
 
   @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
   defp publish_raw(%State{} = state, topic, value) do
-    case RoboticaCommon.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic) do
-      :ok ->
-        :ok
-
-      {:error, msg} ->
-        Logger.error("Audio #{state.location}/#{state.device}: publish_raw() got #{msg}")
-    end
-
-    :ok
+    :ok = RoboticaCommon.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
   end
 
   @spec publish_play_list(State.t(), String.t() | nil) :: :ok

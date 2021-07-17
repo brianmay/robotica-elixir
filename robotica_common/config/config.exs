@@ -33,7 +33,11 @@ config :robotica_common,
 
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
+  metadata: [:request_id],
+  level: :info,
+  compile_time_purge_matching: [
+    [level_lower_than: :info]
+  ]
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

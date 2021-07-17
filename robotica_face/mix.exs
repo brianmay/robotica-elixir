@@ -50,6 +50,8 @@ defmodule RoboticaFace.MixProject do
       {:timex, "~> 3.6"},
       {:event_bus, "~> 1.6.1"},
       {:robotica_common, path: "../robotica_common"},
+      {:cowlib, "~> 2.11", override: true},
+      {:gun, "~> 1.3", override: true},
       {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ]

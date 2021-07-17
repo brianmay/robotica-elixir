@@ -25,15 +25,7 @@ defmodule Robotica.Plugins.SonOff do
 
   @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
   defp publish_raw(%State{} = state, topic, value) do
-    case RoboticaCommon.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic) do
-      :ok ->
-        :ok
-
-      {:error, msg} ->
-        Logger.error("Hs100 #{state.config.host}: publish_raw() got #{msg}")
-    end
-
-    :ok
+    :ok = RoboticaCommon.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
   end
 
   @spec publish_device_state(State.t(), String.t()) :: :ok
@@ -100,10 +92,9 @@ defmodule Robotica.Plugins.SonOff do
       end
 
     if power != nil do
-      case RoboticaCommon.Mqtt.publish_raw("cmnd/#{state.config.topic}/power", power) do
-        :ok -> nil
-        {:error, _} -> Logger.debug("Cannot send sonoff action #{power}.")
-      end
+      :ok = RoboticaCommon.Mqtt.publish_raw("cmnd/#{state.config.topic}/power", power)
+    else
+      :ok
     end
   end
 
@@ -111,7 +102,7 @@ defmodule Robotica.Plugins.SonOff do
     case Robotica.Config.validate_device_command(command) do
       {:ok, command} ->
         if command.type == "device" or command.type == nil do
-          handle_command(state, command)
+          :ok = handle_command(state, command)
           state
         else
           Logger.info("Wrong type #{command.type}, expected device")

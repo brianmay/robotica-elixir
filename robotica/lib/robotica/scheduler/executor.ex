@@ -42,10 +42,7 @@ defmodule Robotica.Scheduler.Executor do
   defp publish_steps(steps, steps), do: nil
 
   defp publish_steps(_old_steps, steps) do
-    case RoboticaCommon.Mqtt.publish_schedule(steps) do
-      :ok -> nil
-      {:error, _} -> Logger.debug("Cannot send current steps.")
-    end
+    :ok = RoboticaCommon.Mqtt.publish_schedule(steps)
   end
 
   @spec notify_steps(

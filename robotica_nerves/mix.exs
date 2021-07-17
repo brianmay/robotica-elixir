@@ -69,6 +69,8 @@ defmodule RoboticaNerves.MixProject do
       {:robotica_face, path: "../robotica_face"},
       {:ring_logger, "~> 0.6"},
       {:toolshed, "~> 0.2"},
+      {:cowlib, "~> 2.11", override: true},
+      {:gun, "~> 1.3", override: true},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}

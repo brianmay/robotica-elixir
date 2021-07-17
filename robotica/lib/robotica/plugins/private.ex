@@ -10,12 +10,6 @@ defmodule Robotica.Plugins.Private do
   def publish(location, device, command) do
     task = %RoboticaCommon.CommandTask{location: location, device: device, command: command}
     :ok = RoboticaCommon.EventBus.notify(:command_task, task)
-
-    case RoboticaCommon.Mqtt.publish_command_task(task) do
-      :ok -> nil
-      {:error, _} -> Logger.debug("Cannot send outgoing command task #{inspect(task)}.")
-    end
-
-    :ok
+    :ok = RoboticaCommon.Mqtt.publish_command_task(task)
   end
 end

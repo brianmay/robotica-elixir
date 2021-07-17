@@ -55,6 +55,7 @@ config :nerves_init_gadget,
 
 config :logger,
   backends: [RingLogger],
+  level: :info,
   compile_time_purge_matching: [
     [level_lower_than: :info]
   ]

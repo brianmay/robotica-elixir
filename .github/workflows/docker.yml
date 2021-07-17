@@ -16,6 +16,7 @@ jobs:
 
     env:
       MIX_ENV: test
+      BUILD_WITHOUT_QUIC: true
 
     steps:
       - uses: actions/checkout@v2.3.4
@@ -82,6 +83,7 @@ jobs:
 
     env:
       DATABASE_URL_TEST: postgresql://postgres:postgres@localhost/test?sslmode=disable
+      BUILD_WITHOUT_QUIC: true
       MIX_ENV: test
 
     steps:
@@ -141,6 +143,7 @@ jobs:
 
     env:
       MIX_ENV: test
+      BUILD_WITHOUT_QUIC: true
 
     steps:
       - uses: actions/checkout@v2.3.4
