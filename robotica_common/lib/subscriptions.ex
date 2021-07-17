@@ -159,7 +159,7 @@ defmodule RoboticaCommon.Subscriptions do
     {:reply, :ok, new_state}
   end
 
-  def handle_cast({:message, topic, message, retain}, state) do
+  def handle_cast({:message, topic, message, _retain}, state) do
     Logger.debug("Got message #{inspect(topic)} #{inspect(message)}.")
 
     last_message = Map.put(state.last_message, topic, message)
