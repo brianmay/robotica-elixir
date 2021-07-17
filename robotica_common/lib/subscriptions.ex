@@ -139,7 +139,7 @@ defmodule RoboticaCommon.Subscriptions do
     # resend last message to new client
     case {resend, Map.fetch(state.last_message, topic)} do
       {:resend, {:ok, last_message}} ->
-        Logger.debug("Resending last message to #{inspect(pid)} from subscription #{topic_str}.")
+        Logger.info("Resending last message to #{inspect(pid)} from subscription #{topic_str}.")
         :ok = send_to_client(topic, label, pid, format, last_message)
 
       _ ->
@@ -160,7 +160,7 @@ defmodule RoboticaCommon.Subscriptions do
   end
 
   def handle_cast({:message, topic, message, _retain}, state) do
-    Logger.debug("Got message #{inspect(topic)} #{inspect(message)}.")
+    Logger.info("Got message #{inspect(topic)} #{inspect(message)}.")
 
     last_message = Map.put(state.last_message, topic, message)
     state = %State{state | last_message: last_message}
