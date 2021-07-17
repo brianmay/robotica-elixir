@@ -10,7 +10,8 @@ ARG APP_VSN=0.1.0
 ARG MIX_ENV=prod
 # Set this to true if this release is not a Phoenix app
 ENV APP_VSN=${APP_VSN} \
-    MIX_ENV=${MIX_ENV}
+    MIX_ENV=${MIX_ENV} \
+    BUILD_WITHOUT_QUIC=true
 
 # By convention, /opt is typically used for applications
 WORKDIR /opt/app
