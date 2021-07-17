@@ -10,6 +10,7 @@ defmodule RoboticaFaceWeb.Live.Local do
   @impl true
   def render(assigns) do
     ~L"""
+    <%= inspect(self()) %>
     <form phx-change="location">
     <select name="location">
     <option value="">None</option>
