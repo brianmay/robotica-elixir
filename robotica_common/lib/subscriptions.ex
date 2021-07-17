@@ -106,11 +106,11 @@ defmodule RoboticaCommon.Subscriptions do
   defp handle_add(state, topic, label, pid, format, resend) do
     state =
       if Map.has_key?(state.monitor, pid) do
+        state
+      else
         ref = Process.monitor(pid)
         monitor = Map.put(state.monitor, pid, ref)
         %State{state | monitor: monitor}
-      else
-        state
       end
 
     topic_str = Enum.join(topic, "/")
