@@ -33,7 +33,7 @@ defmodule Robotica.Client do
   end
 
   @impl MqttPotion.Handler
-  def handle_connect() do
+  def handle_connect do
     GenServer.cast(__MODULE__, :connect)
   end
 
