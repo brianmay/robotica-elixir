@@ -1,6 +1,5 @@
 {
-  "repository": {},
-  "license": "MIT",
+  "license": "GPL-3",
   "scripts": {
     "deploy": "webpack --mode production",
     "watch": "webpack --mode development --watch"
@@ -10,17 +9,21 @@
     "phoenix_html": "file:../deps/phoenix_html"
   },
   "devDependencies": {
-    "@babel/core": "^7.14.6",
-    "@babel/preset-env": "^7.14.7",
-    "babel-loader": "^8.2.2",
-    "copy-webpack-plugin": "^6.4.1",
-    "css-loader": "^5.2.7",
-    "mini-css-extract-plugin": "^1.6.2",
-    "optimize-css-assets-webpack-plugin": "^6.0.1",
+    "copy-webpack-plugin": "^9.0.0",
+    "css-loader": "^5.2.6",
+    "css-minimizer-webpack-plugin": "^3.0.0",
+    "glob": "7.1.7",
+    "mini-css-extract-plugin": "^1.6.0",
+    "webpack": "5.37.1",
+    "webpack-cli": "^4.7.0",
+    "node-sass": "^4.13.1",
+    "sass-loader": "^8.0.2",
+    "bootstrap": "^5.0.2",
+    "@popperjs/core": "^2.9.2",
     "prettier": "^2.2.1",
-    "prettier-plugin-eex": "^0.5.0",
-    "terser-webpack-plugin": "^4.2.3",
-    "webpack": "4.46.0",
-    "webpack-cli": "^4.7.2"
+    "prettier-plugin-eex": "^0.5.0"
+  },
+  "engines": {
+    "node": ">=14.x"
   }
 }
