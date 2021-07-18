@@ -40,10 +40,7 @@ defmodule Robotica.Supervisor do
        ["^request_schedule$", "^command$", "^mark$", "^subscribe$", "^unsubscribe_all$"]}
     )
 
-    subscriptions = [
-      {"execute", 0},
-      {"mark", 0}
-    ]
+    subscriptions = []
 
     subscriptions =
       if opts.remote_scheduler do
@@ -52,11 +49,20 @@ defmodule Robotica.Supervisor do
         subscriptions
       end
 
+    children =
+      if opts.remote_scheduler do
+        []
+      else
+        [
+          {Robotica.Scheduler.Marks, name: Robotica.Scheduler.Marks},
+          {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor}
+        ]
+      end
+
     children = [
       {Robotica.PluginRegistry, name: Robotica.PluginRegistry},
       {RoboticaCommon.Subscriptions, name: RoboticaCommon.Subscriptions},
       {Robotica.Executor, name: Robotica.Executor},
-      {Robotica.Client, [remote_scheduler: opts.remote_scheduler]},
       {MqttPotion,
        name: client_name,
        host: opts.mqtt.host,
@@ -75,17 +81,8 @@ defmodule Robotica.Supervisor do
        ],
        handler: Robotica.Client,
        subscriptions: subscriptions}
+      | children
     ]
-
-    children =
-      if opts.remote_scheduler do
-        children
-      else
-        [
-          {Robotica.Scheduler.Marks, name: Robotica.Scheduler.Marks},
-          {Robotica.Scheduler.Executor, name: Robotica.Scheduler.Executor} | children
-        ]
-      end
 
     extra_children =
       opts.plugins

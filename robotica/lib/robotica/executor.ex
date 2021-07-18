@@ -3,6 +3,8 @@ defmodule Robotica.Executor do
   Execute Robotica tasks in a pseudo synchronised manner
   """
 
+  require Logger
+
   use RoboticaCommon.EventBus
   use GenServer
   use EventBus.EventSource
@@ -27,7 +29,16 @@ defmodule Robotica.Executor do
 
   ## Server Callbacks
 
+  @impl true
   def init(:ok) do
+    RoboticaCommon.Subscriptions.subscribe(
+      ["execute"],
+      :execute,
+      self(),
+      :json,
+      :no_resend
+    )
+
     {:ok, %State{}}
   end
 
@@ -61,6 +72,16 @@ defmodule Robotica.Executor do
     end
 
     :ok
+  end
+
+  @impl true
+  def handle_cast({:mqtt, _, :execute, json}, state) do
+    case Robotica.Config.validate_tasks(json) do
+      {:ok, tasks} -> :ok = handle_execute_tasks(tasks)
+      {:error, reason} -> Logger.error("Invalid execute message received: #{reason}")
+    end
+
+    {:noreply, state}
   end
 
   def handle_cast({:execute_tasks, tasks}, state) do

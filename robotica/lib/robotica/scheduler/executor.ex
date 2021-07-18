@@ -22,10 +22,6 @@ defmodule Robotica.Scheduler.Executor do
     GenServer.call(server, {:get_schedule})
   end
 
-  def reload_marks(server) do
-    GenServer.call(server, {:reload_marks})
-  end
-
   def publish_schedule(server) do
     GenServer.cast(server, {:publish_schedule})
   end
@@ -72,6 +68,16 @@ defmodule Robotica.Scheduler.Executor do
 
     now = DateTime.utc_now()
     state = set_timer(now, {today, nil, steps})
+
+    :ok =
+      RoboticaCommon.Subscriptions.subscribe(
+        ["mark"],
+        :mark,
+        self(),
+        :json,
+        :no_resend
+      )
+
     {:ok, state}
   end
 
@@ -183,6 +189,22 @@ defmodule Robotica.Scheduler.Executor do
   def handle_cast({:request_schedule}, {_, _, list} = state) do
     notify_steps([], list)
     {:noreply, state}
+  end
+
+  def handle_cast({:mqtt, _, :mark, json}, {date, timer, list} = state) do
+    case Robotica.Config.validate_mark(json) do
+      {:ok, mark} ->
+        Marks.put_mark(Marks, mark)
+        list = add_marks_to_schedule(list)
+        notify_steps([], list)
+        publish_steps([], list)
+        new_state = {date, timer, list}
+        {:noreply, new_state}
+
+      {:error, reason} ->
+        Logger.error("Invalid mark message received: #{inspect(reason)}.")
+        {:noreply, state}
+    end
   end
 
   def handle_info(:timer, {_, _, list} = state) do
