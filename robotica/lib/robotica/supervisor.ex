@@ -43,8 +43,6 @@ defmodule Robotica.Supervisor do
     subscriptions = [
       {"execute", 0},
       {"mark", 0},
-      {"request/all/#", 0},
-      {"request/#{client_id}/#", 0}
     ]
 
     subscriptions =
