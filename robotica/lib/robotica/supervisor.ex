@@ -63,7 +63,7 @@ defmodule Robotica.Supervisor do
       {Robotica.PluginRegistry, name: Robotica.PluginRegistry},
       {RoboticaCommon.Subscriptions, name: RoboticaCommon.Subscriptions},
       {Robotica.Executor, name: Robotica.Executor},
-      {MqttPotion,
+      {MqttPotion.Connection,
        name: client_name,
        host: opts.mqtt.host,
        port: opts.mqtt.port,
