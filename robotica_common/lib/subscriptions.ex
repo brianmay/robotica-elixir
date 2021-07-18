@@ -32,12 +32,13 @@ defmodule RoboticaCommon.Subscriptions do
           resend :: :resend | :no_resend
         ) :: :ok
   def subscribe(topic, label, pid, format, resend) do
-    GenServer.call(__MODULE__, {:subscribe, topic, label, pid, format, resend}, 40_000)
+    GenServer.cast(__MODULE__, {:subscribe, topic, label, pid, format, resend})
   end
 
   @spec unsubscribe_all(pid :: pid) :: :ok
   def unsubscribe_all(pid) do
-    GenServer.call(__MODULE__, {:unsubscribe_all, pid}, 40_000)
+    GenServer.cast(__MODULE__, {:unsubscribe_all, pid})
+    :ok
   end
 
   @spec message(topic :: list(String.t()), message :: String.t(), retain :: boolean()) :: :ok
@@ -149,14 +150,14 @@ defmodule RoboticaCommon.Subscriptions do
     %State{state | subscriptions: subscriptions}
   end
 
-  def handle_call({:subscribe, topic, label, pid, format, resend}, _from, state) do
+  def handle_cast({:subscribe, topic, label, pid, format, resend}, state) do
     new_state = handle_add(state, topic, label, pid, format, resend)
-    {:reply, :ok, new_state}
+    {:noreply, new_state}
   end
 
-  def handle_call({:unsubscribe_all, pid}, _from, state) do
+  def handle_cast({:unsubscribe_all, pid}, state) do
     new_state = handle_unsubscribe_all(pid, state)
-    {:reply, :ok, new_state}
+    {:noreply, new_state}
   end
 
   def handle_cast({:message, topic, message, _retain}, state) do
