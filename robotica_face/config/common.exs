@@ -54,6 +54,7 @@ case Mix.env() do
           "--mode",
           "development",
           "--watch",
+          "--watch-options-stdin",
           cd: Path.expand("../../robotica_face/assets", __DIR__)
         ]
       ],
