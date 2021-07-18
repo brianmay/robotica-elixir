@@ -31,6 +31,11 @@ defmodule RoboticaHelloWeb.Router do
     pipe_through [:browser, :auth]
 
     get "/", PageController, :index
+  end
+
+  scope "/", RoboticaHelloWeb do
+    pipe_through [:browser]
+
     get "/login", SessionController, :new
     post "/login", SessionController, :login
     post "/logout", SessionController, :logout
