@@ -25,7 +25,7 @@ defmodule Robotica.Plugins.SonOff do
 
   @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
   defp publish_raw(%State{} = state, topic, value) do
-    :ok = RoboticaCommon.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
+    :ok = Robotica.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
   end
 
   @spec publish_device_state(State.t(), String.t()) :: :ok
@@ -51,7 +51,7 @@ defmodule Robotica.Plugins.SonOff do
   ## Server Callbacks
 
   def init(plugin) do
-    RoboticaCommon.Subscriptions.subscribe(
+    Robotica.Subscriptions.subscribe(
       ["stat", plugin.config.topic, "POWER"],
       :power,
       self(),
@@ -59,7 +59,7 @@ defmodule Robotica.Plugins.SonOff do
       :resend
     )
 
-    RoboticaCommon.Subscriptions.subscribe(
+    Robotica.Subscriptions.subscribe(
       ["tele", plugin.config.topic, "LWT"],
       :lwt,
       self(),
@@ -92,7 +92,7 @@ defmodule Robotica.Plugins.SonOff do
       end
 
     if power != nil do
-      :ok = RoboticaCommon.Mqtt.publish_raw("cmnd/#{state.config.topic}/power", power)
+      :ok = Robotica.Mqtt.publish_raw("cmnd/#{state.config.topic}/power", power)
     else
       :ok
     end

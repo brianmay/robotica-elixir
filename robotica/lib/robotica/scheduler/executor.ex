@@ -38,7 +38,7 @@ defmodule Robotica.Scheduler.Executor do
   defp publish_steps(steps, steps), do: nil
 
   defp publish_steps(_old_steps, steps) do
-    :ok = RoboticaCommon.Mqtt.publish_schedule(steps)
+    :ok = Robotica.Mqtt.publish_schedule(steps)
   end
 
   @spec notify_steps(
@@ -70,7 +70,7 @@ defmodule Robotica.Scheduler.Executor do
     state = set_timer(now, {today, nil, steps})
 
     :ok =
-      RoboticaCommon.Subscriptions.subscribe(
+      Robotica.Subscriptions.subscribe(
         ["mark"],
         :mark,
         self(),

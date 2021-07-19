@@ -1,4 +1,4 @@
-defmodule RoboticaCommon.Subscriptions do
+defmodule Robotica.Subscriptions do
   @moduledoc """
   Implement per process MQTT subscriptions
   """
@@ -120,7 +120,7 @@ defmodule RoboticaCommon.Subscriptions do
       case Map.get(state.subscriptions, topic, nil) do
         nil ->
           subscription = {topic_str, 0}
-          client_name = RoboticaCommon.Mqtt.get_tortoise_client_name()
+          client_name = Robotica.Mqtt.get_tortoise_client_name()
 
           # Logger.info("- Unsubscribing to #{topic_str} pid #{inspect(pid)}.")
           # MqttPotion.unsubscribe(client_name, topic_str)
@@ -205,7 +205,7 @@ defmodule RoboticaCommon.Subscriptions do
 
     Enum.each(new_subscriptions, fn
       {topic, []} ->
-        client_name = RoboticaCommon.Mqtt.get_tortoise_client_name()
+        client_name = Robotica.Mqtt.get_tortoise_client_name()
         topic_str = Enum.join(topic, "/")
         Logger.info("+ Unsubscribing from #{topic_str}.")
         MqttPotion.unsubscribe(client_name, topic_str)

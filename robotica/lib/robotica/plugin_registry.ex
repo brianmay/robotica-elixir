@@ -41,7 +41,7 @@ defmodule Robotica.PluginRegistry do
       nil ->
         if Keyword.get(opts, :remote, false) do
           Logger.info("got command task #{inspect(task)} - remote")
-          RoboticaCommon.Mqtt.publish_command(task.location, task.device, task.command)
+          Robotica.Mqtt.publish_command(task.location, task.device, task.command)
         end
 
       pid ->

@@ -10,6 +10,6 @@ defmodule Robotica.Plugins.Private do
   def publish(location, device, command) do
     task = %RoboticaCommon.CommandTask{location: location, device: device, command: command}
     :ok = RoboticaCommon.EventBus.notify(:command_task, task)
-    :ok = RoboticaCommon.Mqtt.publish_command_task(task)
+    :ok = Robotica.Mqtt.publish_command_task(task)
   end
 end

@@ -28,7 +28,7 @@ defmodule Robotica.Plugin do
           {:ok, pid} ->
             Robotica.PluginRegistry.add(plugin.location, plugin.device, pid)
 
-            RoboticaCommon.Subscriptions.subscribe(
+            Robotica.Subscriptions.subscribe(
               ["command", plugin.location, plugin.device],
               :command,
               pid,

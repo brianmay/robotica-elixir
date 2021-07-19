@@ -55,7 +55,7 @@ defmodule Robotica.Plugins.Hs100 do
 
   @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
   defp publish_raw(%State{} = state, topic, value) do
-    :ok = RoboticaCommon.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
+    :ok = Robotica.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
   end
 
   @spec publish_device_state(State.t(), String.t()) :: :ok

@@ -24,8 +24,8 @@ defmodule Robotica.Supervisor do
 
   @impl true
   def init(%Config{} = opts) do
-    client_id = RoboticaCommon.Mqtt.get_tortoise_client_id()
-    client_name = RoboticaCommon.Mqtt.get_tortoise_client_name()
+    client_id = Robotica.Mqtt.get_tortoise_client_id()
+    client_name = Robotica.Mqtt.get_tortoise_client_name()
 
     EventBus.register_topic(:schedule)
     EventBus.register_topic(:request_schedule)
@@ -61,7 +61,7 @@ defmodule Robotica.Supervisor do
 
     children = [
       {Robotica.PluginRegistry, name: Robotica.PluginRegistry},
-      {RoboticaCommon.Subscriptions, name: RoboticaCommon.Subscriptions},
+      {Robotica.Subscriptions, name: Robotica.Subscriptions},
       {Robotica.Executor, name: Robotica.Executor},
       {MqttPotion.Connection,
        name: client_name,

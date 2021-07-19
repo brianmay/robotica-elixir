@@ -19,14 +19,14 @@ defmodule Robotica.RoboticaService do
   def process({:mark = topic, id}) do
     mark = EventBus.fetch_event_data({topic, id})
     Logger.info("got mark #{inspect(mark)}")
-    RoboticaCommon.Mqtt.publish_mark(mark)
+    Robotica.Mqtt.publish_mark(mark)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 
   def process({:subscribe = topic, id}) do
     data = EventBus.fetch_event_data({topic, id})
 
-    RoboticaCommon.Subscriptions.subscribe(
+    Robotica.Subscriptions.subscribe(
       data.topic,
       data.label,
       data.pid,
@@ -39,7 +39,7 @@ defmodule Robotica.RoboticaService do
 
   def process({:unsubscribe_all = topic, id}) do
     data = EventBus.fetch_event_data({topic, id})
-    RoboticaCommon.Subscriptions.unsubscribe_all(data.pid)
+    Robotica.Subscriptions.unsubscribe_all(data.pid)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 end

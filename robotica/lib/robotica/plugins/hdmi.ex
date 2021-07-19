@@ -33,7 +33,7 @@ defmodule Robotica.Plugins.HDMI do
 
   @spec publish_raw(Plugin.t(), String.t(), String.t()) :: :ok
   defp publish_raw(%Plugin{} = state, topic, value) do
-    :ok = RoboticaCommon.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
+    :ok = Robotica.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
   end
 
   @spec publish_device_output(Robotica.Plugin.t(), integer, integer) :: :ok

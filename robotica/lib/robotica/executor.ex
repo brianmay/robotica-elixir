@@ -31,7 +31,7 @@ defmodule Robotica.Executor do
 
   @impl true
   def init(:ok) do
-    RoboticaCommon.Subscriptions.subscribe(
+    Robotica.Subscriptions.subscribe(
       ["execute"],
       :execute,
       self(),

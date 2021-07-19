@@ -1,4 +1,4 @@
-defmodule RoboticaCommon.Mqtt do
+defmodule Robotica.Mqtt do
   @moduledoc """
   Common MQTT functions
   """

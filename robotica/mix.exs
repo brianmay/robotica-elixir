@@ -26,6 +26,7 @@ defmodule Robotica.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:mqtt_potion, github: "brianmay/mqtt_potion"},
       {:lifx, git: "https://github.com/brianmay/lifx.git"},
       {:tp_link_hs100, git: "https://github.com/brianmay/tp_link_hs100.git"},
       {:event_bus, "~> 1.6.0"},
