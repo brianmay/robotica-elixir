@@ -3,13 +3,6 @@ defmodule Robotica.RoboticaService do
 
   require Logger
 
-  def process({:request_schedule = topic, id}) do
-    Logger.info("got request_schedule")
-    EventBus.fetch_event_data({topic, id})
-    # Does nothing, check this is still required.
-    EventBus.mark_as_completed({__MODULE__, topic, id})
-  end
-
   def process({:command = topic, id}) do
     task = EventBus.fetch_event_data({topic, id})
     Robotica.PluginRegistry.execute_command_task(task, remote: true)

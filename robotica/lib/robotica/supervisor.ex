@@ -28,7 +28,6 @@ defmodule Robotica.Supervisor do
     client_name = Robotica.Mqtt.get_tortoise_client_name()
 
     EventBus.register_topic(:schedule)
-    EventBus.register_topic(:request_schedule)
     EventBus.register_topic(:command_task)
     EventBus.register_topic(:command)
     EventBus.register_topic(:mark)
@@ -36,8 +35,7 @@ defmodule Robotica.Supervisor do
     EventBus.register_topic(:unsubscribe_all)
 
     EventBus.subscribe(
-      {Robotica.RoboticaService,
-       ["^request_schedule$", "^command$", "^mark$", "^subscribe$", "^unsubscribe_all$"]}
+      {Robotica.RoboticaService, ["^command$", "^mark$", "^subscribe$", "^unsubscribe_all$"]}
     )
 
     subscriptions = []

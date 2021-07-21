@@ -20,7 +20,6 @@ defmodule RoboticaFace.Schedule do
   end
 
   def init(_) do
-    RoboticaCommon.EventBus.notify(:request_schedule, nil)
     {:ok, %State{}}
   end
 

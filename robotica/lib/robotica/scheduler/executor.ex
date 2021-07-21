@@ -26,10 +26,6 @@ defmodule Robotica.Scheduler.Executor do
     GenServer.cast(server, {:publish_schedule})
   end
 
-  def request_schedule(server) do
-    GenServer.cast(server, {:request_schedule})
-  end
-
   @spec publish_steps(
           list(RoboticaCommon.ScheduledStep.t()),
           list(RoboticaCommon.ScheduledStep.t())
@@ -183,11 +179,6 @@ defmodule Robotica.Scheduler.Executor do
   def handle_cast({:publish_schedule}, {_, _, list} = state) do
     notify_steps([], list)
     publish_steps([], list)
-    {:noreply, state}
-  end
-
-  def handle_cast({:request_schedule}, {_, _, list} = state) do
-    notify_steps([], list)
     {:noreply, state}
   end
 
