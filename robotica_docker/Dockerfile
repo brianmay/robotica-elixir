@@ -75,7 +75,8 @@ FROM alpine:${ALPINE_VERSION}
 RUN apk update && \
     apk add --no-cache \
       bash \
-      openssl-dev
+      openssl-dev \
+      libstdc++
 
 RUN addgroup -S app && adduser -S app -G app
 WORKDIR /opt/app
