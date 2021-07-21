@@ -2,6 +2,8 @@ defmodule Robotica.Mqtt do
   @moduledoc """
   Common MQTT functions
   """
+  require Logger
+
   @spec get_tortoise_client_id() :: String.t()
   def get_tortoise_client_id do
     {:ok, hostname} = :inet.gethostname()
@@ -26,7 +28,7 @@ defmodule Robotica.Mqtt do
   def publish_json(topic, data, opts \\ []) do
     case Poison.encode(data) do
       {:ok, data} -> publish_raw(topic, data, opts)
-      {:error, msg} -> {:error, "Poison.encode() got error '#{msg}'"}
+      {:error, msg} -> Logger.error("Poison.encode() got error '#{msg}'")
     end
   end
 
