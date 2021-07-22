@@ -50,7 +50,7 @@ defmodule Robotica.Subscriptions do
 
   @spec get_message_format(String.t(), :json | :raw) :: {:ok, any()} | {:error, String.t()}
   def get_message_format(message, :json) do
-    case Poison.decode(message) do
+    case Jason.decode(message) do
       {:ok, message} -> {:ok, message}
       {:error, error} -> {:error, "Error #{inspect(error)}"}
     end
