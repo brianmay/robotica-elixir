@@ -24,7 +24,7 @@ defmodule RoboticaCommon.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:poison, "~> 4.0.1"},
+      {:poison, "~> 5.0.0"},
       {:tzdata, "~> 1.1.0"},
       {:event_bus, "~> 1.6.0"},
       {:yaml_elixir, "~> 2.8.0"},
