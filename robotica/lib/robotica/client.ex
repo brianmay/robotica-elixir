@@ -42,7 +42,7 @@ defmodule Robotica.Client do
   def handle_message(["schedule", _], message) do
     Logger.info("Received mqtt topic: #{message.topic} #{inspect(message)}")
 
-    with {:ok, json} <- Poison.decode(message.payload),
+    with {:ok, json} <- Jason.decode(message.payload),
          {:ok, steps} <- Validation.validate_scheduled_steps(json) do
       EventSource.notify %{topic: :schedule} do
         steps

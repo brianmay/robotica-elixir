@@ -26,9 +26,9 @@ defmodule Robotica.Mqtt do
 
   @spec publish_json(String.t(), list() | map(), MqttPotion.pub_opts()) :: :ok
   def publish_json(topic, data, opts \\ []) do
-    case Poison.encode(data) do
+    case Jason.encode(data) do
       {:ok, data} -> publish_raw(topic, data, opts)
-      {:error, msg} -> Logger.error("Poison.encode() got error '#{msg}'")
+      {:error, msg} -> Logger.error("Jason.encode() got error '#{msg}'")
     end
   end
 
