@@ -79,6 +79,7 @@ defmodule RoboticaCommon do
     @moduledoc """
     Defines a list of locations, list of devices, and a command to execute
     """
+    @derive Jason.Encoder
     @type t :: %__MODULE__{
             locations: list(String.t()),
             devices: list(String.t()),
@@ -166,6 +167,7 @@ defmodule RoboticaCommon do
     @moduledoc """
     Defines a step in the scheduler process
     """
+    @derive Jason.Encoder
     @type t :: %__MODULE__{
             required_time: %DateTime{},
             latest_time: %DateTime{},

@@ -6,6 +6,7 @@ defmodule RoboticaCommon.Mark do
   use RoboticaCommon.EventBus
   alias RoboticaCommon.Date
 
+  @derive Jason.Encoder
   @type t :: %__MODULE__{
           id: String.t(),
           status: :done | :cancelled,
