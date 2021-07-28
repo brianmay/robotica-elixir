@@ -7,33 +7,15 @@
     </div>
   <% end %>
 
-  <%= label f, :name %>
-  <%= text_input f, :name %>
-  <%= error_tag f, :name %>
-
-  <%= label f, :username %>
-  <%= text_input f, :username %>
-  <%= error_tag f, :username %>
-
-  <%= label f, :password %>
-  <%= password_input f, :password %>
-  <%= error_tag f, :password %>
-
-  <%= label f, :password_confirmation %>
-  <%= password_input f, :password_confirmation %>
-  <%= error_tag f, :password_confirmation %>
-
-  <%= label f, :location %>
-  <%= text_input f, :location %>
-  <%= error_tag f, :location %>
-
-  <%= label f, :is_admin %>
-  <%= checkbox f, :is_admin %>
-  <%= error_tag f, :is_admin %>
+  <%= text_input_field(f, :name) %>
+  <%= text_input_field(f, :username) %>
+  <%= password_input_field(f, :password) %>
+  <%= password_input_field(f, :password_confirmation) %>
+  <%= text_input_field(f, :location) %>
+  <%= checkbox_field(f, :is_admin) %>
 
   <div>
-    <%= submit "Save" %>
+    <span><%= submit "Save", class: "btn btn-primary" %></span>
+    <span><%= link "Back", to: Routes.user_path(@conn, :index), class: "btn btn-secondary" %></span>
   </div>
 <% end %>
-
-<span><%= link "Back", to: Routes.user_path(@conn, :index) %></span>

@@ -3,6 +3,6 @@ defmodule RoboticaHelloWeb.InstanceController do
 
   def index(conn, _params) do
     config = RoboticaHello.Config.configuration()
-    render(conn, "index.html", instances: config.instances)
+    render(conn, "index.html", instances: config.instances, active: "instances")
   end
 end

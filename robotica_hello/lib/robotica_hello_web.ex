@@ -39,8 +39,11 @@ defmodule RoboticaHelloWeb do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
+      require RoboticaHelloWeb.Forms
+
       import RoboticaHelloWeb.ErrorHelpers
       import RoboticaHelloWeb.Gettext
+      import RoboticaHelloWeb.Forms
       alias RoboticaHelloWeb.Router.Helpers, as: Routes
     end
   end
