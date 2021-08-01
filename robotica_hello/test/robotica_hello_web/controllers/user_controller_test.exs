@@ -70,63 +70,63 @@ defmodule RoboticaHelloWeb.UserControllerTest do
       token = fixture(:token)
       conn = put_req_header(conn, "authorization", "bearer: " <> token)
       conn = get(conn, Routes.user_path(conn, :index))
-      response(conn, 401)
+      response(conn, 302)
     end
 
     test "new user", %{conn: conn} do
       token = fixture(:token)
       conn = put_req_header(conn, "authorization", "bearer: " <> token)
       conn = get(conn, Routes.user_path(conn, :new))
-      response(conn, 401)
+      response(conn, 302)
     end
 
     test "create user", %{conn: conn} do
       token = fixture(:token)
       conn = put_req_header(conn, "authorization", "bearer: " <> token)
       conn = put(conn, Routes.user_path(conn, :new))
-      response(conn, 401)
+      response(conn, 302)
     end
 
     test "edit user", %{conn: conn, user: user} do
       token = fixture(:token)
       conn = put_req_header(conn, "authorization", "bearer: " <> token)
       conn = get(conn, Routes.user_path(conn, :edit, user))
-      response(conn, 401)
+      response(conn, 302)
     end
 
     test "update user", %{conn: conn, user: user} do
       token = fixture(:token)
       conn = put_req_header(conn, "authorization", "bearer: " <> token)
       conn = put(conn, Routes.user_path(conn, :update, user))
-      response(conn, 401)
+      response(conn, 302)
     end
 
     test "edit user password", %{conn: conn, user: user} do
       token = fixture(:token)
       conn = put_req_header(conn, "authorization", "bearer: " <> token)
       conn = get(conn, Routes.user_path(conn, :password_edit, user))
-      response(conn, 401)
+      response(conn, 302)
     end
 
     test "update user password", %{conn: conn, user: user} do
       token = fixture(:token)
       conn = put_req_header(conn, "authorization", "bearer: " <> token)
       conn = put(conn, Routes.user_path(conn, :password_update, user))
-      response(conn, 401)
+      response(conn, 302)
     end
 
     test "show user", %{conn: conn, user: user} do
       token = fixture(:token)
       conn = put_req_header(conn, "authorization", "bearer: " <> token)
       conn = get(conn, Routes.user_path(conn, :edit, user))
-      response(conn, 401)
+      response(conn, 302)
     end
 
     test "delete user", %{conn: conn, user: user} do
       token = fixture(:token)
       conn = put_req_header(conn, "authorization", "bearer: " <> token)
       conn = delete(conn, Routes.user_path(conn, :delete, user))
-      response(conn, 401)
+      response(conn, 302)
     end
   end
 

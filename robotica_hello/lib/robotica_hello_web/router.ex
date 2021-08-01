@@ -10,7 +10,7 @@ defmodule RoboticaHelloWeb.Router do
   end
 
   pipeline :auth do
-    plug RoboticaHello.Accounts.Pipeline
+    plug RoboticaHelloWeb.Plug.Auth
   end
 
   # We use ensure_auth to fail if there is no one logged in
@@ -20,7 +20,7 @@ defmodule RoboticaHelloWeb.Router do
 
   pipeline :ensure_admin do
     plug Guardian.Plug.EnsureAuthenticated
-    plug RoboticaHello.Accounts.CheckAdmin
+    plug RoboticaHelloWeb.Plug.CheckAdmin
   end
 
   pipeline :api do
