@@ -440,5 +440,5 @@ defmodule Robotica.Plugins.Audio do
 
   @spec execute_tasks(tasks :: list(RoboticaCommon.Task.t()) | nil) :: :ok
   def execute_tasks(nil), do: :ok
-  def execute_tasks(tasks), do: Robotica.Executor.execute_tasks(tasks, remote: true)
+  def execute_tasks(tasks), do: Robotica.Executor.execute_tasks(tasks, remote: false)
 end
