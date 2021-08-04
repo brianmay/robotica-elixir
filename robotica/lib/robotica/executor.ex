@@ -22,9 +22,21 @@ defmodule Robotica.Executor do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  @spec execute_tasks(tasks :: list(RoboticaCommon.Task.t())) :: :ok
-  def execute_tasks(tasks) do
-    GenServer.cast(Robotica.Executor, {:execute_tasks, tasks})
+  @spec execute_tasks(tasks :: list(RoboticaCommon.Task.t()), opts :: keyword()) :: :ok
+  def execute_tasks(tasks, opts \\ []) do
+    Enum.each(tasks, fn scheduled_task ->
+      Enum.each(scheduled_task.locations, fn location ->
+        Enum.each(scheduled_task.devices, fn device ->
+          command = %RoboticaCommon.CommandTask{
+            location: location,
+            device: device,
+            command: scheduled_task.command
+          }
+
+          Robotica.PluginRegistry.execute_command_task(command, opts)
+        end)
+      end)
+    end)
   end
 
   ## Server Callbacks
@@ -44,34 +56,7 @@ defmodule Robotica.Executor do
 
   @spec handle_execute_tasks(tasks :: list(RoboticaCommon.Task.t())) :: :ok
   defp handle_execute_tasks(tasks) do
-    Enum.each(tasks, fn scheduled_task ->
-      Enum.each(scheduled_task.locations, fn location ->
-        Enum.each(scheduled_task.devices, fn device ->
-          command = %RoboticaCommon.CommandTask{
-            location: location,
-            device: device,
-            command: scheduled_task.command
-          }
-
-          Robotica.PluginRegistry.execute_command_task(command, remote: false)
-        end)
-      end)
-    end)
-
-    # Hack: Wait for messages to complete
-    has_msg? =
-      Enum.any?(tasks, fn scheduled_task ->
-        correct_type =
-          scheduled_task.command["type"] == "audio" or scheduled_task.command["type"] == nil
-
-        correct_type and scheduled_task.command["message"] != nil
-      end)
-
-    if has_msg? do
-      Process.sleep(20_000)
-    end
-
-    :ok
+    :ok = execute_tasks(tasks, remote: false)
   end
 
   @impl true
@@ -81,11 +66,6 @@ defmodule Robotica.Executor do
       {:error, reason} -> Logger.error("Invalid execute message received: #{reason}")
     end
 
-    {:noreply, state}
-  end
-
-  def handle_cast({:execute_tasks, tasks}, state) do
-    :ok = handle_execute_tasks(tasks)
     {:noreply, state}
   end
 end

@@ -142,7 +142,7 @@ defmodule Robotica.Scheduler.Executor do
 
   @spec execute_tasks(list(RoboticaCommon.Task.t())) :: :ok
   defp execute_tasks(tasks) do
-    :ok = Robotica.Executor.execute_tasks(tasks)
+    :ok = Robotica.Executor.execute_tasks(tasks, remote: false)
   end
 
   defp do_step(%RoboticaCommon.ScheduledStep{id: id, mark: mark, tasks: tasks}) do

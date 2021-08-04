@@ -412,7 +412,9 @@ defmodule Robotica.Plugins.Audio do
           %State{state | volumes: volume}
       end
 
+    execute_tasks(command.pre_tasks)
     handle_execute(state, command)
+    execute_tasks(command.post_tasks)
 
     state
   end
@@ -435,4 +437,8 @@ defmodule Robotica.Plugins.Audio do
 
     {:noreply, state}
   end
+
+  @spec execute_tasks(tasks :: list(RoboticaCommon.Task.t()) | nil) :: :ok
+  def execute_tasks(nil), do: :ok
+  def execute_tasks(tasks), do: Robotica.Executor.execute_tasks(tasks, remote: true)
 end

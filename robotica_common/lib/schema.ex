@@ -111,7 +111,9 @@ defmodule RoboticaCommon.Schema do
       sound: {sound_action_schema(), false},
       music: {music_action_schema(), false},
       message: {message_action_schema(), false},
-      volume: {volume_action_schema(), false}
+      volume: {volume_action_schema(), false},
+      pre_tasks: {{:list, task_schema()}, false},
+      post_tasks: {{:list, task_schema()}, false}
     }
   end
 
