@@ -10,8 +10,6 @@ use Mix.Config
 port = String.to_integer(System.get_env("PORT") || "4000")
 
 config :robotica_face,
-  api_username: System.get_env("GOOGLE_USERNAME"),
-  api_password: System.get_env("GOOGLE_PASSWORD"),
   mqtt_host: System.get_env("MQTT_HOST"),
   mqtt_port: String.to_integer(System.get_env("MQTT_PORT") || "8883"),
   ca_cert_file: System.get_env("CA_CERT_FILE"),
@@ -85,8 +83,6 @@ case Mix.env() do
       server: false
 
     config :robotica_face,
-      api_username: "google username",
-      api_password: "google pqassword",
       mqtt_host: "mqtt.example.org",
       mqtt_port: 8883,
       ca_cert_file: "cacert_dummy.pem",

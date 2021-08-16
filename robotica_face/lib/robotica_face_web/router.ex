@@ -1,9 +1,6 @@
 defmodule RoboticaFaceWeb.Router do
   use RoboticaFaceWeb, :router
 
-  @api_username Application.compile_env(:robotica_face, :api_username)
-  @api_password Application.compile_env(:robotica_face, :api_password)
-
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -21,11 +18,6 @@ defmodule RoboticaFaceWeb.Router do
 
   pipeline :ensure_auth do
     plug RoboticaFace.Auth.EnsureAuth
-  end
-
-  pipeline :api do
-    plug :accepts, ["json"]
-    plug BasicAuth, username: @api_username, password: @api_password
   end
 
   scope "/", RoboticaFaceWeb do
@@ -53,11 +45,5 @@ defmodule RoboticaFaceWeb.Router do
 
     get "/local", PageController, :local
     get "/schedule", PageController, :schedule
-  end
-
-  scope "/api", RoboticaFaceWeb do
-    pipe_through :api
-
-    post "/", ApiController, :index
   end
 end
