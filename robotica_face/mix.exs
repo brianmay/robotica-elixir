@@ -44,7 +44,7 @@ defmodule RoboticaFace.MixProject do
       {:gettext, "~> 0.11"},
       {:plug_cowboy, "~> 2.0"},
       {:ranch, "~> 2.0", override: true},
-      {:joken, "~> 2.3.0"},
+      {:joken, "~> 2.4.0"},
       {:timex, "~> 3.6"},
       {:event_bus, "~> 1.6.1"},
       {:robotica_common, path: "../robotica_common"},
