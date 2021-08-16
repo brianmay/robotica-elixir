@@ -48,7 +48,7 @@ defmodule RoboticaHello.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:guardian, "~> 2.0"},
       {:bcrypt_elixir, "~> 2.0"},
-      {:joken, "~> 2.3.0"},
+      {:joken, "~> 2.4.0"},
       {:robotica_common, path: "../robotica_common"},
       {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}
