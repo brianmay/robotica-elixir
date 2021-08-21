@@ -21,6 +21,7 @@ defmodule Robotica.Mqtt do
     opts = Keyword.put_new(opts, :qos, 0)
     client_name = get_tortoise_client_name()
 
+    :ok = Robotica.Subscriptions.message(topic, data)
     :ok = MqttPotion.publish(client_name, topic, data, opts)
   end
 

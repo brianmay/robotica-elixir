@@ -10,8 +10,8 @@ defmodule Robotica.Subscriptions do
     Define current state of Subscriptions.
     """
     @type t :: %__MODULE__{
-            subscriptions: %{required(list({atom(), String.t(), :json | :raw})) => list(pid)},
-            last_message: %{required(list(String.t())) => any()},
+            subscriptions: %{required(String.t()) => list({String.t(), pid, :json | :raw})},
+            last_message: %{required(String.t()) => any()},
             monitor: %{required(pid) => reference()}
           }
     defstruct subscriptions: %{}, last_message: %{}, monitor: %{}
@@ -25,13 +25,14 @@ defmodule Robotica.Subscriptions do
   end
 
   @spec subscribe(
-          topic :: list(String.t()),
+          topic_split :: list(String.t()),
           label :: atom(),
           pid :: pid,
           format :: :json | :raw,
           resend :: :resend | :no_resend
         ) :: :ok
-  def subscribe(topic, label, pid, format, resend) do
+  def subscribe(topic_split, label, pid, format, resend) do
+    topic = Enum.join(topic_split, "/")
     GenServer.cast(__MODULE__, {:subscribe, topic, label, pid, format, resend})
   end
 
@@ -41,9 +42,9 @@ defmodule Robotica.Subscriptions do
     :ok
   end
 
-  @spec message(topic :: list(String.t()), message :: String.t(), retain :: boolean()) :: :ok
-  def message(topic, message, retain) do
-    GenServer.cast(__MODULE__, {:message, topic, message, retain})
+  @spec message(topic :: String.t(), message :: String.t()) :: :ok
+  def message(topic, message) do
+    GenServer.cast(__MODULE__, {:message, topic, message})
   end
 
   ## private
@@ -80,7 +81,7 @@ defmodule Robotica.Subscriptions do
     end
   end
 
-  @spec send_to_client(topic :: list(String.t()), any(), pid, atom(), String.t()) :: :ok
+  @spec send_to_client(topic :: String.t(), any(), pid, atom(), String.t()) :: :ok
   defp send_to_client(topic, label, pid, format, raw_message) do
     case get_message_format(raw_message, format) do
       {:ok, message} ->
@@ -88,7 +89,8 @@ defmodule Robotica.Subscriptions do
           "Dispatching #{inspect(topic)} #{inspect(raw_message)} #{inspect(format)} #{inspect(message)}."
         )
 
-        :ok = GenServer.cast(pid, {:mqtt, topic, label, message})
+        topic_split = String.split(topic, "/")
+        :ok = GenServer.cast(pid, {:mqtt, topic_split, label, message})
 
       {:error, message} ->
         Logger.error("Cannot decode #{inspect(message)} using #{inspect(format)}.")
@@ -97,7 +99,7 @@ defmodule Robotica.Subscriptions do
 
   @spec handle_add(
           state :: State.t(),
-          topic :: list(String.t()),
+          topic :: String.t(),
           label :: any(),
           pid :: pid,
           format :: :json | :raw,
@@ -114,24 +116,22 @@ defmodule Robotica.Subscriptions do
         %State{state | monitor: monitor}
       end
 
-    topic_str = Enum.join(topic, "/")
-
     pids =
       case Map.get(state.subscriptions, topic, nil) do
         nil ->
-          subscription = {topic_str, 0}
+          subscription = {topic, qos: 0, nl: true}
           client_name = Robotica.Mqtt.get_tortoise_client_name()
 
-          # Logger.info("- Unsubscribing to #{topic_str} pid #{inspect(pid)}.")
-          # MqttPotion.unsubscribe(client_name, topic_str)
-          Logger.info("- Subscribing to #{topic_str} pid #{inspect(pid)}.")
+          # Logger.info("- Unsubscribing to #{topic} pid #{inspect(pid)}.")
+          # MqttPotion.unsubscribe(client_name, topic)
+          Logger.info("- Subscribing to #{topic} pid #{inspect(pid)}.")
           MqttPotion.subscribe(client_name, subscription)
 
-          Logger.debug("Adding pid #{inspect(pid)} to new subscription #{topic_str}.")
+          Logger.debug("Adding pid #{inspect(pid)} to new subscription #{topic}.")
           [{label, pid, format}]
 
         pids ->
-          Logger.debug("Adding pid #{inspect(pid)} to old subscription #{topic_str}.")
+          Logger.debug("Adding pid #{inspect(pid)} to old subscription #{topic}.")
           [{label, pid, format} | pids]
       end
 
@@ -140,7 +140,7 @@ defmodule Robotica.Subscriptions do
     # resend last message to new client
     case {resend, Map.fetch(state.last_message, topic)} do
       {:resend, {:ok, last_message}} ->
-        Logger.info("Resending last message to #{inspect(pid)} from subscription #{topic_str}.")
+        Logger.info("Resending last message to #{inspect(pid)} from subscription #{topic}.")
         :ok = send_to_client(topic, label, pid, format, last_message)
 
       _ ->
@@ -160,7 +160,7 @@ defmodule Robotica.Subscriptions do
     {:noreply, new_state}
   end
 
-  def handle_cast({:message, topic, message, _retain}, state) do
+  def handle_cast({:message, topic, message}, state) do
     Logger.info("Got message #{inspect(topic)} #{inspect(message)}.")
 
     last_message = Map.put(state.last_message, topic, message)
@@ -206,9 +206,8 @@ defmodule Robotica.Subscriptions do
     Enum.each(new_subscriptions, fn
       {topic, []} ->
         client_name = Robotica.Mqtt.get_tortoise_client_name()
-        topic_str = Enum.join(topic, "/")
-        Logger.info("+ Unsubscribing from #{topic_str}.")
-        MqttPotion.unsubscribe(client_name, topic_str)
+        Logger.info("+ Unsubscribing from #{topic}.")
+        MqttPotion.unsubscribe(client_name, topic)
 
       {_, _} ->
         nil
