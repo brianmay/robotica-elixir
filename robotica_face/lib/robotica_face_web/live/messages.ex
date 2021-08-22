@@ -8,7 +8,7 @@ defmodule RoboticaFaceWeb.Live.Messages do
   def render(assigns) do
     ~L"""
     <%= if not is_nil(@text) do %>
-    <div class="overlay" phx-hook="Message" data-message="<%= @text %>">
+    <div class="overlay" phx-hook="Message" data-message="<%= @text %>" id="message">
     <p><%= @text %></p>
     </div>
     <% end %>
