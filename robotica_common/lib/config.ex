@@ -69,28 +69,28 @@ defmodule RoboticaCommon.Config do
   end
 
   def hostname do
-    {:ok, hostname} = :inet.gethostname()
-    to_string(hostname)
-  end
-
-  def ui_default_host do
-    case Application.get_env(:robotica_common, :location) do
+    case Application.get_env(:robotica_common, :hostname) do
       nil ->
-        Map.fetch!(common_config().hosts, hostname())
+        {:ok, hostname} = :inet.gethostname()
+        to_string(hostname)
 
-      location ->
-        location
+      hostname ->
+        hostname
     end
   end
 
-  def ui_default_location do
-    ui_default_host().default_location
+  def ui_default_host_config do
+    Map.fetch!(common_config().hosts, hostname())
   end
 
-  def ui_schedule_host do
-    case ui_default_host().schedule_host do
+  def ui_default_location do
+    ui_default_host_config().default_location
+  end
+
+  def ui_schedule_hostname do
+    case ui_default_host_config().schedule_host do
       nil -> hostname()
-      host -> host
+      hostname -> hostname
     end
   end
 

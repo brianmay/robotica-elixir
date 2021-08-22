@@ -26,7 +26,7 @@ config :robotica_common,
   timezone: "Australia/Melbourne",
   build_date: System.get_env("BUILD_DATE"),
   vcs_ref: System.get_env("VCS_REF"),
-  location: nil,
+  hostname: nil,
   compile_config_files: true,
   config_common_file: "../../local/config/common.yaml",
   map_types: []

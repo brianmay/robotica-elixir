@@ -3,6 +3,8 @@
 use Mix.Config
 
 config :robotica_common,
-  config_common_file: "../config/common.yaml.sample"
+  hostname: "test-host",
+  config_common_file: "../test/common.yaml",
+  compile_config_files: false
 
 config :logger, level: :warn

@@ -22,7 +22,7 @@ defmodule RoboticaUi.Scene.Schedule do
 
   # --------------------------------------------------------
   def init(_, opts) do
-    schedule_host = Config.ui_schedule_host()
+    schedule_host = Config.ui_schedule_hostname()
 
     RoboticaCommon.EventBus.notify(:subscribe, %{
       topic: ["schedule", schedule_host],

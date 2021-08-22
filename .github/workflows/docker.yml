@@ -171,7 +171,7 @@ jobs:
         id: plt-cache
         with:
           path: ${{ matrix.dir }}/priv/plts
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-plts-${{ hashFiles(format('{0}/{1}/{2}', github.workspace, matrix.dir, 'mix.lock')) }}-4
+          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-plts-${{ hashFiles(format('{0}/{1}/{2}', github.workspace, matrix.dir, 'mix.lock')) }}-5
       - name: Build
         working-directory: ${{ matrix.dir }}
         run: |

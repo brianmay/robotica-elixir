@@ -1,6 +1,7 @@
 import Config
 
 config :robotica_common,
+  hostname: System.get_env("HTTP_HOST"),
   config_common_file: System.get_env("ROBOTICA_COMMON_CONFIG")
 
 config :robotica,

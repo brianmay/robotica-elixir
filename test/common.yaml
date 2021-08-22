@@ -1,0 +1,7 @@
+hosts:
+  test-host:
+    default_location: Brian
+    schedule_host: test-host
+locations:
+  Brian:
+    local_buttons: []

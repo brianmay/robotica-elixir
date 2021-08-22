@@ -44,7 +44,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
   end
 
   def mount(_params, _session, socket) do
-    schedule_host = RoboticaCommon.Config.ui_schedule_host()
+    schedule_host = RoboticaCommon.Config.ui_schedule_hostname()
 
     RoboticaCommon.EventBus.notify(:subscribe, %{
       topic: ["schedule", schedule_host],
