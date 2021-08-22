@@ -1,6 +1,11 @@
 defmodule RoboticaFaceWeb.Live.Schedule do
   @moduledoc false
   use Phoenix.LiveView
+  use RoboticaCommon.EventBus
+
+  require Logger
+
+  alias RoboticaCommon.Schema
 
   def render(assigns) do
     ~L"""
@@ -39,26 +44,35 @@ defmodule RoboticaFaceWeb.Live.Schedule do
   end
 
   def mount(_params, _session, socket) do
-    RoboticaFace.Schedule.register(self())
-    schedule = get_schedule()
+    schedule_host = RoboticaCommon.Config.ui_schedule_host()
+
+    RoboticaCommon.EventBus.notify(:subscribe, %{
+      topic: ["schedule", schedule_host],
+      label: :schedule,
+      pid: self(),
+      format: :json,
+      resend: :resend
+    })
+
+    schedule = []
     {:ok, assign(socket, :schedule, schedule)}
   end
 
-  def handle_cast({:schedule, schedule}, socket) do
-    {:noreply, assign(socket, :schedule, schedule)}
+  def handle_cast({:mqtt, _, :schedule, schedule}, socket) do
+    case Schema.validate_scheduled_steps(schedule) do
+      {:ok, steps} ->
+        {:noreply, assign(socket, :schedule, steps)}
+
+      {:error, reason} ->
+        Logger.error("Invalid schedule message received: #{inspect(reason)}.")
+        {:noreply, socket}
+    end
   end
 
   defp date_time_to_local(dt) do
     dt
     |> DateTime.shift_zone!("Australia/Melbourne")
     |> Timex.format!("%F %T", :strftime)
-  end
-
-  defp get_schedule do
-    case RoboticaFace.Schedule.get_schedule() do
-      {:ok, schedule} -> schedule
-      :error -> []
-    end
   end
 
   defp get_step_message(step) do

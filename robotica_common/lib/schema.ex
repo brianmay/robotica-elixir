@@ -126,6 +126,15 @@ defmodule RoboticaCommon.Schema do
     }
   end
 
+  def command_task_schema do
+    %{
+      struct_type: RoboticaCommon.CommandTask,
+      command: {{:map, :string, :any}, true},
+      location: {:string, true},
+      device: {:string, true}
+    }
+  end
+
   def mark_schema do
     %{
       struct_type: RoboticaCommon.Mark,
@@ -159,5 +168,9 @@ defmodule RoboticaCommon.Schema do
       mark: {:mark, false},
       repeat_number: {{:integer, nil}, false}
     }
+  end
+
+  def validate_scheduled_steps(data) do
+    RoboticaCommon.Validation.validate_schema(data, {:list, scheduled_step_schema()})
   end
 end

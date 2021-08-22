@@ -1,5 +1,6 @@
 hosts:
-  silverfish: Brian
+  silverfish:
+    default_location: Brian
 locations:
   Brian:
     local_buttons: []

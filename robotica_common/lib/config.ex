@@ -36,9 +36,16 @@ defmodule RoboticaCommon.Config do
       }
     end
 
+    defp config_host_schema do
+      %{
+        default_location: {:string, true},
+        schedule_host: {:string, false}
+      }
+    end
+
     defp config_common_schema do
       %{
-        hosts: {{:map, :string, :string}, true},
+        hosts: {{:map, :string, config_host_schema()}, true},
         locations: {{:map, :string, config_location_schema()}, true}
       }
     end
@@ -61,18 +68,29 @@ defmodule RoboticaCommon.Config do
     end
   end
 
-  defp hostname do
+  def hostname do
     {:ok, hostname} = :inet.gethostname()
     to_string(hostname)
   end
 
-  def ui_default_location do
+  def ui_default_host do
     case Application.get_env(:robotica_common, :location) do
       nil ->
         Map.fetch!(common_config().hosts, hostname())
 
       location ->
         location
+    end
+  end
+
+  def ui_default_location do
+    ui_default_host().default_location
+  end
+
+  def ui_schedule_host do
+    case ui_default_host().schedule_host do
+      nil -> hostname()
+      host -> host
     end
   end
 

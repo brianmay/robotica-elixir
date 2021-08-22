@@ -10,12 +10,8 @@ defmodule RoboticaFace.Application do
     children = [
       # Start the endpoint when the application starts
       RoboticaFaceWeb.Endpoint,
-      {Phoenix.PubSub, [name: RoboticaFace.PubSub, adapter: Phoenix.PubSub.PG2]},
-      RoboticaFace.Schedule,
-      RoboticaFace.Execute
+      {Phoenix.PubSub, [name: RoboticaFace.PubSub, adapter: Phoenix.PubSub.PG2]}
     ]
-
-    EventBus.subscribe({RoboticaFace.RoboticaService, ["^schedule", "^command_task"]})
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

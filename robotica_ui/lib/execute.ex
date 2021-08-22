@@ -4,7 +4,10 @@ defmodule RoboticaUi.Execute do
   """
 
   use GenServer
+  use RoboticaCommon.EventBus
   require Logger
+
+  alias RoboticaCommon.Config
 
   defmodule State do
     @moduledoc false
@@ -19,6 +22,16 @@ defmodule RoboticaUi.Execute do
   end
 
   def init(_opts) do
+    local_location = Config.ui_default_location()
+
+    RoboticaCommon.EventBus.notify(:subscribe, %{
+      topic: ["action", local_location, "Robotica"],
+      label: :action,
+      pid: self(),
+      format: :json,
+      resend: :no_resend
+    })
+
     {:ok, %State{}}
   end
 
@@ -49,17 +62,13 @@ defmodule RoboticaUi.Execute do
     %{state | timer: timer}
   end
 
-  def handle_cast({:command_task, task}, state) do
-    location = RoboticaCommon.Config.ui_default_location()
-
-    good_location = task.location == location
-    message = get_in(task.command.message, [:text])
+  def handle_cast({:mqtt, _, :action, command}, state) do
+    message = get_in(command, ["message", "text"])
 
     state =
-      case {good_location, message} do
-        {false, _} -> state
-        {_, nil} -> state
-        {_, text} -> update_message(state, text)
+      case message do
+        nil -> state
+        text -> update_message(state, text)
       end
 
     {:noreply, state}

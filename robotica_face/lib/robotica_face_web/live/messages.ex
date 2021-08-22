@@ -1,6 +1,7 @@
 defmodule RoboticaFaceWeb.Live.Messages do
   @moduledoc false
   use Phoenix.LiveView
+  use RoboticaCommon.EventBus
 
   alias RoboticaCommon.Config
 
@@ -15,8 +16,6 @@ defmodule RoboticaFaceWeb.Live.Messages do
   end
 
   def mount(_params, session, socket) do
-    RoboticaFace.Execute.register(self())
-
     socket =
       socket
       |> assign(:text, nil)
@@ -43,17 +42,13 @@ defmodule RoboticaFaceWeb.Live.Messages do
     |> assign(:timer, timer)
   end
 
-  def handle_cast({:command_task, task}, socket) do
-    location = socket.assigns.location
-
-    good_location = task.location == location
-    message = get_in(task.command.message, [:text])
+  def handle_cast({:mqtt, _, :action, command}, socket) do
+    message = get_in(command, ["message", "text"])
 
     socket =
-      case {good_location, message} do
-        {false, _} -> socket
-        {_, nil} -> socket
-        {_, text} -> update_message(socket, text)
+      case message do
+        nil -> socket
+        text -> update_message(socket, text)
       end
 
     {:noreply, socket}
@@ -76,6 +71,20 @@ defmodule RoboticaFaceWeb.Live.Messages do
         true -> location
         false -> nil
       end
+
+    RoboticaCommon.EventBus.notify(:unsubscribe_all, %{
+      pid: self()
+    })
+
+    if location != nil do
+      RoboticaCommon.EventBus.notify(:subscribe, %{
+        topic: ["action", location, "Robotica"],
+        label: :action,
+        pid: self(),
+        format: :json,
+        resend: :no_resend
+      })
+    end
 
     socket
     |> assign(:location, location)

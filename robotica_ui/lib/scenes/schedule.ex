@@ -1,7 +1,7 @@
 defmodule RoboticaUi.Scene.Schedule do
   @moduledoc false
   use Scenic.Scene
-  use EventBus.EventSource
+  use RoboticaCommon.EventBus
   require Logger
 
   alias Scenic.Graph
@@ -9,6 +9,7 @@ defmodule RoboticaUi.Scene.Schedule do
   import Scenic.Primitives
 
   alias RoboticaCommon.Config
+  alias RoboticaCommon.Schema
   alias RoboticaUi.Components.Marks
   alias RoboticaUi.Components.Nav
   alias RoboticaUi.Components.Step
@@ -21,14 +22,17 @@ defmodule RoboticaUi.Scene.Schedule do
 
   # --------------------------------------------------------
   def init(_, opts) do
-    RoboticaUi.Schedule.register(self())
+    schedule_host = Config.ui_schedule_host()
 
-    schedule =
-      case RoboticaUi.Schedule.get_schedule() do
-        {:ok, schedule} -> schedule
-        {:error, _} -> []
-      end
+    RoboticaCommon.EventBus.notify(:subscribe, %{
+      topic: ["schedule", schedule_host],
+      label: :schedule,
+      pid: self(),
+      format: :json,
+      resend: :resend
+    })
 
+    schedule = []
     viewport = opts[:viewport]
     {:ok, %ViewPort.Status{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
 
@@ -88,12 +92,19 @@ defmodule RoboticaUi.Scene.Schedule do
     |> line({{110, 40}, {width - 10, 40}}, stroke: {1, :red})
   end
 
-  def filter_event({:schedule, steps}, _, state) do
-    graph =
-      state.empty_graph
-      |> update_schedule(steps, state.width)
+  def handle_cast({:mqtt, _, :schedule, schedule}, state) do
+    case Schema.validate_scheduled_steps(schedule) do
+      {:ok, steps} ->
+        graph =
+          state.empty_graph
+          |> update_schedule(steps, state.width)
 
-    {:halt, %{state | graph: graph}, push: graph}
+        {:noreply, %{state | graph: graph}, push: graph}
+
+      {:error, reason} ->
+        Logger.error("Invalid schedule message received: #{inspect(reason)}.")
+        {:noreply, state}
+    end
   end
 
   def filter_event({:click, step}, _, state) do

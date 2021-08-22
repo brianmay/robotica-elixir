@@ -12,12 +12,10 @@ defmodule RoboticaUi do
     # start the application with the viewport
     children = [
       {Scenic, viewports: [main_viewport_config]},
-      RoboticaUi.Schedule,
       RoboticaUi.Execute,
       RoboticaUi.RootManager
     ]
 
-    EventBus.subscribe({RoboticaUi.RoboticaService, ["^schedule", "^command_task"]})
     Supervisor.start_link(children, strategy: :one_for_one)
   end
 end

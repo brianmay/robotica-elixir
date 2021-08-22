@@ -8,7 +8,6 @@ defmodule Robotica.Client do
   use EventBus.EventSource
 
   alias Robotica.Scheduler.Executor
-  alias Robotica.Validation
 
   require Logger
 
@@ -36,20 +35,6 @@ defmodule Robotica.Client do
   @impl MqttPotion.Handler
   def handle_puback(_ack) do
     :ok
-  end
-
-  @impl MqttPotion.Handler
-  def handle_message(["schedule", _], message) do
-    Logger.info("Received mqtt topic: #{message.topic} #{inspect(message)}")
-
-    with {:ok, json} <- Jason.decode(message.payload),
-         {:ok, steps} <- Validation.validate_scheduled_steps(json) do
-      EventSource.notify %{topic: :schedule} do
-        steps
-      end
-    else
-      {:error, error} -> Logger.error("Invalid schedule message received: #{inspect(error)}.")
-    end
   end
 
   @impl MqttPotion.Handler

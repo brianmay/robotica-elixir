@@ -22,8 +22,4 @@ defmodule Robotica.Validation do
   def validate_mark(%{} = data) do
     Validation.validate_schema(data, Schema.mark_schema())
   end
-
-  def validate_scheduled_steps(data) do
-    Validation.validate_schema(data, {:list, Schema.scheduled_step_schema()})
-  end
 end

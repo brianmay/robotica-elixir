@@ -66,8 +66,8 @@ defmodule Robotica.Mqtt do
 
   @spec publish_schedule(list(RoboticaCommon.ScheduledStep.t())) :: :ok
   def publish_schedule(steps) do
-    client_id = get_tortoise_client_id()
-    topic = "schedule/#{client_id}"
+    host = RoboticaCommon.Config.hostname()
+    topic = "schedule/#{host}"
     publish_json(topic, steps, retain: true)
   end
 

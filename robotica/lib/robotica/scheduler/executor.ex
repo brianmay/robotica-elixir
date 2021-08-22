@@ -3,7 +3,6 @@ defmodule Robotica.Scheduler.Executor do
   Execute scheduled tasks
   """
   use GenServer
-  use EventBus.EventSource
 
   require Logger
 
@@ -35,19 +34,6 @@ defmodule Robotica.Scheduler.Executor do
 
   defp publish_steps(_old_steps, steps) do
     :ok = Robotica.Mqtt.publish_schedule(steps)
-  end
-
-  @spec notify_steps(
-          list(RoboticaCommon.ScheduledStep.t()),
-          list(RoboticaCommon.ScheduledStep.t())
-        ) :: nil
-
-  defp notify_steps(steps, steps), do: nil
-
-  defp notify_steps(_old_steps, steps) do
-    EventSource.notify %{topic: :schedule} do
-      steps
-    end
   end
 
   def init(:ok) do
@@ -169,7 +155,6 @@ defmodule Robotica.Scheduler.Executor do
 
   def handle_call({:reload_marks}, _from, {date, timer, list}) do
     list = add_marks_to_schedule(list)
-    notify_steps([], list)
     publish_steps([], list)
 
     new_state = {date, timer, list}
@@ -177,7 +162,6 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   def handle_cast({:publish_schedule}, {_, _, list} = state) do
-    notify_steps([], list)
     publish_steps([], list)
     {:noreply, state}
   end
@@ -187,7 +171,6 @@ defmodule Robotica.Scheduler.Executor do
       {:ok, mark} ->
         Marks.put_mark(Marks, mark)
         list = add_marks_to_schedule(list)
-        notify_steps([], list)
         publish_steps([], list)
         new_state = {date, timer, list}
         {:noreply, new_state}
@@ -241,7 +224,6 @@ defmodule Robotica.Scheduler.Executor do
     state = set_timer(now, {date, nil, new_list})
 
     {_, _, new_list} = state
-    notify_steps(old_list, new_list)
     publish_steps(old_list, new_list)
 
     state

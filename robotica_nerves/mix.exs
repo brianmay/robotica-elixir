@@ -51,9 +51,9 @@ defmodule RoboticaNerves.MixProject do
         :logger,
         :runtime_tools,
         :robotica_common,
+        :robotica,
         :robotica_face,
-        :robotica_ui,
-        :robotica
+        :robotica_ui
       ]
     ]
   end

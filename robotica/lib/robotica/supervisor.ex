@@ -40,13 +40,6 @@ defmodule Robotica.Supervisor do
 
     subscriptions = []
 
-    subscriptions =
-      if opts.remote_scheduler do
-        [{"schedule/#{opts.remote_scheduler}", 0} | subscriptions]
-      else
-        subscriptions
-      end
-
     children =
       if opts.remote_scheduler do
         []
