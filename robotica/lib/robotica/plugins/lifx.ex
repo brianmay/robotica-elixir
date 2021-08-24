@@ -170,25 +170,15 @@ defmodule Robotica.Plugins.LIFX do
 
   # Publish state to MQTT
 
-  @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
-  defp publish_raw(%State{} = state, topic, value) do
-    :ok = Robotica.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
-  end
-
-  @spec publish_json(State.t(), String.t(), map() | list()) :: :ok
-  defp publish_json(%State{} = state, topic, value) do
-    :ok = Robotica.Mqtt.publish_state_json(state.location, state.device, value, topic: topic)
-  end
-
   @spec publish_device_scenes(State.t(), %{required(String.t()) => SceneState.t()}) :: :ok
   defp publish_device_scenes(%State{} = state, scenes) do
     scene_list = Enum.map(scenes, fn {scene_name, _} -> scene_name end)
-    :ok = publish_json(state, "scenes", scene_list)
+    :ok = publish_state_json(state, "scenes", scene_list)
 
     priority_list =
       Enum.map(scenes, fn {_, %SceneState{priority: priority}} -> priority end) |> Enum.uniq()
 
-    :ok = publish_json(state, "priorities", priority_list)
+    :ok = publish_state_json(state, "priorities", priority_list)
     :ok
   end
 
@@ -200,29 +190,29 @@ defmodule Robotica.Plugins.LIFX do
 
   @spec publish_device_colors(State.t(), list(HSBK.t())) :: :ok
   defp publish_device_colors(%State{} = state, colors) do
-    :ok = publish_json(state, "colors", colors)
+    :ok = publish_state_json(state, "colors", colors)
     :ok
   end
 
   @spec publish_device_power(State.t(), integer()) :: :ok
   defp publish_device_power(%State{} = state, power) do
     power = if power != 0, do: "ON", else: "OFF"
-    :ok = publish_raw(state, "power", power)
-    :ok = publish_raw(state, "error", "")
+    :ok = publish_state_raw(state, "power", power)
+    :ok = publish_state_raw(state, "error", "")
     :ok
   end
 
   @spec publish_device_hard_off(State.t()) :: :ok
   defp publish_device_hard_off(%State{} = state) do
     power = "HARD_OFF"
-    :ok = publish_raw(state, "power", power)
-    :ok = publish_raw(state, "error", "")
+    :ok = publish_state_raw(state, "power", power)
+    :ok = publish_state_raw(state, "error", "")
     :ok
   end
 
   @spec publish_device_error(State.t(), String.t()) :: :ok
   defp publish_device_error(%State{} = state, error) do
-    :ok = publish_raw(state, "error", error)
+    :ok = publish_state_raw(state, "error", error)
     :ok
   end
 
@@ -729,7 +719,7 @@ defmodule Robotica.Plugins.LIFX do
 
   defp handle_command(%State{} = state, command) do
     command = apply_scenes_to_command(command, state)
-    publish(state.location, state.device, command)
+    publish_command(state.location, state.device, command)
     do_command(state, command)
   end
 

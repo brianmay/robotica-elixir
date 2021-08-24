@@ -140,20 +140,15 @@ defmodule Robotica.Plugins.Audio do
     }
   end
 
-  @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
-  defp publish_raw(%State{} = state, topic, value) do
-    :ok = Robotica.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
-  end
-
   @spec publish_play_list(State.t(), String.t() | nil) :: :ok
   defp publish_play_list(%State{} = state, play_list) do
     play_list = if play_list == nil, do: "STOP", else: play_list
-    publish_raw(state, "play_list", play_list)
+    publish_state_raw(state, "play_list", play_list)
   end
 
   @spec publish_volume(State.t(), String.t(), integer) :: :ok
   defp publish_volume(%State{} = state, volume, value) do
-    publish_raw(state, "volume/#{volume}", Integer.to_string(value))
+    publish_state_raw(state, "volume/#{volume}", Integer.to_string(value))
   end
 
   @spec publish_error(State.t()) :: :ok
@@ -385,7 +380,7 @@ defmodule Robotica.Plugins.Audio do
   @spec handle_command(Robotica.Plugins.Audio.State.t(), map()) ::
           Robotica.Plugins.Audio.State.t()
   def handle_command(%State{} = state, command) do
-    publish(state.location, state.device, command)
+    publish_command(state.location, state.device, command)
 
     state =
       case command.volume do

@@ -23,29 +23,24 @@ defmodule Robotica.Plugins.SonOff do
     defstruct [:config, :location, :device, :last_power]
   end
 
-  @spec publish_raw(State.t(), String.t(), String.t()) :: :ok
-  defp publish_raw(%State{} = state, topic, value) do
-    :ok = Robotica.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
-  end
-
   @spec publish_device_state(State.t(), String.t()) :: :ok
   defp publish_device_state(%State{} = state, device_state) do
-    publish_raw(state, "power", device_state)
+    publish_state_raw(state, "power", device_state)
   end
 
   # @spec publish_device_error(State.t()) :: :ok
   # defp publish_device_error(%State{} = state) do
-  #   publish_raw(state, "power", "ERROR")
+  #   publish_state_raw(state, "power", "ERROR")
   # end
 
   @spec publish_device_hard_off(State.t()) :: :ok
   defp publish_device_hard_off(%State{} = state) do
-    publish_raw(state, "power", "HARD_OFF")
+    publish_state_raw(state, "power", "HARD_OFF")
   end
 
   @spec publish_device_unknown(State.t()) :: :ok
   defp publish_device_unknown(%State{} = state) do
-    publish_raw(state, "power", "")
+    publish_state_raw(state, "power", "")
   end
 
   ## Server Callbacks
@@ -84,7 +79,7 @@ defmodule Robotica.Plugins.SonOff do
   end
 
   defp handle_command(state, command) do
-    publish(state.location, state.device, command)
+    publish_command(state.location, state.device, command)
 
     power =
       case command.action do

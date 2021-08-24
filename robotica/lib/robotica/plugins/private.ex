@@ -5,8 +5,18 @@ defmodule Robotica.Plugins.Private do
 
   require Logger
 
-  @spec publish(String.t(), String.t(), map()) :: :ok
-  def publish(location, device, command) do
+  @spec publish_state_raw(struct(), String.t(), String.t()) :: :ok
+  def publish_state_raw(state, topic, value) do
+    :ok = Robotica.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
+  end
+
+  @spec publish_state_json(struct(), String.t(), map() | list()) :: :ok
+  def publish_state_json(state, topic, value) do
+    :ok = Robotica.Mqtt.publish_state_json(state.location, state.device, value, topic: topic)
+  end
+
+  @spec publish_command(String.t(), String.t(), map()) :: :ok
+  def publish_command(location, device, command) do
     task = %RoboticaCommon.CommandTask{location: location, device: device, command: command}
     :ok = Robotica.Mqtt.publish_command_task(task)
   end

@@ -27,12 +27,11 @@ defmodule Robotica.Plugins.Dummy do
 
   @spec publish_device_state(Robotica.Plugin.t(), String.t()) :: :ok
   defp publish_device_state(state, device_state) do
-    :ok =
-      Robotica.Mqtt.publish_state_raw(state.location, state.device, device_state, topic: "power")
+    publish_state_raw(state, "power", device_state)
   end
 
   def handle_command(state, command) do
-    publish(state.location, state.device, command)
+    publish_command(state.location, state.device, command)
 
     device_state =
       case command.action do

@@ -8,7 +8,6 @@ defmodule Robotica.Plugins.HDMI do
   require Logger
 
   alias Robotica.Devices.HDMI
-  alias Robotica.Plugin
 
   defmodule Config do
     @moduledoc false
@@ -31,27 +30,22 @@ defmodule Robotica.Plugins.HDMI do
     }
   end
 
-  @spec publish_raw(Plugin.t(), String.t(), String.t()) :: :ok
-  defp publish_raw(%Plugin{} = state, topic, value) do
-    :ok = Robotica.Mqtt.publish_state_raw(state.location, state.device, value, topic: topic)
-  end
-
   @spec publish_device_output(Robotica.Plugin.t(), integer, integer) :: :ok
   defp publish_device_output(%Robotica.Plugin{} = state, input, output) do
     topic = "output#{output}"
-    publish_raw(state, topic, Integer.to_string(input))
+    publish_state_raw(state, topic, Integer.to_string(input))
   end
 
   @spec publish_device_output_off(Robotica.Plugin.t(), integer) :: :ok
   defp publish_device_output_off(%Robotica.Plugin{} = state, output) do
     topic = "output#{output}"
-    publish_raw(state, topic, "OFF")
+    publish_state_raw(state, topic, "OFF")
   end
 
   @spec publish_device_output_hard_off(Robotica.Plugin.t(), integer) :: :ok
   defp publish_device_output_hard_off(%Robotica.Plugin{} = state, output) do
     topic = "output#{output}"
-    publish_raw(state, topic, "HARD_OFF")
+    publish_state_raw(state, topic, "HARD_OFF")
   end
 
   @spec poll(Robotica.Plugin.t(), list(integer)) :: :ok | {:error, String.t()}
@@ -91,7 +85,7 @@ defmodule Robotica.Plugins.HDMI do
 
   def handle_command(%Robotica.Plugin{} = state, command) do
     Logger.info("HDMI #{state.config.host}: #{command.input} #{command.output}")
-    publish(state.location, state.device, command)
+    publish_command(state.location, state.device, command)
 
     publish_device_output_off(state, command.output)
 
