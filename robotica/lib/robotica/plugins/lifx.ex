@@ -729,6 +729,7 @@ defmodule Robotica.Plugins.LIFX do
 
   defp handle_command(%State{} = state, command) do
     command = apply_scenes_to_command(command, state)
+    publish(state.location, state.device, command)
     do_command(state, command)
   end
 

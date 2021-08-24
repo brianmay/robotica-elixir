@@ -91,6 +91,7 @@ defmodule Robotica.Plugins.HDMI do
 
   def handle_command(%Robotica.Plugin{} = state, command) do
     Logger.info("HDMI #{state.config.host}: #{command.input} #{command.output}")
+    publish(state.location, state.device, command)
 
     publish_device_output_off(state, command.output)
 

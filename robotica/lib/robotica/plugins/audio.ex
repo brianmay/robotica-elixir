@@ -362,8 +362,6 @@ defmodule Robotica.Plugins.Audio do
 
   @spec handle_execute(state :: State.t(), action :: map()) :: nil
   defp handle_execute(%State{} = state, action) do
-    publish(state.location, state.device, action)
-
     sound_list = get_sound_list(action)
 
     if length(sound_list) > 0 do
@@ -387,6 +385,8 @@ defmodule Robotica.Plugins.Audio do
   @spec handle_command(Robotica.Plugins.Audio.State.t(), map()) ::
           Robotica.Plugins.Audio.State.t()
   def handle_command(%State{} = state, command) do
+    publish(state.location, state.device, command)
+
     state =
       case command.volume do
         nil ->
