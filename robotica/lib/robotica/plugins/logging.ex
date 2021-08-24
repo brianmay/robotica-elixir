@@ -22,8 +22,15 @@ defmodule Robotica.Plugins.Logging do
   end
 
   def handle_cast({:mqtt, _, :command, command}, state) do
-    publish(state.location, state.device, command)
-    Logger.info(inspect(command))
+    case check_type(command, "logging") do
+      {command, true} ->
+        publish(state.location, state.device, command)
+        Logger.info(inspect(command))
+
+      {_, false} ->
+        state
+    end
+
     {:noreply, state}
   end
 end

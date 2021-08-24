@@ -423,11 +423,9 @@ defmodule Robotica.Plugins.Audio do
     state =
       case Robotica.Config.validate_audio_command(command) do
         {:ok, command} ->
-          if command.type == "audio" or command.type == nil do
-            handle_command(state, command)
-          else
-            Logger.info("Wrong type #{command.type}, expected audio")
-            state
+          case check_type(command, "audio") do
+            {command, true} -> handle_command(state, command)
+            {_, false} -> state
           end
 
         {:error, error} ->

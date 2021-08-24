@@ -737,11 +737,9 @@ defmodule Robotica.Plugins.LIFX do
     state =
       case Robotica.Config.validate_lights_command(command) do
         {:ok, command} ->
-          if command.type == "light" or command.type == nil do
-            handle_command(state, command)
-          else
-            Logger.info("Wrong type #{command.type}, expected light")
-            state
+          case check_type(command, "light") do
+            {command, true} -> handle_command(state, command)
+            {_, false} -> state
           end
 
         {:error, error} ->

@@ -49,11 +49,9 @@ defmodule Robotica.Plugins.Dummy do
   def handle_cast({:mqtt, _, :command, command}, state) do
     case Robotica.Config.validate_device_command(command) do
       {:ok, command} ->
-        if command.type == "device" or command.type == nil do
-          handle_command(state, command)
-        else
-          Logger.info("Wrong type #{command.type}, expected device")
-          state
+        case check_type(command, "device") do
+          {command, true} -> handle_command(state, command)
+          {_, false} -> state
         end
 
       {:error, error} ->
