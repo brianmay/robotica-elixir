@@ -42,7 +42,7 @@ defmodule RoboticaFace.MixProject do
       {:phoenix_live_view, "~> 0.15.4"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
-      {:plug_cowboy, "~> 2.0"},
+      {:plug_cowboy, "~> 2.5.1"},
       {:ranch, "~> 2.0", override: true},
       {:joken, "~> 2.4.0"},
       {:timex, "~> 3.6"},
