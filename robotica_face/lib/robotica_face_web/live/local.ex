@@ -4,18 +4,20 @@ defmodule RoboticaFaceWeb.Live.Local do
   use RoboticaCommon.EventBus
 
   alias RoboticaCommon.Config
+  alias RoboticaFaceWeb.Router.Helpers, as: Routes
 
   require Logger
 
   @impl true
   def render(assigns) do
     ~L"""
-    <%= inspect(self()) %>
+    <%= live_render(@socket, RoboticaFaceWeb.Live.Messages, id: :messages) %>
+
     <form phx-change="location">
     <select name="location">
-    <option value="">None</option>
+    <option value="">Default (<%= get_user_location(@user) %>)</option>
     <%= for location <- @locations do %>
-    <option value="<%= location %>" <%= if location == @location do %>selected="True"<% end %>><%= location %></option>
+    <option value="<%= location %>" <%= if location == @set_location do %>selected="True"<% end %>><%= location %></option>
     <% end %>
     </select>
     </form>
@@ -37,12 +39,39 @@ defmodule RoboticaFaceWeb.Live.Local do
   def mount(_params, session, socket) do
     locations = Config.ui_locations()
 
+    {socket, user} =
+      case RoboticaFace.Auth.authenticate_user(session["token"]) do
+        {:ok, {_token, user}} -> {socket, user}
+        {:error, _} -> {redirect(socket, to: "/login"), nil}
+      end
+
     socket =
       socket
-      |> set_location(session["user"]["location"])
+      |> assign(:active, "local")
       |> assign(:locations, locations)
+      |> assign(:user, user)
 
     {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(params, _uri, socket) do
+    set_location = params["location"]
+    user = socket.assigns.user
+
+    location =
+      case {user, set_location} do
+        {nil, nil} -> nil
+        {user, nil} -> get_user_location(user)
+        {_, location} -> location
+      end
+
+    socket =
+      socket
+      |> assign(:set_location, set_location)
+      |> set_location(location)
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -67,7 +96,8 @@ defmodule RoboticaFaceWeb.Live.Local do
 
   @impl true
   def handle_event("location", param, socket) do
-    socket = set_location(socket, param["location"])
+    url = Routes.local_path(socket, :local, param["location"])
+    socket = push_patch(socket, to: url)
     {:noreply, socket}
   end
 
@@ -86,6 +116,14 @@ defmodule RoboticaFaceWeb.Live.Local do
     end
 
     {:noreply, socket}
+  end
+
+  defp get_user_location(nil) do
+    nil
+  end
+
+  defp get_user_location(user) do
+    user["location"]
   end
 
   defp search_row(row, button_id) do

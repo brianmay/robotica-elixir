@@ -5,6 +5,8 @@ defmodule RoboticaFaceWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
+    plug :put_root_layout, {RoboticaFaceWeb.LayoutView, :root}
+    plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
 
@@ -37,13 +39,14 @@ defmodule RoboticaFaceWeb.Router do
     post "/logout", SessionController, :logout
   end
 
-  scope "/", RoboticaFaceWeb do
+  scope "/", RoboticaFaceWeb.Live do
     pipe_through :browser
     pipe_through :csrf
     pipe_through :auth
     pipe_through :ensure_auth
 
-    get "/local", PageController, :local
-    get "/schedule", PageController, :schedule
+    live "/local", Local, :local
+    live "/local/:location", Local, :local
+    live "/schedule", Schedule, :schedule
   end
 end

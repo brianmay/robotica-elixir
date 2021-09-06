@@ -9,6 +9,8 @@ defmodule RoboticaFaceWeb.Live.Schedule do
 
   def render(assigns) do
     ~L"""
+    <%= live_render(@socket, RoboticaFaceWeb.Live.Messages, id: :messages) %>
+
     <div class="table-responsive">
     <table class="table schedule">
       <thead>
@@ -43,7 +45,13 @@ defmodule RoboticaFaceWeb.Live.Schedule do
     """
   end
 
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
+    {socket, user} =
+      case RoboticaFace.Auth.authenticate_user(session["token"]) do
+        {:ok, {_token, user}} -> {socket, user}
+        {:error, _} -> {redirect(socket, to: "/login"), nil}
+      end
+
     schedule_host = RoboticaCommon.Config.ui_schedule_hostname()
 
     RoboticaCommon.EventBus.notify(:subscribe, %{
@@ -55,7 +63,14 @@ defmodule RoboticaFaceWeb.Live.Schedule do
     })
 
     schedule = []
-    {:ok, assign(socket, :schedule, schedule)}
+
+    socket =
+      socket
+      |> assign(:active, "schedule")
+      |> assign(:schedule, schedule)
+      |> assign(:user, user)
+
+    {:ok, socket}
   end
 
   def handle_cast({:mqtt, _, :schedule, schedule}, socket) do
