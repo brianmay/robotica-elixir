@@ -10,8 +10,8 @@ jobs:
 
     strategy:
       matrix:
-        elixir: [1.12.1]
-        otp: [24.0.2]
+        elixir: [1.12.3]
+        otp: [24.0.4]
         dir: ["robotica_common", "robotica", "robotica_ui", "robotica_docker"]
 
     env:
@@ -77,8 +77,8 @@ jobs:
 
     strategy:
       matrix:
-        elixir: [1.12.1]
-        otp: [24.0.2]
+        elixir: [1.12.3]
+        otp: [24.0.4]
         dir: ["robotica_hello", "robotica_face"]
 
     env:
@@ -137,8 +137,8 @@ jobs:
 
     strategy:
       matrix:
-        elixir: [1.12.1]
-        otp: [24.0.2]
+        elixir: [1.12.3]
+        otp: [24.0.4]
         dir: ["robotica_common", "robotica", "robotica_ui", "robotica_hello", "robotica_face", "robotica_docker"]
 
     env:
