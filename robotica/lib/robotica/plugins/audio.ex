@@ -90,6 +90,7 @@ defmodule Robotica.Plugins.Audio do
 
     run(state, :init, [])
     music_stop(state)
+    publish_play_list(state, nil)
     publish_volume(state, "music", state.volumes.music)
     publish_volume(state, "message", state.volumes.message)
     set_volume(state, state.volumes.music)
