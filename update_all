@@ -8,6 +8,7 @@ export BUILD_WITHOUT_QUIC=true
 
 for i in robotica_common robotica robotica_face robotica_hello robotica_ui; do
     (
+        echo ""
         echo "----- $i -----"
         cd $i
         # test -f .envrc && . ./.envrc
@@ -22,6 +23,7 @@ for i in robotica_nerves robotica_docker; do
     for target in host rpi3; do
         export MIX_TARGET="$target"
         (
+            echo ""
             echo "----- $i $target -----"
             cd $i
             # test -f .envrc && . ./.envrc
@@ -35,6 +37,7 @@ done
 
 for i in robotica_face robotica_hello; do
     (
+        echo ""
         echo "----- $i -----"
         cd $i
         npm install --prefix assets
