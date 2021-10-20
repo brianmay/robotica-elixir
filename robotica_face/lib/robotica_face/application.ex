@@ -8,6 +8,7 @@ defmodule RoboticaFace.Application do
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
+      RoboticaFaceWeb.Telemetry,
       # Start the endpoint when the application starts
       RoboticaFaceWeb.Endpoint,
       {Phoenix.PubSub, [name: RoboticaFace.PubSub, adapter: Phoenix.PubSub.PG2]}

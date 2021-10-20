@@ -1,5 +1,6 @@
 defmodule RoboticaFaceWeb.Router do
   use RoboticaFaceWeb, :router
+  import Phoenix.LiveDashboard.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -48,5 +49,9 @@ defmodule RoboticaFaceWeb.Router do
     live "/local", Local, :local
     live "/local/:location", Local, :local
     live "/schedule", Schedule, :schedule
+
+    if Mix.env() == :dev do
+      live_dashboard "/dashboard", metrics: RoboticaFaceWeb.Telemetry
+    end
   end
 end

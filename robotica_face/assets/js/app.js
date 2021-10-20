@@ -18,7 +18,7 @@ import "phoenix_html";
 // import socket from "./socket"
 
 import {Socket} from "phoenix";
-import LiveSocket from "phoenix_live_view";
+import {LiveSocket} from "phoenix_live_view";
 
 let Hooks = {};
 
