@@ -7,7 +7,7 @@
     <title>RoboticaFace · Phoenix Framework</title>
     <link
       rel="stylesheet"
-      href="<%= Routes.static_path(@conn, "/css/app.css") %>"
+      href={Routes.static_path(@conn, "/css/app.css")}
     />
   </head>
   <body>
@@ -59,14 +59,14 @@
 
     <main role="main" class="container">
       <%= for {flash_key, flash_message} <- get_flash(@conn) do %>
-        <p class="alert alert-<%= flash_key %>"><%= flash_message %></p>
+        <p class={"alert alert-#{flash_key}"}><%= flash_message %></p>
       <% end %>
       <%= @inner_content %>
     </main>
     <%= csrf_meta_tag() %>
     <script
       type="text/javascript"
-      src="<%= Routes.static_path(@conn, "/js/app.js") %>"
+      src={Routes.static_path(@conn, "/js/app.js")}
     ></script>
   </body>
 
