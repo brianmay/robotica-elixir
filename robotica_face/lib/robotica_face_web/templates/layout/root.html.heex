@@ -29,10 +29,10 @@
         <ul class="navbar-nav mr-auto">
           <%= if RoboticaFace.Auth.user_signed_in?(@conn) do %>
             <li class="nav-item">
-              <%= link("Local", to: Routes.local_path(@conn, :local), class: "nav-link " <> active_class(@active, "local")) %>
+              <%= link("Local", to: Routes.local_path(@conn, :local), class: link_class(@active, "local")) %>
             </li>
             <li class="nav-item">
-              <%= link("Schedule", to: Routes.schedule_path(@conn, :schedule), class: "nav-link " <> active_class(@active, "schedule")) %>
+              <%= link("Schedule", to: Routes.schedule_path(@conn, :schedule), class: link_class(@active, "schedule")) %>
             </li>
 
             <li class="nav-item dropdown">
@@ -50,7 +50,7 @@
             </li>
           <% else %>
             <li class="nav-item">
-              <%= link("Login", to: Routes.session_path(@conn, :index), class: "nav-link " <> active_class(@active, "login")) %>
+              <%= link("Login", to: Routes.session_path(@conn, :index), class: link_class(@active, "login")) %>
             </li>
           <% end %>
         </ul>
