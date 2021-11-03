@@ -21,7 +21,7 @@
   "joken": {:hex, :joken, "2.4.1", "63a6e47aaf735637879f31babfad93c936d63b8b7d01c5ef44c7f37689e71ab4", [:mix], [{:jose, "~> 1.11.2", [hex: :jose, repo: "hexpm", optional: false]}], "hexpm", "d4fc7c703112b2dedc4f9ec214856c3a07108c4835f0f174a369521f289c98d1"},
   "jose": {:hex, :jose, "1.11.2", "f4c018ccf4fdce22c71e44d471f15f723cb3efab5d909ab2ba202b5bf35557b3", [:mix, :rebar3], [], "hexpm", "98143fbc48d55f3a18daba82d34fe48959d44538e9697c08f34200fa5f0947d2"},
   "libcluster": {:hex, :libcluster, "3.3.0", "f7d45ff56d88e9fb4c30aee662480cbab69ebc0e7f7da4ad8d01b1e4f7492da8", [:mix], [{:jason, "~> 1.1", [hex: :jason, repo: "hexpm", optional: false]}], "hexpm", "ecdcdc88334ec8eb18b10a13a1d5f22a3319a970b5b1e66cfe71c7719a4ab6cc"},
-  "lifx": {:git, "https://github.com/brianmay/lifx.git", "d50e899b2a691df5c055bb19577190701296b238", []},
+  "lifx": {:git, "https://github.com/brianmay/lifx.git", "af38462193be1a086ca244c92b4af5509c90a81f", []},
   "metrics": {:hex, :metrics, "1.0.1", "25f094dea2cda98213cecc3aeff09e940299d950904393b2a29d191c346a8486", [:rebar3], [], "hexpm", "69b09adddc4f74a40716ae54d140f93beb0fb8978d8636eaded0c31b6f099f16"},
   "mime": {:hex, :mime, "2.0.2", "0b9e1a4c840eafb68d820b0e2158ef5c49385d17fb36855ac6e7e087d4b1dcc5", [:mix], [], "hexpm", "e6a3f76b4c277739e36c2e21a2c640778ba4c3846189d5ab19f97f126df5f9b7"},
   "mimerl": {:hex, :mimerl, "1.2.0", "67e2d3f571088d5cfd3e550c383094b47159f3eee8ffa08e64106cdf5e981be3", [:rebar3], [], "hexpm", "f278585650aa581986264638ebf698f8bb19df297f66ad91b18910dfc6e19323"},
