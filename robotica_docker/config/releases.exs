@@ -10,12 +10,13 @@ config :robotica,
   classifications_file: System.get_env("ROBOTICA_CLASSIFICATIONS"),
   schedule_file: System.get_env("ROBOTICA_SCHEDULE"),
   sequences_file: System.get_env("ROBOTICA_SEQUENCES"),
-  scenes_file: System.get_env("ROBOTICA_SCENES"),
+  scenes_file: System.get_env("ROBOTICA_SCENES")
+
+config :robotica_face,
   oidc: %{
     discovery_document_uri: System.get_env("OIDC_DISCOVERY_URL"),
     client_id: System.get_env("OIDC_CLIENT_ID"),
     client_secret: System.get_env("OIDC_CLIENT_SECRET"),
-    response_type: "code",
     scope: System.get_env("OIDC_AUTH_SCOPE")
   }
 
