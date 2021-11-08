@@ -36,7 +36,7 @@ defmodule RoboticaNerves.Application do
         0 = cmd("mpd", [])
     end
 
-    System.put_env("HTTP_HOST", Robotica.Config.http_host())
+    System.put_env("HTTP_URL", Robotica.Config.http_url())
     Logger.info("...done.")
   end
 

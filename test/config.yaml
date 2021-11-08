@@ -4,5 +4,5 @@ mqtt:
   ca_cert_file: nil
 hosts:
   test-host:
-    http_host: "localhost"
+    http_url: "http://localhost"
     plugins: []

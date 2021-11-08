@@ -23,9 +23,12 @@ config :robotica_face,
   }
 
 # Configures the endpoint
+http_url = System.get_env("HTTP_URL") || "http://localhost"
+http_uri = URI.parse(http_url)
+
 config :robotica_face, RoboticaFaceWeb.Endpoint,
   http: [port: port, ip: {0, 0, 0, 0, 0, 0, 0, 0}],
-  url: [host: {:system, "HTTP_HOST"}],
+  url: [scheme: http_uri.scheme, host: http_uri.host, port: http_uri.port],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: RoboticaFaceWeb.ErrorView, accepts: ~w(html json)],
   pubsub_server: RoboticaFace.PubSub,
@@ -87,7 +90,6 @@ case Mix.env() do
   :test ->
     config :robotica_face, RoboticaFaceWeb.Endpoint,
       http: [port: 4002],
-      url: [host: "localhost"],
       secret_key_base: "dumL2k9lDFzSg+OuQrpbQqkYZ22NnlmRLS/IEpGtu8d+3mofjYRjTjkyUg/r9hf1",
       live_view: [
         signing_salt: "/EeCfa85oE1mkAPMo2kPsT5zkCFPveHk"

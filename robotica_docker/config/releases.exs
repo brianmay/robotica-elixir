@@ -1,11 +1,11 @@
 import Config
 
 config :robotica_common,
-  hostname: System.get_env("HTTP_HOST"),
+  hostname: System.get_env("HOSTNAME"),
   config_common_file: System.get_env("ROBOTICA_COMMON_CONFIG")
 
 config :robotica,
-  hostname: System.get_env("HTTP_HOST"),
+  hostname: System.get_env("HOSTNAME"),
   config_file: System.get_env("ROBOTICA_CONFIG"),
   classifications_file: System.get_env("ROBOTICA_CLASSIFICATIONS"),
   schedule_file: System.get_env("ROBOTICA_SCHEDULE"),
@@ -21,10 +21,12 @@ config :robotica_face,
   }
 
 port = String.to_integer(System.get_env("PORT") || "4000")
+http_url = System.get_env("HTTP_URL")
+http_uri = URI.parse(http_url)
 
 config :robotica_face, RoboticaFaceWeb.Endpoint,
   http: [:inet6, port: port],
-  url: [host: System.get_env("HTTP_HOST")],
+  url: [scheme: http_uri.scheme, host: http_uri.host, port: http_uri.port],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   live_view: [
     signing_salt: System.get_env("SIGNING_SALT")

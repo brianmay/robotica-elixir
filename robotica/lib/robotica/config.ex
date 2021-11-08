@@ -60,7 +60,7 @@ defmodule Robotica.Config do
 
     defp host_schema do
       %{
-        http_host: {:string, true},
+        http_url: {:string, true},
         remote_scheduler: {:string, false},
         plugins: {{:list, plugin_schema()}, true}
       }
@@ -148,9 +148,9 @@ defmodule Robotica.Config do
     end
   end
 
-  @spec http_host :: String.t()
-  def http_host do
-    get_host_config().http_host
+  @spec http_url :: String.t()
+  def http_url do
+    get_host_config().http_url
   end
 
   @spec plugins :: list(Robotica.Plugin.t())
