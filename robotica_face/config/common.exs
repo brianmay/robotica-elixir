@@ -90,9 +90,17 @@ case Mix.env() do
       url: [host: "localhost"],
       secret_key_base: "dumL2k9lDFzSg+OuQrpbQqkYZ22NnlmRLS/IEpGtu8d+3mofjYRjTjkyUg/r9hf1",
       live_view: [
-        signing_salt: "dumL2k9lDFzSg+OuQrpbQqkYZ22NnlmRLS/IEpGtu8d+3mofjYRjTjkyUg/r9hf1"
+        signing_salt: "/EeCfa85oE1mkAPMo2kPsT5zkCFPveHk"
       ],
       server: false
+
+    config :plugoid,
+      auth_cookie_store_opts: [
+        signing_salt: "/EeCfa85oE1mkAPMo2kPsT5zkCFPveHk"
+      ],
+      state_cookie_store_opts: [
+        signing_salt: "/EeCfa85oE1mkAPMo2kPsT5zkCFPveHk"
+      ]
 
     config :robotica_face,
       mqtt_host: "mqtt.example.org",
