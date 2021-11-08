@@ -54,8 +54,7 @@ defmodule RoboticaFace.MixProject do
       {:gun, "~> 1.3", override: true},
       {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
-      # {:plugoid, git: "https://github.com/tanguilp/plugoid.git"}
-      {:plugoid, path: "/home/brian/tree/3rdparty/plugoid"},
+      {:plugoid, git: "https://github.com/tanguilp/plugoid.git", branch: "conn_callback"},
       {:replug, "~> 0.1.0"}
     ]
   end
