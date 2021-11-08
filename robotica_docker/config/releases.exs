@@ -43,5 +43,11 @@ config :libcluster,
     ]
   ]
 
-config :plugoid, :state_cookie_store_opts,
-  signing_salt: System.get_env("SIGNING_SALT")
+config :plugoid,
+  auth_cookie_store: Plug.Session.COOKIE,
+  auth_cookie_store_opts: [
+    signing_salt: System.get_env("SIGNING_SALT")
+  ],
+  state_cookie_store_opts: [
+    signing_salt: System.get_env("SIGNING_SALT")
+  ]

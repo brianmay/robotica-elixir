@@ -1,4 +1,7 @@
 defmodule RoboticaFaceWeb.TokenCallback do
+  @moduledoc """
+  Callback from Plugoid to set session details from token
+  """
   import Plug.Conn
 
   @spec callback(

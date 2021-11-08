@@ -1,4 +1,7 @@
 defmodule RoboticaFaceWeb.InitAssigns do
+  @moduledoc """
+  Hook to intercept liveview mount requests
+  """
   import Phoenix.LiveView
 
   alias RoboticaFaceWeb.Router.Helpers, as: Routes

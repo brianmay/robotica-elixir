@@ -1,4 +1,8 @@
 defmodule RoboticaFaceWeb.ClientCallback do
+  @moduledoc """
+  Implement OIDC client config
+  """
+
   @behaviour OIDC.ClientConfig
   @impl true
   def get(_client_id) do
