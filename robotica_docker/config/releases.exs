@@ -20,10 +20,14 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   live_view: [
     signing_salt: System.get_env("SIGNING_SALT")
-  ]
-
-config :joken,
-  login_secret: System.get_env("LOGIN_SECRET")
+  ],
+  oidc: %{
+    discovery_document_uri: System.get_env("OIDC_DISCOVERY_URL"),
+    client_id: System.get_env("OIDC_CLIENT_ID"),
+    client_secret: System.get_env("OIDC_CLIENT_SECRET"),
+    response_type: "code",
+    scope: System.get_env("OIDC_AUTH_SCOPE")
+  }
 
 config :libcluster,
   topologies: [
@@ -38,3 +42,6 @@ config :libcluster,
       ]
     ]
   ]
+
+config :plugoid, :state_cookie_store_opts,
+  signing_salt: System.get_env("SIGNING_SALT")

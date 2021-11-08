@@ -15,26 +15,12 @@ defmodule RoboticaFaceWeb.Live.Messages do
     """
   end
 
-  def mount(_params, session, socket) do
-    {socket, user} =
-      case RoboticaFace.Auth.authenticate_user(session["token"]) do
-        {:ok, {_token, user}} -> {socket, user}
-        {:error, _} -> {redirect(socket, to: "/login"), nil}
-      end
-
-    location =
-      if user == nil do
-        nil
-      else
-        user["location"]
-      end
-
+  def mount(_params, _session, socket) do
     socket =
       socket
       |> assign(:text, nil)
       |> assign(:timer, nil)
-      |> set_location(location)
-      |> assign(:user, user)
+      |> set_location(Config.ui_default_location())
 
     {:ok, socket}
   end

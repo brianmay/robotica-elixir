@@ -15,7 +15,7 @@ defmodule RoboticaFaceWeb.Live.Local do
 
     <form phx-change="location">
     <select name="location">
-    <option value="">Default (<%= get_user_location(@user) %>)</option>
+    <option value="">Default (<%= Config.ui_default_location() %>)</option>
     <%= for location <- @locations do %>
     <option value="<%= location %>" <%= if location == @set_location do %>selected="True"<% end %>><%= location %></option>
     <% end %>
@@ -36,20 +36,13 @@ defmodule RoboticaFaceWeb.Live.Local do
   @impl true
   @spec mount(any, nil | maybe_improper_list | map, Phoenix.LiveView.Socket.t()) ::
           {:ok, Phoenix.LiveView.Socket.t()}
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     locations = Config.ui_locations()
-
-    {socket, user} =
-      case RoboticaFace.Auth.authenticate_user(session["token"]) do
-        {:ok, {_token, user}} -> {socket, user}
-        {:error, _} -> {redirect(socket, to: "/login"), nil}
-      end
 
     socket =
       socket
       |> assign(:active, "local")
       |> assign(:locations, locations)
-      |> assign(:user, user)
 
     {:ok, socket}
   end
@@ -57,13 +50,11 @@ defmodule RoboticaFaceWeb.Live.Local do
   @impl true
   def handle_params(params, _uri, socket) do
     set_location = params["location"]
-    user = socket.assigns.user
 
     location =
-      case {user, set_location} do
-        {nil, nil} -> nil
-        {user, nil} -> get_user_location(user)
-        {_, location} -> location
+      case set_location do
+        nil -> Config.ui_default_location()
+        location -> location
       end
 
     socket =
@@ -116,14 +107,6 @@ defmodule RoboticaFaceWeb.Live.Local do
     end
 
     {:noreply, socket}
-  end
-
-  defp get_user_location(nil) do
-    nil
-  end
-
-  defp get_user_location(user) do
-    user["location"]
   end
 
   defp search_row(row, button_id) do

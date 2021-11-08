@@ -45,13 +45,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
     """
   end
 
-  def mount(_params, session, socket) do
-    {socket, user} =
-      case RoboticaFace.Auth.authenticate_user(session["token"]) do
-        {:ok, {_token, user}} -> {socket, user}
-        {:error, _} -> {redirect(socket, to: "/login"), nil}
-      end
-
+  def mount(_params, _session, socket) do
     schedule_host = RoboticaCommon.Config.ui_schedule_hostname()
 
     RoboticaCommon.EventBus.notify(:subscribe, %{
@@ -68,7 +62,6 @@ defmodule RoboticaFaceWeb.Live.Schedule do
       socket
       |> assign(:active, "schedule")
       |> assign(:schedule, schedule)
-      |> assign(:user, user)
 
     {:ok, socket}
   end

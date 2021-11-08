@@ -47,14 +47,16 @@ defmodule RoboticaFace.MixProject do
       {:gettext, "~> 0.11"},
       {:plug_cowboy, "~> 2.5.1"},
       {:ranch, "~> 2.0", override: true},
-      {:joken, "~> 2.4.0"},
       {:timex, "~> 3.6"},
       {:event_bus, "~> 1.6.1"},
       {:robotica_common, path: "../robotica_common"},
       {:cowlib, "~> 2.11", override: true},
       {:gun, "~> 1.3", override: true},
       {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
+      # {:plugoid, git: "https://github.com/tanguilp/plugoid.git"}
+      {:plugoid, path: "/home/brian/tree/3rdparty/plugoid"},
+      {:replug, "~> 0.1.0"}
     ]
   end
 

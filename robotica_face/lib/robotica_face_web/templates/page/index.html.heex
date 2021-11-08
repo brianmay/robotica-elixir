@@ -5,13 +5,16 @@
   maintainability.
 </p>
 
-<%= if RoboticaFace.Auth.user_signed_in?(@conn) do %>
-  <%= live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
+<%= live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
 
-  <ul>
+<% user =  RoboticaFaceWeb.Auth.current_user(@conn) %>
+
+<ul>
+  <%= if user != nil do %>
     <li><%= link("Local", to: Routes.local_path(@conn, :local)) %></li>
     <li><%= link("Schedule", to: Routes.schedule_path(@conn, :schedule)) %></li>
-  </ul>
-<% else %>
-  Please <%= link("Login", to: Routes.session_path(@conn, :index)) %>.
-<% end %>
+    <li><%= link("Logout", to: Routes.page_path(@conn, :logout), method: :post) %></li>
+  <% else %>
+    <li><%= link("Login", to: Routes.page_path(@conn, :login)) %></li>
+  <% end %>
+</ul>

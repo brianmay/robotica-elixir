@@ -27,13 +27,20 @@
 
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
-          <%= if RoboticaFace.Auth.user_signed_in?(@conn) do %>
+          <% user =  RoboticaFaceWeb.Auth.current_user(@conn) %>
+          <%= if user != nil do %>
             <li class="nav-item">
-              <%= link("Local", to: Routes.local_path(@conn, :local), class: link_class(@active, "local")) %>
+              <%= link("Local", to: Routes.local_path(@conn, :local), class: link_class(:active, "local")) %>
             </li>
             <li class="nav-item">
-              <%= link("Schedule", to: Routes.schedule_path(@conn, :schedule), class: link_class(@active, "schedule")) %>
+              <%= link("Schedule", to: Routes.schedule_path(@conn, :schedule), class: link_class(:active, "schedule")) %>
             </li>
+
+            <%= if RoboticaFaceWeb.Auth.user_is_admin?(user) do %>
+              <li class="nav-item">
+                <%= link("Dashboard", to: Routes.live_dashboard_path(@conn, :home), class: link_class(@active, "dashboard")) %>
+              </li>
+            <% end %>
 
             <li class="nav-item dropdown">
               <a
@@ -42,15 +49,15 @@
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                <%= RoboticaFace.Auth.current_user(@conn)["name"] %>
+                <%= user["name"] %>
               </a>
               <div class="dropdown-menu">
-                <%= link "Logout", to: Routes.session_path(@conn, :logout), method: :post, class: "dropdown-item" %>
+                <%= link "Logout", to: Routes.page_path(@conn, :logout), method: :post, class: "dropdown-item" %>
               </div>
             </li>
           <% else %>
-            <li class="nav-item">
-              <%= link("Login", to: Routes.session_path(@conn, :index), class: link_class(@active, "login")) %>
+           <li class="nav-item">
+              <%= link("Login", to: Routes.page_path(@conn, :login), class: link_class(@active, "login") ) %>
             </li>
           <% end %>
         </ul>

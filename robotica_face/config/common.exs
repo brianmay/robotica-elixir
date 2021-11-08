@@ -14,7 +14,13 @@ config :robotica_face,
   mqtt_port: String.to_integer(System.get_env("MQTT_PORT") || "8883"),
   ca_cert_file: System.get_env("CA_CERT_FILE"),
   mqtt_user_name: System.get_env("MQTT_USER_NAME"),
-  mqtt_password: System.get_env("MQTT_PASSWORD")
+  mqtt_password: System.get_env("MQTT_PASSWORD"),
+  oidc: %{
+    discovery_document_uri: System.get_env("OIDC_DISCOVERY_URL"),
+    client_id: System.get_env("OIDC_CLIENT_ID"),
+    client_secret: System.get_env("OIDC_CLIENT_SECRET"),
+    scope: System.get_env("OIDC_AUTH_SCOPE")
+  }
 
 # Configures the endpoint
 config :robotica_face, RoboticaFaceWeb.Endpoint,
@@ -29,12 +35,18 @@ config :robotica_face, RoboticaFaceWeb.Endpoint,
   code_reloader: false,
   server: true
 
-config :joken,
-  login_secret: System.get_env("LOGIN_SECRET")
-
 config :phoenix,
   json_library: Jason,
   template_engines: [leex: Phoenix.LiveView.Engine]
+
+config :plugoid,
+  auth_cookie_store: Plug.Session.COOKIE,
+  auth_cookie_store_opts: [
+    signing_salt: System.get_env("SIGNING_SALT")
+  ],
+  state_cookie_store_opts: [
+    signing_salt: System.get_env("SIGNING_SALT")
+  ]
 
 if System.get_env("IPV6") != nil do
   config :robotica_face, RoboticaFace.Repo, socket_options: [:inet6]
@@ -87,10 +99,13 @@ case Mix.env() do
       mqtt_port: 8883,
       ca_cert_file: "cacert_dummy.pem",
       mqtt_user_name: "mqtt_username",
-      mqtt_password: "mqtt_password"
-
-    config :joken,
-      login_secret: "lXI0Bt7DrB968JJ9Vc+q14JD1vK3S1VrmKXLNVJJ7rObkGEULZLdfwqo/NSyb8ez"
+      mqtt_password: "mqtt_password",
+      oidc: %{
+        discovery_document_uri: "",
+        client_id: "",
+        client_secret: "",
+        scope: ""
+      }
 
   :prod ->
     config :robotica_face, RoboticaFaceWeb.Endpoint,
