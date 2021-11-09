@@ -5,9 +5,11 @@
   maintainability.
 </p>
 
-<%= live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
-
 <% user =  RoboticaFaceWeb.Auth.current_user(@conn) %>
+
+<%= if user != nil do %>
+  <%= live_render(@conn, RoboticaFaceWeb.Live.Messages) %>
+<% end %>
 
 <ul>
   <%= if user != nil do %>
