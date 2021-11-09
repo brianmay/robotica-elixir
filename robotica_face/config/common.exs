@@ -23,7 +23,7 @@ config :robotica_face,
   }
 
 # Configures the endpoint
-http_url = System.get_env("HTTP_URL") || "http://localhost"
+http_url = System.get_env("HTTP_URL") || "http://localhost:4000"
 http_uri = URI.parse(http_url)
 
 config :robotica_face, RoboticaFaceWeb.Endpoint,
