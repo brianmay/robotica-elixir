@@ -13,10 +13,10 @@
 
 <ul>
   <%= if user != nil do %>
-    <li><%= link("Local", to: Routes.local_path(@conn, :local)) %></li>
-    <li><%= link("Schedule", to: Routes.schedule_path(@conn, :schedule)) %></li>
-    <li><%= link("Logout", to: Routes.page_path(@conn, :logout), method: :post) %></li>
+    <li><%= live_redirect("Local", to: Routes.local_path(@conn, :local)) %></li>
+    <li><%= live_redirect("Schedule", to: Routes.schedule_path(@conn, :schedule)) %></li>
+    <li><%= live_redirect("Logout", to: Routes.page_path(@conn, :logout), method: :post) %></li>
   <% else %>
-    <li><%= link("Login", to: Routes.page_path(@conn, :login)) %></li>
+    <li><%= live_redirect("Login", to: Routes.page_path(@conn, :login)) %></li>
   <% end %>
 </ul>
