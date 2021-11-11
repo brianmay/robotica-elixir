@@ -15,7 +15,7 @@
   <%= if user != nil do %>
     <li><%= live_redirect("Local", to: Routes.local_path(@conn, :local)) %></li>
     <li><%= live_redirect("Schedule", to: Routes.schedule_path(@conn, :schedule)) %></li>
-    <li><%= live_redirect("Logout", to: Routes.page_path(@conn, :logout), method: :post) %></li>
+    <li><%= link("Logout", to: Routes.page_path(@conn, :logout), method: :post) %></li>
   <% else %>
     <li><%= live_redirect("Login", to: Routes.page_path(@conn, :login)) %></li>
   <% end %>
