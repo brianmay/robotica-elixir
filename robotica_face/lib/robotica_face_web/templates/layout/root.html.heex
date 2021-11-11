@@ -52,7 +52,7 @@
                 <%= user["name"] %>
               </a>
               <div class="dropdown-menu">
-                <%= live_redirect "Logout", to: Routes.page_path(@conn, :logout), method: :post, class: "dropdown-item" %>
+                <%= link "Logout", to: Routes.page_path(@conn, :logout), method: :post, class: "dropdown-item" %>
               </div>
             </li>
           <% else %>
