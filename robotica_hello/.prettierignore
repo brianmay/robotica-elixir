@@ -1,6 +1,0 @@
-deps/
-_build/
-.elixir_ls
-assets
-priv
-README.md

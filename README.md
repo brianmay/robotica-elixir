@@ -10,7 +10,6 @@ automatic schedule.
 * robotica_common: common shared code.
 * robotica base library for scheduling and interacting with devices.
 * robotica_face: Web based interface.
-* robotica_hello: Authentication for web based interface.
 * robotica_nerves: Deployment for RPI3.
 * robotica_ui: Scenic based User Interface.
 
@@ -67,7 +66,7 @@ Follow the following steps:
 6. Build JavaScript stuff:
 
     ```
-    cd robotica_hello
+    cd robotica_face
     mix deps.get
     npm install
     cd ../..
