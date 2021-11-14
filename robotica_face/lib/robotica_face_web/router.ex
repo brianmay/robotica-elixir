@@ -15,10 +15,6 @@ defmodule RoboticaFaceWeb.Router do
     plug :put_secure_browser_headers
   end
 
-  pipeline :csrf do
-    plug :protect_from_forgery
-  end
-
   defmodule PlugoidConfig do
     def common do
       config = Application.get_env(:robotica_face, :oidc)
@@ -51,7 +47,6 @@ defmodule RoboticaFaceWeb.Router do
   live_session :default, on_mount: RoboticaFaceWeb.InitAssigns do
     scope "/", RoboticaFaceWeb do
       pipe_through :browser
-      pipe_through :csrf
       pipe_through :auth
 
       get "/", PageController, :index
@@ -60,7 +55,6 @@ defmodule RoboticaFaceWeb.Router do
 
     scope "/", RoboticaFaceWeb do
       pipe_through :browser
-      pipe_through :csrf
       pipe_through :ensure_auth
 
       get "/login", PageController, :login
@@ -72,7 +66,6 @@ defmodule RoboticaFaceWeb.Router do
 
   scope "/", RoboticaFaceWeb do
     pipe_through :browser
-    pipe_through :csrf
     pipe_through :ensure_auth
     pipe_through :ensure_admin
 
