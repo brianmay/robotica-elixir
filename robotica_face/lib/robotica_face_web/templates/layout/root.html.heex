@@ -28,6 +28,7 @@
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
           <% user =  RoboticaFaceWeb.Auth.current_user(@conn) %>
+          <% active = assigns[:active] %>
           <%= if user != nil do %>
             <li class="nav-item">
               <%= live_redirect("Local", to: Routes.local_path(@conn, :local), class: link_class(:active, "local")) %>
@@ -38,7 +39,7 @@
 
             <%= if RoboticaFaceWeb.Auth.user_is_admin?(user) do %>
               <li class="nav-item">
-                <%= live_redirect("Dashboard", to: Routes.live_dashboard_path(@conn, :home), class: link_class(@active, "dashboard")) %>
+                <%= live_redirect("Dashboard", to: Routes.live_dashboard_path(@conn, :home), class: link_class(active, "dashboard")) %>
               </li>
             <% end %>
 
@@ -57,7 +58,7 @@
             </li>
           <% else %>
            <li class="nav-item">
-              <%= live_redirect("Login", to: Routes.page_path(@conn, :login), class: link_class(@active, "login") ) %>
+              <%= live_redirect("Login", to: Routes.page_path(@conn, :login), class: link_class(active, "login") ) %>
             </li>
           <% end %>
         </ul>
