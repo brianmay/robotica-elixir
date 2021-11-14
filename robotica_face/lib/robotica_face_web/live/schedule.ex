@@ -1,6 +1,6 @@
 defmodule RoboticaFaceWeb.Live.Schedule do
   @moduledoc false
-  use Phoenix.LiveView
+  use RoboticaFaceWeb, :live_view
   use RoboticaCommon.EventBus
 
   require Logger

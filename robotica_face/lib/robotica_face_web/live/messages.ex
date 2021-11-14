@@ -1,6 +1,6 @@
 defmodule RoboticaFaceWeb.Live.Messages do
   @moduledoc false
-  use Phoenix.LiveView
+  use RoboticaFaceWeb, :live_view
   use RoboticaCommon.EventBus
 
   alias RoboticaCommon.Config

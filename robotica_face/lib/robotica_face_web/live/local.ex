@@ -1,10 +1,9 @@
 defmodule RoboticaFaceWeb.Live.Local do
   @moduledoc false
-  use Phoenix.LiveView
+  use RoboticaFaceWeb, :live_view
   use RoboticaCommon.EventBus
 
   alias RoboticaCommon.Config
-  alias RoboticaFaceWeb.Router.Helpers, as: Routes
 
   require Logger
 
