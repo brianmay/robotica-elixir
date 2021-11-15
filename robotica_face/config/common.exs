@@ -7,8 +7,6 @@
 # General application configuration
 use Mix.Config
 
-port = String.to_integer(System.get_env("PORT") || "4000")
-
 config :robotica_face,
   mqtt_host: System.get_env("MQTT_HOST"),
   mqtt_port: String.to_integer(System.get_env("MQTT_PORT") || "8883"),
@@ -23,11 +21,18 @@ config :robotica_face,
   }
 
 # Configures the endpoint
-http_url = System.get_env("HTTP_URL") || "http://localhost:4000"
+default_port = if Mix.env() == :test, do: "4002", else: "4000"
+port = String.to_integer(System.get_env("PORT") || default_port)
+
+http_url = System.get_env("HTTP_URL") || "http://localhost:#{port}"
 http_uri = URI.parse(http_url)
 
 config :robotica_face, RoboticaFaceWeb.Endpoint,
-  http: [port: port, ip: {0, 0, 0, 0, 0, 0, 0, 0}],
+  http: [
+    :inet6,
+    port: port,
+    protocol_options: [max_header_value_length: 8096]
+  ],
   url: [scheme: http_uri.scheme, host: http_uri.host, port: http_uri.port],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: RoboticaFaceWeb.ErrorView, accepts: ~w(html json)],
@@ -46,6 +51,9 @@ config :plugoid,
   auth_cookie_store: Plug.Session.COOKIE,
   auth_cookie_store_opts: [
     signing_salt: System.get_env("SIGNING_SALT")
+  ],
+  state_cookie_opts: [
+    extra: "SameSite=None Secure"
   ],
   state_cookie_store_opts: [
     signing_salt: System.get_env("SIGNING_SALT")
@@ -89,7 +97,6 @@ case Mix.env() do
 
   :test ->
     config :robotica_face, RoboticaFaceWeb.Endpoint,
-      http: [port: 4002],
       secret_key_base: "dumL2k9lDFzSg+OuQrpbQqkYZ22NnlmRLS/IEpGtu8d+3mofjYRjTjkyUg/r9hf1",
       live_view: [
         signing_salt: "/EeCfa85oE1mkAPMo2kPsT5zkCFPveHk"
