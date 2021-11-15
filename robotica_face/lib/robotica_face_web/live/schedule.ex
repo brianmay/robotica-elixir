@@ -8,7 +8,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
   alias RoboticaCommon.Schema
 
   def render(assigns) do
-    ~L"""
+    ~H"""
     <%= live_render(@socket, RoboticaFaceWeb.Live.Messages, id: :messages) %>
 
     <div class="table-responsive">
@@ -19,12 +19,12 @@ defmodule RoboticaFaceWeb.Live.Schedule do
           <th scope="col">Step</th>
           <th scope="col">Marks</th>
           <th scope="col">Actions</th>
-        </th>
+        </tr>
       </thead>
       <tbody>
         <%= for step <- @schedule do %>
           <% iso_time = DateTime.to_iso8601(step.required_time) %>
-            <tr class="<%= step.mark %>">
+            <tr class={step.mark}>
               <td><%= date_time_to_local(step.required_time) %></td>
               <td>
                 <%= for line <- get_step_message(step) do %>
@@ -33,9 +33,9 @@ defmodule RoboticaFaceWeb.Live.Schedule do
               </td>
               <td><%= step.mark %></td>
               <td>
-                <button class="btn btn-warning" phx-click="mark" phx-value-mark="done" phx-value-step_time="<%= iso_time %>" phx-value-step_id="<%= step.id %>">Done</button>
-                <button class="btn btn-warning" phx-click="mark" phx-value-mark="cancel" phx-value-step_time="<%= iso_time %>" phx-value-step_id="<%= step.id %>">Cancel</button>
-                <button class="btn btn-warning" phx-click="mark" phx-value-mark="clear" phx-value-step_time="<%= iso_time %>" phx-value-step_id="<%= step.id %>">Clear</button>
+                <button class="btn btn-warning" phx-click="mark" phx-value-mark="done" phx-value-step_time={iso_time} phx-value-step_id={step.id}>Done</button>
+                <button class="btn btn-warning" phx-click="mark" phx-value-mark="cancel" phx-value-step_time={iso_time} phx-value-step_id={step.id}>Cancel</button>
+                <button class="btn btn-warning" phx-click="mark" phx-value-mark="clear" phx-value-step_time={iso_time} phx-value-step_id={step.id}>Clear</button>
               </td>
             </tr>
         <% end %>

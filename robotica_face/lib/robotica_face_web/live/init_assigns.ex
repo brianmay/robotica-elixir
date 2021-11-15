@@ -14,7 +14,7 @@ defmodule RoboticaFaceWeb.InitAssigns do
       socket = redirect(socket, to: Routes.page_path(socket, :index))
       {:halt, socket}
     else
-      socket = assign(socket, :user, user)
+      socket = assign(socket, :current_user, user)
       {:cont, socket}
     end
   end

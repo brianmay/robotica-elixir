@@ -1,1 +1,60 @@
-<%= @inner_content %>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <%= live_redirect("Robotica", to: Routes.page_path(@conn, :index), class: "navbar-brand") %>
+    <button
+    class="navbar-toggler"
+    type="button"
+    data-bs-toggle="collapse"
+    data-bs-target="#navbarsExampleDefault"
+    aria-controls="navbarsExampleDefault"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+    >
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+    <ul class="navbar-nav mr-auto">
+        <% user =  RoboticaFaceWeb.Auth.current_user(@conn) %>
+        <% active = assigns[:active] %>
+        <%= if user != nil do %>
+            <li class="nav-item">
+                <%= live_redirect("Local", to: Routes.local_path(@conn, :local), class: link_class(active, "local")) %>
+            </li>
+            <li class="nav-item">
+                <%= live_redirect("Schedule", to: Routes.schedule_path(@conn, :schedule), class: link_class(active, "schedule")) %>
+            </li>
+
+            <%= if RoboticaFaceWeb.Auth.user_is_admin?(user) do %>
+                <li class="nav-item">
+                <%= live_redirect("Dashboard", to: Routes.live_dashboard_path(@conn, :home), class: link_class(active, "dashboard")) %>
+                </li>
+            <% end %>
+
+            <li class="nav-item dropdown">
+                <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                >
+                <%= user["name"] %>
+                </a>
+                <div class="dropdown-menu">
+                <%= link "Logout", to: Routes.page_path(@conn, :logout), method: :post, class: "dropdown-item" %>
+                </div>
+            </li>
+        <% else %>
+            <li class="nav-item">
+                <%= live_redirect("Login", to: Routes.page_path(@conn, :login), class: link_class(active, "login") ) %>
+            </li>
+        <% end %>
+    </ul>
+    </div>
+</nav>
+
+<main role="main" class="container">
+    <%= for {flash_key, flash_message} <- get_flash(@conn) do %>
+        <p class={"alert alert-#{flash_key}"}><%= flash_message %></p>
+    <% end %>
+    <%= @inner_content %>
+</main>

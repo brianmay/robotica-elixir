@@ -1,14 +1,14 @@
 defmodule RoboticaFaceWeb.Live.Messages do
   @moduledoc false
-  use RoboticaFaceWeb, :live_view
+  use Phoenix.LiveView
   use RoboticaCommon.EventBus
 
   alias RoboticaCommon.Config
 
   def render(assigns) do
-    ~L"""
+    ~H"""
     <%= if not is_nil(@text) do %>
-    <div class="overlay" phx-hook="Message" data-message="<%= @text %>" id="message">
+    <div class="overlay" phx-hook="Message" data-message={@text} id="message">
     <p><%= @text %></p>
     </div>
     <% end %>

@@ -9,14 +9,15 @@ defmodule RoboticaFaceWeb.Live.Local do
 
   @impl true
   def render(assigns) do
-    ~L"""
+    ~H"""
     <%= live_render(@socket, RoboticaFaceWeb.Live.Messages, id: :messages) %>
 
     <form phx-change="location">
     <select name="location">
     <option value="">Default (<%= Config.ui_default_location() %>)</option>
     <%= for location <- @locations do %>
-    <option value="<%= location %>" <%= if location == @set_location do %>selected="True"<% end %>><%= location %></option>
+    <% selected = if location == @set_location, do: True, else: nil %>
+    <option value={location} selected={selected}><%= location %></option>
     <% end %>
     </select>
     </form>
@@ -25,7 +26,7 @@ defmodule RoboticaFaceWeb.Live.Local do
     <div><%= row.name %></div>
     <%= for button <- row.buttons do %>
     <% class = get_button_state(@button_states, button.id) |> button_state_to_class(button) %>
-    <button class="btn <%= class %> btn-robotica" phx-click="activate" phx-value-button="<%= button.id %>"><%= button.name %></button>
+    <button class={"btn #{class} btn-robotica"} phx-click="activate" phx-value-button={button.id}><%= button.name %></button>
     <% end %>
     </div>
     <% end %>
