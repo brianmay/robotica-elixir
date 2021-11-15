@@ -31,10 +31,10 @@
           <% active = assigns[:active] %>
           <%= if user != nil do %>
             <li class="nav-item">
-              <%= live_redirect("Local", to: Routes.local_path(@conn, :local), class: link_class(:active, "local")) %>
+              <%= live_redirect("Local", to: Routes.local_path(@conn, :local), class: link_class(active, "local")) %>
             </li>
             <li class="nav-item">
-              <%= live_redirect("Schedule", to: Routes.schedule_path(@conn, :schedule), class: link_class(:active, "schedule")) %>
+              <%= live_redirect("Schedule", to: Routes.schedule_path(@conn, :schedule), class: link_class(active, "schedule")) %>
             </li>
 
             <%= if RoboticaFaceWeb.Auth.user_is_admin?(user) do %>
