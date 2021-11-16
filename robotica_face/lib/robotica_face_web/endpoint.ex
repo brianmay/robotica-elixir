@@ -3,6 +3,7 @@ defmodule RoboticaFaceWeb.Endpoint do
 
   @session_options [
     store: :cookie,
+    secure: true,
     max_age: 60 * 60 * 24 * 365,
     key: "_robotica_face_key",
     signing_salt: "/P1irGF1"
