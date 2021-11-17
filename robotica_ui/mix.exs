@@ -31,7 +31,7 @@ defmodule RoboticaUi.MixProject do
       {:event_bus, "~> 1.6.1"},
       {:timex, "~> 3.6"},
       {:robotica_common, path: "../robotica_common"},
-      {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ] ++ deps(@target)
   end
