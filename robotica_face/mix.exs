@@ -52,7 +52,7 @@ defmodule RoboticaFace.MixProject do
       {:robotica_common, path: "../robotica_common"},
       {:cowlib, "~> 2.11", override: true},
       {:gun, "~> 1.3", override: true},
-      {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:plugoid, git: "https://github.com/tanguilp/plugoid.git", branch: "conn_callback"},
       {:replug, "~> 0.1.0"}
