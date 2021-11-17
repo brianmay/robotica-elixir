@@ -61,11 +61,7 @@ defmodule RoboticaCommon.Strings do
             replace_values_internal(rest, values, result)
 
           :error ->
-            map =
-              values
-              # credo:disable-for-next-line Credo.Check.Refactor.Nesting
-              |> Enum.map(fn {a, b} -> "#{a}=#{b}" end)
-              |> Enum.join(", ")
+            map = Enum.map_join(values, ", ", fn {a, b} -> "#{a}=#{b}" end)
 
             {:error, "Cannot find #{name} in lookup table of #{map}."}
         end
