@@ -6,7 +6,7 @@ defmodule Robotica.Validation do
   alias RoboticaCommon.Schema
   alias RoboticaCommon.Validation
 
-  defp module_to_schema(module), do: {:ok, apply(module, :config_schema, [])}
+  defp module_to_schema(module), do: {:ok, module.config_schema()}
 
   def validate_plugin_config(raw_data, data) do
     with {:ok, raw_config} <- Map.fetch(raw_data, "config"),
