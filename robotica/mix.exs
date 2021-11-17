@@ -33,7 +33,7 @@ defmodule Robotica.MixProject do
       {:mojito, "~> 0.7.1"},
       {:mint, "~> 1.0", override: true},
       {:robotica_common, path: "../robotica_common"},
-      {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ]
   end
