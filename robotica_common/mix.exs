@@ -28,7 +28,7 @@ defmodule RoboticaCommon.MixProject do
       {:event_bus, "~> 1.6.0"},
       {:jason, "~> 1.0"},
       {:yaml_elixir, "~> 2.8.0"},
-      {:credo, "~> 1.5.5", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ]
   end
