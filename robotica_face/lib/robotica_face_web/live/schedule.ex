@@ -92,8 +92,9 @@ defmodule RoboticaFaceWeb.Live.Schedule do
 
   defp get_step(schedule, step_time, step_id) do
     schedule
-    |> Enum.filter(fn step -> DateTime.compare(step.required_time, step_time) == :eq end)
-    |> Enum.filter(fn step -> step.id == step_id end)
+    |> Enum.filter(fn step ->
+      DateTime.compare(step.required_time, step_time) == :eq and step.id == step_id
+    end)
     |> head_or_nil
   end
 
