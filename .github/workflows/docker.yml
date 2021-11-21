@@ -6,38 +6,48 @@ on:
 
 jobs:
   robotica_common:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@be76820719a93b0bfb182a7f681270ab0df2b4bb
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@76903592336f16233d954f17116e01b572517f71
     with:
       build_npm_assets: false
       directory: "robotica_common"
+      mix_cache_postfix: "-1"
+      plts_cache_postfix: "-1"
 
   robotica:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@be76820719a93b0bfb182a7f681270ab0df2b4bb
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@76903592336f16233d954f17116e01b572517f71
     with:
       build_npm_assets: false
       directory: "robotica"
+      mix_cache_postfix: "-1"
+      plts_cache_postfix: "-1"
 
   robotica_ui:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@be76820719a93b0bfb182a7f681270ab0df2b4bb
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@76903592336f16233d954f17116e01b572517f71
     with:
       build_npm_assets: false
       directory: "robotica_ui"
+      mix_cache_postfix: "-1"
+      plts_cache_postfix: "-1"
 
   robotica_face:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@be76820719a93b0bfb182a7f681270ab0df2b4bb
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@76903592336f16233d954f17116e01b572517f71
     with:
       build_npm_assets: true
       directory: "robotica_face"
+      mix_cache_postfix: "-1"
+      plts_cache_postfix: "-1"
 
   robotica_docker:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@be76820719a93b0bfb182a7f681270ab0df2b4bb
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@76903592336f16233d954f17116e01b572517f71
     with:
       build_npm_assets: false
       directory: "robotica_docker"
+      mix_cache_postfix: "-1"
+      plts_cache_postfix: "-1"
 
   push:
     name: Push
-    uses: brianmay/workflows/.github/workflows/docker.yaml@be76820719a93b0bfb182a7f681270ab0df2b4bb
+    uses: brianmay/workflows/.github/workflows/docker.yaml@76903592336f16233d954f17116e01b572517f71
     needs:
       - robotica_common
       - robotica
