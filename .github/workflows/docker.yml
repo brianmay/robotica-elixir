@@ -5,191 +5,42 @@ on:
   - pull_request
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  robotica_common:
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@d3443f1e689393e18f40b84b31480021ccda5437
+    with:
+      build_npm_assets: false
+      directory: "robotica_common"
 
-    strategy:
-      matrix:
-        elixir: [1.12.3]
-        otp: [24.0.5]
-        dir: ["robotica_common", "robotica", "robotica_ui", "robotica_docker"]
+  robotica:
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@d3443f1e689393e18f40b84b31480021ccda5437
+    with:
+      build_npm_assets: false
+      directory: "robotica"
 
-    env:
-      MIX_ENV: test
-      BUILD_WITHOUT_QUIC: true
+  robotica_ui:
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@d3443f1e689393e18f40b84b31480021ccda5437
+    with:
+      build_npm_assets: false
+      directory: "robotica_ui"
 
-    steps:
-      - uses: actions/checkout@v2.3.4
-      - name: Setup elixir
-        uses: erlef/setup-elixir@v1.7
-        with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
-      - name: Retrieve Mix Dependencies Cache
-        uses: actions/cache@v2.1.6
-        id: mix-cache # id to use in retrieve action
-        with:
-          path: ${{ matrix.dir }}/deps
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-${{ hashFiles(format('{0}/{1}/{2}', github.workspace, matrix.dir, 'mix.lock')) }}-4
-      - name: Install Mix Dependencies
-        working-directory: ${{ matrix.dir }}
-        if: steps.mix-cache.outputs.cache-hit != 'true'
-        run: |
-          mix local.rebar --force
-          mix local.hex --force
-          # mix archive.install --force hex nerves_bootstrap
-          mix deps.get
-      - name: Build
-        working-directory: ${{ matrix.dir }}
-        run: |
-          mix compile
-      - name: Check Formatting
-        working-directory: ${{ matrix.dir }}
-        run: mix format --check-formatted
-      - name: Run Credo
-        working-directory: ${{ matrix.dir }}
-        run: mix credo --strict
-      - name: Run Tests
-        working-directory: ${{ matrix.dir }}
-        run: mix test
+  robotica_face:
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@d3443f1e689393e18f40b84b31480021ccda5437
+    with:
+      build_npm_assets: true
+      directory: "robotica_face"
 
-  test_web:
-    runs-on: ubuntu-latest
-
-    # Service containers to run with `container-job`
-    services:
-      # Label used to access the service container
-      postgres:
-        # Docker Hub image
-        image: postgres
-        ports: ["5432:5432"]
-        # Provide the password for postgres
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    strategy:
-      matrix:
-        elixir: [1.12.3]
-        otp: [24.0.5]
-        dir: ["robotica_face"]
-
-    env:
-      DATABASE_URL_TEST: postgresql://postgres:postgres@localhost/test?sslmode=disable
-      BUILD_WITHOUT_QUIC: true
-      MIX_ENV: test
-
-    steps:
-      - uses: actions/checkout@v2.3.4
-      - name: Setup elixir
-        uses: erlef/setup-elixir@v1.7
-        with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
-      - name: Retrieve Mix Dependencies Cache
-        uses: actions/cache@v2.1.6
-        id: mix-cache # id to use in retrieve action
-        with:
-          path: ${{ matrix.dir }}/deps
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-${{ hashFiles(format('{0}/{1}/{2}', github.workspace, matrix.dir, 'mix.lock')) }}-4
-      - name: Install Mix Dependencies
-        working-directory: ${{ matrix.dir }}
-        if: steps.mix-cache.outputs.cache-hit != 'true'
-        run: |
-          mix local.rebar --force
-          mix local.hex --force
-          mix deps.get
-      - name: Build
-        working-directory: ${{ matrix.dir }}
-        run: |
-          mix compile
-      - name: Install assets
-        working-directory: ${{ matrix.dir }}
-        run: |
-          npm install --prefix assets
-      - name: Build assets
-        working-directory: ${{ matrix.dir }}
-        run: |
-          npm run deploy --prefix assets
-      - name: Check Formatting
-        working-directory: ${{ matrix.dir }}
-        run: mix format --check-formatted
-      - name: Check Prettier
-        working-directory: ${{ matrix.dir }}
-        run: mix prettier
-      - name: Run Credo
-        working-directory: ${{ matrix.dir }}
-        run: mix credo --strict
-      - name: Run Tests
-        working-directory: ${{ matrix.dir }}
-        run: mix test
-
-
-  dialyzer:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        elixir: [1.12.3]
-        otp: [24.0.5]
-        dir: ["robotica_common", "robotica", "robotica_ui", "robotica_face", "robotica_docker"]
-
-    env:
-      MIX_ENV: test
-      BUILD_WITHOUT_QUIC: true
-
-    steps:
-      - uses: actions/checkout@v2.3.4
-      - name: Setup elixir
-        uses: erlef/setup-elixir@v1.7
-        with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
-      - name: Retrieve Mix Dependencies Cache
-        uses: actions/cache@v2.1.6
-        id: mix-cache # id to use in retrieve action
-        with:
-          path: ${{ matrix.dir }}/deps
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-${{ hashFiles(format('{0}/{1}/{2}', github.workspace,  matrix.dir, 'mix.lock')) }}-4
-      - name: Install Mix Dependencies
-        working-directory: ${{ matrix.dir }}
-        if: steps.mix-cache.outputs.cache-hit != 'true'
-        run: |
-          mix local.rebar --force
-          mix local.hex --force
-          # mix archive.install --force hex nerves_bootstrap
-          mix deps.get
-      - name: Retrieve PLT Cache
-        uses: actions/cache@v2.1.6
-        id: plt-cache
-        with:
-          path: ${{ matrix.dir }}/priv/plts
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-plts-${{ hashFiles(format('{0}/{1}/{2}', github.workspace, matrix.dir, 'mix.lock')) }}-5
-      - name: Build
-        working-directory: ${{ matrix.dir }}
-        run: |
-          mix compile
-      - name: Create PLTs
-        working-directory: ${{ matrix.dir }}
-        if: steps.plt-cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p priv/plts
-          mix dialyzer --plt
-      - name: Run dialyzer
-        working-directory: ${{ matrix.dir }}
-        run: mix dialyzer --no-check
+  robotica_docker:
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@d3443f1e689393e18f40b84b31480021ccda5437
+    with:
+      build_npm_assets: false
+      directory: "robotica_docker"
 
   push:
     name: Push
-    uses: brianmay/workflows/.github/workflows/docker.yaml@6694b3f1e1250158f19273539634d867946c94b9
+    uses: brianmay/workflows/.github/workflows/docker.yaml@d3443f1e689393e18f40b84b31480021ccda5437
     needs:
-      - test
-      - test_web
-      - dialyzer
+      - robotica_common
+      - robotica
+      - robotica_ui
+      - robotica_face
+      - robotica_docker
