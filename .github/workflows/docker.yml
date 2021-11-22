@@ -10,7 +10,7 @@ jobs:
     with:
       build_npm_assets: false
       directory: "robotica_common"
-      mix_cache_postfix: "-1"
+      mix_cache_postfix: "-2"
       plts_cache_postfix: "-1"
 
   robotica:
@@ -18,7 +18,7 @@ jobs:
     with:
       build_npm_assets: false
       directory: "robotica"
-      mix_cache_postfix: "-1"
+      mix_cache_postfix: "-2"
       plts_cache_postfix: "-1"
 
   robotica_ui:
@@ -26,7 +26,7 @@ jobs:
     with:
       build_npm_assets: false
       directory: "robotica_ui"
-      mix_cache_postfix: "-1"
+      mix_cache_postfix: "-2"
       plts_cache_postfix: "-1"
 
   robotica_face:
@@ -34,7 +34,7 @@ jobs:
     with:
       build_npm_assets: true
       directory: "robotica_face"
-      mix_cache_postfix: "-1"
+      mix_cache_postfix: "-2"
       plts_cache_postfix: "-1"
 
   robotica_docker:
@@ -42,7 +42,7 @@ jobs:
     with:
       build_npm_assets: false
       directory: "robotica_docker"
-      mix_cache_postfix: "-1"
+      mix_cache_postfix: "-2"
       plts_cache_postfix: "-1"
 
   push:
