@@ -6,7 +6,7 @@ on:
 
 jobs:
   robotica_common:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@b7166456591b3ce36895b52acfa634b4ef33ad5f
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@b9432d015e8b14c218dff78b70b17982ab7e6218
     with:
       build_npm_assets: false
       directory: "robotica_common"
@@ -14,7 +14,7 @@ jobs:
       plts_cache_postfix: ""
 
   robotica:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@b7166456591b3ce36895b52acfa634b4ef33ad5f
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@b9432d015e8b14c218dff78b70b17982ab7e6218
     with:
       build_npm_assets: false
       directory: "robotica"
@@ -22,7 +22,7 @@ jobs:
       plts_cache_postfix: ""
 
   robotica_ui:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@b7166456591b3ce36895b52acfa634b4ef33ad5f
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@b9432d015e8b14c218dff78b70b17982ab7e6218
     with:
       build_npm_assets: false
       directory: "robotica_ui"
@@ -30,7 +30,7 @@ jobs:
       plts_cache_postfix: ""
 
   robotica_face:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@b7166456591b3ce36895b52acfa634b4ef33ad5f
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@b9432d015e8b14c218dff78b70b17982ab7e6218
     with:
       build_npm_assets: true
       directory: "robotica_face"
@@ -38,7 +38,7 @@ jobs:
       plts_cache_postfix: ""
 
   robotica_docker:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@b7166456591b3ce36895b52acfa634b4ef33ad5f
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@b9432d015e8b14c218dff78b70b17982ab7e6218
     with:
       build_npm_assets: false
       directory: "robotica_docker"
@@ -47,7 +47,7 @@ jobs:
 
   push:
     name: Push
-    uses: brianmay/workflows/.github/workflows/docker.yaml@b7166456591b3ce36895b52acfa634b4ef33ad5f
+    uses: brianmay/workflows/.github/workflows/docker.yaml@b9432d015e8b14c218dff78b70b17982ab7e6218
     needs:
       - robotica_common
       - robotica
