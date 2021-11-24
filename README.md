@@ -8,7 +8,7 @@ automatic schedule.
 * config: configuration files.
 * LICENSE README.html README.md: documentation.
 * robotica_common: common shared code.
-* robotica base library for scheduling and interacting with devices.
+* robotica: base library for scheduling and interacting with devices.
 * robotica_face: Web based interface.
 * robotica_nerves: Deployment for RPI3.
 * robotica_ui: Scenic based User Interface.
