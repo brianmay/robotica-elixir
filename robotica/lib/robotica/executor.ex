@@ -43,7 +43,7 @@ defmodule Robotica.Executor do
 
   @impl true
   def init(:ok) do
-    Robotica.Subscriptions.subscribe(
+    MqttPotion.Multiplexer.subscribe(
       ["execute"],
       :execute,
       self(),

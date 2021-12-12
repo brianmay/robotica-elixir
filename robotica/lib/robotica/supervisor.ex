@@ -52,7 +52,6 @@ defmodule Robotica.Supervisor do
 
     children = [
       {Robotica.PluginRegistry, name: Robotica.PluginRegistry},
-      {Robotica.Subscriptions, name: Robotica.Subscriptions},
       {Robotica.Executor, name: Robotica.Executor},
       {MqttPotion.Connection,
        name: client_name,
@@ -71,7 +70,8 @@ defmodule Robotica.Supervisor do
          cacertfile: opts.mqtt.ca_cert_file
        ],
        handler: Robotica.Client,
-       subscriptions: subscriptions}
+       subscriptions: subscriptions},
+      {MqttPotion.Multiplexer, mqtt_potion: client_name}
       | children
     ]
 

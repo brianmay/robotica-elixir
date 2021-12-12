@@ -40,6 +40,6 @@ defmodule Robotica.Client do
   @impl MqttPotion.Handler
   def handle_message(_topic, message) do
     Logger.debug("handle message #{message.topic} #{inspect(message)}")
-    :ok = Robotica.Subscriptions.message(message.topic, message.payload)
+    :ok = MqttPotion.Multiplexer.message(message.topic, message.payload)
   end
 end

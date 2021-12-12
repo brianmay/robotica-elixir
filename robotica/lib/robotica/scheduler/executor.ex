@@ -52,7 +52,7 @@ defmodule Robotica.Scheduler.Executor do
     state = set_timer(now, {today, nil, steps})
 
     :ok =
-      Robotica.Subscriptions.subscribe(
+      MqttPotion.Multiplexer.subscribe(
         ["mark"],
         :mark,
         self(),

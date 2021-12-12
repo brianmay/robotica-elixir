@@ -55,7 +55,7 @@ defmodule Robotica.Plugins.SonOff do
 
     postfix = get_postfix(state)
 
-    Robotica.Subscriptions.subscribe(
+    MqttPotion.Multiplexer.subscribe(
       ["stat", plugin.config.topic, "POWER#{postfix}"],
       :power,
       self(),
@@ -63,7 +63,7 @@ defmodule Robotica.Plugins.SonOff do
       :resend
     )
 
-    Robotica.Subscriptions.subscribe(
+    MqttPotion.Multiplexer.subscribe(
       ["tele", plugin.config.topic, "LWT"],
       :lwt,
       self(),
