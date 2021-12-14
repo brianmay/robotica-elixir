@@ -51,8 +51,6 @@ defmodule Robotica.Supervisor do
       end
 
     children = [
-      {Robotica.PluginRegistry, name: Robotica.PluginRegistry},
-      {Robotica.Executor, name: Robotica.Executor},
       {MqttPotion.Connection,
        name: client_name,
        host: opts.mqtt.host,
@@ -71,7 +69,9 @@ defmodule Robotica.Supervisor do
        ],
        handler: Robotica.Client,
        subscriptions: subscriptions},
-      {MqttPotion.Multiplexer, mqtt_potion: client_name}
+      {MqttPotion.Multiplexer, mqtt_potion: client_name},
+      {Robotica.Executor, name: Robotica.Executor},
+      {Robotica.PluginRegistry, name: Robotica.PluginRegistry}
       | children
     ]
 
