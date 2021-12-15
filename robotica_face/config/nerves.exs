@@ -1,4 +1,4 @@
-use Mix.Config
+use Config
 
 if Mix.Project.config()[:target] != "host" do
   config :robotica_face, RoboticaFaceWeb.Endpoint,
