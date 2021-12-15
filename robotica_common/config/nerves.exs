@@ -1,4 +1,4 @@
-use Config
+import Config
 
 # Customize non-Elixir parts of the firmware.  See
 # https://hexdocs.pm/nerves/advanced-configuration.html for details.

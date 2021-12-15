@@ -5,7 +5,7 @@
 # is restricted to this project.
 
 # General application configuration
-use Config
+import Config
 
 config :robotica_face,
   mqtt_host: System.get_env("MQTT_HOST"),
