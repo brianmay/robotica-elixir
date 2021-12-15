@@ -1,4 +1,4 @@
-use Config
+import Config
 
 config :robotica_common,
   compile_config_files: false,

@@ -6,7 +6,7 @@ on:
 
 jobs:
   robotica_common:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@70c355700df29dccf131141aa1aa3c4e8b2b9f65
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@d7bf468660e468bd2703e3a7f00d7679ab71c5c0
     with:
       build_npm_assets: false
       directory: "robotica_common"
@@ -14,7 +14,7 @@ jobs:
       plts_cache_postfix: ""
 
   robotica:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@70c355700df29dccf131141aa1aa3c4e8b2b9f65
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@d7bf468660e468bd2703e3a7f00d7679ab71c5c0
     with:
       build_npm_assets: false
       directory: "robotica"
@@ -22,7 +22,7 @@ jobs:
       plts_cache_postfix: ""
 
   robotica_ui:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@70c355700df29dccf131141aa1aa3c4e8b2b9f65
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@d7bf468660e468bd2703e3a7f00d7679ab71c5c0
     with:
       build_npm_assets: false
       directory: "robotica_ui"
@@ -30,7 +30,7 @@ jobs:
       plts_cache_postfix: ""
 
   robotica_face:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@70c355700df29dccf131141aa1aa3c4e8b2b9f65
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@d7bf468660e468bd2703e3a7f00d7679ab71c5c0
     with:
       build_npm_assets: true
       directory: "robotica_face"
@@ -38,7 +38,7 @@ jobs:
       plts_cache_postfix: ""
 
   robotica_docker:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@70c355700df29dccf131141aa1aa3c4e8b2b9f65
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@d7bf468660e468bd2703e3a7f00d7679ab71c5c0
     with:
       build_npm_assets: false
       directory: "robotica_docker"
@@ -47,7 +47,7 @@ jobs:
 
   push:
     name: Push
-    uses: brianmay/workflows/.github/workflows/docker.yaml@70c355700df29dccf131141aa1aa3c4e8b2b9f65
+    uses: brianmay/workflows/.github/workflows/docker.yaml@d7bf468660e468bd2703e3a7f00d7679ab71c5c0
     secrets:
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
     needs:

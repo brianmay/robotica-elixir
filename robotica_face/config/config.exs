@@ -5,7 +5,7 @@
 # is restricted to this project.
 
 # General application configuration
-use Config
+import Config
 
 import_config "../../robotica_common/config/config.exs"
 import_config "common.exs"
