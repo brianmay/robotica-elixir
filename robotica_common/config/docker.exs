@@ -1,4 +1,4 @@
-use Mix.Config
+use Config
 
 config :robotica_common,
   compile_config_files: false,

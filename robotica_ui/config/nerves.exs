@@ -1,4 +1,4 @@
-use Mix.Config
+use Config
 
 case Mix.Project.config()[:target] do
   "host" ->
