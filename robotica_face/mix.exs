@@ -38,7 +38,7 @@ defmodule RoboticaFace.MixProject do
     [
       {:phoenix, "~> 1.6.0"},
       {:phoenix_html, "~> 3.0"},
-      {:phoenix_live_view, "~> 0.16.4"},
+      {:phoenix_live_view, "~> 0.17.5"},
       {:phoenix_live_dashboard, "~> 0.5"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 0.5"},
