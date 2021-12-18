@@ -56,7 +56,7 @@ defmodule Robotica.Plugins.Lifx.Animate do
 
   @impl true
   def handle_info(:timer, %State{repeat: 0} = state) do
-    {:noreply, state}
+    {:stop, :normal, state}
   end
 
   @impl true
