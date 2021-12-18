@@ -50,7 +50,7 @@ defmodule Robotica.Plugins.Lifx.FixedColor do
   end
 
   @impl true
-  def handle_call(:stop, _from, %State{} = state) do
-    {:stop, :normal, :ok, state}
+  def handle_cast(:stop, %State{} = state) do
+    {:stop, :normal, state}
   end
 end

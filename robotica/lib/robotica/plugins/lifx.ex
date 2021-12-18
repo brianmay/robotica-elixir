@@ -513,7 +513,7 @@ defmodule Robotica.Plugins.LIFX do
   @spec stop_scene(State.t(), String.t()) :: :ok
   def stop_scene(state, scene_name) do
     case Map.fetch(state.scenes, scene_name) do
-      {:ok, scene} -> :ok = GenServer.call(scene.pid, :stop)
+      {:ok, scene} -> :ok = GenServer.cast(scene.pid, :stop)
       :error -> nil
     end
 

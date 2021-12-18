@@ -51,8 +51,8 @@ defmodule Robotica.Plugins.Lifx.Auto do
   end
 
   @impl true
-  def handle_call(:stop, _from, %State{} = state) do
-    {:stop, :normal, :ok, state}
+  def handle_cast(:stop, %State{} = state) do
+    {:stop, :normal, state}
   end
 
   @spec get_power_colors(integer()) :: {integer(), list(HSBKA.t())}

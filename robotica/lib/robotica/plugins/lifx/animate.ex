@@ -78,8 +78,8 @@ defmodule Robotica.Plugins.Lifx.Animate do
   end
 
   @impl true
-  def handle_call(:stop, _from, %State{} = state) do
-    {:stop, :normal, :ok, state}
+  def handle_cast(:stop, %State{} = state) do
+    {:stop, :normal, state}
   end
 
   @spec animate(map(), integer()) :: list(hsbkas_t)
