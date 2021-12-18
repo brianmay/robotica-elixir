@@ -55,6 +55,11 @@ defmodule Robotica.Plugins.Lifx.Animate do
   end
 
   @impl true
+  def handle_info(:timer, %State{repeat: 0} = state) do
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_info(:timer, %State{list: [], repeat: repeat} = state) do
     new_repeat =
       case repeat do
