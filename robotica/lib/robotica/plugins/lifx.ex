@@ -55,10 +55,10 @@ defmodule Robotica.Plugins.LIFX do
             priority: integer(),
             power: integer() | nil,
             colors: list(HSBKA.t()) | nil,
-            task: Task.t()
+            pid: pid()
           }
-    @enforce_keys [:priority, :task]
-    defstruct [:priority, :power, :colors, :task]
+    @enforce_keys [:priority, :pid]
+    defstruct [:priority, :power, :colors, :pid]
   end
 
   defmodule State do
@@ -486,7 +486,7 @@ defmodule Robotica.Plugins.LIFX do
       end
 
     scene =
-      if scene != nil and scene.task.pid == pid do
+      if scene != nil and scene.pid == pid do
         scene
       else
         nil
@@ -513,15 +513,15 @@ defmodule Robotica.Plugins.LIFX do
   @spec stop_scene(State.t(), String.t()) :: :ok
   def stop_scene(state, scene_name) do
     case Map.fetch(state.scenes, scene_name) do
-      {:ok, scene} -> Task.shutdown(scene.task)
+      {:ok, scene} -> :ok = GenServer.call(scene.pid, :stop)
       :error -> nil
     end
 
     :ok
   end
 
-  @spec add_scene(State.t(), String.t(), integer(), (() -> :ok)) :: State.t()
-  defp add_scene(%State{} = state, scene_name, priority, function) do
+  @spec add_scene(State.t(), String.t(), integer(), module(), any()) :: State.t()
+  defp add_scene(%State{} = state, scene_name, priority, module, options) do
     Logger.info("#{prefix(state)} add_scene #{scene_name}")
     already_exists = scene_exists?(state, scene_name)
 
@@ -529,15 +529,28 @@ defmodule Robotica.Plugins.LIFX do
       :ok = stop_scene(state, scene_name)
     end
 
-    task = Task.async(function)
+    case module.start(options) do
+      {:ok, pid} ->
+        Process.monitor(pid)
 
-    scene = %SceneState{
-      priority: priority,
-      task: task
-    }
+        scene = %SceneState{
+          priority: priority,
+          pid: pid
+        }
 
-    scenes = Map.put(state.scenes, scene_name, scene)
-    %State{state | scenes: scenes}
+        scenes = Map.put(state.scenes, scene_name, scene)
+        %State{state | scenes: scenes}
+
+      {:error, reason} ->
+        Logger.error(
+          "#{prefix(state)} Animation #{inspect(module)} with options #{inspect(options)} refused to start with #{inspect(reason)}"
+        )
+
+        state
+
+      :ignore ->
+        state
+    end
   end
 
   @spec remove_scene(State.t(), String.t()) :: State.t()
@@ -573,7 +586,7 @@ defmodule Robotica.Plugins.LIFX do
 
     scenes =
       state.scenes
-      |> Enum.reject(fn {_, scene} -> scene.task.pid == pid end)
+      |> Enum.reject(fn {_, scene} -> scene.pid == pid end)
       |> keyword_list_to_map()
 
     state = %State{
@@ -678,7 +691,11 @@ defmodule Robotica.Plugins.LIFX do
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
-    |> add_scene(scene, priority, fn -> FixedColor.go(callback, 65_535, colors) end)
+    |> add_scene(scene, priority, FixedColor, %FixedColor.Options{
+      sender: callback,
+      power: 65_535,
+      colors: colors
+    })
     |> publish_device_state()
   end
 
@@ -700,9 +717,11 @@ defmodule Robotica.Plugins.LIFX do
         |> do_command_stop(command)
         |> remove_scene(scene)
         |> remove_all_scenes_with_priority(priority)
-        |> add_scene(scene, priority, fn ->
-          Animate.go(callback, number, animation)
-        end)
+        |> add_scene(scene, priority, Animate, %Animate.Options{
+          sender: callback,
+          number: number,
+          animation: animation
+        })
         |> publish_device_state()
     end
   end
@@ -720,9 +739,7 @@ defmodule Robotica.Plugins.LIFX do
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
-    |> add_scene(scene, priority, fn ->
-      Auto.go(callback, number)
-    end)
+    |> add_scene(scene, priority, Auto, %Auto.Options{sender: callback, number: number})
     |> publish_device_state()
   end
 

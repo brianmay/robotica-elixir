@@ -1,16 +1,62 @@
 defmodule Robotica.Plugins.Lifx.Auto do
   @moduledoc """
-  LIFX Animation that displays a fixed color
+  LIFX Animation that displays a time dependant color
   """
+  use GenServer
 
   alias Robotica.Devices.Lifx, as: RLifx
   alias Robotica.Devices.Lifx.HSBKA
 
-  @spec replicate(any(), integer()) :: list(any())
-  defp replicate(x, n), do: for(i <- 0..n, i > 0, do: x)
+  defmodule Options do
+    @moduledoc """
+    Options for Auto animation
+    """
+    @type t :: %__MODULE__{
+            sender: RLifx.callback(),
+            number: integer()
+          }
+    @enforce_keys [:sender, :number]
+    defstruct @enforce_keys
+  end
 
-  @spec go(RLifx.callback(), integer()) :: :ok
-  def go(sender, number) do
+  defmodule State do
+    @moduledoc false
+    @type t :: %__MODULE__{
+            options: Options.t()
+          }
+    @enforce_keys [:options]
+    defstruct @enforce_keys
+  end
+
+  def start(%Options{} = options) do
+    GenServer.start(__MODULE__, options)
+  end
+
+  @impl true
+  def init(%Options{} = options) do
+    state = %State{
+      options: options
+    }
+
+    Process.send_after(self(), :timer, 0)
+    {:ok, state}
+  end
+
+  @impl true
+  def handle_info(:timer, %State{options: options} = state) do
+    {power, colors} = get_power_colors(options.number)
+    options.sender.(power, colors)
+    Process.send_after(self(), :timer, 60_000)
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_call(:stop, _from, %State{} = state) do
+    {:stop, :normal, :ok, state}
+  end
+
+  @spec get_power_colors(integer()) :: {integer(), list(HSBKA.t())}
+  defp get_power_colors(number) do
     timezone = RoboticaCommon.Date.get_timezone()
     now = DateTime.now!(timezone)
 
@@ -35,10 +81,12 @@ defmodule Robotica.Plugins.Lifx.Auto do
           %HSBKA{hue: 0, saturation: 0, brightness: 100, kelvin: 3500}
       end
 
-    colors = replicate(color, number)
     power = 65_535
-    sender.(power, colors)
-    Process.sleep(60_000)
-    go(sender, number)
+    colors = replicate(color, number)
+
+    {power, colors}
   end
+
+  @spec replicate(any(), integer()) :: list(any())
+  defp replicate(x, n), do: for(i <- 0..n, i > 0, do: x)
 end
