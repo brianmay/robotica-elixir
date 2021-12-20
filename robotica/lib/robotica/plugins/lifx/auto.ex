@@ -82,11 +82,8 @@ defmodule Robotica.Plugins.Lifx.Auto do
       end
 
     power = 65_535
-    colors = replicate(color, number)
+    colors = RLifx.replicate(color, number)
 
     {power, colors}
   end
-
-  @spec replicate(any(), integer()) :: list(any())
-  defp replicate(x, n), do: for(i <- 0..n, i > 0, do: x)
 end

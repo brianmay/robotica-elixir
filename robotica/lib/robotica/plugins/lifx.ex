@@ -87,7 +87,7 @@ defmodule Robotica.Plugins.LIFX do
       config: plugin.config,
       scenes: %{},
       base_power: 0,
-      base_colors: replicate(@black, number)
+      base_colors: RLifx.replicate(@black, number)
     }
 
     publish_device_hard_off(state)
@@ -150,9 +150,6 @@ defmodule Robotica.Plugins.LIFX do
   defp prefix(%State{} = state) do
     "Lifx #{state.location}/#{state.device} (#{state.config.id}):"
   end
-
-  @spec replicate(any(), integer()) :: list(any())
-  defp replicate(x, n), do: for(i <- 0..n, i > 0, do: x)
 
   @spec poll_device(State.t()) :: State.t()
   def poll_device(state) do
@@ -471,7 +468,7 @@ defmodule Robotica.Plugins.LIFX do
     hsbkas =
       cond do
         length > number -> Enum.take(hsbkas, number)
-        length < number -> hsbkas ++ replicate(nil, number - length)
+        length < number -> hsbkas ++ RLifx.replicate(nil, number - length)
         length == number -> hsbkas
       end
 
@@ -661,7 +658,7 @@ defmodule Robotica.Plugins.LIFX do
     scene = command.scene
 
     # Ensure light is turned off even if it was previously on.
-    %State{state | base_power: 0, base_colors: replicate(@black, number)}
+    %State{state | base_power: 0, base_colors: RLifx.replicate(@black, number)}
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
@@ -682,7 +679,7 @@ defmodule Robotica.Plugins.LIFX do
 
         {:error, error} ->
           Logger.error("Got error in lifx get_colors_from_command: #{inspect(error)}")
-          replicate(@black_alpha, number)
+          RLifx.replicate(@black_alpha, number)
       end
 
     callback = create_callback(scene)
