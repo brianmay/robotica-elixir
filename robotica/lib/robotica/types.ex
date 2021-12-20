@@ -14,7 +14,9 @@ defmodule Robotica.Types do
               date: nil,
               week_day: nil,
               day_of_week: nil,
+              include: nil,
               exclude: nil,
+              replace: nil,
               day_type: nil
   end
 end

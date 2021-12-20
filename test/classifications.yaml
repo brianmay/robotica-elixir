@@ -22,3 +22,16 @@
 
 - stop: "2018-12-25"
   day_type: "before_christmas"
+
+- include:
+  - "christmas"
+  - "saturday"
+  - "sunday"
+  day_type: "good_day"
+
+- date: "2018-12-25"
+  day_type: "special_christmas"
+
+- replace:
+  - "special_christmas"
+  day_type: "evil_christmas"

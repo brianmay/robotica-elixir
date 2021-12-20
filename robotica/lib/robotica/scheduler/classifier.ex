@@ -102,17 +102,42 @@ defmodule Robotica.Scheduler.Classifier do
     end
   end
 
+  defp is_included_entry?(classification_names, %Types.Classification{} = classification) do
+    include_list = Map.get(classification, :include)
+
+    if include_list == nil do
+      true
+    else
+      Enum.any?(include_list, fn include_name ->
+        Enum.member?(classification_names, include_name)
+      end)
+    end
+  end
+
   defp is_excluded_entry?(classification_names, %Types.Classification{} = classification) do
-    exclude_list =
-      if is_nil(classification.exclude) do
-        []
-      else
-        classification.exclude
-      end
+    exclude_list = Map.get(classification, :exclude) || []
 
     Enum.any?(exclude_list, fn exclude_name ->
       Enum.member?(classification_names, exclude_name)
     end)
+  end
+
+  defp allow_included(classifications) do
+    classification_names =
+      Enum.map(classifications, fn classification -> classification.day_type end)
+
+    Enum.filter(classifications, fn classification ->
+      is_included_entry?(classification_names, classification)
+    end)
+  end
+
+  defp remove_replaced(classifications) do
+    delete =
+      Enum.reduce(classifications, MapSet.new(), fn replaces, mapset ->
+        put_list(mapset, replaces.replace || [])
+      end)
+
+    Enum.reject(classifications, fn item -> MapSet.member?(delete, item.day_type) end)
   end
 
   defp reject_excluded(classifications) do
@@ -124,10 +149,17 @@ defmodule Robotica.Scheduler.Classifier do
     end)
   end
 
+  @spec put_list(MapSet.t(), list()) :: MapSet.t()
+  defp put_list(mapset, list) do
+    Enum.reduce(list, mapset, fn item, mapset -> MapSet.put(mapset, item) end)
+  end
+
   def classify_date(date) do
     get_data()
     |> Enum.filter(fn classification -> is_in_classification?(classification, date) end)
+    |> allow_included()
     |> reject_excluded()
+    |> remove_replaced()
     |> Enum.map(fn classification -> classification.day_type end)
   end
 end

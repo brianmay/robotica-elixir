@@ -53,6 +53,36 @@ defmodule Robotica.Scheduler.Classifier.Test do
     assert "bad_day" in classify_date(~D[2018-12-28])
   end
 
+  test "is good day" do
+    assert "good_day" in classify_date(~D[2018-12-22])
+    assert "good_day" in classify_date(~D[2018-12-23])
+    assert "good_day" not in classify_date(~D[2018-12-24])
+    assert "good_day" in classify_date(~D[2018-12-25])
+    assert "good_day" not in classify_date(~D[2018-12-26])
+    assert "good_day" not in classify_date(~D[2018-12-27])
+    assert "good_day" not in classify_date(~D[2018-12-28])
+  end
+
+  test "is special_christmas" do
+    assert "special_christmas" not in classify_date(~D[2018-12-22])
+    assert "special_christmas" not in classify_date(~D[2018-12-23])
+    assert "special_christmas" not in classify_date(~D[2018-12-24])
+    assert "special_christmas" not in classify_date(~D[2018-12-25])
+    assert "special_christmas" not in classify_date(~D[2018-12-26])
+    assert "special_christmas" not in classify_date(~D[2018-12-27])
+    assert "special_christmas" not in classify_date(~D[2018-12-28])
+  end
+
+  test "is evil_christmas" do
+    assert "evil_christmas" in classify_date(~D[2018-12-22])
+    assert "evil_christmas" in classify_date(~D[2018-12-23])
+    assert "evil_christmas" in classify_date(~D[2018-12-24])
+    assert "evil_christmas" in classify_date(~D[2018-12-25])
+    assert "evil_christmas" in classify_date(~D[2018-12-26])
+    assert "evil_christmas" in classify_date(~D[2018-12-27])
+    assert "evil_christmas" in classify_date(~D[2018-12-28])
+  end
+
   test "after christmas" do
     assert "after_christmas" not in classify_date(~D[2018-12-22])
     assert "after_christmas" not in classify_date(~D[2018-12-23])
