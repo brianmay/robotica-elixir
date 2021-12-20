@@ -652,14 +652,20 @@ defmodule Robotica.Plugins.LIFX do
     state
   end
 
+  @spec set_default_base_colors(State.t()) :: State.t()
+  defp set_default_base_colors(%State{} = state) do
+    number = get_number(state)
+    %State{state | base_power: 0, base_colors: RLifx.replicate(@black, number)}
+  end
+
   defp do_command(%State{} = state, %{action: "turn_off"} = command) do
     Logger.debug("#{prefix(state)} turn_off")
-    number = get_number(state)
     priority = get_priority(command, 100)
     scene = command.scene
 
     # Ensure light is turned off even if it was previously on.
-    %State{state | base_power: 0, base_colors: RLifx.replicate(@black, number)}
+    state
+    |> set_default_base_colors()
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
@@ -686,6 +692,7 @@ defmodule Robotica.Plugins.LIFX do
     callback = create_callback(scene)
 
     state
+    |> set_default_base_colors()
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
@@ -712,6 +719,7 @@ defmodule Robotica.Plugins.LIFX do
         callback = create_callback(scene)
 
         state
+        |> set_default_base_colors()
         |> do_command_stop(command)
         |> remove_scene(scene)
         |> remove_all_scenes_with_priority(priority)
@@ -734,6 +742,7 @@ defmodule Robotica.Plugins.LIFX do
     callback = create_callback(scene)
 
     state
+    |> set_default_base_colors()
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
@@ -755,6 +764,7 @@ defmodule Robotica.Plugins.LIFX do
     callback = create_callback(scene)
 
     state
+    |> set_default_base_colors()
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
