@@ -160,7 +160,7 @@ defmodule Robotica.Devices.Lifx do
   end
 
   @spec replicate(any(), integer()) :: list(any())
-  def replicate(x, n), do: for(_i <- 1..n, do: x)
+  def replicate(x, n), do: for(_i <- 1..n//1, do: x)
 
   @spec fill_colors(list(HSBKA.t()), integer()) :: list(HSBKA.t() | nil)
   defp fill_colors(list_hsbks, index) do
