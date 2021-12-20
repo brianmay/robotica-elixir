@@ -13,7 +13,7 @@
 - date: "2018-12-25"
   day_type: "christmas"
 
-- exclude:
+- if_not:
   - "christmas"
   day_type: "bad_day"
 
@@ -23,7 +23,7 @@
 - stop: "2018-12-25"
   day_type: "before_christmas"
 
-- include:
+- if:
   - "christmas"
   - "saturday"
   - "sunday"
@@ -34,4 +34,12 @@
 
 - replace:
   - "special_christmas"
+  if:
+  - "special_christmas"
   day_type: "evil_christmas"
+
+- replace:
+  - "special_christmas"
+  if:
+  - "special_christmas"
+  day_type: "good_christmas"

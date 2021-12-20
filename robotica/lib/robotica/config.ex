@@ -21,8 +21,8 @@ defmodule Robotica.Config do
         date: {:date, false},
         week_day: {{:boolean, nil}, false},
         day_of_week: {:day_of_week, false},
-        exclude: {{:list, :string}, false},
-        include: {{:list, :string}, false},
+        if_not: {{:list, :string}, false},
+        if: {{:list, :string}, false},
         replace: {{:list, :string}, false},
         day_type: {:string, true}
       }

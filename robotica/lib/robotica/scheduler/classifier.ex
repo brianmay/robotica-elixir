@@ -103,7 +103,7 @@ defmodule Robotica.Scheduler.Classifier do
   end
 
   defp is_included_entry?(classification_names, %Types.Classification{} = classification) do
-    include_list = Map.get(classification, :include)
+    include_list = Map.get(classification, :if)
 
     if include_list == nil do
       true
@@ -115,38 +115,15 @@ defmodule Robotica.Scheduler.Classifier do
   end
 
   defp is_excluded_entry?(classification_names, %Types.Classification{} = classification) do
-    exclude_list = Map.get(classification, :exclude) || []
+    exclude_list = Map.get(classification, :if_not) || []
 
     Enum.any?(exclude_list, fn exclude_name ->
       Enum.member?(classification_names, exclude_name)
     end)
   end
 
-  defp allow_included(classifications) do
-    classification_names =
-      Enum.map(classifications, fn classification -> classification.day_type end)
-
-    Enum.filter(classifications, fn classification ->
-      is_included_entry?(classification_names, classification)
-    end)
-  end
-
-  defp remove_replaced(classifications) do
-    delete =
-      Enum.reduce(classifications, MapSet.new(), fn replaces, mapset ->
-        put_list(mapset, replaces.replace || [])
-      end)
-
-    Enum.reject(classifications, fn item -> MapSet.member?(delete, item.day_type) end)
-  end
-
-  defp reject_excluded(classifications) do
-    classification_names =
-      Enum.map(classifications, fn classification -> classification.day_type end)
-
-    Enum.reject(classifications, fn classification ->
-      is_excluded_entry?(classification_names, classification)
-    end)
+  defp is_duplicated_entry?(classification_names, %Types.Classification{} = classification) do
+    Enum.member?(classification_names, classification.day_type)
   end
 
   @spec put_list(MapSet.t(), list()) :: MapSet.t()
@@ -154,12 +131,42 @@ defmodule Robotica.Scheduler.Classifier do
     Enum.reduce(list, mapset, fn item, mapset -> MapSet.put(mapset, item) end)
   end
 
+  @spec list_to_mapset(list(Types.Classification.t())) :: MapSet.t()
+  defp list_to_mapset(classifications) do
+    Enum.reduce(classifications, MapSet.new(), fn classification, mapset ->
+      MapSet.put(mapset, classification.day_type)
+    end)
+  end
+
+  @spec remove_replaced(list(Types.Classification.t()), Types.Classification.t()) ::
+          list(Types.Classification.t())
+  defp remove_replaced(classifications, replaces) do
+    delete = put_list(MapSet.new(), replaces.replace || [])
+    Enum.reject(classifications, fn item -> MapSet.member?(delete, item.day_type) end)
+  end
+
   def classify_date(date) do
     get_data()
-    |> Enum.filter(fn classification -> is_in_classification?(classification, date) end)
-    |> allow_included()
-    |> reject_excluded()
-    |> remove_replaced()
+    |> Enum.reduce([], fn classification, list ->
+      names = list_to_mapset(list)
+
+      add =
+        cond do
+          not is_in_classification?(classification, date) -> false
+          not is_included_entry?(names, classification) -> false
+          is_excluded_entry?(names, classification) -> false
+          is_duplicated_entry?(names, classification) -> false
+          true -> true
+        end
+
+      if add do
+        list = remove_replaced(list, classification)
+        [classification | list]
+      else
+        list
+      end
+    end)
     |> Enum.map(fn classification -> classification.day_type end)
+    |> Enum.reverse()
   end
 end
