@@ -16,6 +16,7 @@ defmodule Robotica.Plugins.LIFX do
   alias Robotica.Plugins.Lifx.Animate
   alias Robotica.Plugins.Lifx.Auto
   alias Robotica.Plugins.Lifx.FixedColor
+  alias Robotica.Plugins.Lifx.Mqtt
 
   @black %HSBK{
     hue: 0,
@@ -721,6 +722,27 @@ defmodule Robotica.Plugins.LIFX do
         })
         |> publish_device_state()
     end
+  end
+
+  defp do_command(%State{} = state, %{action: "mqtt"} = command) do
+    Logger.debug("#{prefix(state)} auto")
+    number = get_number(state)
+    priority = get_priority(command, 100)
+    scene = command.scene
+    state = do_command_stop(state, command)
+
+    callback = create_callback(scene)
+
+    state
+    |> do_command_stop(command)
+    |> remove_scene(scene)
+    |> remove_all_scenes_with_priority(priority)
+    |> add_scene(scene, priority, Mqtt, %Mqtt.Options{
+      sender: callback,
+      number: number,
+      topic: ["command", state.location, state.device, "scene", scene]
+    })
+    |> publish_device_state()
   end
 
   defp do_command(%State{} = state, %{action: "auto"} = command) do
