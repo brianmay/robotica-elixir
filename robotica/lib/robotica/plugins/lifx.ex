@@ -67,9 +67,11 @@ defmodule Robotica.Plugins.LIFX do
             location: String.t(),
             device: String.t(),
             config: Config.t(),
-            scenes: %{required(String.t()) => SceneState.t()}
+            scenes: %{required(String.t()) => SceneState.t()},
+            base_power: integer(),
+            base_colors: list(HSBK.t())
           }
-    defstruct [:location, :device, :config, :scenes]
+    defstruct [:location, :device, :config, :scenes, :base_power, :base_colors]
   end
 
   ## Server Callbacks
@@ -77,11 +79,15 @@ defmodule Robotica.Plugins.LIFX do
   @spec init(atom | %{:config => any, :device => any, :location => any, optional(any) => any}) ::
           {:ok, Robotica.Plugins.LIFX.State.t()}
   def init(plugin) do
+    number = if plugin.config.number == nil, do: 1, else: plugin.config.number
+
     state = %State{
       location: plugin.location,
       device: plugin.device,
       config: plugin.config,
-      scenes: %{}
+      scenes: %{},
+      base_power: 0,
+      base_colors: RLifx.replicate(@black, number)
     }
 
     publish_device_hard_off(state)
@@ -149,8 +155,8 @@ defmodule Robotica.Plugins.LIFX do
   def poll_device(state) do
     if state.scenes == %{} do
       case save_device(state) do
-        {:ok, {_power, _color}} ->
-          state
+        {:ok, {power, color}} ->
+          %State{state | base_power: power, base_colors: color}
 
         {:error, _} ->
           state
@@ -424,13 +430,12 @@ defmodule Robotica.Plugins.LIFX do
     end)
   end
 
-  @spec handle_update(state :: State.t()) :: State.t()
+  @spec handle_update(State.t()) :: State.t()
   defp handle_update(%State{} = state) do
     Logger.debug("#{prefix(state)} update")
-    number = get_number(state)
 
-    base_power = 0
-    base_colors = RLifx.replicate(@black, number)
+    base_power = state.base_power
+    base_colors = state.base_colors
 
     Logger.debug("#{prefix(state)} base #{inspect(base_power)} #{inspect(base_colors)}")
 
@@ -451,7 +456,6 @@ defmodule Robotica.Plugins.LIFX do
 
     Logger.debug("#{prefix(state)} GOT #{inspect(power)} #{inspect(colors)}")
     restore_device(state, {power, colors})
-
     state
   end
 
@@ -647,6 +651,12 @@ defmodule Robotica.Plugins.LIFX do
     state
   end
 
+  @spec set_default_base_colors(State.t()) :: State.t()
+  defp set_default_base_colors(%State{} = state) do
+    number = get_number(state)
+    %State{state | base_power: 0, base_colors: RLifx.replicate(@black, number)}
+  end
+
   defp do_command(%State{} = state, %{action: "turn_off"} = command) do
     Logger.debug("#{prefix(state)} turn_off")
     priority = get_priority(command, 100)
@@ -654,6 +664,7 @@ defmodule Robotica.Plugins.LIFX do
 
     # Ensure light is turned off even if it was previously on.
     state
+    |> set_default_base_colors()
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
@@ -680,6 +691,7 @@ defmodule Robotica.Plugins.LIFX do
     callback = create_callback(scene)
 
     state
+    |> set_default_base_colors()
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
@@ -706,6 +718,7 @@ defmodule Robotica.Plugins.LIFX do
         callback = create_callback(scene)
 
         state
+        |> set_default_base_colors()
         |> do_command_stop(command)
         |> remove_scene(scene)
         |> remove_all_scenes_with_priority(priority)
@@ -728,6 +741,7 @@ defmodule Robotica.Plugins.LIFX do
     callback = create_callback(scene)
 
     state
+    |> set_default_base_colors()
     |> do_command_stop(command)
     |> remove_scene(scene)
     |> remove_all_scenes_with_priority(priority)
