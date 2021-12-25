@@ -718,7 +718,6 @@ defmodule Robotica.Plugins.LIFX do
         callback = create_callback(scene)
 
         state
-        |> set_default_base_colors()
         |> do_command_stop(command)
         |> remove_scene(scene)
         |> remove_all_scenes_with_priority(priority)
