@@ -718,6 +718,7 @@ defmodule Robotica.Plugins.LIFX do
         callback = create_callback(scene)
 
         state
+        |> poll_device()
         |> do_command_stop(command)
         |> remove_scene(scene)
         |> remove_all_scenes_with_priority(priority)
