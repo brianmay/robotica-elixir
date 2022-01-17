@@ -48,7 +48,6 @@ defmodule RoboticaFace.MixProject do
       {:plug_cowboy, "~> 2.5.1"},
       {:ranch, "~> 2.0", override: true},
       {:timex, "~> 3.6"},
-      {:event_bus, "~> 1.6.1"},
       {:robotica_common, path: "../robotica_common"},
       {:cowlib, "~> 2.11", override: true},
       {:gun, "~> 1.3", override: true},
