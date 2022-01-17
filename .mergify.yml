@@ -1,0 +1,14 @@
+queue_rules:
+  - name: default
+    conditions:
+      - "check-success=Push / push"
+
+pull_request_rules:
+  - name: Automatic merge on approval
+    conditions:
+      - "#approved-reviews-by>=1"
+      - "check-success=Push / push"
+    actions:
+      queue:
+        name: default
+        method: rebase
