@@ -28,7 +28,6 @@ defmodule RoboticaUi.MixProject do
   defp deps do
     [
       {:scenic, "~> 0.10"},
-      {:event_bus, "~> 1.6.1"},
       {:timex, "~> 3.6"},
       {:robotica_common, path: "../robotica_common"},
       {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},

@@ -25,7 +25,7 @@ defmodule RoboticaCommon.MixProject do
   defp deps do
     [
       {:tzdata, "~> 1.1.0"},
-      {:event_bus, "~> 1.6.0"},
+      {:event_bus, "~> 1.7.0"},
       {:jason, "~> 1.0"},
       {:yaml_elixir, "~> 2.8.0"},
       {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},
