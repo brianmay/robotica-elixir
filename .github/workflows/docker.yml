@@ -6,48 +6,48 @@ on:
 
 jobs:
   robotica_common:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@b8ac8e58821a896616de972c4e8602c3e17a6a46
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
     with:
       build_npm_assets: false
       directory: "robotica_common"
       mix_cache_postfix: ""
-      plts_cache_postfix: ""
+      plts_cache_postfix: "-1"
 
   robotica:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@b8ac8e58821a896616de972c4e8602c3e17a6a46
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
     with:
       build_npm_assets: false
       directory: "robotica"
       mix_cache_postfix: ""
-      plts_cache_postfix: ""
+      plts_cache_postfix: "-1"
 
   robotica_ui:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@b8ac8e58821a896616de972c4e8602c3e17a6a46
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
     with:
       build_npm_assets: false
       directory: "robotica_ui"
       mix_cache_postfix: ""
-      plts_cache_postfix: ""
+      plts_cache_postfix: "-1"
 
   robotica_face:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@b8ac8e58821a896616de972c4e8602c3e17a6a46
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
     with:
       build_npm_assets: true
       directory: "robotica_face"
       mix_cache_postfix: ""
-      plts_cache_postfix: ""
+      plts_cache_postfix: "-1"
 
   robotica_docker:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@b8ac8e58821a896616de972c4e8602c3e17a6a46
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
     with:
       build_npm_assets: false
       directory: "robotica_docker"
       mix_cache_postfix: ""
-      plts_cache_postfix: ""
+      plts_cache_postfix: "-1"
 
   push:
     name: Push
-    uses: brianmay/workflows/.github/workflows/docker.yaml@b8ac8e58821a896616de972c4e8602c3e17a6a46
+    uses: brianmay/workflows/.github/workflows/docker.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
     secrets:
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
     needs:
