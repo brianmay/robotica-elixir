@@ -167,6 +167,6 @@ defmodule Robotica.Scheduler.Classifier do
       end
     end)
     |> Enum.map(fn classification -> classification.day_type end)
-    |> Enum.reverse()
+    |> MapSet.new()
   end
 end

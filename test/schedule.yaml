@@ -1,13 +1,15 @@
-"*":
-    "08:30:00":
-        - "wake_up"
-    "20:30:00":
-        - "sleep"
+  - sequences:
+      "wake_up":
+        time: "08:30:00"
+      "sleep":
+        time: "20:30:00"
 
-"christmas":
-    "08:00:00":
-        - "presents"
+  - today: ["christmas"]
+    sequences:
+      "presents":
+        time: "08:00:00"
 
-"boxing":
-    "12:30:00":
-        - "wake_up"
+  - today: ["boxing"]
+    sequences:
+      "wake_up":
+        time: "12:30:00"

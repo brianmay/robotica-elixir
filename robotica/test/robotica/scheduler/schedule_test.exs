@@ -13,7 +13,7 @@ defmodule Robotica.Scheduler.Schedule.Test do
   end
 
   test "every day" do
-    schedule = get_schedule([], ~D[2018-12-25])
+    schedule = get_schedule(MapSet.new([]), ~D[2018-12-25])
 
     assert length(schedule) == 2
 
@@ -29,7 +29,7 @@ defmodule Robotica.Scheduler.Schedule.Test do
   end
 
   test "christmas day" do
-    schedule = get_schedule(["christmas"], ~D[2018-12-25])
+    schedule = get_schedule(MapSet.new(["christmas"]), ~D[2018-12-25])
 
     assert length(schedule) == 3
 
@@ -49,7 +49,7 @@ defmodule Robotica.Scheduler.Schedule.Test do
   end
 
   test "boxing day" do
-    schedule = get_schedule(["boxing"], ~D[2018-12-25])
+    schedule = get_schedule(MapSet.new(["boxing"]), ~D[2018-12-25])
 
     assert length(schedule) == 2
 

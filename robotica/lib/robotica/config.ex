@@ -32,8 +32,22 @@ defmodule Robotica.Config do
       {:list, classification_schema()}
     end
 
+    defp schedule_sequence_schema do
+      %{
+        options: {{:list, :string}, false},
+        time: {:time, true}
+      }
+    end
+
+    defp schedule_block_schema do
+      %{
+        today: {{:list, :string}, false},
+        sequences: {{:map, :string, schedule_sequence_schema()}, true}
+      }
+    end
+
     defp schedule_schema do
-      {:map, :string, {:map, :time, {:list, :string}}}
+      {:list, schedule_block_schema()}
     end
 
     defp sequences_schema do
