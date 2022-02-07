@@ -13,54 +13,54 @@ defmodule Robotica.Scheduler.Schedule.Test do
   end
 
   test "every day" do
-    schedule = get_schedule(MapSet.new([]), ~D[2018-12-25])
+    schedule = get_schedule(~D[2018-12-24])
 
     assert length(schedule) == 2
 
     [wakeup, sleep] = schedule
 
     assert {time, sequence} = wakeup
-    assert_datetime(time, local_datetime(~N[2018-12-25 08:30:00]))
     assert sequence == [{"wake_up", MapSet.new()}]
+    assert_datetime(time, local_datetime(~N[2018-12-24 08:30:00]))
 
     assert {time, sequence} = sleep
-    assert_datetime(time, local_datetime(~N[2018-12-25 20:30:00]))
     assert sequence == [{"sleep", MapSet.new()}]
+    assert_datetime(time, local_datetime(~N[2018-12-24 20:30:00]))
   end
 
   test "christmas day" do
-    schedule = get_schedule(MapSet.new(["christmas"]), ~D[2018-12-25])
+    schedule = get_schedule(~D[2018-12-25])
 
     assert length(schedule) == 3
 
     [presents, wakeup, sleep] = schedule
 
     assert {time, sequence} = presents
-    assert_datetime(time, local_datetime(~N[2018-12-25 08:00:00]))
     assert sequence == [{"presents", MapSet.new()}]
+    assert_datetime(time, local_datetime(~N[2018-12-25 08:00:00]))
 
     assert {time, sequence} = wakeup
-    assert_datetime(time, local_datetime(~N[2018-12-25 08:30:00]))
     assert sequence == [{"wake_up", MapSet.new()}]
+    assert_datetime(time, local_datetime(~N[2018-12-25 08:30:00]))
 
     assert {time, sequence} = sleep
-    assert_datetime(time, local_datetime(~N[2018-12-25 20:30:00]))
     assert sequence == [{"sleep", MapSet.new()}]
+    assert_datetime(time, local_datetime(~N[2018-12-25 20:30:00]))
   end
 
   test "boxing day" do
-    schedule = get_schedule(MapSet.new(["boxing"]), ~D[2018-12-25])
+    schedule = get_schedule(~D[2018-12-26])
 
     assert length(schedule) == 2
 
     [wakeup, sleep] = schedule
 
     assert {time, sequence} = wakeup
-    assert_datetime(time, local_datetime(~N[2018-12-25 12:30:00]))
     assert sequence == [{"wake_up", MapSet.new()}]
+    assert_datetime(time, local_datetime(~N[2018-12-26 12:30:00]))
 
     assert {time, sequence} = sleep
-    assert_datetime(time, local_datetime(~N[2018-12-25 20:30:00]))
     assert sequence == [{"sleep", MapSet.new()}]
+    assert_datetime(time, local_datetime(~N[2018-12-26 20:30:00]))
   end
 end

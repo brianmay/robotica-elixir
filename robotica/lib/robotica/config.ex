@@ -42,6 +42,7 @@ defmodule Robotica.Config do
     defp schedule_block_schema do
       %{
         today: {{:list, :string}, false},
+        tomorrow: {{:list, :string}, false},
         sequences: {{:map, :string, schedule_sequence_schema()}, true}
       }
     end

@@ -6,7 +6,6 @@ defmodule Robotica.Scheduler.Executor do
 
   require Logger
 
-  alias Robotica.Scheduler.Classifier
   alias Robotica.Scheduler.Marks
   alias Robotica.Scheduler.Schedule
   alias Robotica.Scheduler.Sequence
@@ -96,8 +95,7 @@ defmodule Robotica.Scheduler.Executor do
 
   def get_expanded_steps_for_date(date) do
     date
-    |> Classifier.classify_date()
-    |> Schedule.get_schedule(date)
+    |> Schedule.get_schedule()
     |> Sequence.expand_schedule()
   end
 

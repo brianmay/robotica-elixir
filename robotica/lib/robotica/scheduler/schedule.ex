@@ -4,6 +4,7 @@ defmodule Robotica.Scheduler.Schedule do
   """
 
   alias Robotica.Config.Loader
+  alias Robotica.Scheduler.Classifier
 
   @timezone Application.compile_env(:robotica, :timezone)
 
@@ -26,14 +27,20 @@ defmodule Robotica.Scheduler.Schedule do
     utc_date_time
   end
 
-  def check_block(classifications, block) do
-    if block.today == nil do
+  def check_block_date(classifications, requirements) do
+    if requirements == nil do
       true
     else
-      today = MapSet.new(block.today)
+      today = MapSet.new(requirements)
       intersection = MapSet.intersection(classifications, today)
       MapSet.size(intersection) > 0
     end
+  end
+
+  def check_block(block, date) do
+    today = Classifier.classify_date(date)
+    tomorrow = Classifier.classify_date(Date.add(date, 1))
+    check_block_date(today, block.today) and check_block_date(tomorrow, block.tomorrow)
   end
 
   def transform_sequence(seq_name, seq_options, date) do
@@ -42,9 +49,9 @@ defmodule Robotica.Scheduler.Schedule do
     {datetime, seq_name, options}
   end
 
-  def get_schedule(classifications, date) do
+  def get_schedule(date) do
     get_data()
-    |> Enum.filter(fn block -> check_block(classifications, block) end)
+    |> Enum.filter(fn block -> check_block(block, date) end)
     |> Enum.reduce(%{}, fn block, map -> Map.merge(map, block.sequences) end)
     |> Enum.map(fn {seq_name, seq_options} -> transform_sequence(seq_name, seq_options, date) end)
     |> Enum.reduce(%{}, fn {datetime, seq_name, options}, acc ->

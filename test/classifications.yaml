@@ -43,3 +43,6 @@
   if:
   - "special_christmas"
   day_type: "good_christmas"
+
+- date: "2018-12-26"
+  day_type: "boxing"
