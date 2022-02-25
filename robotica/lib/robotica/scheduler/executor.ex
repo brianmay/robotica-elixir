@@ -48,7 +48,7 @@ defmodule Robotica.Scheduler.Executor do
       |> Sequence.sort_schedule()
 
     now = DateTime.utc_now()
-    state = set_timer(now, {today, nil, steps})
+    state = finalize(now, today, [], steps)
 
     :ok =
       MqttPotion.Multiplexer.subscribe(
