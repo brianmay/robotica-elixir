@@ -20,6 +20,7 @@ defmodule RoboticaUi.Components.Step do
       case Date.diff(local_dt, local_now) do
         0 -> ""
         x when x > 0 -> "+#{x}"
+        x when x < 0 -> "#{x}"
       end
 
     Timex.format!(local_dt, "%T#{date_offset}", :strftime)
