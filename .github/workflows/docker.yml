@@ -11,7 +11,7 @@ jobs:
       build_npm_assets: false
       directory: "robotica_common"
       mix_cache_postfix: ""
-      plts_cache_postfix: "-1"
+      plts_cache_postfix: "-2"
 
   robotica:
     uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
@@ -19,7 +19,7 @@ jobs:
       build_npm_assets: false
       directory: "robotica"
       mix_cache_postfix: ""
-      plts_cache_postfix: "-1"
+      plts_cache_postfix: "-2"
 
   robotica_ui:
     uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
@@ -27,7 +27,7 @@ jobs:
       build_npm_assets: false
       directory: "robotica_ui"
       mix_cache_postfix: ""
-      plts_cache_postfix: "-1"
+      plts_cache_postfix: "-2"
 
   robotica_face:
     uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
@@ -35,7 +35,7 @@ jobs:
       build_npm_assets: true
       directory: "robotica_face"
       mix_cache_postfix: ""
-      plts_cache_postfix: "-1"
+      plts_cache_postfix: "-2"
 
   robotica_docker:
     uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
@@ -43,7 +43,7 @@ jobs:
       build_npm_assets: false
       directory: "robotica_docker"
       mix_cache_postfix: ""
-      plts_cache_postfix: "-1"
+      plts_cache_postfix: "-2"
 
   push:
     name: Push
