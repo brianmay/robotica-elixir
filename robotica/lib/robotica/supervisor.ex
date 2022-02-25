@@ -67,7 +67,7 @@ defmodule Robotica.Supervisor do
          verify: :verify_peer,
          cacertfile: opts.mqtt.ca_cert_file
        ],
-       handler: Robotica.Client,
+       handler_pid: MqttPotion.Multiplexer,
        subscriptions: subscriptions},
       {MqttPotion.Multiplexer, mqtt_potion: client_name},
       {Robotica.Executor, name: Robotica.Executor},
