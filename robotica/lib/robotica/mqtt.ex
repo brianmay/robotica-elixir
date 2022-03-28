@@ -2,6 +2,8 @@ defmodule Robotica.Mqtt do
   @moduledoc """
   Common MQTT functions
   """
+  use GenServer
+
   require Logger
 
   @spec get_tortoise_client_id() :: String.t()
@@ -13,7 +15,7 @@ defmodule Robotica.Mqtt do
 
   @spec get_tortoise_client_name() :: atom()
   def get_tortoise_client_name do
-    __MODULE__
+    Robotica.MqttPotion
   end
 
   @spec publish_raw(String.t(), String.t(), MqttPotion.pub_opts()) :: :ok
@@ -53,15 +55,15 @@ defmodule Robotica.Mqtt do
     {topic, opts} = Keyword.pop(opts, :topic)
     opts = Keyword.put_new(opts, :retain, true)
     topic = get_state_topic(location, device, topic)
-    publish_raw(topic, state, opts)
+    GenServer.cast(__MODULE__, {:send_state, topic, state, opts})
   end
 
   @spec publish_state_json(String.t(), String.t(), list() | map(), keyword()) :: :ok
   def publish_state_json(location, device, state, opts \\ []) do
-    {topic, opts} = Keyword.pop(opts, :topic)
-    opts = Keyword.put_new(opts, :retain, true)
-    topic = get_state_topic(location, device, topic)
-    publish_json(topic, state, opts)
+    case Jason.encode(state) do
+      {:ok, state} -> publish_state_raw(location, device, state, opts)
+      {:error, msg} -> Logger.error("Jason.encode() got error '#{msg}'")
+    end
   end
 
   @spec publish_schedule(list(RoboticaCommon.ScheduledStep.t())) :: :ok
@@ -94,5 +96,31 @@ defmodule Robotica.Mqtt do
   def publish_command(location, device, msg) do
     topic = "command/#{location}/#{device}"
     publish_json(topic, msg)
+  end
+
+  @spec start_link(opts :: list) :: {:ok, pid} | {:error, String.t()}
+  def start_link(opts) do
+    {:ok, _pid} = GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+  end
+
+  @impl true
+  def init(_) do
+    {:ok, %{}}
+  end
+
+  @impl true
+  def handle_cast({:send_state, topic, new_value, opts}, state) do
+    changed =
+      case Map.fetch(state, topic) do
+        {:ok, old_value} -> old_value != new_value
+        :error -> true
+      end
+
+    if changed do
+      publish_raw(topic, new_value, opts)
+    end
+
+    state = Map.put(state, topic, new_value)
+    {:noreply, state}
   end
 end

@@ -70,6 +70,7 @@ defmodule Robotica.Supervisor do
        handler_pid: MqttPotion.Multiplexer,
        subscriptions: subscriptions},
       {MqttPotion.Multiplexer, mqtt_potion: client_name},
+      {Robotica.Mqtt, []},
       {Robotica.Executor, name: Robotica.Executor},
       {Robotica.PluginRegistry, name: Robotica.PluginRegistry}
       | children
