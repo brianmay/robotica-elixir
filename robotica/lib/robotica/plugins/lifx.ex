@@ -24,10 +24,10 @@ defmodule Robotica.Plugins.LIFX do
     kelvin: 3500
   }
 
-  @black_alpha %HSBKA{
+  @red_alpha %HSBKA{
     hue: 0,
-    saturation: 0,
-    brightness: 0,
+    saturation: 100,
+    brightness: 100,
     kelvin: 3500,
     alpha: 100
   }
@@ -685,7 +685,7 @@ defmodule Robotica.Plugins.LIFX do
 
         {:error, error} ->
           Logger.error("Got error in lifx get_colors_from_command: #{inspect(error)}")
-          RLifx.replicate(@black_alpha, number)
+          RLifx.replicate(@red_alpha, number)
       end
 
     callback = create_callback(scene)
