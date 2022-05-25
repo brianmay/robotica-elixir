@@ -40,4 +40,3 @@ end
 import_config "../../robotica_common/config/nerves.exs"
 import_config "../../robotica_face/config/nerves.exs"
 import_config "../../robotica_ui/config/nerves.exs"
-

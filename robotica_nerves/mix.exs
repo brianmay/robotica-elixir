@@ -63,7 +63,6 @@ defmodule RoboticaNerves.MixProject do
       {:nerves_system_bbb, "~> 2.13", runtime: false, targets: :bbb},
       {:nerves_system_osd32mp1, "~> 0.9", runtime: false, targets: :osd32mp1},
       {:nerves_system_x86_64, "~> 1.18", runtime: false, targets: :x86_64},
-
       {:robotica, path: "../robotica"},
       {:robotica_common, path: "../robotica_common"},
       {:robotica_ui, path: "../robotica_ui"},

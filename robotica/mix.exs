@@ -29,7 +29,7 @@ defmodule Robotica.MixProject do
       {:mqtt_potion, github: "brianmay/mqtt_potion"},
       {:lifx, git: "https://github.com/brianmay/lifx.git"},
       {:tp_link_hs100, git: "https://github.com/brianmay/tp_link_hs100.git"},
-      {:mint, "~> 1.0", override: true},
+      {:finch, "~> 0.11.0"},
       {:robotica_common, path: "../robotica_common"},
       {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}

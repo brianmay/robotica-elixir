@@ -71,6 +71,7 @@ defmodule Robotica.Supervisor do
        subscriptions: subscriptions},
       {MqttPotion.Multiplexer, mqtt_potion: client_name},
       {Robotica.Mqtt, []},
+      {Finch, name: Robotica.Finch},
       {Robotica.Executor, name: Robotica.Executor},
       {Robotica.PluginRegistry, name: Robotica.PluginRegistry}
       | children

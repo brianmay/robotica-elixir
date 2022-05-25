@@ -10,14 +10,17 @@ defmodule RoboticaFace.Application do
   def start(_type, _args) do
     # Kludge to set http url correctly for nerves at runtime
     http_url = System.get_env("HTTP_URL")
-    Logger.debug("Setting url to '#{http_url}'.")
-    http_uri = URI.parse(http_url)
 
-    endpoint =
-      Application.get_env(:robotica_face, RoboticaFaceWeb.Endpoint)
-      |> Keyword.put(:url, scheme: http_uri.scheme, host: http_uri.host, port: http_uri.port)
+    if http_url != nil do
+      Logger.debug("Setting url to '#{http_url}'.")
+      http_uri = URI.parse(http_url)
 
-    Application.put_env(:robotica_face, RoboticaFaceWeb.Endpoint, endpoint)
+      endpoint =
+        Application.get_env(:robotica_face, RoboticaFaceWeb.Endpoint)
+        |> Keyword.put(:url, scheme: http_uri.scheme, host: http_uri.host, port: http_uri.port)
+
+      Application.put_env(:robotica_face, RoboticaFaceWeb.Endpoint, endpoint)
+    end
 
     # List all child processes to be supervised
     children = [

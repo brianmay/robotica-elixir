@@ -68,9 +68,11 @@ defmodule Robotica.Devices.HDMI do
   def send_command(host, cmd) do
     url = cmd_to_url(host, cmd)
 
-    case Mojito.request(:get, url) do
-      {:ok, %{status_code: 200}} -> :ok
-      {:ok, %{status_code: code}} -> {:error, "Got HTTP response #{code}"}
+    response = Finch.build(:get, url) |> Finch.request(Robotica.Finch)
+
+    case response do
+      {:ok, %{status: 200}} -> :ok
+      {:ok, %{status: code}} -> {:error, "Got HTTP response #{code}"}
       {:error, msg} -> {:error, "Got hdmi error #{inspect(msg)}"}
     end
   end
@@ -79,9 +81,11 @@ defmodule Robotica.Devices.HDMI do
   def get_result(host) do
     url = "http://#{host}/cgi-bin/query"
 
-    case Mojito.request(:get, url) do
-      {:ok, %{status_code: 200, body: body}} -> {:ok, body}
-      {:ok, %{status_code: code}} -> {:error, "2Got HTTP response #{code}"}
+    response = Finch.build(:get, url) |> Finch.request(Robotica.Finch)
+
+    case response do
+      {:ok, %{status: 200, body: body}} -> {:ok, body}
+      {:ok, %{status: code}} -> {:error, "Got HTTP response #{code}"}
       {:error, msg} -> {:error, "Got hdmi error #{inspect(msg)}"}
     end
   end
