@@ -1,10 +1,10 @@
 import Config
 
-case Mix.Project.config()[:target] do
-  "host" ->
+case Mix.target() do
+  :host ->
     nil
 
-  "rpi3" ->
+  :rpi3 ->
     config :robotica_ui, :viewport, %{
       name: :main_viewport,
       size: {800, 480},

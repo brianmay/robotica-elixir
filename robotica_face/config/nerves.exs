@@ -1,6 +1,6 @@
 import Config
 
-if Mix.Project.config()[:target] != "host" do
+if Mix.target() != :host do
   config :robotica_face, RoboticaFaceWeb.Endpoint,
     force_ssl: [hsts: true],
     https: [

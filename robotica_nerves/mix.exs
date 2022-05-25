@@ -2,45 +2,23 @@ defmodule RoboticaNerves.MixProject do
   use Mix.Project
 
   @app :robotica_nerves
-  @target System.get_env("MIX_TARGET") || "host"
+  @version "0.1.0"
+  @all_targets [:rpi, :rpi0, :rpi2, :rpi3, :rpi3a, :rpi4, :bbb, :osd32mp1, :x86_64]
 
   def project do
     [
       app: @app,
-      version: "0.1.0",
-      elixir: "~> 1.4",
-      elixirc_options: [warnings_as_errors: true],
-      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
-      target: @target,
-      archives: [nerves_bootstrap: "~> 1.6"],
-      deps_path: "deps/#{@target}",
-      build_path: "_build/#{@target}",
-      lockfile: "mix.lock.#{@target}",
+      version: @version,
+      elixir: "~> 1.9",
+      archives: [nerves_bootstrap: "~> 1.10"],
       start_permanent: Mix.env() == :prod,
-      aliases: aliases(),
+      build_embedded: true,
       deps: deps(),
       releases: [{@app, release()}],
       preferred_cli_target: [run: :host, test: :host],
       elixirc_options: [warnings_as_errors: true],
       dialyzer: dialyzer()
     ]
-  end
-
-  def release do
-    [
-      overwrite: true,
-      cookie: "#{@app}_cookie",
-      include_erts: &Nerves.Release.erts/0,
-      steps: [&Nerves.Release.init/1, :assemble],
-      strip_beams: Mix.env() == :prod
-    ]
-  end
-
-  # Starting nerves_bootstrap adds the required aliases to Mix.Project.config()
-  # Aliases are only added if MIX_TARGET is set.
-  def bootstrap(args) do
-    Application.start(:nerves_bootstrap)
-    Mix.Task.run("loadconfig", args)
   end
 
   # Run "mix help compile.app" to learn about applications.
@@ -61,59 +39,52 @@ defmodule RoboticaNerves.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:nerves, "~> 1.7.4", runtime: false},
-      {:shoehorn, "~> 0.6"},
+      # Dependencies for all targets
+      {:nerves, "~> 1.7.15", runtime: false},
+      {:shoehorn, "~> 0.8.0"},
+      {:ring_logger, "~> 0.8.3"},
+      {:toolshed, "~> 0.2.13"},
+
+      # Dependencies for all targets except :host
+      {:nerves_runtime, "~> 0.11.6", targets: @all_targets},
+      {:nerves_pack, "~> 0.6.0", targets: @all_targets},
+
+      # Dependencies for specific targets
+      # NOTE: It's generally low risk and recommended to follow minor version
+      # bumps to Nerves systems. Since these include Linux kernel and Erlang
+      # version updates, please review their release notes in case
+      # changes to your application are needed.
+      {:nerves_system_rpi, "~> 1.18", runtime: false, targets: :rpi},
+      {:nerves_system_rpi0, "~> 1.18", runtime: false, targets: :rpi0},
+      {:nerves_system_rpi2, "~> 1.18", runtime: false, targets: :rpi2},
+      {:robotica_rpi3, "~> 1.18", runtime: false, targets: :rpi3},
+      {:nerves_system_rpi3a, "~> 1.18", runtime: false, targets: :rpi3a},
+      {:nerves_system_rpi4, "~> 1.18", runtime: false, targets: :rpi4},
+      {:nerves_system_bbb, "~> 2.13", runtime: false, targets: :bbb},
+      {:nerves_system_osd32mp1, "~> 0.9", runtime: false, targets: :osd32mp1},
+      {:nerves_system_x86_64, "~> 1.18", runtime: false, targets: :x86_64},
+
       {:robotica, path: "../robotica"},
       {:robotica_common, path: "../robotica_common"},
       {:robotica_ui, path: "../robotica_ui"},
       {:robotica_face, path: "../robotica_face"},
-      {:ring_logger, "~> 0.6"},
-      {:toolshed, "~> 0.2"},
       {:cowlib, "~> 2.11", override: true},
       {:gun, "~> 1.3", override: true},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:credo, "~> 1.6.1", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}
-    ] ++ deps(@target)
-  end
-
-  # Specify target specific dependencies
-  defp deps("host") do
-    []
-  end
-
-  defp deps("rpi3" = target) do
-    deps_nerves() ++ system(target)
-  end
-
-  defp deps("rpi2" = target) do
-    deps_nerves() ++ system(target)
-  end
-
-  defp deps_nerves() do
-    [
-      {:nerves_runtime, "~> 0.6"},
-      {:nerves_network, "~> 0.3"},
-      {:nerves_time, "~> 0.3"},
-      {:nerves_init_gadget, "~> 0.4"},
-      {:dns, "~> 2.3.0"}
     ]
   end
 
-  defp system("rpi"), do: [{:nerves_system_rpi, "~> 1.8", runtime: false}]
-  defp system("rpi0"), do: [{:nerves_system_rpi0, "~> 1.8", runtime: false}]
-  defp system("rpi2"), do: [{:nerves_system_rpi2, "~> 1.8", runtime: false}]
-  defp system("rpi3"), do: [{:robotica_rpi3, "~> 1.14", runtime: false}]
-  defp system("bbb"), do: [{:nerves_system_bbb, "~> 2.3", runtime: false}]
-  defp system("ev3"), do: [{:nerves_system_ev3, "~> 1.8", runtime: false}]
-  defp system("qemu_arm"), do: [{:nerves_system_qemu_arm, "~> 1.8", runtime: false}]
-  defp system("x86_64"), do: [{:nerves_system_x86_64, "~> 1.8", runtime: false}]
-  defp system(target), do: Mix.raise("Unknown MIX_TARGET: #{target}")
-
-  defp aliases do
+  def release do
     [
-      loadconfig: [&bootstrap/1],
-      test: "test --no-start"
+      overwrite: true,
+      # Erlang distribution is not started automatically.
+      # See https://hexdocs.pm/nerves_pack/readme.html#erlang-distribution
+      cookie: "#{@app}_cookie",
+      include_erts: &Nerves.Release.erts/0,
+      steps: [&Nerves.Release.init/1, :assemble],
+      strip_beams: Mix.env() == :prod or [keep: ["Docs"]]
     ]
   end
 
