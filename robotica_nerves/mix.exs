@@ -41,7 +41,7 @@ defmodule RoboticaNerves.MixProject do
     [
       # Dependencies for all targets
       {:nerves, "~> 1.7.15", runtime: false},
-      {:shoehorn, "~> 0.8.0"},
+      {:shoehorn, "~> 0.9.1"},
       {:ring_logger, "~> 0.8.3"},
       {:toolshed, "~> 0.2.13"},
 
