@@ -3,7 +3,7 @@ defmodule RoboticaNerves.Application do
   # for more information on OTP Applications
   @moduledoc false
 
-  @target Mix.Project.config()[:target]
+  @target Mix.target()
 
   use Application
   require Logger
@@ -15,8 +15,12 @@ defmodule RoboticaNerves.Application do
     rc
   end
 
-  def config do
-    Logger.info("Configuring user level...")
+  def config(:host) do
+    Logger.info("Configuring user level (host)...")
+  end
+
+  def config(_target) do
+    Logger.info("Configuring user level (target)...")
 
     if not File.exists?("/root/mpd") do
       File.mkdir!("/root/mpd")
@@ -41,6 +45,8 @@ defmodule RoboticaNerves.Application do
   end
 
   def start(_type, _args) do
+    config(@target)
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: RoboticaNerves.Supervisor]
@@ -48,7 +54,7 @@ defmodule RoboticaNerves.Application do
   end
 
   # List all child processes to be supervised
-  def children("host") do
+  def children(:host) do
     [
       # Starts a worker by calling: RoboticaNerves.Worker.start_link(arg)
       # {RoboticaNerves.Worker, arg},
