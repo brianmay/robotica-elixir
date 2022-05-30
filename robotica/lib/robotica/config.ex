@@ -23,7 +23,7 @@ defmodule Robotica.Config do
         day_of_week: {:day_of_week, false},
         if_not: {{:list, :string}, false},
         if: {{:list, :string}, false},
-        replace: {{:list, :string}, false},
+        delete: {{:list, :string}, false},
         day_type: {:string, true}
       }
     end

@@ -32,13 +32,13 @@
 - date: "2018-12-25"
   day_type: "special_christmas"
 
-- replace:
+- delete:
   - "special_christmas"
   if:
   - "special_christmas"
   day_type: "evil_christmas"
 
-- replace:
+- delete:
   - "special_christmas"
   if:
   - "special_christmas"

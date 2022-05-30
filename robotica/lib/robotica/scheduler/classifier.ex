@@ -138,10 +138,10 @@ defmodule Robotica.Scheduler.Classifier do
     end)
   end
 
-  @spec remove_replaced(list(Types.Classification.t()), Types.Classification.t()) ::
+  @spec process_delete(list(Types.Classification.t()), Types.Classification.t()) ::
           list(Types.Classification.t())
-  defp remove_replaced(classifications, replaces) do
-    delete = put_list(MapSet.new(), replaces.replace || [])
+  defp process_delete(classifications, replaces) do
+    delete = put_list(MapSet.new(), replaces.delete || [])
     Enum.reject(classifications, fn item -> MapSet.member?(delete, item.day_type) end)
   end
 
@@ -160,7 +160,7 @@ defmodule Robotica.Scheduler.Classifier do
         end
 
       if add do
-        list = remove_replaced(list, classification)
+        list = process_delete(list, classification)
         [classification | list]
       else
         list

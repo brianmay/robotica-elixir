@@ -16,7 +16,7 @@ defmodule Robotica.Types do
             day_of_week: String.t() | nil,
             if: list(String.t()) | nil,
             if_not: list(String.t()) | nil,
-            replace: list(String.t()) | nil,
+            delete: list(String.t()) | nil,
             day_type: String.t() | nil
           }
     @enforce_keys [:day_type]
@@ -27,7 +27,7 @@ defmodule Robotica.Types do
               day_of_week: nil,
               if: nil,
               if_not: nil,
-              replace: nil,
+              delete: nil,
               day_type: nil
   end
 end
