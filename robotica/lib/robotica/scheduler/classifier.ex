@@ -122,51 +122,42 @@ defmodule Robotica.Scheduler.Classifier do
     end)
   end
 
-  defp is_duplicated_entry?(classification_names, %Types.Classification{} = classification) do
-    Enum.member?(classification_names, classification.day_type)
-  end
-
   @spec put_list(MapSet.t(), list()) :: MapSet.t()
   defp put_list(mapset, list) do
     Enum.reduce(list, mapset, fn item, mapset -> MapSet.put(mapset, item) end)
   end
 
-  @spec list_to_mapset(list(Types.Classification.t())) :: MapSet.t()
-  defp list_to_mapset(classifications) do
-    Enum.reduce(classifications, MapSet.new(), fn classification, mapset ->
-      MapSet.put(mapset, classification.day_type)
-    end)
+  @spec process_add(MapSet.t(String.t()), Types.Classification.t()) :: MapSet.t(String.t())
+  defp process_add(classifications, replaces) do
+    add = put_list(MapSet.new(), replaces.add || [])
+    MapSet.union(classifications, add)
   end
 
-  @spec process_delete(list(Types.Classification.t()), Types.Classification.t()) ::
-          list(Types.Classification.t())
+  @spec process_delete(MapSet.t(String.t()), Types.Classification.t()) :: MapSet.t(String.t())
   defp process_delete(classifications, replaces) do
     delete = put_list(MapSet.new(), replaces.delete || [])
-    Enum.reject(classifications, fn item -> MapSet.member?(delete, item.day_type) end)
+    MapSet.difference(classifications, delete)
   end
 
+  @spec classify_date(any) :: MapSet.t(String.t())
   def classify_date(date) do
     get_data()
-    |> Enum.reduce([], fn classification, list ->
-      names = list_to_mapset(list)
-
-      add =
+    |> Enum.reduce(MapSet.new(), fn classification, names ->
+      do_process =
         cond do
           not is_in_classification?(classification, date) -> false
           not is_included_entry?(names, classification) -> false
           is_excluded_entry?(names, classification) -> false
-          is_duplicated_entry?(names, classification) -> false
           true -> true
         end
 
-      if add do
-        list = process_delete(list, classification)
-        [classification | list]
+      if do_process do
+        names
+        |> process_add(classification)
+        |> process_delete(classification)
       else
-        list
+        names
       end
     end)
-    |> Enum.map(fn classification -> classification.day_type end)
-    |> MapSet.new()
   end
 end

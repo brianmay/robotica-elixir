@@ -1,48 +1,63 @@
-- day_type: "weekday"
+- add:
+  - "weekday"
   week_day: true
 
-- day_type: "not_weekday"
+- week_day: true
+
+- add:
+  - "not_weekday"
   week_day: false
 
 - day_of_week: Saturday
-  day_type: "saturday"
+  add:
+  - "saturday"
 
 - day_of_week: Sunday
-  day_type: "sunday"
+  add:
+  - "sunday"
 
 - date: "2018-12-25"
-  day_type: "christmas"
+  add:
+  - "christmas"
 
 - if_not:
   - "christmas"
-  day_type: "bad_day"
+  add:
+  - "bad_day"
 
 - start: "2018-12-25"
-  day_type: "after_christmas"
+  add:
+  - "after_christmas"
 
 - stop: "2018-12-25"
-  day_type: "before_christmas"
+  add:
+  - "before_christmas"
 
 - if:
   - "christmas"
   - "saturday"
   - "sunday"
-  day_type: "good_day"
+  add:
+  - "good_day"
 
 - date: "2018-12-25"
-  day_type: "special_christmas"
+  add:
+  - "special_christmas"
 
 - delete:
   - "special_christmas"
   if:
   - "special_christmas"
-  day_type: "evil_christmas"
+  add:
+  - "evil_christmas"
 
 - delete:
   - "special_christmas"
   if:
   - "special_christmas"
-  day_type: "good_christmas"
+  add:
+  - "good_christmas"
 
 - date: "2018-12-26"
-  day_type: "boxing"
+  add:
+  - "boxing"
