@@ -122,7 +122,7 @@ defmodule Robotica.Scheduler.Classifier do
     end)
   end
 
-  @spec put_list(MapSet.t(), list()) :: MapSet.t()
+  @spec put_list(MapSet.t(String.t()), list()) :: MapSet.t(String.t())
   defp put_list(mapset, list) do
     Enum.reduce(list, mapset, fn item, mapset -> MapSet.put(mapset, item) end)
   end
