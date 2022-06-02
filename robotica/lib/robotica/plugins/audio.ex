@@ -161,7 +161,7 @@ defmodule Robotica.Plugins.Audio do
           :ok | {:error, String.t()} | {:rc, pos_integer}
   defp run_commands(%State{} = state, [cmd | tail], values, on_nonzero) do
     [cmd | args] = cmd
-    args = Enum.map(args, &Strings.solve_string_combined(&1, values))
+    args = Enum.map(args, &Strings.replace_values(&1, values))
 
     {args, errors} =
       Enum.split_with(args, fn

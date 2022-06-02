@@ -18,8 +18,9 @@ hosts:
                 postfix: "sounds/logout.wav"
             commands:
                 init:
-                  - ["amixer", "sset", "Master", "100%"]
                   - ["mpc", "repeat", "on"]
+                volume:
+                  - ["amixer", "sset", "Master", "{volume}%"]
                 play:
                   - ["aplay", "-q", "{file}"]
                 say:
