@@ -33,8 +33,8 @@ defmodule Robotica.Devices.Lifx do
   ...> }
   iex> eval_color(%{
   ...>   brightness: 100,
-  ...>   hue: "{frame}*2",
-  ...>   saturation: "{light}*2",
+  ...>   hue: "frame*2",
+  ...>   saturation: "light*2",
   ...>   kelvin: 3500,
   ...>   alpha: 100,
   ...> }, values)
@@ -75,14 +75,14 @@ defmodule Robotica.Devices.Lifx do
   iex> import Robotica.Devices.Lifx
   iex> color = %{
   ...>   brightness: 100,
-  ...>   hue: "{frame}*30",
-  ...>   saturation: "{light}*100",
+  ...>   hue: "frame*30",
+  ...>   saturation: "light*100",
   ...>   kelvin: 3500,
   ...>   alpha: 100,
   ...>  }
   iex> colors = [
   ...>   %{
-  ...>     count: "{frame}",
+  ...>     count: "frame",
   ...>     colors: [color, color]
   ...>   }
   ...> ]
