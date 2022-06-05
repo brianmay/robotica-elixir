@@ -5,7 +5,7 @@ Rules.
 %% a number
 [0-9]+ : {token, {number, TokenLine, list_to_integer(TokenChars)}}.
 %% a word
-\{{W}+\} : {token, {word, TokenLine, strip_quotes(TokenChars)}}.
+{W}+ : {token, {word, TokenLine, list_to_binary(TokenChars)}}.
 %% open/close parens
 \( : {token, {'(', TokenLine}}.
 \) : {token, {')', TokenLine}}.
@@ -18,6 +18,3 @@ Rules.
 [\s\n\r\t]+           : skip_token.
 
 Erlang code.
-strip_quotes(Str) ->
-    S = tl(lists:droplast(Str)),
-    list_to_binary(S).

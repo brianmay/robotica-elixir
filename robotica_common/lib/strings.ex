@@ -76,11 +76,11 @@ defmodule RoboticaCommon.Strings do
   {:ok, 10}
 
   iex> import RoboticaCommon.Strings
-  iex> eval_string("{i}+{j}", %{"i" => 10, "j" => 20})
+  iex> eval_string("i+j", %{"i" => 10, "j" => 20})
   {:ok, 30}
 
   iex> import RoboticaCommon.Strings
-  iex> eval_string("{x}+{y}", %{"i" => 10, "j" => 20})
+  iex> eval_string("x+y", %{"i" => 10, "j" => 20})
   {:error, "Cannot find x in lookup table of i=10, j=20."}
   """
 
