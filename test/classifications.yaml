@@ -20,7 +20,7 @@
   add:
   - "christmas"
 
-- if_not:
+- if_not_set:
   - "christmas"
   add:
   - "bad_day"
@@ -33,7 +33,7 @@
   add:
   - "before_christmas"
 
-- if:
+- if_set:
   - "christmas"
   - "saturday"
   - "sunday"
@@ -46,14 +46,14 @@
 
 - delete:
   - "special_christmas"
-  if:
+  if_set:
   - "special_christmas"
   add:
   - "evil_christmas"
 
 - delete:
   - "special_christmas"
-  if:
+  if_set:
   - "special_christmas"
   add:
   - "good_christmas"

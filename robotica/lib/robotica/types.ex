@@ -14,8 +14,8 @@ defmodule Robotica.Types do
             date: Date.t() | nil,
             week_day: boolean() | nil,
             day_of_week: String.t() | nil,
-            if: list(String.t()) | nil,
-            if_not: list(String.t()) | nil,
+            if_set: list(String.t()) | nil,
+            if_not_set: list(String.t()) | nil,
             add: list(String.t()) | nil,
             delete: list(String.t()) | nil
           }
@@ -24,8 +24,8 @@ defmodule Robotica.Types do
               date: nil,
               week_day: nil,
               day_of_week: nil,
-              if: nil,
-              if_not: nil,
+              if_set: nil,
+              if_not_set: nil,
               add: nil,
               delete: nil
   end

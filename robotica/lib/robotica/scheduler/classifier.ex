@@ -103,7 +103,7 @@ defmodule Robotica.Scheduler.Classifier do
   end
 
   defp is_included_entry?(classification_names, %Types.Classification{} = classification) do
-    include_list = Map.get(classification, :if)
+    include_list = Map.get(classification, :if_set)
 
     if include_list == nil do
       true
@@ -115,7 +115,7 @@ defmodule Robotica.Scheduler.Classifier do
   end
 
   defp is_excluded_entry?(classification_names, %Types.Classification{} = classification) do
-    exclude_list = Map.get(classification, :if_not) || []
+    exclude_list = Map.get(classification, :if_not_set) || []
 
     Enum.any?(exclude_list, fn exclude_name ->
       Enum.member?(classification_names, exclude_name)
