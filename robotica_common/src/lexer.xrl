@@ -14,6 +14,7 @@ Rules.
 \- : {token, {'-', TokenLine}}.
 \* : {token, {'*', TokenLine}}.
 \/ : {token, {'/', TokenLine}}.
+\% : {token, {'%', TokenLine}}.
 %% white space
 [\s\n\r\t]+           : skip_token.
 

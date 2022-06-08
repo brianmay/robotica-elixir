@@ -82,6 +82,14 @@ defmodule RoboticaCommon.Strings do
   iex> import RoboticaCommon.Strings
   iex> eval_string("x+y", %{"i" => 10, "j" => 20})
   {:error, "Cannot find x in lookup table of i=10, j=20."}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string("i%2", %{"i" => 10, "j" => 20})
+  {:ok, 0}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string("i%2", %{"i" => 11, "j" => 20})
+  {:ok, 1}
   """
 
   @spec eval_string(String.t() | integer(), %{required(String.t()) => integer()}) ::
@@ -145,8 +153,9 @@ defmodule RoboticaCommon.Strings do
   # evaluation a binary operation is an application
   # of a corresponding operator to the lhs and rhs
   # evaluated recursively
-  defp eval({:mult, lhs, rhs}, s), do: eval(lhs, s) * eval(rhs, s)
-  defp eval({:divi, lhs, rhs}, s), do: div(eval(lhs, s), eval(rhs, s))
+  defp eval({:multiply, lhs, rhs}, s), do: eval(lhs, s) * eval(rhs, s)
+  defp eval({:divide, lhs, rhs}, s), do: div(eval(lhs, s), eval(rhs, s))
+  defp eval({:remainder, lhs, rhs}, s), do: rem(eval(lhs, s), eval(rhs, s))
   defp eval({:plus, lhs, rhs}, s), do: eval(lhs, s) + eval(rhs, s)
   defp eval({:minus, lhs, rhs}, s), do: eval(lhs, s) - eval(rhs, s)
 end
