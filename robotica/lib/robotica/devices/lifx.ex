@@ -50,11 +50,11 @@ defmodule Robotica.Devices.Lifx do
   def eval_color(color, values) do
     alpha = if color.alpha == nil, do: 100, else: color.alpha
 
-    with {:ok, brightness} <- Strings.eval_string(color.brightness, values),
-         {:ok, hue} <- Strings.eval_string(color.hue, values),
-         {:ok, saturation} <- Strings.eval_string(color.saturation, values),
-         {:ok, kelvin} <- Strings.eval_string(color.kelvin, values),
-         {:ok, alpha} <- Strings.eval_string(alpha, values) do
+    with {:ok, brightness} <- Strings.eval_string_to_integer(color.brightness, values),
+         {:ok, hue} <- Strings.eval_string_to_integer(color.hue, values),
+         {:ok, saturation} <- Strings.eval_string_to_integer(color.saturation, values),
+         {:ok, kelvin} <- Strings.eval_string_to_integer(color.kelvin, values),
+         {:ok, alpha} <- Strings.eval_string_to_integer(alpha, values) do
       color = %HSBKA{
         brightness: brightness,
         hue: hue,
@@ -119,7 +119,7 @@ defmodule Robotica.Devices.Lifx do
       "frame" => frame_n
     }
 
-    with {:ok, count} <- Strings.eval_string(head.count, values),
+    with {:ok, count} <- Strings.eval_string_to_integer(head.count, values),
          {:ok, result} <- expand_repeat(head.colors, frame_n, count, 0, result) do
       loop_colors(tail, frame_n, result)
     else

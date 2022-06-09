@@ -19,7 +19,7 @@ jobs:
       build_npm_assets: false
       directory: "robotica"
       mix_cache_postfix: ""
-      plts_cache_postfix: "-2"
+      plts_cache_postfix: "-3"
 
 #  robotica_ui:
 #    uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
@@ -43,7 +43,7 @@ jobs:
       build_npm_assets: false
       directory: "robotica_docker"
       mix_cache_postfix: ""
-      plts_cache_postfix: "-2"
+      plts_cache_postfix: "-3"
 
   push:
     name: Push

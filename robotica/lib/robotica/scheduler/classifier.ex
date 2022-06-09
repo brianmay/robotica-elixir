@@ -102,6 +102,26 @@ defmodule Robotica.Scheduler.Classifier do
     end
   end
 
+  defp is_condition_ok?(%Types.Classification{} = classification, date) do
+    condition_list = Map.get(classification, :if)
+
+    if condition_list == nil do
+      true
+    else
+      {days_since_epoch, _} = Date.to_iso_days(date)
+
+      values = %{
+        "days_since_epoch" => days_since_epoch
+      }
+
+      Enum.any?(condition_list, fn condition ->
+        {:ok, result} = RoboticaCommon.Strings.eval_string_to_bool(condition, values)
+
+        result
+      end)
+    end
+  end
+
   defp is_included_entry?(classification_names, %Types.Classification{} = classification) do
     include_list = Map.get(classification, :if_set)
 
@@ -145,6 +165,7 @@ defmodule Robotica.Scheduler.Classifier do
     |> Enum.reduce(MapSet.new(), fn classification, names ->
       do_process =
         cond do
+          not is_condition_ok?(classification, date) -> false
           not is_in_classification?(classification, date) -> false
           not is_included_entry?(names, classification) -> false
           is_excluded_entry?(names, classification) -> false

@@ -72,29 +72,32 @@ defmodule RoboticaCommon.Strings do
   Substitute values in string and solve simple maths.
 
   iex> import RoboticaCommon.Strings
-  iex> eval_string(10, %{"i" => 10, "j" => 20})
+  iex> eval_string_to_integer(10, %{"i" => 10, "j" => 20})
   {:ok, 10}
 
   iex> import RoboticaCommon.Strings
-  iex> eval_string("i+j", %{"i" => 10, "j" => 20})
+  iex> eval_string_to_integer("i+j", %{"i" => 10, "j" => 20})
   {:ok, 30}
 
   iex> import RoboticaCommon.Strings
-  iex> eval_string("x+y", %{"i" => 10, "j" => 20})
+  iex> eval_string_to_integer("x+y", %{"i" => 10, "j" => 20})
   {:error, "Cannot find x in lookup table of i=10, j=20."}
 
   iex> import RoboticaCommon.Strings
-  iex> eval_string("i%2", %{"i" => 10, "j" => 20})
+  iex> eval_string_to_integer("i%2", %{"i" => 10, "j" => 20})
   {:ok, 0}
 
   iex> import RoboticaCommon.Strings
-  iex> eval_string("i%2", %{"i" => 11, "j" => 20})
+  iex> eval_string_to_integer("i%2", %{"i" => 11, "j" => 20})
   {:ok, 1}
+
+  iex> import RoboticaCommon.Strings
+  iex> {:error, _} = eval_string_to_integer("1==2 or 2==3", %{"i" => 11, "j" => 20})
   """
 
-  @spec eval_string(String.t() | integer(), %{required(String.t()) => integer()}) ::
+  @spec eval_string_to_integer(String.t() | integer(), %{required(String.t()) => integer()}) ::
           {:ok, integer()} | {:error, String.t()}
-  def eval_string(string, values) do
+  def eval_string_to_integer(string, values) do
     cond do
       is_integer(string) ->
         {:ok, string}
@@ -122,10 +125,109 @@ defmodule RoboticaCommon.Strings do
       {:error, "Cannot find #{name} in lookup table of #{map}."}
   end
 
+  @doc """
+  Substitute values in string and solve simple maths.
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("10==10", %{})
+  {:ok, true}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("10==11", %{})
+  {:ok, false}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("11>11", %{})
+  {:ok, false}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("12>11", %{})
+  {:ok, true}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("10>=11", %{})
+  {:ok, false}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("11>=11", %{})
+  {:ok, true}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("11<11", %{})
+  {:ok, false}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("10<11", %{})
+  {:ok, true}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("12<=11", %{})
+  {:ok, false}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("11<=11", %{})
+  {:ok, true}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("10==10 or 11==10", %{})
+  {:ok, true}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("10==9 or 11==10", %{})
+  {:ok, false}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("10==10 and 11==11", %{})
+  {:ok, true}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("10==10 and 11==10", %{})
+  {:ok, false}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("(10==10 and 11==10) or 12==12", %{})
+  {:ok, true}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("(10==10 and 11==10) or 11==12", %{})
+  {:ok, false}
+  """
+
+  @spec eval_string_to_bool(String.t() | integer(), %{required(String.t()) => integer()}) ::
+          {:ok, boolean()} | {:error, String.t()}
+  def eval_string_to_bool(string, values) do
+    cond do
+      is_integer(string) ->
+        {:ok, string}
+
+      is_float(string) ->
+        {:ok, round(string)}
+
+      true ->
+        string = to_charlist(string)
+
+        with {:ok, tokens, _} <- :lexer.string(string),
+             {:ok, tree} <- :cond_parser.parse(tokens) do
+          {:ok, eval_cond(tree, values)}
+        else
+          {:error, {line, :lexer, error}, _} ->
+            {:error, "lexer error #{line}: #{inspect(error)}"}
+
+          {:error, {line, :cond_parser, error}} ->
+            {:error, "parser error #{line}: #{inspect(error)}"}
+        end
+    end
+  catch
+    {:undefined, name} ->
+      map = Enum.map_join(values, ", ", fn {a, b} -> "#{a}=#{b}" end)
+      {:error, "Cannot find #{name} in lookup table of #{map}."}
+  end
+
   # two mutally recursive data types, defining the AST
   @type expr_ast ::
-          {:mult, aterm, aterm}
-          | {:divi, aterm, aterm}
+          {:multiple, aterm, aterm}
+          | {:divide, aterm, aterm}
+          | {:remainder, aterm, aterm}
           | {:plus, aterm, aterm}
           | {:minus, aterm, aterm}
           | aterm
@@ -158,4 +260,13 @@ defmodule RoboticaCommon.Strings do
   defp eval({:remainder, lhs, rhs}, s), do: rem(eval(lhs, s), eval(rhs, s))
   defp eval({:plus, lhs, rhs}, s), do: eval(lhs, s) + eval(rhs, s)
   defp eval({:minus, lhs, rhs}, s), do: eval(lhs, s) - eval(rhs, s)
+
+  defp eval_cond({:and, lhs, rhs}, s), do: eval_cond(lhs, s) and eval_cond(rhs, s)
+  defp eval_cond({:or, lhs, rhs}, s), do: eval_cond(lhs, s) or eval_cond(rhs, s)
+  defp eval_cond({:eq, lhs, rhs}, s), do: eval(lhs, s) == eval(rhs, s)
+  defp eval_cond({:ne, lhs, rhs}, s), do: eval(lhs, s) != eval(rhs, s)
+  defp eval_cond({:lt, lhs, rhs}, s), do: eval(lhs, s) < eval(rhs, s)
+  defp eval_cond({:le, lhs, rhs}, s), do: eval(lhs, s) <= eval(rhs, s)
+  defp eval_cond({:gt, lhs, rhs}, s), do: eval(lhs, s) > eval(rhs, s)
+  defp eval_cond({:ge, lhs, rhs}, s), do: eval(lhs, s) >= eval(rhs, s)
 end
