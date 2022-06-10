@@ -177,6 +177,10 @@ defmodule RoboticaCommon.Strings do
   {:ok, false}
 
   iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("10==10 or 11==10 or 12==10", %{})
+  {:ok, true}
+
+  iex> import RoboticaCommon.Strings
   iex> eval_string_to_bool("10==10 and 11==11", %{})
   {:ok, true}
 
@@ -185,12 +189,32 @@ defmodule RoboticaCommon.Strings do
   {:ok, false}
 
   iex> import RoboticaCommon.Strings
-  iex> eval_string_to_bool("(10==10 and 11==10) or 12==12", %{})
+  iex> eval_string_to_bool("(10==10 or 11==10) and 12==10", %{})
+  {:ok, false}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("10==10 or (11==10 or 12==10)", %{})
   {:ok, true}
 
   iex> import RoboticaCommon.Strings
-  iex> eval_string_to_bool("(10==10 and 11==10) or 11==12", %{})
+  iex> eval_string_to_bool("10==10 or 11==10 and 12==10", %{})
   {:ok, false}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("not 10==10", %{})
+  {:ok, false}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("not (10==10 or 11==11)", %{})
+  {:ok, false}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("(not 10==10) or 11==11", %{})
+  {:ok, true}
+
+  iex> import RoboticaCommon.Strings
+  iex> eval_string_to_bool("not 10==10 or 11==11", %{})
+  {:ok, true}
   """
 
   @spec eval_string_to_bool(String.t() | integer(), %{required(String.t()) => integer()}) ::
@@ -261,6 +285,7 @@ defmodule RoboticaCommon.Strings do
   defp eval({:plus, lhs, rhs}, s), do: eval(lhs, s) + eval(rhs, s)
   defp eval({:minus, lhs, rhs}, s), do: eval(lhs, s) - eval(rhs, s)
 
+  defp eval_cond({:not, rhs}, s), do: not eval_cond(rhs, s)
   defp eval_cond({:and, lhs, rhs}, s), do: eval_cond(lhs, s) and eval_cond(rhs, s)
   defp eval_cond({:or, lhs, rhs}, s), do: eval_cond(lhs, s) or eval_cond(rhs, s)
   defp eval_cond({:eq, lhs, rhs}, s), do: eval(lhs, s) == eval(rhs, s)

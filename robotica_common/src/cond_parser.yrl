@@ -1,9 +1,10 @@
 Nonterminals boolean condition expr term factor.
-Terminals word number 'and' 'or' '+' '-' '*' '/' '%' '(' ')' '==' '!=' '<' '<=' '>' '>='.
+Terminals word number 'not' 'and' 'or' '+' '-' '*' '/' '%' '(' ')' '==' '!=' '<' '<=' '>' '>='.
 Rootsymbol boolean.
 
-boolean -> condition 'and' condition: {'and', '$1', '$3'}.
-boolean -> condition 'or' condition: {'or', '$1', '$3'}.
+boolean -> 'not' condition: {'not', '$2'}.
+boolean -> boolean 'and' condition: {'and', '$1', '$3'}.
+boolean -> boolean 'or' condition: {'or', '$1', '$3'}.
 boolean -> condition: '$1'.
 
 condition -> '(' boolean ')': '$2'.
