@@ -154,6 +154,7 @@ defmodule RoboticaCommon.Schema do
       tasks: {{:list, task_schema()}, true},
       repeat_time: {:delta, false},
       repeat_count: {{:integer, 0}, false},
+      classifications: {{:list, :string}, false},
       options: {{:list, :string}, false}
     }
   end

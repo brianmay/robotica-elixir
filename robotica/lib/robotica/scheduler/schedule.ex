@@ -37,25 +37,43 @@ defmodule Robotica.Scheduler.Schedule do
     end
   end
 
-  def check_block(block, date) do
-    today = Classifier.classify_date(date)
-    tomorrow = Classifier.classify_date(Date.add(date, 1))
-    check_block_date(today, block.today) and check_block_date(tomorrow, block.tomorrow)
+  def check_block(block, classifications_today, classifications_tomorrow) do
+    check_block_date(classifications_today, block.today) and
+      check_block_date(classifications_tomorrow, block.tomorrow)
   end
 
-  def transform_sequence(seq_name, seq_options, date) do
+  def transform_sequence(seq_name, seq_options, date, classifications) do
     options = MapSet.new(seq_options.options || [])
     datetime = convert_time_to_utc(date, seq_options.time)
-    {datetime, seq_name, options}
+
+    %{
+      seq_options
+      | time: datetime,
+        options: options
+    }
+    |> Map.put(:classifications, classifications)
+    |> Map.put(:name, seq_name)
   end
 
   def get_schedule(date) do
+    classifications_today = Classifier.classify_date(date)
+    classifications_tomorrow = Classifier.classify_date(Date.add(date, 1))
+
     get_data()
-    |> Enum.filter(fn block -> check_block(block, date) end)
+    |> Enum.filter(fn block ->
+      check_block(block, classifications_today, classifications_tomorrow)
+    end)
     |> Enum.reduce(%{}, fn block, map -> Map.merge(map, block.sequences) end)
-    |> Enum.map(fn {seq_name, seq_options} -> transform_sequence(seq_name, seq_options, date) end)
-    |> Enum.reduce(%{}, fn {datetime, seq_name, options}, acc ->
-      action = {seq_name, options}
+    |> Enum.map(fn {seq_name, seq_options} ->
+      transform_sequence(seq_name, seq_options, date, classifications_today)
+    end)
+    |> Enum.reduce(%{}, fn values, acc ->
+      datetime = values.time
+      name = values.name
+      classifications = values.classifications
+      options = values.options
+
+      action = {name, classifications, options}
       Map.update(acc, datetime, [action], &[action | &1])
     end)
     |> Map.to_list()

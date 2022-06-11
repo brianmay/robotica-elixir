@@ -26,18 +26,36 @@ defmodule Robotica.Scheduler.Sequence do
     [step | add_id_to_steps(tail, sequence_name, n + 1)]
   end
 
-  defp filter_options(sequence, options) do
+  defp filter_classifications(sequence, classifications) do
     Enum.filter(sequence, fn step ->
-      case step.options do
-        nil -> true
-        soptions -> Enum.any?(soptions, fn option -> MapSet.member?(options, option) end)
+      case step.classifications do
+        nil ->
+          true
+
+        step_classifications ->
+          Enum.any?(step_classifications, fn step_classification ->
+            MapSet.member?(classifications, step_classification)
+          end)
       end
     end)
   end
 
-  defp get_sequence(sequence_name, options) do
+  defp filter_options(sequence, options) do
+    Enum.filter(sequence, fn step ->
+      case step.options do
+        nil ->
+          true
+
+        step_options ->
+          Enum.any?(step_options, fn step_option -> MapSet.member?(options, step_option) end)
+      end
+    end)
+  end
+
+  defp get_sequence(sequence_name, classifications, options) do
     Map.fetch!(get_data(), sequence_name)
     |> add_id_to_steps(sequence_name, 0)
+    |> filter_classifications(classifications)
     |> filter_options(options)
   end
 
@@ -114,9 +132,9 @@ defmodule Robotica.Scheduler.Sequence do
     end
   end
 
-  defp expand_sequence(start_time, {sequence_name, options}) do
+  defp expand_sequence(start_time, {sequence_name, classifications, options}) do
     Logger.debug("Loading sequence #{inspect(sequence_name)} for #{inspect(start_time)}.")
-    sequence = get_sequence(sequence_name, options)
+    sequence = get_sequence(sequence_name, classifications, options)
     start_time = get_corrected_start_time(start_time, sequence)
 
     Logger.debug(
