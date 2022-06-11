@@ -32,8 +32,8 @@ defmodule Robotica.Scheduler.Schedule do
       true
     else
       today = MapSet.new(requirements)
-      intersection = MapSet.difference(today, classifications)
-      MapSet.size(intersection) == 0
+      intersection = MapSet.intersection(classifications, today)
+      MapSet.size(intersection) > 0
     end
   end
 
