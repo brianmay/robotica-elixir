@@ -5,6 +5,18 @@ defmodule Robotica.Scheduler.Classifier do
   alias Robotica.Config.Loader
   alias Robotica.Types
 
+  defmodule ClassifiedDate do
+    @moduledoc """
+    A classified date
+    """
+    @type t :: %__MODULE__{
+            date: Date.t(),
+            classifications: MapSet.t(String.t())
+          }
+    @enforce_keys [:date, :classifications]
+    defstruct [:date, :classifications]
+  end
+
   defp is_week_day?(date) do
     case Date.day_of_week(date) do
       dow when dow in 1..5 -> true
@@ -159,26 +171,32 @@ defmodule Robotica.Scheduler.Classifier do
     MapSet.difference(classifications, delete)
   end
 
-  @spec classify_date(any) :: MapSet.t(String.t())
+  @spec classify_date(Date.t()) :: ClassifiedDate.t()
   def classify_date(date) do
-    get_data()
-    |> Enum.reduce(MapSet.new(), fn classification, names ->
-      do_process =
-        cond do
-          not is_condition_ok?(classification, date) -> false
-          not is_in_classification?(classification, date) -> false
-          not is_included_entry?(names, classification) -> false
-          is_excluded_entry?(names, classification) -> false
-          true -> true
-        end
+    classifications =
+      get_data()
+      |> Enum.reduce(MapSet.new(), fn classification, names ->
+        do_process =
+          cond do
+            not is_condition_ok?(classification, date) -> false
+            not is_in_classification?(classification, date) -> false
+            not is_included_entry?(names, classification) -> false
+            is_excluded_entry?(names, classification) -> false
+            true -> true
+          end
 
-      if do_process do
-        names
-        |> process_add(classification)
-        |> process_delete(classification)
-      else
-        names
-      end
-    end)
+        if do_process do
+          names
+          |> process_add(classification)
+          |> process_delete(classification)
+        else
+          names
+        end
+      end)
+
+    %ClassifiedDate{
+      date: date,
+      classifications: classifications
+    }
   end
 end

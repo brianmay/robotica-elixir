@@ -3,8 +3,29 @@ defmodule Robotica.Scheduler.Schedule do
   Process a schedule entry
   """
 
+  defmodule Schedule do
+    @moduledoc """
+    A complete unexpanded schedule
+    """
+    alias Robotica.Scheduler.Classifier.ClassifiedDate
+
+    @type schedule_t ::
+            list(
+              {time :: DateTime.t(),
+               options :: {name :: String.t(), options :: MapSet.t(String.t())}}
+            )
+
+    @type t :: %__MODULE__{
+            today: ClassifiedDate.t(),
+            tomorrow: ClassifiedDate.t(),
+            schedule: schedule_t()
+          }
+    @enforce_keys [:today, :tomorrow, :schedule]
+    defstruct [:today, :tomorrow, :schedule]
+  end
+
   alias Robotica.Config.Loader
-  alias Robotica.Scheduler.Classifier
+  alias Robotica.Scheduler.Classifier.ClassifiedDate
 
   @timezone Application.compile_env(:robotica, :timezone)
 
@@ -27,7 +48,7 @@ defmodule Robotica.Scheduler.Schedule do
     utc_date_time
   end
 
-  def check_block_date(classifications, requirements) do
+  defp check_block_date(classifications, requirements) do
     if requirements == nil do
       true
     else
@@ -37,12 +58,12 @@ defmodule Robotica.Scheduler.Schedule do
     end
   end
 
-  def check_block(block, classifications_today, classifications_tomorrow) do
+  defp check_block(block, classifications_today, classifications_tomorrow) do
     check_block_date(classifications_today, block.today) and
       check_block_date(classifications_tomorrow, block.tomorrow)
   end
 
-  def transform_sequence(seq_name, seq_options, date, classifications) do
+  defp transform_sequence(seq_name, seq_options, date) do
     options = MapSet.new(seq_options.options || [])
     datetime = convert_time_to_utc(date, seq_options.time)
 
@@ -51,32 +72,36 @@ defmodule Robotica.Scheduler.Schedule do
       | time: datetime,
         options: options
     }
-    |> Map.put(:classifications, classifications)
     |> Map.put(:name, seq_name)
   end
 
-  def get_schedule(date) do
-    classifications_today = Classifier.classify_date(date)
-    classifications_tomorrow = Classifier.classify_date(Date.add(date, 1))
+  @spec get_schedule(today :: ClassifiedDate.t(), tomorrow :: ClassifiedDate.t()) :: Schedule.t()
 
-    get_data()
-    |> Enum.filter(fn block ->
-      check_block(block, classifications_today, classifications_tomorrow)
-    end)
-    |> Enum.reduce(%{}, fn block, map -> Map.merge(map, block.sequences) end)
-    |> Enum.map(fn {seq_name, seq_options} ->
-      transform_sequence(seq_name, seq_options, date, classifications_today)
-    end)
-    |> Enum.reduce(%{}, fn values, acc ->
-      datetime = values.time
-      name = values.name
-      classifications = values.classifications
-      options = values.options
+  def get_schedule(c_today, c_tomorrow) do
+    schedule =
+      get_data()
+      |> Enum.filter(fn block ->
+        check_block(block, c_today.classifications, c_tomorrow.classifications)
+      end)
+      |> Enum.reduce(%{}, fn block, map -> Map.merge(map, block.sequences) end)
+      |> Enum.map(fn {seq_name, seq_options} ->
+        transform_sequence(seq_name, seq_options, c_today.date)
+      end)
+      |> Enum.reduce(%{}, fn values, acc ->
+        datetime = values.time
+        name = values.name
+        options = values.options
 
-      action = {name, classifications, options}
-      Map.update(acc, datetime, [action], &[action | &1])
-    end)
-    |> Map.to_list()
-    |> Enum.sort(fn x, y -> DateTime.compare(elem(x, 0), elem(y, 0)) == :lt end)
+        action = {name, options}
+        Map.update(acc, datetime, [action], &[action | &1])
+      end)
+      |> Map.to_list()
+      |> Enum.sort(fn x, y -> DateTime.compare(elem(x, 0), elem(y, 0)) == :lt end)
+
+    %Schedule{
+      today: c_today,
+      tomorrow: c_tomorrow,
+      schedule: schedule
+    }
   end
 end

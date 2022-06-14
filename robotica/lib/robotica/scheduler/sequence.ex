@@ -5,6 +5,7 @@ defmodule Robotica.Scheduler.Sequence do
   require Logger
 
   alias Robotica.Config.Loader
+  alias Robotica.Scheduler.Schedule.Schedule
 
   if Application.compile_env(:robotica_common, :compile_config_files) do
     @filename Application.compile_env(:robotica, :sequences_file)
@@ -52,10 +53,10 @@ defmodule Robotica.Scheduler.Sequence do
     end)
   end
 
-  defp get_sequence(sequence_name, classifications, options) do
+  defp get_sequence(sequence_name, c_today, _c_tomorrow, options) do
     Map.fetch!(get_data(), sequence_name)
     |> add_id_to_steps(sequence_name, 0)
-    |> filter_classifications(classifications)
+    |> filter_classifications(c_today)
     |> filter_options(options)
   end
 
@@ -132,9 +133,9 @@ defmodule Robotica.Scheduler.Sequence do
     end
   end
 
-  defp expand_sequence(start_time, {sequence_name, classifications, options}) do
+  defp expand_sequence(start_time, {sequence_name, options}, c_today, c_tomorrow) do
     Logger.debug("Loading sequence #{inspect(sequence_name)} for #{inspect(start_time)}.")
-    sequence = get_sequence(sequence_name, classifications, options)
+    sequence = get_sequence(sequence_name, c_today, c_tomorrow, options)
     start_time = get_corrected_start_time(start_time, sequence)
 
     Logger.debug(
@@ -147,16 +148,22 @@ defmodule Robotica.Scheduler.Sequence do
     |> schedule_steps(start_time)
   end
 
-  defp expand_sequences(start_time, sequence_details) do
+  defp expand_sequences(start_time, sequence_details, c_today, c_tomorrow) do
     Enum.map(sequence_details, fn sequence_detail ->
-      expand_sequence(start_time, sequence_detail)
+      expand_sequence(start_time, sequence_detail, c_today, c_tomorrow)
     end)
     |> List.flatten()
   end
 
+  @spec expand_schedule(Schedule.t()) :: list(any())
   def expand_schedule(schedule) do
-    Enum.map(schedule, fn {start_time, sequence_details} ->
-      expand_sequences(start_time, sequence_details)
+    Enum.map(schedule.schedule, fn {start_time, sequence_details} ->
+      expand_sequences(
+        start_time,
+        sequence_details,
+        schedule.today.classifications,
+        schedule.tomorrow.classifications
+      )
     end)
     |> List.flatten()
   end

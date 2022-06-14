@@ -1,6 +1,8 @@
 defmodule Robotica.Scheduler.Sequence.Test do
   use ExUnit.Case, async: true
 
+  alias Robotica.Scheduler.Classifier.ClassifiedDate
+  alias Robotica.Scheduler.Schedule.Schedule
   import Robotica.Scheduler.Sequence
 
   def local_datetime(dt) do
@@ -18,9 +20,19 @@ defmodule Robotica.Scheduler.Sequence.Test do
   end
 
   test "expand_schedule" do
-    schedule = [
-      {local_datetime(~N[2018-12-25 05:00:00]), [{"open_presents", MapSet.new(), MapSet.new()}]}
-    ]
+    schedule = %Schedule{
+      today: %ClassifiedDate{
+        date: ~D[2018-12-25],
+        classifications: MapSet.new()
+      },
+      tomorrow: %ClassifiedDate{
+        date: ~D[2018-12-26],
+        classifications: MapSet.new()
+      },
+      schedule: [
+        {local_datetime(~N[2018-12-25 05:00:00]), [{"open_presents", MapSet.new()}]}
+      ]
+    }
 
     schedule_with_steps = expand_schedule(schedule)
 
