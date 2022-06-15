@@ -27,6 +27,5 @@ for i in robotica_face; do
         echo "----- $i -----"
         cd $i
         npm install --prefix assets
-        mix prettier
     )
 done

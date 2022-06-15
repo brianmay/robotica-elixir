@@ -6,7 +6,7 @@ on:
 
 jobs:
   robotica_common:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@c8e75f9a7e2cbad8d294ddbe829b1457ae0568aa
     with:
       build_npm_assets: false
       directory: "robotica_common"
@@ -14,7 +14,7 @@ jobs:
       plts_cache_postfix: "-2"
 
   robotica:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@c8e75f9a7e2cbad8d294ddbe829b1457ae0568aa
     with:
       build_npm_assets: false
       directory: "robotica"
@@ -22,7 +22,7 @@ jobs:
       plts_cache_postfix: "-3"
 
 #  robotica_ui:
-#    uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
+#    uses: brianmay/workflows/.github/workflows/elixir.yaml@c8e75f9a7e2cbad8d294ddbe829b1457ae0568aa
 #    with:
 #      build_npm_assets: false
 #      directory: "robotica_ui"
@@ -30,7 +30,7 @@ jobs:
 #      plts_cache_postfix: "-2"
 
   robotica_face:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@c8e75f9a7e2cbad8d294ddbe829b1457ae0568aa
     with:
       build_npm_assets: true
       directory: "robotica_face"
@@ -38,7 +38,7 @@ jobs:
       plts_cache_postfix: "-2"
 
   robotica_docker:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
+    uses: brianmay/workflows/.github/workflows/elixir.yaml@c8e75f9a7e2cbad8d294ddbe829b1457ae0568aa
     with:
       build_npm_assets: false
       directory: "robotica_docker"
@@ -47,7 +47,7 @@ jobs:
 
   push:
     name: Push
-    uses: brianmay/workflows/.github/workflows/docker.yaml@816bc3cdbc1e381ff95dc5f4dd7cd32062290791
+    uses: brianmay/workflows/.github/workflows/docker.yaml@c8e75f9a7e2cbad8d294ddbe829b1457ae0568aa
     secrets:
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
     needs:

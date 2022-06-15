@@ -66,8 +66,7 @@ defmodule RoboticaFace.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      test: ["test --no-start"],
-      prettier: "cmd ./assets/node_modules/.bin/prettier --check . --color"
+      test: ["test --no-start"]
     ]
   end
 
