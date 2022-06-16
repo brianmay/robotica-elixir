@@ -20,7 +20,7 @@ config :robotica_common,
 config :lifx,
   tcp_server: false,
   tcp_port: 8800,
-  multicast: {192, 168, 5, 255},
+  multicast: {192, 168, 16, 255},
   #  Don't make this too small or the poller task will fall behind.
   dead_time: 55 * 1000,
   poll_discover_time: 10 * 1000,
@@ -31,7 +31,7 @@ config :lifx,
   udp: Lifx.Udp
 
 config :tp_link_hs100,
-  multicast: "192.168.5.255",
+  multicast: "192.168.16.255",
   dead_time: 35 * 1000,
   poll_discover_time: 10 * 1000,
   wait_time: 1 * 1000
