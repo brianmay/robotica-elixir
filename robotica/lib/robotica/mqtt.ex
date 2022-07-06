@@ -6,6 +6,10 @@ defmodule Robotica.Mqtt do
 
   require Logger
 
+  alias Robotica.Types.CommandTask
+  alias Robotica.Types.ScheduledStep
+  alias Robotica.Types.Task
+
   @spec get_tortoise_client_id() :: String.t()
   def get_tortoise_client_id do
     {:ok, hostname} = :inet.gethostname()
@@ -35,8 +39,8 @@ defmodule Robotica.Mqtt do
     end
   end
 
-  @spec publish_command_task(RoboticaCommon.CommandTask.t()) :: :ok
-  def publish_command_task(%RoboticaCommon.CommandTask{} = task) do
+  @spec publish_command_task(CommandTask.t()) :: :ok
+  def publish_command_task(%Robotica.Types.CommandTask{} = task) do
     topic = "action/#{task.location}/#{task.device}"
     publish_json(topic, task.command)
   end
@@ -66,9 +70,9 @@ defmodule Robotica.Mqtt do
     end
   end
 
-  @spec publish_schedule(list(RoboticaCommon.ScheduledStep.t())) :: :ok
+  @spec publish_schedule(list(ScheduledStep.t())) :: :ok
   def publish_schedule(steps) do
-    host = RoboticaCommon.Config.hostname()
+    host = Robotica.CommonConfig.hostname()
     topic = "schedule/#{host}"
     publish_json(topic, steps, retain: true)
   end
@@ -86,7 +90,7 @@ defmodule Robotica.Mqtt do
     publish_json(topic, action)
   end
 
-  @spec publish_execute(RoboticaCommon.Task.t()) :: :ok
+  @spec publish_execute(Task.t()) :: :ok
   def publish_execute(task) do
     topic = "execute"
     publish_json(topic, task)

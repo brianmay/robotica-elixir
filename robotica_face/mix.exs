@@ -49,6 +49,7 @@ defmodule RoboticaFace.MixProject do
       {:ranch, "~> 2.0", override: true},
       {:timex, "~> 3.6"},
       {:robotica_common, path: "../robotica_common"},
+      {:robotica, path: "../robotica"},
       {:cowlib, "~> 2.11", override: true},
       {:gun, "~> 1.3", override: true},
       {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},

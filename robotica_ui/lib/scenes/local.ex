@@ -8,7 +8,7 @@ defmodule RoboticaUi.Scene.Local do
   alias Scenic.ViewPort
   import Scenic.Primitives
 
-  alias RoboticaCommon.Config
+  alias Robotica.CommonConfig
   alias RoboticaUi.Layout
   import RoboticaUi.Scene.Utils
   alias RoboticaUi.Components.Nav
@@ -26,8 +26,8 @@ defmodule RoboticaUi.Scene.Local do
     {:ok, %ViewPort.Status{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
 
     graph = @graph
-    location = Config.ui_default_location()
-    buttons = Config.ui_local_buttons(location)
+    location = CommonConfig.ui_default_location()
+    buttons = CommonConfig.ui_local_buttons(location)
 
     graph = Layout.add_background(graph, vp_width, vp_height)
 
@@ -76,15 +76,15 @@ defmodule RoboticaUi.Scene.Local do
     buttons =
       Enum.reduce(buttons, %{}, fn row, buttons ->
         Enum.reduce(row.buttons, buttons, fn button, buttons ->
-          RoboticaCommon.Buttons.subscribe_topics(button)
+          Robotica.Buttons.subscribe_topics(button)
           Map.put(buttons, button.id, button)
         end)
       end)
 
     button_states =
       Enum.reduce(buttons, %{}, fn {id, button}, button_states ->
-        RoboticaCommon.Buttons.subscribe_topics(button)
-        Map.put(button_states, id, RoboticaCommon.Buttons.get_initial_state(button))
+        Robotica.Buttons.subscribe_topics(button)
+        Map.put(button_states, id, Robotica.Buttons.get_initial_state(button))
       end)
 
     graph = Nav.add_to_graph(graph, :local)
@@ -103,11 +103,11 @@ defmodule RoboticaUi.Scene.Local do
         button ->
           button_state = Map.get(state.button_states, button_id)
 
-          button_state = RoboticaCommon.Buttons.process_message(button, label, data, button_state)
+          button_state = Robotica.Buttons.process_message(button, label, data, button_state)
 
           button_states = Map.put(state.button_states, button_id, button_state)
 
-          display_state = RoboticaCommon.Buttons.get_display_state(button, button_state)
+          display_state = Robotica.Buttons.get_display_state(button, button_state)
 
           controls = [:state_on, :state_off, :state_hard_off, :state_error, nil]
 
@@ -156,7 +156,7 @@ defmodule RoboticaUi.Scene.Local do
 
       button ->
         button_state = Map.get(state.button_states, button_id)
-        RoboticaCommon.Buttons.execute_press_commands(button, button_state)
+        Robotica.Buttons.execute_press_commands(button, button_state)
     end
 
     state

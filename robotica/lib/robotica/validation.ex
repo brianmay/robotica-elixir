@@ -3,7 +3,7 @@ defmodule Robotica.Validation do
   Robotica specific json validation stuff
   """
 
-  alias RoboticaCommon.Schema
+  alias Robotica.Schema
   alias RoboticaCommon.Validation
 
   defp module_to_schema(module), do: {:ok, module.config_schema()}

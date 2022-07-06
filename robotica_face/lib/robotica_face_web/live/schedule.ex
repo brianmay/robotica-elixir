@@ -5,7 +5,9 @@ defmodule RoboticaFaceWeb.Live.Schedule do
 
   require Logger
 
-  alias RoboticaCommon.Schema
+  alias Robotica.CommonConfig
+  alias Robotica.Schema
+  alias Robotica.Types.ScheduledStep
 
   def render(assigns) do
     ~H"""
@@ -46,7 +48,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
   end
 
   def mount(_params, _session, socket) do
-    schedule_host = RoboticaCommon.Config.ui_schedule_hostname()
+    schedule_host = CommonConfig.ui_schedule_hostname()
 
     RoboticaCommon.EventBus.notify(:subscribe, %{
       topic: ["schedule", schedule_host],
@@ -84,7 +86,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
   end
 
   defp get_step_message(step) do
-    RoboticaCommon.ScheduledStep.step_to_text(step, include_locations: true)
+    ScheduledStep.step_to_text(step, include_locations: true)
   end
 
   defp head_or_nil([]), do: nil
@@ -99,7 +101,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
   end
 
   defp do_mark(task, status) do
-    RoboticaCommon.Mark.mark_task(task, status)
+    Robotica.Mark.mark_task(task, status)
   end
 
   def handle_event("mark", %{"mark" => status, "step_time" => step_time, "step_id" => id}, socket) do

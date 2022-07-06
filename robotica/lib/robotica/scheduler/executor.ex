@@ -10,6 +10,8 @@ defmodule Robotica.Scheduler.Executor do
   alias Robotica.Scheduler.Marks
   alias Robotica.Scheduler.Schedule
   alias Robotica.Scheduler.Sequence
+  alias Robotica.Types.ScheduledStep
+  alias Robotica.Types.Task
 
   @timezone Application.compile_env(:robotica, :timezone)
 
@@ -26,8 +28,8 @@ defmodule Robotica.Scheduler.Executor do
   end
 
   @spec publish_steps(
-          list(RoboticaCommon.ScheduledStep.t()),
-          list(RoboticaCommon.ScheduledStep.t())
+          list(ScheduledStep.t()),
+          list(ScheduledStep.t())
         ) :: nil
 
   defp publish_steps(steps, steps), do: nil
@@ -107,7 +109,7 @@ defmodule Robotica.Scheduler.Executor do
     list ++ get_expanded_steps_for_date(date)
   end
 
-  defp add_mark_to_step(%RoboticaCommon.ScheduledStep{} = step) do
+  defp add_mark_to_step(%ScheduledStep{} = step) do
     required_time = step.required_time
     mark = Marks.get_mark(Robotica.Scheduler.Marks, step.id)
 
@@ -128,12 +130,12 @@ defmodule Robotica.Scheduler.Executor do
     end)
   end
 
-  @spec execute_tasks(list(RoboticaCommon.Task.t())) :: :ok
+  @spec execute_tasks(list(Task.t())) :: :ok
   defp execute_tasks(tasks) do
     :ok = Robotica.Executor.execute_tasks(tasks, remote: false)
   end
 
-  defp do_step(%RoboticaCommon.ScheduledStep{id: id, mark: mark, tasks: tasks}) do
+  defp do_step(%ScheduledStep{id: id, mark: mark, tasks: tasks}) do
     cond do
       is_nil(mark) ->
         Logger.info("Executing step #{id}.")

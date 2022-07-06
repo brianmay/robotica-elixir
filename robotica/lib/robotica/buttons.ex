@@ -1,4 +1,4 @@
-defmodule RoboticaCommon.Buttons do
+defmodule Robotica.Buttons do
   @moduledoc """
   Functions to determine button state
   """
@@ -36,13 +36,13 @@ defmodule RoboticaCommon.Buttons do
 
   @callback process_message(Config.t(), atom(), any(), state) :: state
   @callback get_display_state(Config.t(), state) :: display_state
-  @callback get_press_commands(Config.t(), state) :: list(RoboticaCommon.CommandTask.t())
+  @callback get_press_commands(Config.t(), state) :: list(Robotica.Types.CommandTask.t())
 
   @spec get_button_controller(Config.t()) :: module()
-  def get_button_controller(%Config{type: "light"}), do: RoboticaCommon.Buttons.Light
-  def get_button_controller(%Config{type: "music"}), do: RoboticaCommon.Buttons.Music
-  def get_button_controller(%Config{type: "hdmi"}), do: RoboticaCommon.Buttons.HDMI
-  def get_button_controller(%Config{type: "switch"}), do: RoboticaCommon.Buttons.Switch
+  def get_button_controller(%Config{type: "light"}), do: Robotica.Buttons.Light
+  def get_button_controller(%Config{type: "music"}), do: Robotica.Buttons.Music
+  def get_button_controller(%Config{type: "hdmi"}), do: Robotica.Buttons.HDMI
+  def get_button_controller(%Config{type: "switch"}), do: Robotica.Buttons.Switch
 
   @spec get_initial_state(Config.t()) :: state
   def get_initial_state(%Config{} = config) do
@@ -68,7 +68,7 @@ defmodule RoboticaCommon.Buttons do
     controller.get_display_state(config, state)
   end
 
-  @spec get_press_commands(Config.t(), state) :: list(RoboticaCommon.CommandTask.t())
+  @spec get_press_commands(Config.t(), state) :: list(Robotica.Types.CommandTask.t())
   def get_press_commands(%Config{} = config, state) do
     controller = get_button_controller(config)
     controller.get_press_commands(config, state)

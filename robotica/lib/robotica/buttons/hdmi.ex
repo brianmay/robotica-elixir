@@ -1,12 +1,12 @@
-defmodule RoboticaCommon.Buttons.HDMI do
+defmodule Robotica.Buttons.HDMI do
   @moduledoc """
   HDMI Buttons
   """
   use RoboticaCommon.EventBus
-  @behaviour RoboticaCommon.Buttons
+  @behaviour Robotica.Buttons
 
-  alias RoboticaCommon.Buttons
-  alias RoboticaCommon.Buttons.Config
+  alias Robotica.Buttons
+  alias Robotica.Buttons.Config
 
   @spec get_topic_for_output(integer()) :: String.t()
   defp get_topic_for_output(n), do: "output#{n}"
@@ -42,10 +42,10 @@ defmodule RoboticaCommon.Buttons.HDMI do
   def get_display_state(%Config{action: "switch", params: %{"input" => n}}, n), do: :state_on
   def get_display_state(%Config{action: _}, _), do: :state_off
 
-  @spec switch(Config.t()) :: list(RoboticaCommon.CommandTask.t())
+  @spec switch(Config.t()) :: list(Robotica.Types.CommandTask.t())
   defp switch(%Config{} = config) do
     [
-      %RoboticaCommon.CommandTask{
+      %Robotica.Types.CommandTask{
         location: config.location,
         device: config.device,
         command: %{
@@ -56,6 +56,6 @@ defmodule RoboticaCommon.Buttons.HDMI do
     ]
   end
 
-  @spec get_press_commands(Config.t(), state) :: list(RoboticaCommon.CommandTask.t())
+  @spec get_press_commands(Config.t(), state) :: list(Robotica.Types.CommandTask.t())
   def get_press_commands(%Config{action: "switch"} = config, _state), do: switch(config)
 end

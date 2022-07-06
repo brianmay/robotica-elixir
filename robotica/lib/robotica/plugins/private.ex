@@ -17,7 +17,7 @@ defmodule Robotica.Plugins.Private do
 
   @spec publish_command(String.t(), String.t(), map()) :: :ok
   def publish_command(location, device, command) do
-    task = %RoboticaCommon.CommandTask{location: location, device: device, command: command}
+    task = %Robotica.Types.CommandTask{location: location, device: device, command: command}
     :ok = Robotica.Mqtt.publish_command_task(task)
   end
 

@@ -78,36 +78,36 @@ defmodule Robotica.Scheduler.Sequence.Test do
 
   test "sort_schedule" do
     schedule = [
-      %RoboticaCommon.ScheduledStep{
+      %Robotica.Types.ScheduledStep{
         required_time: local_datetime(~N[2018-12-25 04:35:00]),
         latest_time: local_datetime(~N[2018-12-25 04:40:00]),
         id: "1",
         tasks: [
-          %RoboticaCommon.Task{
+          %Robotica.Types.Task{
             locations: ["here"],
             devices: ["here"],
             command: %{}
           }
         ]
       },
-      %RoboticaCommon.ScheduledStep{
+      %Robotica.Types.ScheduledStep{
         required_time: local_datetime(~N[2018-12-25 03:35:00]),
         latest_time: local_datetime(~N[2018-12-25 03:40:00]),
         id: "2",
         tasks: [
-          %RoboticaCommon.Task{
+          %Robotica.Types.Task{
             locations: ["here"],
             devices: ["here"],
             command: %{}
           }
         ]
       },
-      %RoboticaCommon.ScheduledStep{
+      %Robotica.Types.ScheduledStep{
         required_time: local_datetime(~N[2018-12-25 06:35:00]),
         latest_time: local_datetime(~N[2018-12-25 06:40:00]),
         id: "3",
         tasks: [
-          %RoboticaCommon.Task{
+          %Robotica.Types.Task{
             locations: ["here"],
             devices: ["here"],
             command: %{}

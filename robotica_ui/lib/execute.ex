@@ -7,7 +7,7 @@ defmodule RoboticaUi.Execute do
   use RoboticaCommon.EventBus
   require Logger
 
-  alias RoboticaCommon.Config
+  alias Robotica.CommonConfig
 
   defmodule State do
     @moduledoc false
@@ -22,7 +22,7 @@ defmodule RoboticaUi.Execute do
   end
 
   def init(_opts) do
-    local_location = Config.ui_default_location()
+    local_location = CommonConfig.ui_default_location()
 
     RoboticaCommon.EventBus.notify(:subscribe, %{
       topic: ["action", local_location, "Robotica"],

@@ -1,4 +1,4 @@
-defmodule RoboticaCommon.Schema do
+defmodule Robotica.Schema do
   @moduledoc """
   Common json schemas
   """
@@ -119,7 +119,7 @@ defmodule RoboticaCommon.Schema do
 
   def task_schema do
     %{
-      struct_type: RoboticaCommon.Task,
+      struct_type: Robotica.Types.Task,
       command: {{:map, :string, :any}, true},
       locations: {{:list, :string}, true},
       devices: {{:list, :string}, true}
@@ -128,7 +128,7 @@ defmodule RoboticaCommon.Schema do
 
   def command_task_schema do
     %{
-      struct_type: RoboticaCommon.CommandTask,
+      struct_type: Robotica.Types.CommandTask,
       command: {{:map, :string, :any}, true},
       location: {:string, true},
       device: {:string, true}
@@ -137,7 +137,7 @@ defmodule RoboticaCommon.Schema do
 
   def mark_schema do
     %{
-      struct_type: RoboticaCommon.Mark,
+      struct_type: Robotica.Types.Mark,
       id: {:string, true},
       status: {:mark_status, true},
       start_time: {:date_time, true},
@@ -147,7 +147,7 @@ defmodule RoboticaCommon.Schema do
 
   def source_step_schema do
     %{
-      struct_type: RoboticaCommon.SourceStep,
+      struct_type: Robotica.Types.SourceStep,
       if: {{:list, :string}, false},
       zero_time: {{:boolean, false}, false},
       required_time: {:delta, true},
@@ -162,7 +162,7 @@ defmodule RoboticaCommon.Schema do
 
   def scheduled_step_schema do
     %{
-      struct_type: RoboticaCommon.ScheduledStep,
+      struct_type: Robotica.Types.ScheduledStep,
       required_time: {:date_time, true},
       latest_time: {:date_time, true},
       tasks: {{:list, task_schema()}, true},

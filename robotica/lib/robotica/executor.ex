@@ -9,6 +9,9 @@ defmodule Robotica.Executor do
   use GenServer
   use EventBus.EventSource
 
+  alias Robotica.Types.CommandTask
+  alias Robotica.Types.Task
+
   defmodule State do
     @moduledoc false
     @type t :: %__MODULE__{}
@@ -22,12 +25,12 @@ defmodule Robotica.Executor do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  @spec execute_tasks(tasks :: list(RoboticaCommon.Task.t()), opts :: keyword()) :: :ok
+  @spec execute_tasks(tasks :: list(Task.t()), opts :: keyword()) :: :ok
   def execute_tasks(tasks, opts \\ []) do
     Enum.each(tasks, fn scheduled_task ->
       Enum.each(scheduled_task.locations, fn location ->
         Enum.each(scheduled_task.devices, fn device ->
-          command = %RoboticaCommon.CommandTask{
+          command = %CommandTask{
             location: location,
             device: device,
             command: scheduled_task.command
@@ -54,7 +57,7 @@ defmodule Robotica.Executor do
     {:ok, %State{}}
   end
 
-  @spec handle_execute_tasks(tasks :: list(RoboticaCommon.Task.t())) :: :ok
+  @spec handle_execute_tasks(tasks :: list(Task.t())) :: :ok
   defp handle_execute_tasks(tasks) do
     :ok = execute_tasks(tasks, remote: false)
   end
