@@ -6,7 +6,9 @@ defmodule RoboticaUi.Components.Step do
   alias Scenic.Graph
   import Scenic.Primitives
 
-  def verify(%RoboticaCommon.ScheduledStep{} = step), do: {:ok, step}
+  alias Robotica.Types.ScheduledStep
+
+  def verify(%ScheduledStep{} = step), do: {:ok, step}
   def verify(_), do: :invalid_data
 
   @timezone Application.compile_env(:robotica_common, :timezone)
@@ -35,7 +37,7 @@ defmodule RoboticaUi.Components.Step do
       end
 
     text =
-      RoboticaCommon.ScheduledStep.step_to_text(step)
+      ScheduledStep.step_to_text(step)
       |> Enum.join(", ")
 
     @graph

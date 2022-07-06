@@ -8,8 +8,8 @@ defmodule RoboticaUi.Scene.Schedule do
   alias Scenic.ViewPort
   import Scenic.Primitives
 
-  alias RoboticaCommon.Config
-  alias RoboticaCommon.Schema
+  alias Robotica.CommonConfig
+  alias Robotica.Schema
   alias RoboticaUi.Components.Marks
   alias RoboticaUi.Components.Nav
   alias RoboticaUi.Components.Step
@@ -22,7 +22,7 @@ defmodule RoboticaUi.Scene.Schedule do
 
   # --------------------------------------------------------
   def init(_, opts) do
-    schedule_host = Config.ui_schedule_hostname()
+    schedule_host = CommonConfig.ui_schedule_hostname()
 
     RoboticaCommon.EventBus.notify(:subscribe, %{
       topic: ["schedule", schedule_host],
@@ -57,7 +57,7 @@ defmodule RoboticaUi.Scene.Schedule do
   end
 
   defp update_schedule(graph, steps, width) do
-    local_location = Config.ui_default_location()
+    local_location = CommonConfig.ui_default_location()
 
     steps =
       steps
@@ -71,7 +71,7 @@ defmodule RoboticaUi.Scene.Schedule do
             %{task | locations: [local_location]}
           end)
 
-        %RoboticaCommon.ScheduledStep{step | tasks: tasks}
+        %Robotica.Types.ScheduledStep{step | tasks: tasks}
       end)
       |> Enum.reject(fn step -> Enum.empty?(step.tasks) end)
       |> Enum.take(20)

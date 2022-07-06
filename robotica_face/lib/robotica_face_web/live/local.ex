@@ -3,7 +3,7 @@ defmodule RoboticaFaceWeb.Live.Local do
   use RoboticaFaceWeb, :live_view
   use RoboticaCommon.EventBus
 
-  alias RoboticaCommon.Config
+  alias Robotica.CommonConfig
 
   require Logger
 
@@ -14,7 +14,7 @@ defmodule RoboticaFaceWeb.Live.Local do
 
     <form phx-change="location">
     <select name="location">
-    <option value="">Default (<%= Config.ui_default_location() %>)</option>
+    <option value="">Default (<%= CommonConfig.ui_default_location() %>)</option>
     <%= for location <- @locations do %>
     <% selected = if location == @set_location, do: True, else: nil %>
     <option value={location} selected={selected}><%= location %></option>
@@ -37,7 +37,7 @@ defmodule RoboticaFaceWeb.Live.Local do
   @spec mount(any, nil | maybe_improper_list | map, Phoenix.LiveView.Socket.t()) ::
           {:ok, Phoenix.LiveView.Socket.t()}
   def mount(_params, _session, socket) do
-    locations = Config.ui_locations()
+    locations = CommonConfig.ui_locations()
 
     socket =
       socket
@@ -53,7 +53,7 @@ defmodule RoboticaFaceWeb.Live.Local do
 
     location =
       case set_location do
-        nil -> Config.ui_default_location()
+        nil -> CommonConfig.ui_default_location()
         location -> location
       end
 
@@ -76,7 +76,7 @@ defmodule RoboticaFaceWeb.Live.Local do
         button ->
           button_state = get_button_state(socket.assigns.button_states, button_id)
 
-          button_state = RoboticaCommon.Buttons.process_message(button, label, data, button_state)
+          button_state = Robotica.Buttons.process_message(button, label, data, button_state)
 
           button_states = Map.put(socket.assigns.button_states, button_id, button_state)
           assign(socket, :button_states, button_states)
@@ -103,7 +103,7 @@ defmodule RoboticaFaceWeb.Live.Local do
 
       button ->
         button_state = get_button_state(socket.assigns.button_states, button_id)
-        RoboticaCommon.Buttons.execute_press_commands(button, button_state)
+        Robotica.Buttons.execute_press_commands(button, button_state)
     end
 
     {:noreply, socket}
@@ -130,7 +130,7 @@ defmodule RoboticaFaceWeb.Live.Local do
     Map.get(button_states, id)
   end
 
-  @spec display_state_to_class(RoboticaCommon.Buttons.display_state()) :: String.t()
+  @spec display_state_to_class(Robotica.Buttons.display_state()) :: String.t()
   defp display_state_to_class(:state_on), do: "btn-success"
   defp display_state_to_class(:state_off), do: "btn-primary"
   defp display_state_to_class(:state_hard_off), do: "btn-light"
@@ -138,25 +138,25 @@ defmodule RoboticaFaceWeb.Live.Local do
   defp display_state_to_class(nil), do: "btn-secondary"
 
   defp button_state_to_class(button_state, button) do
-    RoboticaCommon.Buttons.get_display_state(button, button_state) |> display_state_to_class()
+    Robotica.Buttons.get_display_state(button, button_state) |> display_state_to_class()
   end
 
   defp set_location(socket, location) do
-    locations = Config.ui_locations()
+    locations = CommonConfig.ui_locations()
 
     buttons =
       case Enum.member?(locations, location) do
-        true -> Config.ui_local_buttons(location)
+        true -> CommonConfig.ui_local_buttons(location)
         false -> []
       end
 
-    RoboticaCommon.Buttons.unsubscribe_all()
+    Robotica.Buttons.unsubscribe_all()
 
     button_states =
       Enum.reduce(buttons, %{}, fn row, button_states ->
         Enum.reduce(row.buttons, button_states, fn button, button_states ->
-          RoboticaCommon.Buttons.subscribe_topics(button)
-          Map.put(button_states, button.id, RoboticaCommon.Buttons.get_initial_state(button))
+          Robotica.Buttons.subscribe_topics(button)
+          Map.put(button_states, button.id, Robotica.Buttons.get_initial_state(button))
         end)
       end)
 

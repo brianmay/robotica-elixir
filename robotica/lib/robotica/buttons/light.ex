@@ -1,12 +1,12 @@
-defmodule RoboticaCommon.Buttons.Light do
+defmodule Robotica.Buttons.Light do
   @moduledoc """
   LIFX Buttons
   """
   use RoboticaCommon.EventBus
-  @behaviour RoboticaCommon.Buttons
+  @behaviour Robotica.Buttons
 
-  alias RoboticaCommon.Buttons
-  alias RoboticaCommon.Buttons.Config
+  alias Robotica.Buttons
+  alias Robotica.Buttons.Config
 
   @type state :: {String.t() | nil, list(String.t()) | nil, list(integer) | nil}
 
@@ -109,10 +109,10 @@ defmodule RoboticaCommon.Buttons.Light do
     end
   end
 
-  @spec turn_on(Config.t()) :: list(RoboticaCommon.CommandTask.t())
+  @spec turn_on(Config.t()) :: list(Robotica.Types.CommandTask.t())
   defp turn_on(%Config{} = config) do
     [
-      %RoboticaCommon.CommandTask{
+      %Robotica.Types.CommandTask{
         location: config.location,
         device: config.device,
         command: %{
@@ -123,10 +123,10 @@ defmodule RoboticaCommon.Buttons.Light do
     ]
   end
 
-  @spec turn_off(Config.t()) :: list(RoboticaCommon.CommandTask.t())
+  @spec turn_off(Config.t()) :: list(Robotica.Types.CommandTask.t())
   defp turn_off(%Config{} = config) do
     [
-      %RoboticaCommon.CommandTask{
+      %Robotica.Types.CommandTask{
         location: config.location,
         device: config.device,
         command: %{
@@ -138,7 +138,7 @@ defmodule RoboticaCommon.Buttons.Light do
     ]
   end
 
-  @spec get_press_commands(Config.t(), state) :: list(RoboticaCommon.CommandTask.t())
+  @spec get_press_commands(Config.t(), state) :: list(Robotica.Types.CommandTask.t())
   def get_press_commands(%Config{action: "turn_on"} = config, _state), do: turn_on(config)
   def get_press_commands(%Config{action: "turn_off"} = config, _state), do: turn_off(config)
 

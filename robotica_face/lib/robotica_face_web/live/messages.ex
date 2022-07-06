@@ -3,7 +3,7 @@ defmodule RoboticaFaceWeb.Live.Messages do
   use Phoenix.LiveView
   use RoboticaCommon.EventBus
 
-  alias RoboticaCommon.Config
+  alias Robotica.CommonConfig
 
   def render(assigns) do
     ~H"""
@@ -20,7 +20,7 @@ defmodule RoboticaFaceWeb.Live.Messages do
       socket
       |> assign(:text, nil)
       |> assign(:timer, nil)
-      |> set_location(Config.ui_default_location())
+      |> set_location(CommonConfig.ui_default_location())
 
     {:ok, socket}
   end
@@ -64,7 +64,7 @@ defmodule RoboticaFaceWeb.Live.Messages do
   end
 
   defp set_location(socket, location) do
-    locations = Config.ui_locations()
+    locations = CommonConfig.ui_locations()
 
     location =
       case Enum.member?(locations, location) do

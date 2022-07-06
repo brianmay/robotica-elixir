@@ -9,6 +9,7 @@ defmodule Robotica.Plugins.Audio do
   require Logger
 
   import Robotica.Types
+  alias Robotica.Types.Task
   alias RoboticaCommon.Strings
 
   defmodule Commands do
@@ -432,7 +433,7 @@ defmodule Robotica.Plugins.Audio do
     {:noreply, state}
   end
 
-  @spec execute_tasks(tasks :: list(RoboticaCommon.Task.t()) | nil) :: :ok
+  @spec execute_tasks(tasks :: list(Task.t()) | nil) :: :ok
   def execute_tasks(nil), do: :ok
   def execute_tasks(tasks), do: Robotica.Executor.execute_tasks(tasks, remote: false)
 end

@@ -30,6 +30,7 @@ defmodule RoboticaUi.MixProject do
       {:scenic, "~> 0.10"},
       {:timex, "~> 3.6"},
       {:robotica_common, path: "../robotica_common"},
+      {:robotica, path: "../robotica"},
       {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ] ++ deps(@target)

@@ -1,4 +1,4 @@
-defmodule RoboticaCommon.Config do
+defmodule Robotica.CommonConfig do
   @moduledoc """
   Common config functions
   """
@@ -12,7 +12,7 @@ defmodule RoboticaCommon.Config do
 
     defp button do
       %{
-        struct_type: RoboticaCommon.Buttons.Config,
+        struct_type: Robotica.Buttons.Config,
         name: {:string, true},
         id: {:string, false},
         location: {:string, false},
@@ -108,7 +108,7 @@ defmodule RoboticaCommon.Config do
   defp update_row(row, location) do
     buttons =
       Enum.map(row.buttons, fn
-        %RoboticaCommon.Buttons.Config{} = config ->
+        %Robotica.Buttons.Config{} = config ->
           config
           |> update_if_nil(:location, fn -> location end)
           |> update_if_nil(:id, fn -> Base62.unique_id() end)

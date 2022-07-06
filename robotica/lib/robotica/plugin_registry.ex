@@ -35,8 +35,8 @@ defmodule Robotica.PluginRegistry do
     end
   end
 
-  @spec execute_command_task(task :: RoboticaCommon.CommandTask.t(), opts :: keyword()) :: :ok
-  def execute_command_task(%RoboticaCommon.CommandTask{} = task, opts \\ []) do
+  @spec execute_command_task(task :: Robotica.Types.CommandTask.t(), opts :: keyword()) :: :ok
+  def execute_command_task(%Robotica.Types.CommandTask{} = task, opts \\ []) do
     case Robotica.PluginRegistry.lookup_single(task.location, task.device) do
       nil ->
         if Keyword.get(opts, :remote, false) do
