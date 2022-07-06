@@ -9,7 +9,8 @@
       "presents":
         time: "08:00:00"
 
-  - today: ["boxing"]
+  - if:
+    - "'boxing' in today"
     sequences:
       "wake_up":
         time: "12:30:00"

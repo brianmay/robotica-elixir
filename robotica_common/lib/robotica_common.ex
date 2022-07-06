@@ -149,6 +149,7 @@ defmodule RoboticaCommon do
             repeat_time: integer | nil,
             repeat_count: integer,
             repeat_number: integer | nil,
+            if: list(String.t()) | nil,
             classifications: list(String.t()) | nil,
             options: list(String.t()) | nil
           }
@@ -161,6 +162,7 @@ defmodule RoboticaCommon do
               repeat_time: nil,
               repeat_count: 0,
               repeat_number: nil,
+              if: nil,
               classifications: [],
               options: []
   end

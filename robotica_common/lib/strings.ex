@@ -297,7 +297,7 @@ defmodule RoboticaCommon.Strings do
     end
   catch
     {:undefined, name} ->
-      map = Enum.map_join(values, ", ", fn {a, b} -> "#{a}=#{b}" end)
+      map = Enum.map_join(values, ", ", fn {a, b} -> "#{a}=#{inspect(b)}" end)
       {:error, "Cannot find #{name} in lookup table of #{map}."}
 
     {:illegal_lookup_type, value, expected_type} ->

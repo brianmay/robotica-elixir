@@ -148,6 +148,7 @@ defmodule RoboticaCommon.Schema do
   def source_step_schema do
     %{
       struct_type: RoboticaCommon.SourceStep,
+      if: {{:list, :string}, false},
       zero_time: {{:boolean, false}, false},
       required_time: {:delta, true},
       latest_time: {:delta, false},

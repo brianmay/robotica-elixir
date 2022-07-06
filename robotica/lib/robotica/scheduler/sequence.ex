@@ -27,37 +27,58 @@ defmodule Robotica.Scheduler.Sequence do
     [step | add_id_to_steps(tail, sequence_name, n + 1)]
   end
 
-  defp filter_classifications(sequence, classifications) do
-    Enum.filter(sequence, fn step ->
-      case step.classifications do
-        nil ->
-          true
+  defp is_condition_ok?(step, options, classifications_today, classifications_tomorrow) do
+    condition_list = Map.get(step, :if)
 
-        step_classifications ->
-          Enum.any?(step_classifications, fn step_classification ->
-            MapSet.member?(classifications, step_classification)
-          end)
-      end
-    end)
+    if condition_list == nil do
+      true
+    else
+      values = %{
+        "options" => options,
+        "today" => classifications_today.classifications,
+        "tomorrow" => classifications_tomorrow.classifications
+      }
+
+      Enum.any?(condition_list, fn condition ->
+        {:ok, result} = RoboticaCommon.Strings.eval_string_to_bool(condition, values)
+
+        result
+      end)
+    end
   end
 
-  defp filter_options(sequence, options) do
-    Enum.filter(sequence, fn step ->
-      case step.options do
-        nil ->
-          true
+  defp is_classifications_ok?(step, c_today) do
+    case step.classifications do
+      nil ->
+        true
 
-        step_options ->
-          Enum.any?(step_options, fn step_option -> MapSet.member?(options, step_option) end)
-      end
-    end)
+      step_classifications ->
+        Enum.any?(step_classifications, fn step_classification ->
+          MapSet.member?(c_today.classifications, step_classification)
+        end)
+    end
   end
 
-  defp get_sequence(sequence_name, c_today, _c_tomorrow, options) do
+  defp is_options_ok?(step, options) do
+    case step.options do
+      nil ->
+        true
+
+      step_options ->
+        Enum.any?(step_options, fn step_option ->
+          MapSet.member?(options, step_option)
+        end)
+    end
+  end
+
+  defp get_sequence(sequence_name, c_today, c_tomorrow, options) do
     Map.fetch!(get_data(), sequence_name)
     |> add_id_to_steps(sequence_name, 0)
-    |> filter_classifications(c_today)
-    |> filter_options(options)
+    |> Enum.filter(fn step ->
+      is_condition_ok?(step, options, c_today, c_tomorrow) and
+        is_classifications_ok?(step, c_today) and
+        is_options_ok?(step, options)
+    end)
   end
 
   defp get_corrected_start_time(start_time, sequence) do
@@ -161,8 +182,8 @@ defmodule Robotica.Scheduler.Sequence do
       expand_sequences(
         start_time,
         sequence_details,
-        schedule.today.classifications,
-        schedule.tomorrow.classifications
+        schedule.today,
+        schedule.tomorrow
       )
     end)
     |> List.flatten()

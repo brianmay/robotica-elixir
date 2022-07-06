@@ -3,6 +3,8 @@
 
 "open_presents":
     - required_time: "00:05:00"
+      if:
+        - "'christmas' in today and 'boxing' in tomorrow"
       tasks:
         - locations: ["kids"]
           devices: ["robotica"]

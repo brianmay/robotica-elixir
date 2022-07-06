@@ -48,6 +48,25 @@ defmodule Robotica.Scheduler.Schedule do
     utc_date_time
   end
 
+  defp is_condition_ok?(block, classifications_today, classifications_tomorrow) do
+    condition_list = Map.get(block, :if)
+
+    if condition_list == nil do
+      true
+    else
+      values = %{
+        "today" => classifications_today.classifications,
+        "tomorrow" => classifications_tomorrow.classifications
+      }
+
+      Enum.any?(condition_list, fn condition ->
+        {:ok, result} = RoboticaCommon.Strings.eval_string_to_bool(condition, values)
+
+        result
+      end)
+    end
+  end
+
   defp check_block_date(classifications, requirements) do
     if requirements == nil do
       true
@@ -59,8 +78,11 @@ defmodule Robotica.Scheduler.Schedule do
   end
 
   defp check_block(block, classifications_today, classifications_tomorrow) do
-    check_block_date(classifications_today, block.today) and
-      check_block_date(classifications_tomorrow, block.tomorrow)
+    today = classifications_today.classifications
+    tomorrow = classifications_tomorrow.classifications
+
+    check_block_date(today, block.today) and
+      check_block_date(tomorrow, block.tomorrow)
   end
 
   defp transform_sequence(seq_name, seq_options, date) do
@@ -81,7 +103,8 @@ defmodule Robotica.Scheduler.Schedule do
     schedule =
       get_data()
       |> Enum.filter(fn block ->
-        check_block(block, c_today.classifications, c_tomorrow.classifications)
+        is_condition_ok?(block, c_today, c_tomorrow) and
+          check_block(block, c_today, c_tomorrow)
       end)
       |> Enum.reduce(%{}, fn block, map -> Map.merge(map, block.sequences) end)
       |> Enum.map(fn {seq_name, seq_options} ->

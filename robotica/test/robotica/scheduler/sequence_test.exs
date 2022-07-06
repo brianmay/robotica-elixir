@@ -23,11 +23,11 @@ defmodule Robotica.Scheduler.Sequence.Test do
     schedule = %Schedule{
       today: %ClassifiedDate{
         date: ~D[2018-12-25],
-        classifications: MapSet.new()
+        classifications: MapSet.new(["christmas"])
       },
       tomorrow: %ClassifiedDate{
         date: ~D[2018-12-26],
-        classifications: MapSet.new()
+        classifications: MapSet.new(["boxing"])
       },
       schedule: [
         {local_datetime(~N[2018-12-25 05:00:00]), [{"open_presents", MapSet.new()}]}
