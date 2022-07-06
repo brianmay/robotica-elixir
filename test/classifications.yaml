@@ -12,7 +12,8 @@
   add:
   - "saturday"
 
-- day_of_week: Sunday
+- if:
+  - "day_of_week == 'sunday' or 'random' in classifications"
   add:
   - "sunday"
 
@@ -46,8 +47,8 @@
 
 - delete:
   - "special_christmas"
-  if_set:
-  - "special_christmas"
+  if:
+  - "'special_christmas' in classifications"
   add:
   - "evil_christmas"
 

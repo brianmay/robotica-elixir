@@ -114,7 +114,7 @@ defmodule Robotica.Scheduler.Classifier do
     end
   end
 
-  defp is_condition_ok?(%Types.Classification{} = classification, date) do
+  defp is_condition_ok?(classification_names, %Types.Classification{} = classification, date) do
     condition_list = Map.get(classification, :if)
 
     if condition_list == nil do
@@ -122,8 +122,21 @@ defmodule Robotica.Scheduler.Classifier do
     else
       {days_since_epoch, _} = Date.to_iso_days(date)
 
+      day_of_week =
+        case Date.day_of_week(date) do
+          1 -> "monday"
+          2 -> "tuesday"
+          3 -> "wednesday"
+          4 -> "thursday"
+          5 -> "friday"
+          6 -> "saturday"
+          7 -> "sunday"
+        end
+
       values = %{
-        "days_since_epoch" => days_since_epoch
+        "days_since_epoch" => days_since_epoch,
+        "classifications" => classification_names,
+        "day_of_week" => day_of_week
       }
 
       Enum.any?(condition_list, fn condition ->
@@ -178,7 +191,7 @@ defmodule Robotica.Scheduler.Classifier do
       |> Enum.reduce(MapSet.new(), fn classification, names ->
         do_process =
           cond do
-            not is_condition_ok?(classification, date) -> false
+            not is_condition_ok?(names, classification, date) -> false
             not is_in_classification?(classification, date) -> false
             not is_included_entry?(names, classification) -> false
             is_excluded_entry?(names, classification) -> false
