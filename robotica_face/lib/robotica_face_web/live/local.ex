@@ -143,9 +143,9 @@ defmodule RoboticaFaceWeb.Live.Local do
   defp display_state_to_class(nil), do: "btn-secondary"
 
   @spec display_state_to_text(Robotica.Buttons.display_state()) :: String.t()
-  defp display_state_to_text(:state_on), do: "⏽"
-  defp display_state_to_text(:state_off), do: "⏼"
-  defp display_state_to_text(:state_hard_off), do: "⭘"
+  defp display_state_to_text(:state_on), do: "1"
+  defp display_state_to_text(:state_off), do: "0"
+  defp display_state_to_text(:state_hard_off), do: "—"
   defp display_state_to_text(:state_error), do: "❌"
   defp display_state_to_text(nil), do: "?"
 
