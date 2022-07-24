@@ -137,7 +137,7 @@ defmodule Robotica.Schema do
 
   def mark_schema do
     %{
-      struct_type: Robotica.Types.Mark,
+      struct_type: Robotica.Mark,
       id: {:string, true},
       status: {:mark_status, true},
       start_time: {:date_time, true},
