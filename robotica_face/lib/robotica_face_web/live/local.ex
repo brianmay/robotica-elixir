@@ -25,8 +25,13 @@ defmodule RoboticaFaceWeb.Live.Local do
     <div>
     <div><%= row.name %></div>
     <%= for button <- row.buttons do %>
-    <% class = get_button_state(@button_states, button.id) |> button_state_to_class(button) %>
-    <button class={"btn #{class} btn-robotica"} phx-click="activate" phx-value-button={button.id}><%= button.name %></button>
+    <% state = get_button_state(@button_states, button.id) %>
+    <% class = button_state_to_class(state, button) %>
+    <% state_text = button_state_to_text(state, button) %>
+    <button class={"btn #{class} btn-robotica"} phx-click="activate" phx-value-button={button.id}>
+      <div><%= button.name %></div>
+      <div><%= state_text %></div>
+    </button>
     <% end %>
     </div>
     <% end %>
@@ -137,8 +142,19 @@ defmodule RoboticaFaceWeb.Live.Local do
   defp display_state_to_class(:state_error), do: "btn-danger"
   defp display_state_to_class(nil), do: "btn-secondary"
 
+  @spec display_state_to_text(Robotica.Buttons.display_state()) :: String.t()
+  defp display_state_to_text(:state_on), do: "⏽"
+  defp display_state_to_text(:state_off), do: "⏼"
+  defp display_state_to_text(:state_hard_off), do: "⭘"
+  defp display_state_to_text(:state_error), do: "❌"
+  defp display_state_to_text(nil), do: "?"
+
   defp button_state_to_class(button_state, button) do
     Robotica.Buttons.get_display_state(button, button_state) |> display_state_to_class()
+  end
+
+  defp button_state_to_text(button_state, button) do
+    Robotica.Buttons.get_display_state(button, button_state) |> display_state_to_text()
   end
 
   defp set_location(socket, location) do

@@ -7,5 +7,5 @@
 # General application configuration
 import Config
 
-import_config "../../robotica_common/config/config.exs"
+import_config "../../robotica/config/config.exs"
 import_config "common.exs"
