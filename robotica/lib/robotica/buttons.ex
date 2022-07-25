@@ -43,6 +43,7 @@ defmodule Robotica.Buttons do
   def get_button_controller(%Config{type: "music"}), do: Robotica.Buttons.Music
   def get_button_controller(%Config{type: "hdmi"}), do: Robotica.Buttons.HDMI
   def get_button_controller(%Config{type: "switch"}), do: Robotica.Buttons.Switch
+  def get_button_controller(%Config{type: "zigbee_contact"}), do: Robotica.Buttons.ZigbeeContact
 
   @spec get_initial_state(Config.t()) :: state
   def get_initial_state(%Config{} = config) do
