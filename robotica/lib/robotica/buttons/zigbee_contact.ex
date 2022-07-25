@@ -8,7 +8,7 @@ defmodule Robotica.Buttons.ZigbeeContact do
   alias Robotica.Buttons
   alias Robotica.Buttons.Config
 
-  @type state :: String.t() | nil
+  @type state :: bool | nil
 
   @spec get_topics(Config.t()) :: list({list(String.t()), atom(), atom()})
   def get_topics(%Config{} = config) do
@@ -28,8 +28,8 @@ defmodule Robotica.Buttons.ZigbeeContact do
   end
 
   @spec get_display_state(Config.t(), state) :: Buttons.display_state()
-  def get_display_state(_, true), do: :state_on
-  def get_display_state(_, false), do: :state_off
+  def get_display_state(_, true), do: :state_off
+  def get_display_state(_, false), do: :state_on
   def get_display_state(%Config{action: _}, _), do: nil
 
   @spec get_press_commands(Config.t(), state) :: list(Robotica.Types.CommandTask.t())
