@@ -8,7 +8,6 @@ defmodule Robotica.Mqtt do
 
   alias Robotica.Types.CommandTask
   alias Robotica.Types.ScheduledStep
-  alias Robotica.Types.Task
 
   @spec get_tortoise_client_id() :: String.t()
   def get_tortoise_client_id do
@@ -82,12 +81,6 @@ defmodule Robotica.Mqtt do
     }
 
     publish_json(topic, action)
-  end
-
-  @spec publish_execute(Task.t()) :: :ok
-  def publish_execute(task) do
-    topic = "execute"
-    publish_json(topic, task)
   end
 
   @spec publish_command_task(command :: CommandTask.t()) :: :ok

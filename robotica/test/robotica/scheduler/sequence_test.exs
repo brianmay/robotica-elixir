@@ -16,7 +16,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
 
   def assert_tasks(tasks, message) do
     task = hd(tasks)
-    assert task.command["message"]["text"] == message
+    assert task.payload_json["message"]["text"] == message
   end
 
   test "expand_schedule" do
@@ -86,7 +86,8 @@ defmodule Robotica.Scheduler.Sequence.Test do
           %Robotica.Types.Task{
             locations: ["here"],
             devices: ["here"],
-            command: %{}
+            topics: [],
+            payload_json: %{}
           }
         ]
       },
@@ -98,7 +99,8 @@ defmodule Robotica.Scheduler.Sequence.Test do
           %Robotica.Types.Task{
             locations: ["here"],
             devices: ["here"],
-            command: %{}
+            topics: [],
+            payload_json: %{}
           }
         ]
       },
@@ -110,7 +112,8 @@ defmodule Robotica.Scheduler.Sequence.Test do
           %Robotica.Types.Task{
             locations: ["here"],
             devices: ["here"],
-            command: %{}
+            topics: [],
+            payload_json: %{}
           }
         ]
       }

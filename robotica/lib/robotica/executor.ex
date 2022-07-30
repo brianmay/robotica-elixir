@@ -14,15 +14,13 @@ defmodule Robotica.Executor do
   @spec execute_tasks(tasks :: list(Task.t())) :: :ok
   def execute_tasks(tasks) do
     Enum.each(tasks, fn scheduled_task ->
-      Enum.each(scheduled_task.locations, fn location ->
-        Enum.each(scheduled_task.devices, fn device ->
-          command = %CommandTask{
-            topic: "command/#{location}/#{device}",
-            payload_json: scheduled_task.command
-          }
+      Enum.each(scheduled_task.topics, fn topic ->
+        command = %CommandTask{
+          topic: topic,
+          payload_json: scheduled_task.payload_json
+        }
 
-          Robotica.Mqtt.publish_command_task(command)
-        end)
+        Robotica.Mqtt.publish_command_task(command)
       end)
     end)
   end

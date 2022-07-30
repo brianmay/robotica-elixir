@@ -8,7 +8,7 @@
       tasks:
         - locations: ["kids"]
           devices: ["robotica"]
-          command:
+          payload_json:
             type: "audio"
             message:
               text: Time to wakeup. It is am emergency!
@@ -18,7 +18,7 @@
       tasks:
         - locations: ["kids"]
           devices: ["robotica"]
-          command:
+          payload_json:
             type: "audio"
             message:
               text: Time to wakeup the adults.
@@ -28,7 +28,7 @@
       tasks:
         - locations: ["kids"]
           devices: ["robotica"]
-          command:
+          payload_json:
             type: "audio"
             message:
               text: Time to wakeup the adults.
@@ -38,7 +38,7 @@
       tasks:
         - locations: ["kids"]
           devices: ["robotica"]
-          command:
+          payload_json:
             type: "audio"
             message:
               text: Time to wakeup the adults.
@@ -48,7 +48,7 @@
       tasks:
         - locations: ["kids"]
           devices: ["robotica"]
-          command:
+          payload_json:
             type: "audio"
             message:
               text: Time to wakeup the adults.
@@ -58,7 +58,7 @@
       tasks:
         - locations: ["kids"]
           devices: ["robotica"]
-          command:
+          payload_json:
             type: "audio"
             message:
               text: Time to wakeup the adults.
@@ -70,7 +70,7 @@
       tasks:
         - locations: ["kids"]
           devices: ["robotica"]
-          command:
+          payload_json:
             type: "audio"
             message:
               text: Time to open presents.

@@ -113,7 +113,18 @@ defmodule Robotica.Config do
     @spec sequences(String.t()) :: map()
     def sequences(filename) do
       {:ok, data} = Validation.load_and_validate(filename, sequences_schema())
+
       data
+      |> Enum.map(fn {key, steps} ->
+        steps =
+          Enum.map(steps, fn step ->
+            tasks = Enum.map(step.tasks, &Robotica.Types.Task.normalize/1)
+            %{step | tasks: tasks}
+          end)
+
+        {key, steps}
+      end)
+      |> Enum.into(%{})
     end
 
     @spec scenes(String.t()) :: map()

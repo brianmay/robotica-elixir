@@ -81,21 +81,37 @@ defmodule Robotica.Types do
     """
     @derive Jason.Encoder
     @type t :: %__MODULE__{
-            locations: list(String.t()),
-            devices: list(String.t()),
-            command: map()
+            locations: list(String.t()) | nil,
+            devices: list(String.t()) | nil,
+            topics: list(String.t()) | nil,
+            payload_json: map()
           }
-    @enforce_keys [:locations, :devices, :command]
-    defstruct locations: [], devices: [], command: nil
+    @enforce_keys [:locations, :devices, :topics, :payload_json]
+    defstruct locations: [], devices: [], topics: [], payload_json: nil
 
-    @spec location_device_to_text(String.t(), String.t(), keyword()) :: String.t()
-    defp location_device_to_text(location, device, opts) do
+    @spec normalize(Robotica.Types.Task.t()) :: Robotica.Types.Task.t()
+    def normalize(%Task{} = task) do
+      topics = task.topics || []
+      locations = task.locations || []
+      devices = task.devices || []
+
+      topics_converted =
+        Enum.map(locations, fn location ->
+          Enum.map(devices, fn device -> "command/#{location}/#{device}" end)
+        end)
+        |> List.flatten()
+
+      %{task | topics: topics ++ topics_converted}
+    end
+
+    @spec topic_to_text(String.t(), keyword()) :: String.t()
+    defp topic_to_text(topic, opts) do
       case opts[:include_locations] do
         true ->
-          "/#{location}/#{device}"
+          topic
 
         _ ->
-          "#{device}"
+          String.split(topic, "/") |> List.last("nil")
       end
     end
 
@@ -103,20 +119,18 @@ defmodule Robotica.Types do
     def task_to_text(%Task{} = task, opts \\ []) do
       list = []
 
-      action_str = Command.command_to_text(task.command)
+      action_str = Command.command_to_text(task.payload_json)
       list = [action_str | list]
 
-      location_list =
-        Enum.reduce(task.locations, [], fn location, list ->
-          Enum.reduce(task.devices, list, fn device, list ->
-            [location_device_to_text(location, device, opts) | list]
-          end)
+      topic_list =
+        Enum.map(task.topics, fn topic ->
+          topic_to_text(topic, opts)
         end)
 
       list =
-        case location_list do
+        case topic_list do
           [] -> ["Nowhere:" | list]
-          location_list -> [Enum.join(location_list, ", ") <> ":" | list]
+          topic_list -> [Enum.join(topic_list, ", ") <> ":" | list]
         end
 
       Enum.join(list, " ")

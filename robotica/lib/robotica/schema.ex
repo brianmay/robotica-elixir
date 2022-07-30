@@ -120,18 +120,10 @@ defmodule Robotica.Schema do
   def task_schema do
     %{
       struct_type: Robotica.Types.Task,
-      command: {{:map, :string, :any}, true},
-      locations: {{:list, :string}, true},
-      devices: {{:list, :string}, true}
-    }
-  end
-
-  def command_task_schema do
-    %{
-      struct_type: Robotica.Types.CommandTask,
-      command: {{:map, :string, :any}, true},
-      location: {:string, true},
-      device: {:string, true}
+      payload_json: {{:map, :string, :any}, true},
+      locations: {{:list, :string}, false},
+      devices: {{:list, :string}, false},
+      topics: {{:list, :string}, false}
     }
   end
 
