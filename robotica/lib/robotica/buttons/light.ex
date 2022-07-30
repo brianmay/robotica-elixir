@@ -113,9 +113,8 @@ defmodule Robotica.Buttons.Light do
   defp turn_on(%Config{} = config) do
     [
       %Robotica.Types.CommandTask{
-        location: config.location,
-        device: config.device,
-        command: %{
+        topic: "command/#{config.location}/#{config.device}",
+        payload_json: %{
           "scene" => config.params["scene"],
           "priority" => config.params["priority"]
         }
@@ -127,9 +126,8 @@ defmodule Robotica.Buttons.Light do
   defp turn_off(%Config{} = config) do
     [
       %Robotica.Types.CommandTask{
-        location: config.location,
-        device: config.device,
-        command: %{
+        topic: "command/#{config.location}/#{config.device}",
+        payload_json: %{
           "action" => "turn_off",
           "scene" => config.params["scene"],
           "priority" => config.params["priority"]

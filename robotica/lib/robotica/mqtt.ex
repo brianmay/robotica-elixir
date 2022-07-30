@@ -39,12 +39,6 @@ defmodule Robotica.Mqtt do
     end
   end
 
-  @spec publish_command_task(CommandTask.t()) :: :ok
-  def publish_command_task(%Robotica.Types.CommandTask{} = task) do
-    topic = "action/#{task.location}/#{task.device}"
-    publish_json(topic, task.command)
-  end
-
   @spec get_state_topic(String.t(), String.t(), String.t() | nil) :: String.t()
   defp get_state_topic(location, device, nil) do
     "state/#{location}/#{device}"
@@ -96,10 +90,11 @@ defmodule Robotica.Mqtt do
     publish_json(topic, task)
   end
 
-  @spec publish_command(String.t(), String.t(), map()) :: :ok
-  def publish_command(location, device, msg) do
-    topic = "command/#{location}/#{device}"
-    publish_json(topic, msg)
+  @spec publish_command_task(command :: CommandTask.t()) :: :ok
+  def publish_command_task(%CommandTask{} = command) do
+    Logger.info("sending command task #{command.topic}")
+    :ok = publish_json(command.topic, command.payload_json)
+    :ok
   end
 
   @spec start_link(opts :: list) :: {:ok, pid} | {:error, String.t()}

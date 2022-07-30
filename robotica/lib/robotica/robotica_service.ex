@@ -5,7 +5,8 @@ defmodule Robotica.RoboticaService do
 
   def process({:command = topic, id}) do
     task = EventBus.fetch_event_data({topic, id})
-    Robotica.PluginRegistry.execute_command_task(task, remote: true)
+    Logger.info("got command #{inspect(task.topic)}")
+    Robotica.Mqtt.publish_command_task(task)
     EventBus.mark_as_completed({__MODULE__, topic, id})
   end
 

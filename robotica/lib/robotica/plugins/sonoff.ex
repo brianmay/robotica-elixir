@@ -90,8 +90,6 @@ defmodule Robotica.Plugins.SonOff do
   end
 
   defp handle_command(%State{} = state, command) do
-    publish_command(state.location, state.device, command)
-
     power =
       case command.action do
         "turn_on" -> "ON"

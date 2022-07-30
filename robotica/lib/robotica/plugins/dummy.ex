@@ -31,8 +31,6 @@ defmodule Robotica.Plugins.Dummy do
   end
 
   def handle_command(state, command) do
-    publish_command(state.location, state.device, command)
-
     device_state =
       case command.action do
         "turn_on" -> "ON"

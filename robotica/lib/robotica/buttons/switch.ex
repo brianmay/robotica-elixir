@@ -44,9 +44,8 @@ defmodule Robotica.Buttons.Switch do
   defp turn_on(%Config{} = config) do
     [
       %Robotica.Types.CommandTask{
-        location: config.location,
-        device: config.device,
-        command: %{
+        topic: "command/#{config.location}/#{config.device}",
+        payload_json: %{
           "action" => "turn_on"
         }
       }
@@ -57,9 +56,8 @@ defmodule Robotica.Buttons.Switch do
   defp turn_off(%Config{} = config) do
     [
       %Robotica.Types.CommandTask{
-        location: config.location,
-        device: config.device,
-        command: %{
+        topic: "command/#{config.location}/#{config.device}",
+        payload_json: %{
           "action" => "turn_off"
         }
       }

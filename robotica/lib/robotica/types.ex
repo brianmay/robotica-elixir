@@ -128,12 +128,11 @@ defmodule Robotica.Types do
     Defines a location, device, and a command to execute
     """
     @type t :: %__MODULE__{
-            location: String.t(),
-            device: String.t(),
-            command: map()
+            topic: String.t(),
+            payload_json: map()
           }
-    @enforce_keys [:location, :device, :command]
-    defstruct location: [], device: [], command: {}
+    @enforce_keys [:topic, :payload_json]
+    defstruct [:topic, :payload_json]
   end
 
   defmodule SourceStep do

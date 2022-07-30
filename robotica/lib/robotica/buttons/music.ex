@@ -45,9 +45,8 @@ defmodule Robotica.Buttons.Music do
   defp play(%Config{} = config, play_list) do
     [
       %Robotica.Types.CommandTask{
-        location: config.location,
-        device: config.device,
-        command: %{
+        topic: "command/#{config.location}/#{config.device}",
+        payload_json: %{
           "music" => %{"play_list" => play_list}
         }
       }
@@ -58,9 +57,8 @@ defmodule Robotica.Buttons.Music do
   defp stop(%Config{} = config) do
     [
       %Robotica.Types.CommandTask{
-        location: config.location,
-        device: config.device,
-        command: %{
+        topic: "command/#{config.location}/#{config.device}",
+        payload_json: %{
           "music" => %{
             "stop" => true
           }

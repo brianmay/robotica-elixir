@@ -15,12 +15,6 @@ defmodule Robotica.Plugins.Private do
     :ok = Robotica.Mqtt.publish_state_json(state.location, state.device, value, topic: topic)
   end
 
-  @spec publish_command(String.t(), String.t(), map()) :: :ok
-  def publish_command(location, device, command) do
-    task = %Robotica.Types.CommandTask{location: location, device: device, command: command}
-    :ok = Robotica.Mqtt.publish_command_task(task)
-  end
-
   @spec check_type(map(), String.t()) :: {map(), boolean()}
   def check_type(command, type) do
     if command.type == type or command.type == nil do

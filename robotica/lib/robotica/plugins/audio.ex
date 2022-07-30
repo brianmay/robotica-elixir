@@ -382,8 +382,6 @@ defmodule Robotica.Plugins.Audio do
   @spec handle_command(Robotica.Plugins.Audio.State.t(), map()) ::
           Robotica.Plugins.Audio.State.t()
   def handle_command(%State{} = state, command) do
-    publish_command(state.location, state.device, command)
-
     state =
       case command.volume do
         nil ->
@@ -435,5 +433,5 @@ defmodule Robotica.Plugins.Audio do
 
   @spec execute_tasks(tasks :: list(Task.t()) | nil) :: :ok
   def execute_tasks(nil), do: :ok
-  def execute_tasks(tasks), do: Robotica.Executor.execute_tasks(tasks, remote: true)
+  def execute_tasks(tasks), do: Robotica.Executor.execute_tasks(tasks)
 end

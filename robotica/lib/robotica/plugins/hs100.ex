@@ -70,8 +70,6 @@ defmodule Robotica.Plugins.Hs100 do
 
   @spec handle_command(State.t(), map()) :: :ok
   def handle_command(%State{} = state, command) do
-    publish_command(state.location, state.device, command)
-
     {power, device_state} =
       case command.action do
         "turn_on" -> {true, "ON"}

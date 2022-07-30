@@ -46,9 +46,8 @@ defmodule Robotica.Buttons.HDMI do
   defp switch(%Config{} = config) do
     [
       %Robotica.Types.CommandTask{
-        location: config.location,
-        device: config.device,
-        command: %{
+        topic: "command/#{config.location}/#{config.device}",
+        payload_json: %{
           "input" => config.params["input"],
           "output" => config.params["output"]
         }
