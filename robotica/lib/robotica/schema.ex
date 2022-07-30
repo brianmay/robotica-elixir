@@ -120,9 +120,11 @@ defmodule Robotica.Schema do
   def task_schema do
     %{
       struct_type: Robotica.Types.Task,
-      payload_json: {{:map, :string, :any}, true},
-      locations: {{:list, :string}, false},
-      devices: {{:list, :string}, false},
+      description: {:string, false},
+      payload_str: {:string, false},
+      payload_json: {{:map, :string, :any}, false},
+      locations: {{:list, :string}, true},
+      devices: {{:list, :string}, true},
       topics: {{:list, :string}, false}
     }
   end

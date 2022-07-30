@@ -86,7 +86,18 @@ defmodule Robotica.Mqtt do
   @spec publish_command_task(command :: CommandTask.t()) :: :ok
   def publish_command_task(%CommandTask{} = command) do
     Logger.info("sending command task #{command.topic}")
-    :ok = publish_json(command.topic, command.payload_json)
+
+    case command do
+      %{payload_str: payload_str} when payload_str != nil ->
+        :ok = publish_raw(command.topic, payload_str)
+
+      %{payload_json: payload_json} when payload_json != nil ->
+        :ok = publish_json(command.topic, command.payload_json)
+
+      _ ->
+        :ok = publish_json(command.topic, "")
+    end
+
     :ok
   end
 

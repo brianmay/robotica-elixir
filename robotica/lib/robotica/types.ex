@@ -81,37 +81,49 @@ defmodule Robotica.Types do
     """
     @derive Jason.Encoder
     @type t :: %__MODULE__{
-            locations: list(String.t()) | nil,
-            devices: list(String.t()) | nil,
+            description: list(String.t()) | nil,
+            locations: list(String.t()),
+            devices: list(String.t()),
             topics: list(String.t()) | nil,
-            payload_json: map()
+            payload_str: String.t(),
+            payload_json: map() | nil
           }
-    @enforce_keys [:locations, :devices, :topics, :payload_json]
-    defstruct locations: [], devices: [], topics: [], payload_json: nil
+    @enforce_keys [:description, :locations, :devices, :topics, :payload_str, :payload_json]
+    defstruct description: nil,
+              locations: [],
+              devices: [],
+              topics: [],
+              payload_str: nil,
+              payload_json: %{}
 
     @spec normalize(Robotica.Types.Task.t()) :: Robotica.Types.Task.t()
     def normalize(%Task{} = task) do
-      topics = task.topics || []
-      locations = task.locations || []
-      devices = task.devices || []
+      topics =
+        case task.topics do
+          # if task.topics not given, we must generate it from the locations and devices
+          nil ->
+            Enum.reduce(task.locations, [], fn location, list ->
+              Enum.reduce(task.devices, list, fn device, list ->
+                ["command/#{location}/#{device}" | list]
+              end)
+            end)
 
-      topics_converted =
-        Enum.map(locations, fn location ->
-          Enum.map(devices, fn device -> "command/#{location}/#{device}" end)
-        end)
-        |> List.flatten()
+          # Otherwise just use supplied topics.
+          topics ->
+            topics
+        end
 
-      %{task | topics: topics ++ topics_converted}
+      %{task | topics: topics}
     end
 
-    @spec topic_to_text(String.t(), keyword()) :: String.t()
-    defp topic_to_text(topic, opts) do
+    @spec location_device_to_text(String.t(), String.t(), keyword()) :: String.t()
+    defp location_device_to_text(location, device, opts) do
       case opts[:include_locations] do
         true ->
-          topic
+          "/#{location}/#{device}"
 
         _ ->
-          String.split(topic, "/") |> List.last("nil")
+          "#{device}"
       end
     end
 
@@ -119,16 +131,32 @@ defmodule Robotica.Types do
     def task_to_text(%Task{} = task, opts \\ []) do
       list = []
 
-      action_str = Command.command_to_text(task.payload_json)
+      action_str =
+        case task do
+          %{description: description} when description != nil ->
+            description
+
+          %{payload_str: payload_str} when payload_str != nil ->
+            payload_str
+
+          %{payload_json: payload_json} when payload_json != nil ->
+            Command.command_to_text(payload_json)
+
+          _ ->
+            "N/A"
+        end
+
       list = [action_str | list]
 
-      topic_list =
-        Enum.map(task.topics, fn topic ->
-          topic_to_text(topic, opts)
+      location_list =
+        Enum.reduce(task.locations, [], fn location, list ->
+          Enum.reduce(task.devices, list, fn device, list ->
+            [location_device_to_text(location, device, opts) | list]
+          end)
         end)
 
       list =
-        case topic_list do
+        case location_list do
           [] -> ["Nowhere:" | list]
           topic_list -> [Enum.join(topic_list, ", ") <> ":" | list]
         end
@@ -143,10 +171,11 @@ defmodule Robotica.Types do
     """
     @type t :: %__MODULE__{
             topic: String.t(),
-            payload_json: map()
+            payload_str: String.t() | nil,
+            payload_json: map() | nil
           }
-    @enforce_keys [:topic, :payload_json]
-    defstruct [:topic, :payload_json]
+    @enforce_keys [:topic]
+    defstruct [:topic, :payload_str, :payload_json]
   end
 
   defmodule SourceStep do

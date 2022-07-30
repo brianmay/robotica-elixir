@@ -17,6 +17,7 @@ defmodule Robotica.Executor do
       Enum.each(scheduled_task.topics, fn topic ->
         command = %CommandTask{
           topic: topic,
+          payload_str: scheduled_task.payload_str,
           payload_json: scheduled_task.payload_json
         }
 
