@@ -95,7 +95,7 @@ defmodule Robotica.Mqtt do
         :ok = publish_json(command.topic, command.payload_json)
 
       _ ->
-        :ok = publish_json(command.topic, "")
+        :ok = publish_raw(command.topic, "")
     end
 
     :ok

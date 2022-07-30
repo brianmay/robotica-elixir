@@ -304,8 +304,8 @@ defmodule Robotica.Plugins.Audio do
     sound_list
   end
 
-  defp prepend_message(sound_list, %{message: %{text: text}}) do
-    [{:say, text} | sound_list]
+  defp prepend_message(sound_list, %{message: message}) do
+    [{:say, message} | sound_list]
   end
 
   defp prepend_message(sound_list, _), do: sound_list

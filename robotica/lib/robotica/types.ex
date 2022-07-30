@@ -16,7 +16,7 @@ defmodule Robotica.Types do
     defp add_list_if_empty(list, _), do: list
 
     def command_to_text(%{"type" => "audio"} = command) do
-      message_text = get_in(command, ["message", "text"])
+      message = get_in(command, ["message"])
       music_playlist = get_in(command, ["music", "play_list"])
       music_stop = get_in(command, ["music", "stop"])
 
@@ -25,7 +25,7 @@ defmodule Robotica.Types do
 
       []
       |> add_list_if_cond(v(message_volume), "Message #{message_volume}%")
-      |> add_list_if_cond(v(message_text), "Message #{message_text}")
+      |> add_list_if_cond(v(message), "Message #{message}")
       |> add_list_if_cond(v(music_stop) and music_stop, "Music Stop")
       |> add_list_if_cond(v(music_volume), "Music #{music_volume}%")
       |> add_list_if_cond(v(music_playlist), "Music #{music_playlist}")
@@ -67,7 +67,7 @@ defmodule Robotica.Types do
     end
 
     def command_to_message(%{type: "audio"} = action) do
-      get_in(action.message, [:text])
+      action.message
     end
 
     def command_to_message(%{}) do
@@ -88,7 +88,7 @@ defmodule Robotica.Types do
             payload_str: String.t(),
             payload_json: map() | nil
           }
-    @enforce_keys [:description, :locations, :devices, :topics, :payload_str, :payload_json]
+    @enforce_keys [:locations, :devices, :topics]
     defstruct description: nil,
               locations: [],
               devices: [],

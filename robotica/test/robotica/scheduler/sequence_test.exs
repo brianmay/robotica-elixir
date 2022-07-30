@@ -16,7 +16,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
 
   def assert_tasks(tasks, message) do
     task = hd(tasks)
-    assert task.payload_json["message"]["text"] == message
+    assert task.payload_json["message"] == message
   end
 
   test "expand_schedule" do

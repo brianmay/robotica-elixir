@@ -13,12 +13,6 @@ defmodule Robotica.Schema do
     }
   end
 
-  def message_action_schema do
-    %{
-      text: {:string, true}
-    }
-  end
-
   def volume_action_schema do
     %{
       music: {:integer, false},
@@ -110,7 +104,7 @@ defmodule Robotica.Schema do
       type: {:string, false},
       sound: {sound_action_schema(), false},
       music: {music_action_schema(), false},
-      message: {message_action_schema(), false},
+      message: {:string, false},
       volume: {volume_action_schema(), false},
       pre_tasks: {{:list, task_schema()}, false},
       post_tasks: {{:list, task_schema()}, false}
