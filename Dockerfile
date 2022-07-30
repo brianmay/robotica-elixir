@@ -37,6 +37,7 @@ RUN mix deps.get --only prod
 # This builds the dependancies
 COPY robotica_common/config /opt/robotica_common/config/
 COPY robotica_common/lib /opt/robotica_common/lib/
+COPY robotica_common/src /opt/robotica_common/src/
 COPY robotica_face/config /opt/robotica_face/config/
 COPY robotica_face/lib /opt/robotica_face/lib/
 COPY robotica/config /opt/robotica/config/
