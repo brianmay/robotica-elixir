@@ -43,7 +43,7 @@ defmodule RoboticaFaceWeb.Live.Messages do
   end
 
   def handle_cast({:mqtt, _, :action, command}, socket) do
-    message = get_in(command, ["message", "text"])
+    message = get_in(command, ["message"])
 
     socket =
       case message do

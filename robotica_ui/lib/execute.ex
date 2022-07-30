@@ -63,7 +63,7 @@ defmodule RoboticaUi.Execute do
   end
 
   def handle_cast({:mqtt, _, :action, command}, state) do
-    message = get_in(command, ["message", "text"])
+    message = get_in(command, ["message"])
 
     state =
       case message do
