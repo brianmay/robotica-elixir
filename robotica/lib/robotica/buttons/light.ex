@@ -10,12 +10,12 @@ defmodule Robotica.Buttons.Light do
 
   @type state :: {String.t() | nil, list(String.t()) | nil, list(integer) | nil}
 
-  @spec get_topics(Config.t()) :: list({list(String.t()), atom(), atom()})
+  @spec get_topics(Config.t()) :: list({String.t(), atom(), atom()})
   def get_topics(%Config{} = config) do
     [
-      {["state", config.location, config.device, "power"], :raw, :power},
-      {["state", config.location, config.device, "scenes"], :json, :scenes},
-      {["state", config.location, config.device, "priorities"], :json, :priorities}
+      {"state/#{config.location}/#{config.device}/power", :raw, :power},
+      {"state/#{config.location}/#{config.device}/scenes", :json, :scenes},
+      {"state/#{config.location}/#{config.device}/priorities", :json, :priorities}
     ]
   end
 

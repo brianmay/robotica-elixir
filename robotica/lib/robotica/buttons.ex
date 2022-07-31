@@ -32,7 +32,7 @@ defmodule Robotica.Buttons do
   @type display_state :: :state_on | :state_off | :state_hard_off | :state_error | nil
 
   @callback get_initial_state(Config.t()) :: state
-  @callback get_topics(Config.t()) :: list({list(String.t()), atom(), atom()})
+  @callback get_topics(Config.t()) :: list({String.t(), atom(), atom()})
 
   @callback process_message(Config.t(), atom(), any(), state) :: state
   @callback get_display_state(Config.t(), state) :: display_state
@@ -51,7 +51,7 @@ defmodule Robotica.Buttons do
     controller.get_initial_state(config)
   end
 
-  @spec get_topics(Config.t()) :: list({list(String.t()), atom(), atom()})
+  @spec get_topics(Config.t()) :: list({String.t(), atom(), atom()})
   def get_topics(%Config{} = config) do
     controller = get_button_controller(config)
     controller.get_topics(config)

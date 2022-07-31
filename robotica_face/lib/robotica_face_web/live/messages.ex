@@ -78,7 +78,7 @@ defmodule RoboticaFaceWeb.Live.Messages do
 
     if location != nil do
       RoboticaCommon.EventBus.notify(:subscribe, %{
-        topic: ["command", location, "Robotica"],
+        topic: "command/#{location}/Robotica",
         label: :action,
         pid: self(),
         format: :json,

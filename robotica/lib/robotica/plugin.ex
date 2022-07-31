@@ -28,8 +28,8 @@ defmodule Robotica.Plugin do
           {:ok, pid} ->
             Robotica.PluginRegistry.add(plugin.location, plugin.device, pid)
 
-            MqttPotion.Multiplexer.subscribe(
-              ["command", plugin.location, plugin.device],
+            MqttPotion.Multiplexer.subscribe_str(
+              "command/#{plugin.location}/#{plugin.device}",
               :command,
               pid,
               :json,

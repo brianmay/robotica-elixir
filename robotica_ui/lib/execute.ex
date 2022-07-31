@@ -25,7 +25,7 @@ defmodule RoboticaUi.Execute do
     local_location = CommonConfig.ui_default_location()
 
     RoboticaCommon.EventBus.notify(:subscribe, %{
-      topic: ["command", local_location, "Robotica"],
+      topic: "command/#{local_location}/Robotica",
       label: :action,
       pid: self(),
       format: :json,

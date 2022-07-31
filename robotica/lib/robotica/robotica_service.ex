@@ -20,7 +20,7 @@ defmodule Robotica.RoboticaService do
   def process({:subscribe = topic, id}) do
     data = EventBus.fetch_event_data({topic, id})
 
-    MqttPotion.Multiplexer.subscribe(
+    MqttPotion.Multiplexer.subscribe_str(
       data.topic,
       data.label,
       data.pid,

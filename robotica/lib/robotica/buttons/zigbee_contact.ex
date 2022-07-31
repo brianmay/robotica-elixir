@@ -10,10 +10,10 @@ defmodule Robotica.Buttons.ZigbeeContact do
 
   @type state :: bool | nil
 
-  @spec get_topics(Config.t()) :: list({list(String.t()), atom(), atom()})
+  @spec get_topics(Config.t()) :: list({String.t(), atom(), atom()})
   def get_topics(%Config{} = config) do
     [
-      {["zigbee2mqtt", config.location, config.device], :json, :power}
+      {"zigbee2mqtt/#{config.location}/#{config.device}", :json, :power}
     ]
   end
 

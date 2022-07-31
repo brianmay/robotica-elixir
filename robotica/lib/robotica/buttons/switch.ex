@@ -10,10 +10,10 @@ defmodule Robotica.Buttons.Switch do
 
   @type state :: String.t() | nil
 
-  @spec get_topics(Config.t()) :: list({list(String.t()), atom(), atom()})
+  @spec get_topics(Config.t()) :: list({String.t(), atom(), atom()})
   def get_topics(%Config{} = config) do
     [
-      {["state", config.location, config.device, "power"], :raw, :power}
+      {"state/#{config.location}/#{config.device}/power", :raw, :power}
     ]
   end
 

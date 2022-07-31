@@ -51,7 +51,7 @@ defmodule RoboticaFaceWeb.Live.Schedule do
     schedule_host = CommonConfig.ui_schedule_hostname()
 
     RoboticaCommon.EventBus.notify(:subscribe, %{
-      topic: ["schedule", schedule_host],
+      topic: "schedule/#{schedule_host}",
       label: :schedule,
       pid: self(),
       format: :json,

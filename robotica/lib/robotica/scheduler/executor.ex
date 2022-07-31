@@ -54,8 +54,8 @@ defmodule Robotica.Scheduler.Executor do
     state = finalize(now, today, [], steps)
 
     :ok =
-      MqttPotion.Multiplexer.subscribe(
-        ["mark"],
+      MqttPotion.Multiplexer.subscribe_str(
+        "mark",
         :mark,
         self(),
         :json,
