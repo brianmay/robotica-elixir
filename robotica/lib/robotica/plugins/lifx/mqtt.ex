@@ -14,7 +14,7 @@ defmodule Robotica.Plugins.Lifx.Mqtt do
     """
     @type t :: %__MODULE__{
             sender: RLifx.callback(),
-            topic: list(String.t()),
+            topic: String.t(),
             number: integer()
           }
     @enforce_keys [:sender, :topic, :number]
@@ -35,12 +35,14 @@ defmodule Robotica.Plugins.Lifx.Mqtt do
   end
 
   @impl true
+  @spec init(Robotica.Plugins.Lifx.Mqtt.Options.t()) ::
+          {:ok, Robotica.Plugins.Lifx.Mqtt.State.t()}
   def init(%Options{} = options) do
     state = %State{
       options: options
     }
 
-    MqttPotion.Multiplexer.subscribe(
+    MqttPotion.Multiplexer.subscribe_str(
       options.topic,
       :mqtt,
       self(),

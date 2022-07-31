@@ -748,7 +748,7 @@ defmodule Robotica.Plugins.LIFX do
     |> add_scene(scene, priority, Mqtt, %Mqtt.Options{
       sender: callback,
       number: number,
-      topic: ["command", state.location, state.device, "scene", scene]
+      topic: "command/#{state.location}/#{state.device}/scene/#{scene}"
     })
     |> publish_device_state()
   end
