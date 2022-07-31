@@ -304,7 +304,7 @@ defmodule Robotica.Plugins.Audio do
     sound_list
   end
 
-  defp prepend_message(sound_list, %{message: message}) do
+  defp prepend_message(sound_list, %{message: message}) when message != nil do
     [{:say, message} | sound_list]
   end
 
