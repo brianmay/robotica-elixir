@@ -104,6 +104,7 @@ defmodule Robotica.Schema do
       type: {:string, false},
       sound: {sound_action_schema(), false},
       music: {music_action_schema(), false},
+      title: {:string, false},
       message: {:string, false},
       volume: {volume_action_schema(), false},
       pre_tasks: {{:list, task_schema()}, false},
