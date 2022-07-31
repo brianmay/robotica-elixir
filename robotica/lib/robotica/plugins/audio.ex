@@ -433,5 +433,10 @@ defmodule Robotica.Plugins.Audio do
 
   @spec execute_tasks(tasks :: list(Task.t()) | nil) :: :ok
   def execute_tasks(nil), do: :ok
-  def execute_tasks(tasks), do: Robotica.Executor.execute_tasks(tasks)
+
+  def execute_tasks(tasks) do
+    tasks
+    |> Enum.map(&Task.normalize/1)
+    |> Robotica.Executor.execute_tasks()
+  end
 end
