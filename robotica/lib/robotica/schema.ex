@@ -118,6 +118,7 @@ defmodule Robotica.Schema do
       description: {:string, false},
       payload_str: {:string, false},
       payload_json: {{:map, :string, :any}, false},
+      qos: {:integer, false},
       locations: {{:list, :string}, true},
       devices: {{:list, :string}, true},
       topics: {{:list, :string}, false}

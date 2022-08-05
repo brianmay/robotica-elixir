@@ -50,7 +50,8 @@ defmodule Robotica.Buttons.HDMI do
         payload_json: %{
           "input" => config.params["input"],
           "output" => config.params["output"]
-        }
+        },
+        qos: 1
       }
     ]
   end

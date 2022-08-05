@@ -47,7 +47,8 @@ defmodule Robotica.Buttons.Switch do
         topic: "command/#{config.location}/#{config.device}",
         payload_json: %{
           "action" => "turn_on"
-        }
+        },
+        qos: 1
       }
     ]
   end
@@ -59,7 +60,8 @@ defmodule Robotica.Buttons.Switch do
         topic: "command/#{config.location}/#{config.device}",
         payload_json: %{
           "action" => "turn_off"
-        }
+        },
+        qos: 1
       }
     ]
   end

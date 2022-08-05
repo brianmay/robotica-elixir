@@ -89,10 +89,10 @@ defmodule Robotica.Mqtt do
 
     case command do
       %{payload_str: payload_str} when payload_str != nil ->
-        :ok = publish_raw(command.topic, payload_str)
+        :ok = publish_raw(command.topic, payload_str, qos: command.qos)
 
       %{payload_json: payload_json} when payload_json != nil ->
-        :ok = publish_json(command.topic, command.payload_json)
+        :ok = publish_json(command.topic, command.payload_json, qos: command.qos)
 
       _ ->
         :ok = publish_raw(command.topic, "")

@@ -48,7 +48,8 @@ defmodule Robotica.Buttons.Music do
         topic: "command/#{config.location}/#{config.device}",
         payload_json: %{
           "music" => %{"play_list" => play_list}
-        }
+        },
+        qos: 1
       }
     ]
   end
@@ -62,7 +63,8 @@ defmodule Robotica.Buttons.Music do
           "music" => %{
             "stop" => true
           }
-        }
+        },
+        qos: 1
       }
     ]
   end

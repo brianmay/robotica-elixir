@@ -85,14 +85,16 @@ defmodule Robotica.Types do
             locations: list(String.t()),
             devices: list(String.t()),
             topics: list(String.t()) | nil,
+            qos: list(integer()) | nil,
             payload_str: String.t(),
             payload_json: map() | nil
           }
-    @enforce_keys [:locations, :devices, :topics]
+    @enforce_keys [:locations, :devices, :topics, :qos]
     defstruct description: nil,
               locations: [],
               devices: [],
               topics: [],
+              qos: nil,
               payload_str: nil,
               payload_json: %{}
 
@@ -172,10 +174,11 @@ defmodule Robotica.Types do
     @type t :: %__MODULE__{
             topic: String.t(),
             payload_str: String.t() | nil,
-            payload_json: map() | nil
+            payload_json: map() | nil,
+            qos: integer()
           }
-    @enforce_keys [:topic]
-    defstruct [:topic, :payload_str, :payload_json]
+    @enforce_keys [:topic, :qos]
+    defstruct [:topic, :payload_str, :payload_json, :qos]
   end
 
   defmodule SourceStep do

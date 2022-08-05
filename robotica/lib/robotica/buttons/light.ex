@@ -117,7 +117,8 @@ defmodule Robotica.Buttons.Light do
         payload_json: %{
           "scene" => config.params["scene"],
           "priority" => config.params["priority"]
-        }
+        },
+        qos: 1
       }
     ]
   end
@@ -131,7 +132,8 @@ defmodule Robotica.Buttons.Light do
           "action" => "turn_off",
           "scene" => config.params["scene"],
           "priority" => config.params["priority"]
-        }
+        },
+        qos: 1
       }
     ]
   end
