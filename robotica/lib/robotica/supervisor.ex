@@ -58,6 +58,7 @@ defmodule Robotica.Supervisor do
        ssl: true,
        protocol_version: 5,
        client_id: client_id,
+       keepalive: 60,
        username: opts.mqtt.user_name,
        password: opts.mqtt.password,
        tcp_opts: [
