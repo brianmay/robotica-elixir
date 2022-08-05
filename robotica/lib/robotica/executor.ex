@@ -15,7 +15,7 @@ defmodule Robotica.Executor do
   def execute_tasks(tasks) do
     Enum.each(tasks, fn scheduled_task ->
       Enum.each(scheduled_task.topics, fn topic ->
-        qos = scheduled_task.qos || 1
+        qos = scheduled_task.qos || 2
 
         command = %CommandTask{
           topic: topic,
