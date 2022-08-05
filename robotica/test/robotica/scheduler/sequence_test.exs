@@ -87,6 +87,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
             locations: ["here"],
             devices: ["here"],
             topics: [],
+            qos: 1,
             payload_json: %{}
           }
         ]
@@ -100,6 +101,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
             locations: ["here"],
             devices: ["here"],
             topics: [],
+            qos: 1,
             payload_json: %{}
           }
         ]
@@ -113,6 +115,7 @@ defmodule Robotica.Scheduler.Sequence.Test do
             locations: ["here"],
             devices: ["here"],
             topics: [],
+            qos: 1,
             payload_json: %{}
           }
         ]
