@@ -56,6 +56,7 @@ defmodule Robotica.Supervisor do
        host: opts.mqtt.host,
        port: opts.mqtt.port,
        ssl: true,
+       force_ping: true,
        protocol_version: 5,
        client_id: client_id,
        keepalive: 30,
