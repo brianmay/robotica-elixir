@@ -110,7 +110,9 @@ defmodule RoboticaUi.RootManager do
       end
 
     if old_scene != new_scene do
-      ViewPort.set_root(:main_viewport, required_scene)
+      {:ok, viewport} = Scenic.ViewPort.info(:main_viewport)
+      {scene, args} = required_scene
+      ViewPort.set_root(viewport, scene, args)
     end
 
     if old_scene == :screen_off and new_scene != :screen_off do

@@ -120,12 +120,12 @@ defmodule Scenic.Clock.Components do
   # internal utilities
 
   defp add_to_graph(%Graph{} = g, mod, data, options) do
-    mod.verify!(data)
+    mod.validate(data)
     mod.add_to_graph(g, data, options)
   end
 
   defp modify(%Primitive{module: Primitive.SceneRef} = p, mod, data, options) do
-    mod.verify!(data)
+    mod.validate(data)
     Primitive.put(p, {mod, data}, options)
   end
 end

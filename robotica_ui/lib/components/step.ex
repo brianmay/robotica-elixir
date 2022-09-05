@@ -1,20 +1,23 @@
 defmodule RoboticaUi.Components.Step do
   @moduledoc false
+  @font :roboto
+  @font_size 16
 
   use Scenic.Component
 
+  # alias Scenic.Assets.Static
   alias Scenic.Graph
   import Scenic.Primitives
 
   alias Robotica.Types.ScheduledStep
 
-  def verify(%ScheduledStep{} = step), do: {:ok, step}
-  def verify(_), do: :invalid_data
+  def validate(%ScheduledStep{} = step), do: {:ok, step}
+  def validate(_), do: :invalid_data
 
   @timezone Application.compile_env(:robotica_common, :timezone)
-  @graph Graph.build(styles: %{}, font_size: 20)
+  @graph Graph.build(styles: %{}, font: @font, font_size: @font_size)
 
-  defp date_time_to_local(dt) do
+  def date_time_to_local(dt) do
     {:ok, local_dt} = DateTime.shift_zone(dt, @timezone)
     {:ok, local_now} = DateTime.shift_zone(DateTime.utc_now(), @timezone)
 
@@ -41,32 +44,46 @@ defmodule RoboticaUi.Components.Step do
       |> Enum.join(", ")
 
     @graph
-    |> rect({width, 40}, fill: background_color, translate: {0, 0})
+    |> rect({width, 40},
+      fill: background_color,
+      translate: {0, 0},
+      id: :btn,
+      input: :cursor_button
+    )
     |> text(date_time_to_local(step.required_time), translate: {10, 30}, fill: foreground_color)
     |> text(text, translate: {110, 30}, fill: foreground_color)
   end
 
-  def init(step, opts) do
-    width = opts[:styles][:width]
+  def init(scene, step, opts) do
+    width = opts[:width]
     graph = draw(step, width)
 
-    {:ok, %{step: step, width: width}, push: graph}
+    scene =
+      scene
+      |> assign(step: step, width: width)
+      |> push_graph(graph)
+
+    {:ok, scene}
   end
 
-  def handle_input({:cursor_button, {:left, :press, 0, _click_pos}}, _context, state) do
-    graph = draw(state.step, state.width, :blue)
+  def handle_input({:cursor_button, {:btn_left, 1, _, _click_pos}}, _id, scene) do
+    {:ok, scene}
+    graph = draw(scene.assigns.step, scene.assigns.width, :blue)
+    scene = push_graph(scene, graph)
+
+    {:ok, scene}
     RoboticaUi.RootManager.reset_screensaver()
-    {:noreply, state, push: graph}
+    {:noreply, scene}
   end
 
-  def handle_input({:cursor_button, {:left, :release, 0, _click_pos}}, _context, state) do
-    send_event({:click, state.step})
+  def handle_input({:cursor_button, {:btn_left, 0, _, _click_pos}}, _id, scene) do
+    :ok = send_parent_event(scene, {:click, scene.assigns.step})
     RoboticaUi.RootManager.reset_screensaver()
-    {:noreply, state}
+    {:noreply, scene}
   end
 
-  def handle_input(_event, _context, state) do
+  def handle_input(_event, _, scene) do
     RoboticaUi.RootManager.reset_screensaver()
-    {:noreply, state}
+    {:noreply, scene}
   end
 end
