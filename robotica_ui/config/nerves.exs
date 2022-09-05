@@ -8,17 +8,11 @@ case Mix.target() do
     config :robotica_ui, :viewport, %{
       name: :main_viewport,
       size: {800, 480},
-      default_scene: {RoboticaUi.Scene.Schedule, nil},
+      default_scene: {RoboticaUi.Scene.Clock, nil},
       drivers: [
         %{
-          module: Scenic.Driver.Nerves.Rpi
-        },
-        %{
-          module: Scenic.Driver.Nerves.Touch,
-          opts: [
-            device: "raspberrypi-ts",
-            calibration: {{1, 0, 0}, {1, 0, 0}}
-          ]
+          module: Scenic.Driver.Local,
+          name: :main_driver
         }
       ]
     }

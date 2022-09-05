@@ -1,6 +1,5 @@
 defmodule RoboticaUi.MixProject do
   use Mix.Project
-  @target System.get_env("MIX_TARGET") || "host"
 
   def project do
     [
@@ -32,28 +31,8 @@ defmodule RoboticaUi.MixProject do
       {:robotica_common, path: "../robotica_common"},
       {:robotica, path: "../robotica"},
       {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.2.0", only: [:dev, :test], runtime: false}
-    ] ++ deps(@target)
-  end
-
-  # Specify target specific dependencies
-  defp deps("host") do
-    [
-      {:scenic_driver_glfw, "~> 0.10"}
-    ]
-  end
-
-  defp deps("rpi3") do
-    [
-      {:scenic_driver_nerves_rpi, "~> 0.10"},
-      {:scenic_driver_nerves_touch, "~> 0.10"}
-    ]
-  end
-
-  defp deps("rpi2") do
-    [
-      {:scenic_driver_nerves_rpi, "~> 0.10"},
-      {:scenic_driver_nerves_touch, "~> 0.10"}
+      {:dialyxir, "~> 1.2.0", only: [:dev, :test], runtime: false},
+      {:scenic_driver_local, "~> 0.10"}
     ]
   end
 

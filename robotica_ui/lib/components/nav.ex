@@ -3,23 +3,16 @@ defmodule RoboticaUi.Components.Nav do
 
   use Scenic.Component
 
-  alias Scenic.Cache.Static.Texture
   alias Scenic.Graph
 
   import Scenic.Primitives
   import Scenic.Clock.Components
 
-  def verify(tab) when is_atom(tab), do: {:ok, tab}
-  def verify(_), do: :invalid_data
+  def validate(tab) when is_atom(tab), do: {:ok, tab}
+  def validate(_), do: :invalid_data
 
   # build the path to the static asset file (compile time)
   @timezone Application.compile_env(:robotica_common, :timezone)
-  @schedule_path :code.priv_dir(:robotica_ui) |> Path.join("/static/images/schedule.png")
-  @local_path :code.priv_dir(:robotica_ui) |> Path.join("/static/images/local.png")
-
-  # pre-compute the hash (compile time)
-  @schedule_hash Scenic.Cache.Support.Hash.file!(@schedule_path, :sha)
-  @local_hash Scenic.Cache.Support.Hash.file!(@local_path, :sha)
 
   @scenes [
     {:clock, {0, 0}},
@@ -39,13 +32,7 @@ defmodule RoboticaUi.Components.Nav do
          |> line({{0, 200}, {100, 200}}, stroke: {1, :red})
          |> line({{0, 300}, {100, 300}}, stroke: {1, :red})
 
-  def init(tab, opts) do
-    schedule_path = :code.priv_dir(:robotica_ui) |> Path.join("/static/images/schedule.png")
-    local_path = :code.priv_dir(:robotica_ui) |> Path.join("/static/images/local.png")
-
-    Texture.load(schedule_path, @schedule_hash, scope: :global)
-    Texture.load(local_path, @local_hash, scope: :global)
-
+  def init(scene, tab, _opts) do
     scenes = Enum.filter(@scenes, fn {scene_tab, _} -> scene_tab == tab end)
 
     icon_position =
@@ -59,13 +46,16 @@ defmodule RoboticaUi.Components.Nav do
       |> rect({100, 100}, fill: :red, translate: icon_position)
       |> analog_clock(radius: 40, translate: {50, 50}, timezone: @timezone)
       |> rect({80, 80}, fill: {:black, 0}, translate: {10, 10})
-      |> rect({80, 80}, fill: {:image, @schedule_hash}, translate: {10, 110})
-      |> rect({80, 80}, fill: {:image, @local_hash}, translate: {10, 210})
+      |> rect({80, 80}, fill: {:image, :schedule}, translate: {10, 110})
+      |> rect({80, 80}, fill: {:image, :local}, translate: {10, 210})
 
-    {:ok, %{graph: graph, viewport: opts[:viewport]}, push: graph}
+    scene = push_graph(scene, graph)
+
+    :ok = request_input(scene, :cursor_button)
+    {:ok, scene}
   end
 
-  def handle_input({:cursor_button, {:left, :press, 0, click_pos}}, _context, state) do
+  def handle_input({:cursor_button, {:btn_left, 0, _, click_pos}}, _, scene) do
     scenes = Enum.filter(@scenes, fn {_, icon_pos} -> in_bounding_box(click_pos, icon_pos) end)
 
     case scenes do
@@ -74,11 +64,11 @@ defmodule RoboticaUi.Components.Nav do
     end
 
     RoboticaUi.RootManager.reset_screensaver()
-    {:noreply, state}
+    {:noreply, scene}
   end
 
-  def handle_input(_event, _context, state) do
+  def handle_input(_event, _, scene) do
     RoboticaUi.RootManager.reset_screensaver()
-    {:noreply, state}
+    {:noreply, scene}
   end
 end

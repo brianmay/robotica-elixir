@@ -15,15 +15,15 @@ defmodule RoboticaUi.Scene.Local do
 
   require Logger
 
-  @graph Graph.build(font: :roboto, font_size: 24)
+  @graph Graph.build(font: :roboto, font_size: 16)
 
   # ============================================================================
   # setup
 
   # --------------------------------------------------------
-  def init(_, opts) do
-    viewport = opts[:viewport]
-    {:ok, %ViewPort.Status{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
+  def init(scene, _, _opts) do
+    viewport = scene.viewport
+    {:ok, %{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
 
     graph = @graph
     location = CommonConfig.ui_default_location()
@@ -89,30 +89,36 @@ defmodule RoboticaUi.Scene.Local do
 
     graph = Nav.add_to_graph(graph, :local)
 
-    {:ok, %{location: location, buttons: buttons, button_states: button_states, graph: graph},
-     push: graph}
+    scene =
+      scene
+      |> assign(location: location, buttons: buttons, button_states: button_states, graph: graph)
+      |> push_graph(graph)
+
+    :ok = request_input(scene, :cursor_button)
+    :ok = request_input(scene, :key)
+    {:ok, scene}
   end
 
-  def handle_cast({:mqtt, _, {button_id, label}, data}, state) do
-    state =
-      case Map.get(state.buttons, button_id) do
+  def handle_cast({:mqtt, _, {button_id, label}, data}, scene) do
+    scene =
+      case Map.get(scene.assigns.buttons, button_id) do
         nil ->
           Logger.error("Unknown button #{button_id}")
-          state
+          scene
 
         button ->
-          button_state = Map.get(state.button_states, button_id)
+          button_state = Map.get(scene.assigns.button_states, button_id)
 
           button_state = Robotica.Buttons.process_message(button, label, data, button_state)
 
-          button_states = Map.put(state.button_states, button_id, button_state)
+          button_states = Map.put(scene.assigns.button_states, button_id, button_state)
 
           display_state = Robotica.Buttons.get_display_state(button, button_state)
 
           controls = [:state_on, :state_off, :state_hard_off, :state_error, nil]
 
           graph =
-            Enum.reduce(controls, state.graph, fn control, graph ->
+            Enum.reduce(controls, scene.assigns.graph, fn control, graph ->
               Graph.modify(
                 graph,
                 {control, button_id},
@@ -120,34 +126,36 @@ defmodule RoboticaUi.Scene.Local do
               )
             end)
 
-          %{state | button_states: button_states, graph: graph}
+          scene
+          |> assign(button_states: button_states, graph: graph)
+          |> push_graph(graph)
       end
 
-    {:noreply, state, push: state.graph}
+    {:noreply, scene}
   end
 
-  def handle_input(_event, _context, state) do
+  def handle_input(_event, _context, scene) do
     RoboticaUi.RootManager.reset_screensaver()
-    {:noreply, state}
+    {:noreply, scene}
   end
 
-  def filter_event({:click, button}, _, state) do
+  def handle_event({:click, button}, _, scene) do
     RoboticaUi.RootManager.reset_screensaver()
 
-    state =
+    scene =
       case button do
         {_, button_id} ->
-          handle_command_press(button_id, state)
+          handle_command_press(button_id, scene)
 
         _ ->
-          state
+          scene
       end
 
-    {:halt, state, push: state.graph}
+    {:halt, scene}
   end
 
-  def handle_command_press(button_id, state) do
-    button = Map.get(state.buttons, button_id)
+  def handle_command_press(button_id, scene) do
+    button = Map.get(scene.assigns.buttons, button_id)
     Logger.info("robotica_ui: Got button press #{button.name}")
 
     case button do
@@ -155,10 +163,10 @@ defmodule RoboticaUi.Scene.Local do
         Logger.error("Unknown button #{inspect(button_id)}")
 
       button ->
-        button_state = Map.get(state.button_states, button_id)
+        button_state = Map.get(scene.assigns.button_states, button_id)
         Robotica.Buttons.execute_press_commands(button, button_state)
     end
 
-    state
+    scene
   end
 end

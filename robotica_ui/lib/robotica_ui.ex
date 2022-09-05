@@ -11,7 +11,7 @@ defmodule RoboticaUi do
 
     # start the application with the viewport
     children = [
-      {Scenic, viewports: [main_viewport_config]},
+      {Scenic, [main_viewport_config]},
       RoboticaUi.Execute,
       RoboticaUi.RootManager
     ]

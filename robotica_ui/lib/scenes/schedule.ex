@@ -15,13 +15,13 @@ defmodule RoboticaUi.Scene.Schedule do
   alias RoboticaUi.Components.Step
   alias RoboticaUi.Layout
 
-  @graph Graph.build(font: :roboto, font_size: 24)
+  @graph Graph.build(font: :roboto, font_size: 16)
 
   # ============================================================================
   # setup
 
   # --------------------------------------------------------
-  def init(_, opts) do
+  def init(scene, _, _opts) do
     schedule_host = CommonConfig.ui_schedule_hostname()
 
     RoboticaCommon.EventBus.notify(:subscribe, %{
@@ -33,8 +33,7 @@ defmodule RoboticaUi.Scene.Schedule do
     })
 
     schedule = []
-    viewport = opts[:viewport]
-    {:ok, %ViewPort.Status{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
+    {:ok, %{size: {vp_width, vp_height}}} = ViewPort.info(scene.viewport)
 
     empty_graph =
       @graph
@@ -47,13 +46,20 @@ defmodule RoboticaUi.Scene.Schedule do
       empty_graph
       |> update_schedule(schedule, vp_width)
 
-    {:ok, %{graph: graph, empty_graph: empty_graph, width: vp_width, height: vp_height},
-     push: graph}
+    scene =
+      scene
+      |> assign(graph: graph, empty_graph: empty_graph, width: vp_width, height: vp_height)
+      |> push_graph(graph)
+
+    :ok = request_input(scene, :cursor_button)
+    :ok = request_input(scene, :key)
+
+    {:ok, scene}
   end
 
-  def handle_input(_event, _context, state) do
+  def handle_input(_event, _context, scene) do
     RoboticaUi.RootManager.reset_screensaver()
-    {:noreply, state}
+    {:noreply, scene}
   end
 
   defp update_schedule(graph, steps, width) do
@@ -92,34 +98,41 @@ defmodule RoboticaUi.Scene.Schedule do
     |> line({{110, 40}, {width - 10, 40}}, stroke: {1, :red})
   end
 
-  def handle_cast({:mqtt, _, :schedule, schedule}, state) do
+  def handle_cast({:mqtt, _, :schedule, schedule}, scene) do
     case Schema.validate_scheduled_steps(schedule) do
       {:ok, steps} ->
         graph =
-          state.empty_graph
-          |> update_schedule(steps, state.width)
+          scene.assigns.empty_graph
+          |> update_schedule(steps, scene.assigns.width)
 
-        {:noreply, %{state | graph: graph}, push: graph}
+        scene =
+          scene
+          |> assign(graph: graph)
+          |> push_graph(graph)
+
+        {:noreply, scene}
 
       {:error, reason} ->
         Logger.error("Invalid schedule message received: #{inspect(reason)}.")
-        {:noreply, state}
+        {:noreply, scene}
     end
   end
 
-  def filter_event({:click, step}, _, state) do
+  def handle_event({:click, step}, _, scene) do
     graph =
       @graph
       |> Marks.add_to_graph(step,
         translate: {10, 10},
-        width: state.width - 20,
-        height: state.height - 20
+        width: scene.assigns.width - 20,
+        height: scene.assigns.height - 20
       )
 
-    {:halt, state, push: graph}
+    scene = push_graph(scene, graph)
+    {:halt, scene}
   end
 
-  def filter_event({:done, _step}, _, state) do
-    {:halt, state, push: state.graph}
+  def handle_event({:done, _step}, _, scene) do
+    scene = push_graph(scene, scene.assigns.graph)
+    {:halt, scene}
   end
 end

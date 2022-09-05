@@ -18,9 +18,9 @@ defmodule RoboticaUi.Scene.Clock do
   # setup
 
   # --------------------------------------------------------
-  def init(_, opts) do
-    viewport = opts[:viewport]
-    {:ok, %ViewPort.Status{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
+  def init(scene, _, _opts) do
+    viewport = scene.viewport
+    {:ok, %{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
 
     ul_margin_x = 110
     ul_margin_y = 10
@@ -48,17 +48,20 @@ defmodule RoboticaUi.Scene.Clock do
       )
       |> Nav.add_to_graph(:clock)
 
-    {:ok, %{}, push: graph}
+    scene = push_graph(scene, graph)
+    :ok = request_input(scene, :cursor_button)
+    :ok = request_input(scene, :key)
+    {:ok, scene}
   end
 
-  def handle_input(_event, _context, state) do
+  def handle_input(_event, _context, scene) do
     RoboticaUi.RootManager.reset_screensaver()
-    {:noreply, state}
+    {:noreply, scene}
   end
 
-  def filter_event({:click, _button}, _, state) do
+  def handle_event({:click, _button}, _, scene) do
     RoboticaUi.RootManager.reset_screensaver()
 
-    {:halt, state}
+    {:halt, scene}
   end
 end

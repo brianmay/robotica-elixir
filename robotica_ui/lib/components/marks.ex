@@ -11,8 +11,8 @@ defmodule RoboticaUi.Components.Marks do
   alias Robotica.Mark
   alias Robotica.Types.ScheduledStep
 
-  def verify(%ScheduledStep{} = step), do: {:ok, step}
-  def verify(_), do: :invalid_data
+  def validate(%ScheduledStep{} = step), do: {:ok, step}
+  def validate(_), do: :invalid_data
 
   @graph Graph.build(styles: %{}, font_size: 20)
   @timezone Application.compile_env(:robotica_common, :timezone)
@@ -22,9 +22,9 @@ defmodule RoboticaUi.Components.Marks do
     Timex.format!(local_dt, "%F %T", :strftime)
   end
 
-  def init(step, opts) do
-    width = opts[:styles][:width]
-    height = opts[:styles][:height]
+  def init(scene, step, opts) do
+    width = opts[:width]
+    height = opts[:height]
 
     text = ScheduledStep.step_to_text(step) |> Enum.join(", ")
     locations = ScheduledStep.step_to_locations(step)
@@ -62,10 +62,15 @@ defmodule RoboticaUi.Components.Marks do
         id: :btn_close
       )
 
-    {:ok, %{graph: graph, viewport: opts[:viewport], step: step}, push: graph}
+    scene =
+      scene
+      |> assign(graph: graph, step: step)
+      |> push_graph(graph)
+
+    {:ok, scene}
   end
 
-  def filter_event({:click, id}, _, state) do
+  def handle_event({:click, id}, _, scene) do
     RoboticaUi.RootManager.reset_screensaver()
 
     new_mark =
@@ -77,15 +82,16 @@ defmodule RoboticaUi.Components.Marks do
       end
 
     if not is_nil(new_mark) do
-      Mark.mark_task(state.step, new_mark)
+      Mark.mark_task(scene.assigns.step, new_mark)
     end
 
-    send_event({:done, state.step})
-    {:halt, state}
+    :ok = send_parent_event(scene, {:done, scene.assigns.step})
+
+    {:halt, scene}
   end
 
-  def handle_input(_event, _context, state) do
+  def handle_input(_event, _context, scene) do
     RoboticaUi.RootManager.reset_screensaver()
-    {:noreply, state}
+    {:noreply, scene}
   end
 end

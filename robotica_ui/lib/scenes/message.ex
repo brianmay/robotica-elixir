@@ -15,11 +15,11 @@ defmodule RoboticaUi.Scene.Message do
   # setup
 
   # --------------------------------------------------------
-  def init(params, opts) do
+  def init(scene, params, opts) do
     message = Keyword.get(params, :text)
 
-    viewport = opts[:viewport]
-    {:ok, %ViewPort.Status{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
+    viewport = scene.viewport
+    {:ok, %{size: {vp_width, vp_height}}} = ViewPort.info(viewport)
 
     x = vp_width / 2
     y = vp_height / 2
@@ -29,12 +29,15 @@ defmodule RoboticaUi.Scene.Message do
       |> Layout.add_background(vp_width, vp_height)
       |> text(message, id: :text, text_align: :center, translate: {x, y})
 
-    {:ok, %{}, push: graph}
+    scene = push_graph(scene, graph)
+    :ok = request_input(scene, :cursor_button)
+    :ok = request_input(scene, :key)
+    {:ok, scene}
   end
 
-  def handle_input(_event, _context, state) do
+  def handle_input(_event, _context, scene) do
     RoboticaUi.RootManager.reset_screensaver()
     RoboticaUi.RootManager.set_priority_scene(nil)
-    {:noreply, state}
+    {:noreply, scene}
   end
 end
