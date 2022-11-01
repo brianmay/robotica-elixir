@@ -51,7 +51,7 @@ defmodule RoboticaUi.Scene.Local do
 
             graph =
               add_button(graph, button.name, {:state_hard_off, button.id}, x, y,
-                theme: :dark,
+                theme: :info,
                 hidden: true
               )
 
