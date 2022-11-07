@@ -6,5 +6,6 @@
         "Nonterminals",
         "parens",
         "Rootsymbol"
-    ]
+    ],
+    "cmake.configureOnOpen": false
 }
