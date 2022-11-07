@@ -15,7 +15,7 @@ defmodule RoboticaUi.Scene.Message do
   # setup
 
   # --------------------------------------------------------
-  def init(scene, params, opts) do
+  def init(scene, params, _opts) do
     message = Keyword.get(params, :text)
 
     viewport = scene.viewport
