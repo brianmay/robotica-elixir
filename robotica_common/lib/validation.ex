@@ -108,27 +108,21 @@ defmodule RoboticaCommon.Validation do
       Enum.map(schema, fn {k, v} -> {schema_key_to_data_key(k), v} end)
       |> Enum.into(%{})
 
-    data_keys = MapSet.new(Map.keys(data))
-    schema_keys = MapSet.new(Map.keys(remapped_schema))
-    unwanted_keys = MapSet.difference(data_keys, schema_keys)
+    # Remove data keys not in schema.
+    data = Map.take(data, Map.keys(remapped_schema))
 
-    if MapSet.size(unwanted_keys) == 0 do
-      schema = Map.to_list(schema)
+    schema = Map.to_list(schema)
 
-      case validate_kwlist(data, schema, struct_type) do
-        {:ok, result} ->
-          if is_nil(struct_type) do
-            {:ok, result}
-          else
-            {:ok, struct(struct_type, result)}
-          end
+    case validate_kwlist(data, schema, struct_type) do
+      {:ok, result} ->
+        if is_nil(struct_type) do
+          {:ok, result}
+        else
+          {:ok, struct(struct_type, result)}
+        end
 
-        {:error, err} ->
-          {:error, err}
-      end
-    else
-      {:error,
-       "Map #{inspect(data)} of type #{inspect(struct_type)} has keys #{inspect(unwanted_keys)} that are not supported"}
+      {:error, err} ->
+        {:error, err}
     end
   end
 
