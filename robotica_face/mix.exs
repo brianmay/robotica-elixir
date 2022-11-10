@@ -45,7 +45,7 @@ defmodule RoboticaFace.MixProject do
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
-      {:plug_cowboy, "~> 2.5.1"},
+      {:plug_cowboy, "~> 2.6.0"},
       {:ranch, "~> 2.0", override: true},
       {:timex, "~> 3.6"},
       {:robotica_common, path: "../robotica_common"},
