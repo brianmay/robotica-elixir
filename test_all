@@ -8,7 +8,7 @@ export MIX_ENV=test
 
 . ./.envrc.test
 
-for i in robotica_common robotica robotica_face robotica_ui robotica_nerves robotica_docker; do
+for i in robotica_common robotica robotica_face robotica_nerves robotica_docker; do
     (
         echo "----- $i -----"
         cd $i
