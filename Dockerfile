@@ -2,7 +2,7 @@
 # This should match the version of Alpine that the `elixir:1.7.2-alpine` image uses
 ARG ALPINE_VERSION=3.16
 
-FROM elixir:1.13.3-alpine AS builder
+FROM elixir:1.14.1-alpine AS builder
 
 # The version of the application we are building (required)
 ARG APP_VSN=0.1.0
