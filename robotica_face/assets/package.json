@@ -20,7 +20,7 @@
     "webpack-cli": "^5.0.0",
     "node-sass": "^8.0.0",
     "sass-loader": "^13.2.0",
-    "bootstrap": "^5.2.2",
+    "bootstrap": "^5.2.3",
     "@popperjs/core": "^2.11.6"
   },
   "engines": {
