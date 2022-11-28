@@ -50,6 +50,7 @@ jobs:
     uses: brianmay/workflows/.github/workflows/docker.yaml@main
     secrets:
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_SECRET: ${{ secrets.DEPLOY_SECRET }}
     needs:
       - robotica_common
       - robotica
