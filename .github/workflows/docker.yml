@@ -11,7 +11,7 @@ jobs:
       build_npm_assets: false
       directory: "robotica_common"
       mix_cache_postfix: ""
-      plts_cache_postfix: "-2"
+      plts_cache_postfix: "-3"
 
   robotica:
     uses: brianmay/workflows/.github/workflows/elixir.yaml@main
