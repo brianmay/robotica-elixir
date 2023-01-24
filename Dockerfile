@@ -29,7 +29,6 @@ RUN apk update && \
 
 # This installs the dependancies
 COPY robotica_common/mix.exs robotica_common/mix.lock /opt/robotica_common/
-COPY robotica_face/mix.exs robotica_face/mix.lock /opt/robotica_face/
 COPY robotica/mix.exs robotica/mix.lock /opt/robotica/
 COPY robotica_docker/mix.exs robotica_docker/mix.lock /opt/robotica_docker/
 RUN mix deps.get --only prod
@@ -38,27 +37,11 @@ RUN mix deps.get --only prod
 COPY robotica_common/config /opt/robotica_common/config/
 COPY robotica_common/lib /opt/robotica_common/lib/
 COPY robotica_common/src /opt/robotica_common/src/
-COPY robotica_face/config /opt/robotica_face/config/
-COPY robotica_face/lib /opt/robotica_face/lib/
 COPY robotica/config /opt/robotica/config/
 COPY robotica/lib /opt/robotica/lib/
 COPY robotica_docker/config /opt/robotica_docker/config/
 COPY robotica_docker/lib /opt/robotica_docker/lib/
 RUN mix deps.compile
-
-# Build phoenix stuff
-# Note mix phx.digest won't work unless app is compiled.
-# We compile in test to reduce the external dependancies required.
-COPY config/*.sample /opt/config/
-RUN cd /opt/robotica_face && MIX_ENV=test mix deps.get
-RUN cd /opt/robotica_face && MIX_ENV=test mix compile
-COPY robotica_face/assets /opt/robotica_face/assets/
-RUN \
-  cd /opt/robotica_face/assets && \
-  npm install && \
-  npm run deploy && \
-  cd .. && \
-  MIX_ENV=test mix phx.digest;
 
 # Setup access to version information
 ARG BUILD_DATE=date

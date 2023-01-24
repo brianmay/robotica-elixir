@@ -28,7 +28,6 @@ defmodule RoboticaDocker.MixProject do
     [
       {:robotica, path: "../robotica"},
       {:robotica_common, path: "../robotica_common"},
-      {:robotica_face, path: "../robotica_face"},
       {:libcluster, "~> 3.3"},
       {:cowlib, "~> 2.11", override: true},
       {:gun, "~> 1.3", override: true},

@@ -29,14 +29,6 @@ jobs:
 #      mix_cache_postfix: ""
 #      plts_cache_postfix: "-2"
 
-  robotica_face:
-    uses: brianmay/workflows/.github/workflows/elixir.yaml@main
-    with:
-      build_npm_assets: true
-      directory: "robotica_face"
-      mix_cache_postfix: ""
-      plts_cache_postfix: "-2"
-
   robotica_docker:
     uses: brianmay/workflows/.github/workflows/elixir.yaml@main
     with:
@@ -54,5 +46,4 @@ jobs:
     needs:
       - robotica_common
       - robotica
-      - robotica_face
       - robotica_docker

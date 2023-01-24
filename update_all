@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 export MIX_ENV=test
 export BUILD_WITHOUT_QUIC=true
 
-for i in robotica_common robotica robotica_face robotica_ui; do
+for i in robotica_common robotica robotica_ui; do
     (
         echo ""
         echo "----- $i -----"
@@ -33,15 +33,4 @@ for i in robotica_nerves robotica_docker; do
             mix compile
         )
     done
-done
-
-for i in robotica_face; do
-    (
-        echo ""
-        echo "----- $i -----"
-        cd $i
-        npm install --prefix assets
-        npm run deploy --prefix assets
-        mix phx.digest
-    )
 done

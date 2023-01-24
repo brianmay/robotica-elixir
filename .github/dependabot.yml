@@ -36,47 +36,6 @@ updates:
     time: "19:00"
   open-pull-requests-limit: 10
 - package-ecosystem: mix
-  directory: "/robotica_face"
-  schedule:
-    interval: daily
-    time: "19:00"
-  open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: timex
-    versions:
-    - 3.7.1
-  - dependency-name: phoenix_live_view
-    versions:
-    - 0.15.4
-- package-ecosystem: npm
-  directory: "/robotica_face/assets"
-  schedule:
-    interval: daily
-    time: "19:00"
-  open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: "@babel/core"
-    versions:
-    - 7.12.13
-    - 7.12.17
-    - 7.13.1
-    - 7.13.16
-  - dependency-name: mini-css-extract-plugin
-    versions:
-    - 1.5.0
-  - dependency-name: "@babel/preset-env"
-    versions:
-    - 7.12.16
-    - 7.13.15
-    - 7.13.5
-    - 7.13.8
-  - dependency-name: css-loader
-    versions:
-    - 5.1.2
-  - dependency-name: autoprefixer
-    versions:
-    - 10.2.5
-- package-ecosystem: mix
   directory: "/robotica_nerves"
   schedule:
     interval: daily

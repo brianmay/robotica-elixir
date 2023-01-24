@@ -9,7 +9,6 @@ automatic schedule.
 * LICENSE README.html README.md: documentation.
 * robotica_common: common shared code.
 * robotica: base library for scheduling and interacting with devices.
-* robotica_face: Web based interface.
 * robotica_nerves: Deployment for RPI3.
 * robotica_ui: Scenic based User Interface.
 
@@ -62,15 +61,6 @@ Follow the following steps:
 
 5. Setup required config files. Look at config directory. Copy files ending with
    `.sample` to `.yaml` extensions and edit as required.
-
-6. Build JavaScript stuff:
-
-    ```
-    cd robotica_face
-    mix deps.get
-    npm install
-    cd ../..
-    ```
 
 7. Configure nerves:
 

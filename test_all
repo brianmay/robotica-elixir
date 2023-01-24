@@ -8,7 +8,7 @@ export MIX_ENV=test
 
 . ./.envrc.test
 
-for i in robotica_common robotica robotica_face robotica_nerves robotica_docker; do
+for i in robotica_common robotica robotica_nerves robotica_docker; do
     (
         echo "----- $i -----"
         cd $i
@@ -19,13 +19,5 @@ for i in robotica_common robotica robotica_face robotica_nerves robotica_docker;
         mix test
         mkdir -p priv/plts
         mix dialyzer
-    )
-done
-
-for i in robotica_face; do
-    (
-        echo "----- $i -----"
-        cd $i
-        npm install --prefix assets
     )
 done

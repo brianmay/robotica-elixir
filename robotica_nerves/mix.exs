@@ -30,7 +30,6 @@ defmodule RoboticaNerves.MixProject do
         :runtime_tools,
         :robotica_common,
         :robotica,
-        :robotica_face,
         :robotica_ui
       ]
     ]
@@ -66,7 +65,6 @@ defmodule RoboticaNerves.MixProject do
       {:robotica, path: "../robotica"},
       {:robotica_common, path: "../robotica_common"},
       {:robotica_ui, path: "../robotica_ui"},
-      {:robotica_face, path: "../robotica_face"},
       {:cowlib, "~> 2.11", override: true},
       {:gun, "~> 1.3", override: true},
       {:phoenix_live_reload, "~> 1.2", only: :dev},

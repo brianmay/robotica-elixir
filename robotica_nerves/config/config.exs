@@ -28,7 +28,6 @@ config :logger, backends: [RingLogger]
 
 import_config "../../robotica/config/config.exs"
 
-import_config "../../robotica_face/config/common.exs"
 import_config "../../robotica_ui/config/common.exs"
 
 if Mix.target() == :host or Mix.target() == :"" do
@@ -38,5 +37,4 @@ else
 end
 
 import_config "../../robotica_common/config/nerves.exs"
-import_config "../../robotica_face/config/nerves.exs"
 import_config "../../robotica_ui/config/nerves.exs"

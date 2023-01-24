@@ -19,7 +19,6 @@ config :shoehorn,
     :robotica_nerves,
     :robotica_common,
     :robotica,
-    :robotica_face,
     :robotica_ui
   ],
   app: Mix.Project.config()[:app]
