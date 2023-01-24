@@ -19,7 +19,7 @@ for i in robotica_common robotica robotica_ui; do
     )
 done
 
-for i in robotica_nerves robotica_docker; do
+for i in robotica_nerves; do
     for target in host rpi3; do
         export MIX_TARGET="$target"
         (
