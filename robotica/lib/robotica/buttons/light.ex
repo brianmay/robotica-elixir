@@ -115,6 +115,7 @@ defmodule Robotica.Buttons.Light do
       %Robotica.Types.CommandTask{
         topic: "command/#{config.location}/#{config.device}",
         payload_json: %{
+          "type" => "light",
           "scene" => config.params["scene"],
           "priority" => config.params["priority"]
         },
@@ -129,6 +130,7 @@ defmodule Robotica.Buttons.Light do
       %Robotica.Types.CommandTask{
         topic: "command/#{config.location}/#{config.device}",
         payload_json: %{
+          "type" => "light",
           "action" => "turn_off",
           "scene" => config.params["scene"],
           "priority" => config.params["priority"]

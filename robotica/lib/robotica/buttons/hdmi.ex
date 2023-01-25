@@ -48,6 +48,7 @@ defmodule Robotica.Buttons.HDMI do
       %Robotica.Types.CommandTask{
         topic: "command/#{config.location}/#{config.device}",
         payload_json: %{
+          "type" => "hdmi",
           "input" => config.params["input"],
           "output" => config.params["output"]
         },

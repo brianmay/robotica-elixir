@@ -46,6 +46,7 @@ defmodule Robotica.Buttons.Switch do
       %Robotica.Types.CommandTask{
         topic: "command/#{config.location}/#{config.device}",
         payload_json: %{
+          "type" => "device",
           "action" => "turn_on"
         },
         qos: 1
@@ -59,6 +60,7 @@ defmodule Robotica.Buttons.Switch do
       %Robotica.Types.CommandTask{
         topic: "command/#{config.location}/#{config.device}",
         payload_json: %{
+          "type" => "device",
           "action" => "turn_off"
         },
         qos: 1

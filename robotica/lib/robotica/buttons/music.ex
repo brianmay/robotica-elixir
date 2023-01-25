@@ -47,6 +47,7 @@ defmodule Robotica.Buttons.Music do
       %Robotica.Types.CommandTask{
         topic: "command/#{config.location}/#{config.device}",
         payload_json: %{
+          "type" => "audio",
           "music" => %{"play_list" => play_list}
         },
         qos: 1
@@ -60,6 +61,7 @@ defmodule Robotica.Buttons.Music do
       %Robotica.Types.CommandTask{
         topic: "command/#{config.location}/#{config.device}",
         payload_json: %{
+          "type" => "audio",
           "music" => %{
             "stop" => true
           }
