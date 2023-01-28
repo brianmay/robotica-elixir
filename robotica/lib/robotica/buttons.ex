@@ -40,6 +40,7 @@ defmodule Robotica.Buttons do
 
   @spec get_button_controller(Config.t()) :: module()
   def get_button_controller(%Config{type: "light"}), do: Robotica.Buttons.Light
+  def get_button_controller(%Config{type: "light2"}), do: Robotica.Buttons.Light2
   def get_button_controller(%Config{type: "music"}), do: Robotica.Buttons.Music
   def get_button_controller(%Config{type: "hdmi"}), do: Robotica.Buttons.HDMI
   def get_button_controller(%Config{type: "switch"}), do: Robotica.Buttons.Switch
