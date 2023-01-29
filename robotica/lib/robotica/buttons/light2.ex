@@ -14,16 +14,16 @@ defmodule Robotica.Buttons.Light2 do
   def get_topics(%Config{} = config) do
     [
       {"state/#{config.location}/#{config.device}/scene", :raw, :scene},
-      {"state/#{config.location}/#{config.device}/status", :json, :status}
+      {"state/#{config.location}/#{config.device}/power", :json, :power}
     ]
   end
 
   @spec process_message(Config.t(), atom(), any(), state) :: state
-  def process_message(%Config{}, :scene, data, {_scene, status}) do
-    {data, status}
+  def process_message(%Config{}, :scene, data, {_scene, power}) do
+    {data, power}
   end
 
-  def process_message(%Config{}, :status, data, {scene, _status}) do
+  def process_message(%Config{}, :power, data, {scene, _power}) do
     {scene, data}
   end
 
@@ -33,20 +33,26 @@ defmodule Robotica.Buttons.Light2 do
   end
 
   @spec get_display_state(Config.t(), state) :: Buttons.display_state()
-  def get_display_state(%Config{action: "turn_on"} = config, {scene, status}) do
+  def get_display_state(%Config{action: "turn_on"} = config, {scene, power}) do
     scene_selected = config.params["scene"] == scene
 
-    case status do
+    case power do
       nil ->
         nil
 
-      %{"offline" => _} ->
+      "offline" ->
         :state_hard_off
 
-      %{"online" => _} when scene_selected ->
+      "on" when scene_selected ->
         :state_on
 
-      %{"online" => _} when not scene_selected ->
+      "off" when scene_selected ->
+        :state_on
+
+      "on" when not scene_selected ->
+        :state_off
+
+      "off" when not scene_selected ->
         :state_off
 
       _ ->
@@ -54,20 +60,26 @@ defmodule Robotica.Buttons.Light2 do
     end
   end
 
-  def get_display_state(%Config{action: "turn_off"} = _config, {scene, status}) do
+  def get_display_state(%Config{action: "turn_off"} = _config, {scene, power}) do
     scene_selected = "off" == scene
 
-    case status do
+    case power do
       nil ->
         nil
 
-      %{"offline" => _} ->
+      "offline" ->
         :state_hard_off
 
-      %{"online" => _} when scene_selected ->
+      "on" when scene_selected ->
         :state_on
 
-      %{"online" => _} when not scene_selected ->
+      "off" when scene_selected ->
+        :state_on
+
+      "on" when not scene_selected ->
+        :state_off
+
+      "off" when not scene_selected ->
         :state_off
 
       _ ->
@@ -75,20 +87,26 @@ defmodule Robotica.Buttons.Light2 do
     end
   end
 
-  def get_display_state(%Config{action: "toggle"} = config, {scene, status}) do
+  def get_display_state(%Config{action: "toggle"} = config, {scene, power}) do
     scene_selected = config.params["scene"] == scene
 
-    case status do
+    case power do
       nil ->
         nil
 
-      %{"offline" => _} ->
+      "offline" ->
         :state_hard_off
 
-      %{"online" => _} when scene_selected ->
+      "on" when scene_selected ->
         :state_on
 
-      %{"online" => _} when not scene_selected ->
+      "off" when scene_selected ->
+        :state_on
+
+      "on" when not scene_selected ->
+        :state_off
+
+      "off" when not scene_selected ->
         :state_off
 
       _ ->
