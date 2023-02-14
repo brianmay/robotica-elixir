@@ -10,6 +10,7 @@ defmodule Robotica.Plugins.Audio do
 
   import Robotica.Types
   alias Robotica.Types.Task
+  alias Robotica.Types.SubTask
   alias RoboticaCommon.Strings
 
   defmodule Commands do
@@ -49,7 +50,8 @@ defmodule Robotica.Plugins.Audio do
     @type t :: %__MODULE__{
             commands: Commands.t(),
             sounds: %{required(String.t()) => String.t()},
-            volumes: %{required(atom()) => integer}
+            volumes: %{required(atom()) => integer},
+            targets: %{required(String.t()) => String.t()}
           }
     @enforce_keys [:commands, :sounds, :volumes]
     defstruct commands: %Commands{
@@ -63,7 +65,8 @@ defmodule Robotica.Plugins.Audio do
                 music_resume: nil
               },
               sounds: %{},
-              volumes: %{}
+              volumes: %{},
+              targets: %{}
   end
 
   defmodule State do
@@ -138,7 +141,8 @@ defmodule Robotica.Plugins.Audio do
       struct_type: Config,
       commands: {commands(), true},
       sounds: {sounds(), true},
-      volumes: {volumes(), true}
+      volumes: {volumes(), true},
+      targets: {{:map, :string, :string}, false}
     }
   end
 
@@ -407,9 +411,9 @@ defmodule Robotica.Plugins.Audio do
           %State{state | volumes: volume}
       end
 
-    execute_tasks(command.pre_tasks)
+    execute_tasks(state, command.pre_tasks)
     handle_execute(state, command)
-    execute_tasks(command.post_tasks)
+    execute_tasks(state, command.post_tasks)
 
     state
   end
@@ -431,12 +435,16 @@ defmodule Robotica.Plugins.Audio do
     {:noreply, state}
   end
 
-  @spec execute_tasks(tasks :: list(Task.t()) | nil) :: :ok
-  def execute_tasks(nil), do: :ok
+  @spec execute_tasks(Robotica.Plugins.Audio.State.t(), tasks :: list(Task.t()) | nil) :: :ok
+  def execute_tasks(%State{} = _state, nil), do: :ok
 
-  def execute_tasks(tasks) do
+  def execute_tasks(%State{} = state, tasks) do
+    IO.inspect(state.config)
+
     tasks
-    |> Enum.map(&Task.normalize/1)
+    |> IO.inspect()
+    |> Enum.map(fn task -> SubTask.to_task(task, state.config.targets) end)
+    |> IO.inspect()
     |> Robotica.Executor.execute_tasks()
   end
 end

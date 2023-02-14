@@ -107,8 +107,19 @@ defmodule Robotica.Schema do
       title: {:string, false},
       message: {:string, false},
       volume: {volume_action_schema(), false},
-      pre_tasks: {{:list, task_schema()}, false},
-      post_tasks: {{:list, task_schema()}, false}
+      pre_tasks: {{:list, sub_task_schema()}, false},
+      post_tasks: {{:list, sub_task_schema()}, false}
+    }
+  end
+
+  def sub_task_schema do
+    %{
+      struct_type: Robotica.Types.SubTask,
+      description: {:string, false},
+      payload_str: {:string, false},
+      payload_json: {{:map, :string, :any}, false},
+      qos: {:integer, false},
+      target: {:string, true}
     }
   end
 

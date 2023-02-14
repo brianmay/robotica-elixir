@@ -167,6 +167,42 @@ defmodule Robotica.Types do
     end
   end
 
+  defmodule SubTask do
+    @moduledoc """
+    A nested task inside a Task
+    """
+    # @derive Jason.Encoder
+    @type t :: %__MODULE__{
+            description: list(String.t()) | nil,
+            target: String.t() | nil,
+            qos: list(integer()) | nil,
+            payload_str: String.t(),
+            payload_json: map() | nil
+          }
+    @enforce_keys [:target, :qos]
+    defstruct description: nil,
+              target: nil,
+              qos: nil,
+              payload_str: nil,
+              payload_json: %{}
+
+    def to_task(%__MODULE__{} = subtask, targets) do
+      topic = Map.get(targets, subtask.target, nil)
+      topics = if(topic != nil, do: [topic], else: [])
+
+      %Task{
+        # description: subtask.description,
+        locations: [],
+        devices: [],
+        topics: topics,
+        qos: subtask.qos,
+        payload_str: subtask.payload_str,
+        payload_json: subtask.payload_json
+      }
+      |> Task.normalize()
+    end
+  end
+
   defmodule CommandTask do
     @moduledoc """
     Defines a location, device, and a command to execute
