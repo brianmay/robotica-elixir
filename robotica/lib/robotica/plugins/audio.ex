@@ -9,8 +9,8 @@ defmodule Robotica.Plugins.Audio do
   require Logger
 
   import Robotica.Types
-  alias Robotica.Types.Task
   alias Robotica.Types.SubTask
+  alias Robotica.Types.Task
   alias RoboticaCommon.Strings
 
   defmodule Commands do
@@ -439,12 +439,8 @@ defmodule Robotica.Plugins.Audio do
   def execute_tasks(%State{} = _state, nil), do: :ok
 
   def execute_tasks(%State{} = state, tasks) do
-    IO.inspect(state.config)
-
     tasks
-    |> IO.inspect()
     |> Enum.map(fn task -> SubTask.to_task(task, state.config.targets) end)
-    |> IO.inspect()
     |> Robotica.Executor.execute_tasks()
   end
 end
