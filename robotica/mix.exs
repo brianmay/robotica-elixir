@@ -31,7 +31,7 @@ defmodule Robotica.MixProject do
       {:tp_link_hs100, git: "https://github.com/brianmay/tp_link_hs100.git"},
       {:finch, "~> 0.15.0"},
       {:robotica_common, path: "../robotica_common"},
-      {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.2.0", only: [:dev, :test], runtime: false}
     ]
   end
