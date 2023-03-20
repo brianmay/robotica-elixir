@@ -30,7 +30,7 @@ defmodule RoboticaUi.MixProject do
       {:timex, "~> 3.6"},
       {:robotica_common, path: "../robotica_common"},
       {:robotica, path: "../robotica"},
-      {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.2.0", only: [:dev, :test], runtime: false},
       {:scenic_driver_local, "~> 0.10"}
     ]
