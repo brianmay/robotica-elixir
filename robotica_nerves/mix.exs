@@ -67,7 +67,7 @@ defmodule RoboticaNerves.MixProject do
       {:robotica_ui, path: "../robotica_ui"},
       {:cowlib, "~> 2.11", override: true},
       {:gun, "~> 2.0", override: true},
-      {:credo, "~> 1.6.1", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.2.0", only: [:dev, :test], runtime: false}
     ]
   end
