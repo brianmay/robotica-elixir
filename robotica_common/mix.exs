@@ -29,7 +29,7 @@ defmodule RoboticaCommon.MixProject do
       {:jason, "~> 1.0"},
       {:yaml_elixir, "~> 2.9.0"},
       {:credo, "~> 1.7.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.2.0", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.3.0", only: [:dev, :test], runtime: false}
     ]
   end
 
