@@ -68,7 +68,7 @@ defmodule RoboticaNerves.MixProject do
       {:cowlib, "~> 2.11", override: true},
       {:gun, "~> 2.0", override: true},
       {:credo, "~> 1.7.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.2.0", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.3.0", only: [:dev, :test], runtime: false}
     ]
   end
 
