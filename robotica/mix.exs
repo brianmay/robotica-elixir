@@ -32,7 +32,7 @@ defmodule Robotica.MixProject do
       {:finch, "~> 0.15.0"},
       {:robotica_common, path: "../robotica_common"},
       {:credo, "~> 1.7.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.2.0", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.3.0", only: [:dev, :test], runtime: false}
     ]
   end
 
